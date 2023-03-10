@@ -64,3 +64,25 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
+
+model Court {
+  id          Int           @id @default(autoincrement())
+  covered     Boolean?      @default(false)
+  reservation Reservation[]
+}
+
+model Client {
+  id          Int           @id @default(autoincrement())
+  name        String
+  premium     Boolean?      @default(false)
+  reservation Reservation[]
+}
+
+model Reservation {
+  id       Int    @id @default(autoincrement())
+  client   Client @relation(fields: [clientId], references: [id])
+  Court    Court  @relation(fields: [courtId], references: [id])
+  clientId Int
+  courtId  Int
+  date     DateTime
+}
