@@ -5,7 +5,7 @@ import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
-import ClientCRUD from "~/components/ClientCRUD";
+import ItemCRUD from "~/components/ItemCRUD";
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -22,7 +22,7 @@ const Home: NextPage = () => {
           <h1 >
             Create T3 App
           </h1>
-          <ClientCRUD />
+          <ItemCRUD />
         </div>
       </main>
       <div className={styles.showcaseContainer}>
