@@ -4,15 +4,30 @@ import { api } from "~/utils/api";
 
 export default function ClientCRUD() {
   const utils = api.useContext();
+
   const clientQuery = api.clients.getAll.useQuery();
 
-  const clientMutation = api.clients.insertOne.useMutation({
+  const clientMutationAdd = api.clients.insertOne.useMutation({
     async onSuccess() {
       await utils.clients.invalidate()
     },
   })
 
-  const emptyClient: Client = { id: -1, Name: "", Premium: false };
+  const clientMutationDelete = api.clients.deleteOne.useMutation({
+    async onSuccess() {
+      await utils.clients.invalidate()
+    },
+  })
+
+  function sendToDB(client: Client) {
+    clientMutationAdd.mutate(client);
+  }
+
+  function deleteClient(id: number) {
+    clientMutationDelete.mutate(id);
+  }
+
+  const emptyClient: Client = { id: -1, name: "", premium: false };
   const [client, setClient] = useState<Client>(emptyClient);
 
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
@@ -22,7 +37,7 @@ export default function ClientCRUD() {
   }
 
   const handleCheckboxChange = () => {
-    setClient(values => ({ ...values, Premium: !values.Premium }))
+    setClient(values => ({ ...values, premium: !values.premium }))
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -32,23 +47,24 @@ export default function ClientCRUD() {
     setClient(emptyClient);
   }
 
-  function sendToDB(client: Client) {
-    clientMutation.mutate(client);
-    // await api.client.getAll.;
-  }
+
 
   return (
     <>
       <ul>
-        {clientQuery.data?.map((client: Client, index: number) => {
+        {clientQuery.data?.map((client: Client) => {
           return (
-            <li key={index}>
-              <p>
-                name: {client.Name}
-                <br />
-                premium: {client.Premium ? "yes" : "no"}
-              </p>
-            </li>
+            <>
+              <li key={client.id}>
+                <p>
+                  name: {client.name}
+                  <br />
+                  premium: {client.premium ? "yes" : "no"}
+                  <br />
+                </p>
+              </li>
+              <button onClick={() => deleteClient(client.id)}>Delete</button>
+            </>
           )
         })}
       </ul>
@@ -57,7 +73,7 @@ export default function ClientCRUD() {
           <input
             type="text"
             name={Object.keys(client)[1]}
-            value={client.Name || ""}
+            value={client.name || ""}
             onChange={(event) => handleChange(event)}
           />
         </label>
@@ -66,7 +82,7 @@ export default function ClientCRUD() {
             type="checkbox"
             name={Object.keys(client)[2]}
             value="premium"
-            checked={client.Premium || false}
+            checked={client.premium || false}
             onChange={() => handleCheckboxChange()}
           />
         </label>

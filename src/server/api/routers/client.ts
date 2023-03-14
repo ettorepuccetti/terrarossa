@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, protectedProcedure } from "~/server/api/trpc";
 
 export const clientRouter = createTRPCRouter({
   getOne: publicProcedure
@@ -12,20 +12,32 @@ export const clientRouter = createTRPCRouter({
         }
       });
     }),
+
   getAll: publicProcedure
     .query(async ({ ctx }) => {
        return await ctx.prisma.client.findMany();
     }),
-  insertOne: publicProcedure
+
+  insertOne: protectedProcedure
     .input(z.object({
-      Name: z.string(),
-      Premium: z.boolean().nullish()
+      name: z.string(),
+      premium: z.boolean().nullish()
     }))
     .mutation(({ ctx, input }) => {
       return ctx.prisma.client.create({
         data: {
-          Name: input.Name,
-          Premium: input.Premium,
+          name: input.name,
+          premium: input.premium,
+        }
+      });
+    }),
+
+  deleteOne: protectedProcedure
+    .input(z.number())
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.client.delete({
+        where: {
+          id: input,
         }
       });
     }),
