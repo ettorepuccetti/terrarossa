@@ -1,7 +1,8 @@
-import { type Item } from "@prisma/client";
+import { type User, type Item } from "@prisma/client";
 import { useState } from "react"
 import { api } from "~/utils/api";
 import { z } from "zod";
+import { useSession } from "next-auth/react";
 
 export const ItemSchema = z.object({
   name: z.string(),
@@ -56,22 +57,27 @@ export default function ItemCRUD() {
     setItem(emptyItem);
   }
 
+  const { data: sessionData } = useSession();
+
   return (
     <>
       <ul>
-        {itemQuery.data?.map((client: Item) => {
+        {itemQuery.data?.map((item) => {
           return (
-            <>
-              <li key={client.id}>
-                <p>
-                  name: {client.name}
-                  <br />
-                  property: {client.property ? "yes" : "no"}
-                  <br />
-                </p>
-              </li>
-              <button onClick={() => deleteItem(client.id)}>Delete</button>
-            </>
+            <li key={item.id}>
+              <p>
+                name: {item.name}
+                <br />
+                property: {item.property ? "yes" : "no"}
+                <br />
+                mail: {item.user.email}
+              </p>
+              <button
+                hidden={((sessionData?.user.role === "ADMIN" || sessionData?.user.id === item.userId)) ? false : true}
+                onClick={() => deleteItem(item.id)}>
+                Delete
+              </button>
+            </li>
           )
         })}
       </ul>
@@ -79,7 +85,7 @@ export default function ItemCRUD() {
         <label>{"Name: "}
           <input
             type="text"
-            name={Object.keys(item)[1]}
+            name={Object.keys(item)[0]}
             value={item.name || ""}
             onChange={(event) => handleChange(event)}
           />
@@ -87,7 +93,7 @@ export default function ItemCRUD() {
         <label>Premium:
           <input
             type="checkbox"
-            name={Object.keys(item)[2]}
+            name={Object.keys(item)[1]}
             value="property"
             checked={item.property || false}
             onChange={() => handleCheckboxChange()}
