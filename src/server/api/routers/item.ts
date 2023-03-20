@@ -1,7 +1,6 @@
 import { z } from "zod";
-
+import { ItemInputSchema } from "~/components/Calendar";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "~/server/api/trpc";
-import { ItemSchema } from "~/components/ItemCRUD";
 
 export const itemRouter = createTRPCRouter({
   getMine: protectedProcedure
@@ -24,7 +23,7 @@ export const itemRouter = createTRPCRouter({
     }),
 
   insertOne: protectedProcedure
-    .input(ItemSchema)
+    .input(ItemInputSchema)
     .mutation(({ ctx, input }) => {
       return ctx.prisma.item.create({
         data: {

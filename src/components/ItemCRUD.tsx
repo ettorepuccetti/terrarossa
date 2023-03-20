@@ -3,14 +3,9 @@ import { useState } from "react"
 import { api } from "~/utils/api";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
+import { ItemInputSchema } from "./Calendar";
 
-export const ItemSchema = z.object({
-  name: z.string(),
-  property: z.boolean(),
-  date: z.date().nullish(),
-});
-
-type ItemSchemaType = z.infer<typeof ItemSchema>;
+type ItemSchemaType = z.infer<typeof ItemInputSchema>;
 
 export default function ItemCRUD() {
   const utils = api.useContext();
