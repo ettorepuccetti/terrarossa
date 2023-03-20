@@ -71,7 +71,7 @@ model Item {
   id       Int       @id @default(autoincrement())
   name     String
   property Boolean?  @default(false)
-  date     DateTime? @default(now())
+  date     DateTime @default(now())
   userId   String
   user     User      @relation(fields: [userId], references: [id])
 }
