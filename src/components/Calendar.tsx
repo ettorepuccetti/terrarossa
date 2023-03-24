@@ -1,5 +1,5 @@
 import FullCalendar from "@fullcalendar/react";
-import interactionPlugin from '@fullcalendar/interaction'
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction'
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import { api } from "~/utils/api";
 import { z } from "zod";
@@ -88,32 +88,6 @@ export default function Calendar() {
   }, [getEventsFromDb])
 
 
-  const addEvent = (selectInfo: DateSelectArg) => {
-    console.log(selectInfo.startStr, selectInfo.endStr);
-    console.log("resouceId: ", selectInfo.resource?.id);
-    const calendarApi = selectInfo.view.calendar
-    calendarApi.unselect() // clear date selection
-
-    if (selectInfo.resource === undefined) {
-      throw new Error("No court selected");
-    }
-
-    calendarApi.addEvent({
-      id: "???", // will be overwritten by the id of the reservation in the db
-      title: "", // will be overwritten by the name of the user get from the session
-      start: selectInfo.startStr,
-      end: selectInfo.endStr,
-      allDay: selectInfo.allDay,
-      resourceId: selectInfo.resource?.id,
-    })
-
-    reservationAdd.mutate({
-      courtId: selectInfo.resource.id,
-      startDateTime: new Date(selectInfo.startStr),
-      endDateTime: new Date(selectInfo.endStr)
-    })
-  }
-
   function deleteEvent(eventClickInfo: EventClickArg): void {
 
     const calendarApi = eventClickInfo.view.calendar;
@@ -127,13 +101,44 @@ export default function Calendar() {
     reservationDelete.mutate(eventClickInfo.event.id);
   }
 
+
+  const addEventOnClick = (selectInfo: DateClickArg) => {
+    console.log(selectInfo.dateStr);
+    console.log("resouceId: ", selectInfo.resource?.id);
+    const calendarApi = selectInfo.view.calendar
+    calendarApi.unselect() // clear date selection
+
+    if (selectInfo.resource === undefined) {
+      throw new Error("No court selected");
+    }
+
+    //endDate is one hounr after selectInfo.dateStr
+    const endDate = new Date(selectInfo.dateStr);
+    endDate.setHours(endDate.getHours() + 1);
+
+    calendarApi.addEvent({
+      id: "???", // will be overwritten by the id of the reservation in the db
+      title: "", // will be overwritten by the name of the user get from the session
+      start: selectInfo.dateStr,
+      end: endDate,
+      allDay: selectInfo.allDay,
+      resourceId: selectInfo.resource?.id,
+    })
+
+    reservationAdd.mutate({
+      courtId: selectInfo.resource.id,
+      startDateTime: new Date(selectInfo.dateStr),
+      endDateTime: endDate
+    })
+  }
+
   return (
     <div style={{ padding: '10px' }}>
       <FullCalendar
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
         plugins={[interactionPlugin, resourceTimeGridPlugin]}
         initialView="resourceTimeGridDay"
-        slotLabelFormat= {{hour: 'numeric', minute: '2-digit', hour12: false}}
+        slotLabelFormat={{ hour: 'numeric', minute: '2-digit', hour12: false }}
         navLinks={true}
         height="auto"
         headerToolbar={{
@@ -142,8 +147,8 @@ export default function Calendar() {
         }}
         events={events}
         resources={getCourts()}
-        selectable={true}
-        select={(selectInfo) => addEvent(selectInfo)}
+        selectable={false}
+        // select={(selectInfo) => addEvent(selectInfo)}
         eventClick={(eventClickInfo) => deleteEvent(eventClickInfo)}
         validRange={function (currentDate) {
           const startDate = new Date(currentDate.valueOf());
@@ -153,8 +158,13 @@ export default function Calendar() {
           return { start: startDate, end: endDate };
         }}
         slotMinTime="08:00:00"
-        slotMaxTime="23:30:00"
-        longPressDelay={0}
+        slotMaxTime="22:30:00"
+        selectLongPressDelay={0}
+        dateClick={(info) => {
+          console.log("dateClick: ", info.dateStr);
+          addEventOnClick(info);
+        }
+        }
       />
     </div>
   )
