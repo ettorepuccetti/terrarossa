@@ -3,37 +3,11 @@ import { useState } from "react"
 import { api } from "~/utils/api";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
-import { ItemInputSchema } from "./Calendar";
-
-type ItemSchemaType = z.infer<typeof ItemInputSchema>;
+import { ReservationInputSchema } from "./Calendar";
 
 export default function ItemCRUD() {
-  const utils = api.useContext();
 
-  const itemQuery = api.items.getAll.useQuery();
-
-  const itemMutationAdd = api.items.insertOne.useMutation({
-    async onSuccess() {
-      await utils.items.invalidate()
-    },
-  })
-
-  const itemMutationDelete = api.items.deleteOne.useMutation({
-    async onSuccess() {
-      await utils.items.invalidate()
-    },
-  })
-
-  function addToDB(item: ItemSchemaType) {
-    itemMutationAdd.mutate(item);
-  }
-
-  function deleteItem(id: number) {
-    itemMutationDelete.mutate(id);
-  }
-
-  const emptyItem: ItemSchemaType = { name: "", property: false, date: new Date() };
-  const [item, setItem] = useState<ItemSchemaType>(emptyItem);
+  const [item, setItem] = useState({userId: ""});
 
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
     const name: string = event.currentTarget.name;
@@ -42,46 +16,31 @@ export default function ItemCRUD() {
   }
 
   const handleCheckboxChange = () => {
-    setItem(values => ({ ...values, property: !values.property }))
+    setItem(values => ({ ...values }))
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    addToDB(item);
     console.log(item);
-    setItem(emptyItem);
+    setItem({userId: ""});
   }
 
   const { data: sessionData } = useSession();
 
   return (
     <>
-      <ul>
-        {itemQuery.data?.map((item) => {
-          return (
-            <li key={item.id}>
-              <p>
-                name: {item.name}
-                <br />
-                property: {item.property ? "yes" : "no"}
-                <br />
-                mail: {item.user.email}
-              </p>
-              <button
-                hidden={((sessionData?.user.role === "ADMIN" || sessionData?.user.id === item.userId)) ? false : true}
-                onClick={() => deleteItem(item.id)}>
-                Delete
-              </button>
-            </li>
-          )
-        })}
-      </ul>
+      <button
+        hidden={((sessionData?.user.role === "ADMIN" || sessionData?.user.id === item.userId)) ? false : true}
+      >
+        Delete
+      </button>
+
       <form className="form" onSubmit={(event) => handleSubmit(event)}>
         <label>{"Name: "}
           <input
             type="text"
             name={Object.keys(item)[0]}
-            value={item.name || ""}
+            // value={item.name || ""}
             onChange={(event) => handleChange(event)}
           />
         </label>
@@ -90,7 +49,7 @@ export default function ItemCRUD() {
             type="checkbox"
             name={Object.keys(item)[1]}
             value="property"
-            checked={item.property || false}
+            // checked={item.property || false}
             onChange={() => handleCheckboxChange()}
           />
         </label>

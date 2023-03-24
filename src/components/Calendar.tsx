@@ -1,8 +1,5 @@
-import { type User, type Item } from "@prisma/client";
 import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
-import timeGridPlugin from '@fullcalendar/timegrid' // a plugin!
-import interactionPlugin from '@fullcalendar/interaction' // needed for dayClick
+import interactionPlugin from '@fullcalendar/interaction'
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import { api } from "~/utils/api";
 import { z } from "zod";
@@ -13,80 +10,108 @@ import {
   type EventClickArg,
   type EventInput,
 } from '@fullcalendar/core'
+import { type ResourceInput } from "@fullcalendar/resource";
 
-export const ItemInputSchema = z.object({
-  name: z.string(),
-  property: z.boolean(),
-  date: z.date(),
+export const ReservationInputSchema = z.object({
+  startDateTime: z.date(),
+  endDateTime: z.date(),
+  courtId: z.string(),
 });
 
-type ItemSchemaType = z.infer<typeof ItemInputSchema>;
-
-let nextAvailableId = 0;
-function getNextAvailableId() {
-  nextAvailableId += 1;
-  return nextAvailableId.toString();
-}
+// type ItemSchemaType = z.infer<typeof ReservationInputSchema>;
 
 export default function Calendar() {
 
+
+  /**
+   * -------------------------------------
+   *      ----- trpc procedures -----
+   * -------------------------------------
+   */
+
+  const utils = api.useContext();
+
+  const reservationQuery = api.reservation.getAll.useQuery();
+  const courtQuery = api.court.getAll.useQuery();
+
+  const reservationAdd = api.reservation.insertOne.useMutation({
+    async onSuccess() {
+      await utils.reservation.invalidate() // Do I need this?
+    },
+  })
+  const reservationDelete = api.reservation.deleteOne.useMutation({
+    async onSuccess() {
+      await utils.reservation.invalidate() // Do I need this?
+    },
+  })
+
+  /**
+   * ---------- end of trpc procedures ----------------
+   */
+
+  function getCourts(): ResourceInput[] {
+    if (courtQuery.error) {
+      console.log("Error: ", courtQuery.error);
+    }
+    if (!courtQuery.data) {
+      console.log("No data");
+      return [];
+    }
+    return courtQuery.data.map((court) => {
+      return {
+        id: court.id,
+        title: court.name,
+      }
+    })
+  }
+
   const [events, setEvents] = useState<EventInput[]>([]);
 
-  //trpc procedures
-  const utils = api.useContext();
-  const itemQuery = api.items.getAll.useQuery();
-  const itemMutationAdd = api.items.insertOne.useMutation({
-    async onSuccess() {
-      await utils.items.invalidate() // Do I need this?
-    },
-  })
-  const itemMutationDelete = api.items.deleteOne.useMutation({
-    async onSuccess() {
-      await utils.items.invalidate() // Do I need this?
-    },
-  })
-
   const getEventsFromDb = useCallback(() => {
-    const itemFromDb = itemQuery.data;
-    if (itemFromDb) {
-      //get max id of items in db
-      const maxId = itemFromDb.length !== 0 ? Math.max(...itemFromDb.map((item) => item.id)) : 0;
-      nextAvailableId = maxId;
-      setEvents(itemFromDb.map((item) => {
+    const reservationFromDb = reservationQuery.data;
+    if (reservationFromDb) {
+      setEvents(reservationFromDb.map((reservation) => {
         return {
-          id: item.id.toString(),
-          title: item.name,
-          start: item.date,
-          end: new Date(item.date.getTime() + 1000 * 60 * 60),
+          id: reservation.id.toString(),
+          title: reservation.user.name || "", //user.name can be null
+          start: reservation.startTime,
+          end: reservation.endTime,
           allDay: false,
+          resourceId: reservation.courtId,
         }
       }))
     }
-  }, [itemQuery.data])
+  }, [reservationQuery.data])
 
   useEffect(() => {
     getEventsFromDb();
-  },[getEventsFromDb])
+  }, [getEventsFromDb])
 
 
   const addEvent = (selectInfo: DateSelectArg) => {
-    const title = "Title"
-    console.log(selectInfo.startStr);
+    console.log(selectInfo.startStr, selectInfo.endStr);
+    console.log("resouceId: ", selectInfo.resource?.id);
     const calendarApi = selectInfo.view.calendar
-
     calendarApi.unselect() // clear date selection
 
-    if (title) {
-      calendarApi.addEvent({
-        id: getNextAvailableId(), // useless actually. It is overwritten by the id of the item in the db
-        title: title,
-        start: selectInfo.startStr,
-        end: new Date(selectInfo.startStr).setHours(new Date(selectInfo.startStr).getHours() + 1),
-        allDay: selectInfo.allDay
-      })
+    if (selectInfo.resource === undefined) {
+      throw new Error("No court selected");
     }
 
-    itemMutationAdd.mutate({ name: title, property: false, date: new Date(selectInfo.startStr) })
+    calendarApi.addEvent({
+      id: "???", // will be overwritten by the id of the reservation in the db
+      title: "", // will be overwritten by the name of the user get from the session
+      start: selectInfo.startStr,
+      end: selectInfo.endStr,
+      allDay: selectInfo.allDay,
+      resourceId: selectInfo.resource?.id,
+    })
+
+    reservationAdd.mutate({
+      courtId: selectInfo.resource.id,
+      startDateTime: new Date(selectInfo.startStr),
+      endDateTime: new Date(selectInfo.endStr)
+    })
   }
 
   function deleteEvent(eventClickInfo: EventClickArg): void {
@@ -98,33 +123,38 @@ export default function Calendar() {
       return;
     }
     event.remove();
-    console.log("deleteItem: ", +eventClickInfo.event.id);
-    itemMutationDelete.mutate(+eventClickInfo.event.id);
+    console.log("deleteItem: ", eventClickInfo.event.id);
+    reservationDelete.mutate(eventClickInfo.event.id);
   }
 
   return (
     <div style={{ padding: '10px' }}>
       <FullCalendar
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, resourceTimeGridPlugin]}
-        initialView="timeGridWeek"
+        plugins={[interactionPlugin, resourceTimeGridPlugin]}
+        initialView="resourceTimeGridDay"
+        slotLabelFormat= {{hour: 'numeric', minute: '2-digit', hour12: false}}
         navLinks={true}
         height="auto"
         headerToolbar={{
           left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,resourceTimeGridDay'
+          right: 'title',
         }}
         events={events}
-        eventsSet={(events) => console.log("eventsSet: ", events)}
-        resources={[
-          { id: 'a', title: 'Auditorium A' },
-          { id: 'b', title: 'Auditorium B', eventColor: 'green' },
-        ]}
+        resources={getCourts()}
         selectable={true}
         select={(selectInfo) => addEvent(selectInfo)}
-        // editable={true}
         eventClick={(eventClickInfo) => deleteEvent(eventClickInfo)}
+        validRange={function (currentDate) {
+          const startDate = new Date(currentDate.valueOf());
+          const endDate = new Date(currentDate.valueOf());
+          // Adjust the start & end dates, respectively
+          endDate.setDate(endDate.getDate() + 7); // Seven days into the future
+          return { start: startDate, end: endDate };
+        }}
+        slotMinTime="08:00:00"
+        slotMaxTime="23:30:00"
+        longPressDelay={0}
       />
     </div>
   )
