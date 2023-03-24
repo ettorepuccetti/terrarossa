@@ -56,7 +56,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  Item          Item[]
+  items         Item[]
   role          String    @default("USER")
 }
 

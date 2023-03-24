@@ -42,7 +42,7 @@ export default function Calendar() {
   })
   const itemMutationDelete = api.items.deleteOne.useMutation({
     async onSuccess() {
-      await utils.items .invalidate() // Do I need this?
+      await utils.items.invalidate() // Do I need this?
     },
   })
 
