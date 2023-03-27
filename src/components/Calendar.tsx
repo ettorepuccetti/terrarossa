@@ -1,12 +1,12 @@
 import FullCalendar from "@fullcalendar/react";
-import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction'
+import interactionPlugin, { type DateClickArg } from '@fullcalendar/interaction'
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import { api } from "~/utils/api";
 import { z } from "zod";
 import React, { useCallback, useEffect, useState } from "react";
+import ReservationDialog from "~/components/ReservationDialog";
 
 import {
-  type DateSelectArg,
   type EventClickArg,
   type EventInput,
 } from '@fullcalendar/core'
@@ -116,21 +116,40 @@ export default function Calendar() {
     const endDate = new Date(selectInfo.dateStr);
     endDate.setHours(endDate.getHours() + 1);
 
-    calendarApi.addEvent({
-      id: "???", // will be overwritten by the id of the reservation in the db
-      title: "", // will be overwritten by the name of the user get from the session
-      start: selectInfo.dateStr,
-      end: endDate,
-      allDay: selectInfo.allDay,
-      resourceId: selectInfo.resource?.id,
-    })
+    setStartDate(new Date(selectInfo.dateStr));
 
-    reservationAdd.mutate({
-      courtId: selectInfo.resource.id,
-      startDateTime: new Date(selectInfo.dateStr),
-      endDateTime: endDate
-    })
+    handleDialogOpen();
+
+    // calendarApi.addEvent({
+    //   id: "???", // will be overwritten by the id of the reservation in the db
+    //   title: "", // will be overwritten by the name of the user get from the session
+    //   start: selectInfo.dateStr,
+    //   end: endDate,
+    //   allDay: selectInfo.allDay,
+    //   resourceId: selectInfo.resource?.id,
+    // })
+
+    // reservationAdd.mutate({
+    //   courtId: selectInfo.resource.id,
+    //   startDateTime: new Date(selectInfo.dateStr),
+    //   endDateTime: endDate
+    // })
   }
+
+  const [open, setOpen] = React.useState(false);
+  const [startDate, setStartDate] = React.useState<Date>();
+  const [endDate, setEndDate] = React.useState<Date>();
+
+  const handleDialogOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDialogClose = (value: Date) => {
+    setOpen(false);
+    setEndDate(() => value);
+    console.log("startDate in calendar: ", startDate);
+    console.log("endDate in calendar: ", endDate);
+  };
 
   return (
     <div style={{ padding: '10px' }}>
@@ -138,7 +157,6 @@ export default function Calendar() {
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
         plugins={[interactionPlugin, resourceTimeGridPlugin]}
         initialView="resourceTimeGridDay"
-        slotLabelFormat={{ hour: 'numeric', minute: '2-digit', hour12: false }}
         navLinks={true}
         height="auto"
         headerToolbar={{
@@ -161,10 +179,16 @@ export default function Calendar() {
         slotMaxTime="22:30:00"
         selectLongPressDelay={0}
         dateClick={(info) => {
-          console.log("dateClick: ", info.dateStr);
           addEventOnClick(info);
-        }
-        }
+        }}
+        slotLabelFormat={{ hour: 'numeric', minute: '2-digit', hour12: false }}
+        eventTimeFormat={{ hour: 'numeric', minute: '2-digit', hour12: false }}
+      />
+
+      <ReservationDialog
+        open={open}
+        startDate={startDate}
+        onClose={(endDate) => handleDialogClose(endDate)}
       />
     </div>
   )
