@@ -12,3 +12,4 @@ npx prisma
 
 ### Privacy policy
 generated using https://www.freeprivacypolicy.com/free-terms-and-conditions-generator/
+account: terrarouge.vercel@gmail.com
