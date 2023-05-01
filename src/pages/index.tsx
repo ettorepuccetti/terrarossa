@@ -14,11 +14,11 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <Calendar/>
+        <Calendar />
+        <div className={styles.showcaseContainer}>
+          <AuthShowcase />
+        </div>
       </main>
-      <div className={styles.showcaseContainer}>
-        <AuthShowcase />
-      </div>
     </>
   );
 };

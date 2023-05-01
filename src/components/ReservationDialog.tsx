@@ -18,19 +18,22 @@ export default function ReservationDialog(props: SimpleDialogProps) {
       endDate.setHours(endDate.getHours() + hours);
       onClose(endDate);
       console.log("endDate from dialog: ", endDate);
-      return;
     }
-    endDate.setHours(endDate.getHours() + 1);
-    onClose(endDate);
   };
 
   return (
     <>
       <Dialog open={open} onClose={() => handleClose(undefined)}>
         <DialogTitle> Prenota </DialogTitle>
+        <div> Data: {startDate?.toDateString()}</div>
+        <div> Orario di Inizio: {startDate?.toTimeString().split(":").splice(0, 2).join(":")}</div>
         <ListItem disableGutters>
-          <ListItemButton onClick={() => handleClose(1)}> un&apos;ora </ListItemButton>
-          <ListItemButton onClick={() => handleClose(2)}> due ore</ListItemButton>
+          <ListItemButton onClick={() => handleClose(1)}>
+            un&apos;ora
+          </ListItemButton>
+          <ListItemButton onClick={() => handleClose(2)}>
+            due ore
+          </ListItemButton>
         </ListItem>
       </Dialog>
     </>

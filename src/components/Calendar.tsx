@@ -18,7 +18,6 @@ export const ReservationInputSchema = z.object({
   courtId: z.string(),
 });
 
-// type ItemSchemaType = z.infer<typeof ReservationInputSchema>;
 
 export default function Calendar() {
 
@@ -101,6 +100,9 @@ export default function Calendar() {
     reservationDelete.mutate(eventClickInfo.event.id);
   }
 
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [startDate, setStartDate] = React.useState<Date>();
+  const [courtId, setCourtId] = React.useState<string>("");
 
   const addEventOnClick = (selectInfo: DateClickArg) => {
     console.log(selectInfo.dateStr);
@@ -112,13 +114,9 @@ export default function Calendar() {
       throw new Error("No court selected");
     }
 
-    //endDate is one hounr after selectInfo.dateStr
-    const endDate = new Date(selectInfo.dateStr);
-    endDate.setHours(endDate.getHours() + 1);
-
+    setCourtId(selectInfo.resource.id);
     setStartDate(new Date(selectInfo.dateStr));
-
-    handleDialogOpen();
+    setOpenDialog(true);
 
     // calendarApi.addEvent({
     //   id: "???", // will be overwritten by the id of the reservation in the db
@@ -128,31 +126,25 @@ export default function Calendar() {
     //   allDay: selectInfo.allDay,
     //   resourceId: selectInfo.resource?.id,
     // })
-
-    // reservationAdd.mutate({
-    //   courtId: selectInfo.resource.id,
-    //   startDateTime: new Date(selectInfo.dateStr),
-    //   endDateTime: endDate
-    // })
   }
 
-  const [open, setOpen] = React.useState(false);
-  const [startDate, setStartDate] = React.useState<Date>();
-  const [endDate, setEndDate] = React.useState<Date>();
 
-  const handleDialogOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDialogClose = (value: Date) => {
-    setOpen(false);
-    setEndDate(() => value);
+  const handleDialogClose = (endDate: Date) => {
+    setOpenDialog(false);
     console.log("startDate in calendar: ", startDate);
     console.log("endDate in calendar: ", endDate);
+    console.log("courtId: ", courtId)
+    if (startDate) {
+      reservationAdd.mutate({
+        courtId: courtId,
+        startDateTime: startDate,
+        endDateTime: endDate
+      })
+    }
   };
 
   return (
-    <div style={{ padding: '10px' }}>
+    <div>
       <FullCalendar
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
         plugins={[interactionPlugin, resourceTimeGridPlugin]}
@@ -186,7 +178,7 @@ export default function Calendar() {
       />
 
       <ReservationDialog
-        open={open}
+        open={openDialog}
         startDate={startDate}
         onClose={(endDate) => handleDialogClose(endDate)}
       />
