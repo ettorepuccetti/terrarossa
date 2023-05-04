@@ -11,6 +11,7 @@ import {
 import { type ResourceInput } from "@fullcalendar/resource";
 import FullCalendarWrapper from "./FullCalendarWrapper";
 import EventDetailDialog from './EventDetailDialog';
+import { useSession } from 'next-auth/react';
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -21,6 +22,7 @@ export const ReservationInputSchema = z.object({
 
 export default function Calendar() {
 
+  const { data: sessionData } = useSession();
 
   /**
    * -------------------------------------
@@ -35,12 +37,14 @@ export default function Calendar() {
 
   const reservationAdd = api.reservation.insertOne.useMutation({
     async onSuccess() {
-      await utils.reservation.invalidate()
+      await reservationQuery.refetch()
+      // await utils.reservation.invalidate()
     },
   })
   const reservationDelete = api.reservation.deleteOne.useMutation({
     async onSuccess() {
-      await utils.reservation.invalidate()
+      await reservationQuery.refetch()
+      // await utils.reservation.()
     },
   })
 
@@ -155,7 +159,7 @@ export default function Calendar() {
   }, [getEventsFromDb, getCourtsFromDb])
 
 
-  if (courtQuery.isInitialLoading || reservationQuery.isInitialLoading) {
+  if (courtQuery.isLoading || reservationQuery.isLoading) {
     return <div>Loading...</div>
   }
 
