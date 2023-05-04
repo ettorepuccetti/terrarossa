@@ -1,6 +1,4 @@
-import FullCalendar from "@fullcalendar/react";
-import interactionPlugin, { type DateClickArg } from '@fullcalendar/interaction'
-import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
+import { type DateClickArg } from '@fullcalendar/interaction'
 import { api } from "~/utils/api";
 import { z } from "zod";
 import React, { useCallback, useEffect, useState } from "react";
@@ -11,6 +9,8 @@ import {
   type EventInput,
 } from '@fullcalendar/core'
 import { type ResourceInput } from "@fullcalendar/resource";
+import FullCalendarWrapper from "./FullCalendarWrapper";
+import EventDetailDialog from './EventDetailDialog';
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -35,12 +35,12 @@ export default function Calendar() {
 
   const reservationAdd = api.reservation.insertOne.useMutation({
     async onSuccess() {
-      await utils.reservation.invalidate() // Do I need this?
+      await utils.reservation.invalidate()
     },
   })
   const reservationDelete = api.reservation.deleteOne.useMutation({
     async onSuccess() {
-      await utils.reservation.invalidate() // Do I need this?
+      await utils.reservation.invalidate()
     },
   })
 
@@ -48,23 +48,21 @@ export default function Calendar() {
    * ---------- end of trpc procedures ----------------
    */
 
-  function getCourts(): ResourceInput[] {
+  const getCourtsFromDb = useCallback(() => {
     if (courtQuery.error) {
-      console.log("Error: ", courtQuery.error);
+      console.error("Error: ", courtQuery.error);
     }
     if (!courtQuery.data) {
-      console.log("No data");
-      return [];
+      return;
     }
-    return courtQuery.data.map((court) => {
+    setCourts(courtQuery.data.map((court) => {
       return {
         id: court.id,
         title: court.name,
       }
-    })
-  }
+    }))
+  }, [courtQuery.data, courtQuery.error])
 
-  const [events, setEvents] = useState<EventInput[]>([]);
 
   const getEventsFromDb = useCallback(() => {
     const reservationFromDb = reservationQuery.data;
@@ -82,10 +80,6 @@ export default function Calendar() {
     }
   }, [reservationQuery.data])
 
-  useEffect(() => {
-    getEventsFromDb();
-  }, [getEventsFromDb])
-
 
   function deleteEvent(eventClickInfo: EventClickArg): void {
 
@@ -100,9 +94,6 @@ export default function Calendar() {
     reservationDelete.mutate(eventClickInfo.event.id);
   }
 
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [startDate, setStartDate] = React.useState<Date>();
-  const [courtId, setCourtId] = React.useState<string>("");
 
   const addEventOnClick = (selectInfo: DateClickArg) => {
     console.log(selectInfo.dateStr);
@@ -117,71 +108,84 @@ export default function Calendar() {
     setCourtId(selectInfo.resource.id);
     setStartDate(new Date(selectInfo.dateStr));
     setOpenDialog(true);
+  }
 
-    // calendarApi.addEvent({
-    //   id: "???", // will be overwritten by the id of the reservation in the db
-    //   title: "", // will be overwritten by the name of the user get from the session
-    //   start: selectInfo.dateStr,
-    //   end: endDate,
-    //   allDay: selectInfo.allDay,
-    //   resourceId: selectInfo.resource?.id,
-    // })
+  const openEventDetails = (eventClickInfo: EventClickArg) => {
+    console.log("eventClickInfo: ", eventClickInfo);
+    setEventDetails({
+      startDate: eventClickInfo.event.start,
+      endDate: eventClickInfo.event.end,
+      court: eventClickInfo.event.getResources()[0]?.title || "",
+    })
   }
 
 
-  const handleDialogClose = (endDate: Date) => {
-    setOpenDialog(false);
+  const setEndDate = (endDate: Date | undefined) => {
     console.log("startDate in calendar: ", startDate);
     console.log("endDate in calendar: ", endDate);
     console.log("courtId: ", courtId)
-    if (startDate) {
-      reservationAdd.mutate({
-        courtId: courtId,
-        startDateTime: startDate,
-        endDateTime: endDate
-      })
+
+    setOpenDialog(false);
+
+    if (!endDate) {
+      return;
     }
+
+    if (!startDate || !courtId) {
+      throw new Error(`startDate or courtId is undefined`);
+    }
+
+    reservationAdd.mutate({
+      courtId: courtId,
+      startDateTime: startDate,
+      endDateTime: endDate
+    })
   };
+
+  const [courts, setCourts] = useState<ResourceInput[]>([]);
+  const [events, setEvents] = useState<EventInput[]>([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [startDate, setStartDate] = useState<Date>();
+  const [courtId, setCourtId] = useState<string>();
+  const [eventDetails, setEventDetails] = useState<EventDetailDialogProps>();
+
+  useEffect(() => {
+    getCourtsFromDb();
+    getEventsFromDb();
+  }, [getEventsFromDb, getCourtsFromDb])
+
+
+  if (courtQuery.isInitialLoading || reservationQuery.isInitialLoading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div>
-      <FullCalendar
-        schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
-        plugins={[interactionPlugin, resourceTimeGridPlugin]}
-        initialView="resourceTimeGridDay"
-        navLinks={true}
-        height="auto"
-        headerToolbar={{
-          left: 'prev,next today',
-          right: 'title',
-        }}
+      <FullCalendarWrapper
         events={events}
-        resources={getCourts()}
-        selectable={false}
-        // select={(selectInfo) => addEvent(selectInfo)}
-        eventClick={(eventClickInfo) => deleteEvent(eventClickInfo)}
-        validRange={function (currentDate) {
-          const startDate = new Date(currentDate.valueOf());
-          const endDate = new Date(currentDate.valueOf());
-          // Adjust the start & end dates, respectively
-          endDate.setDate(endDate.getDate() + 7); // Seven days into the future
-          return { start: startDate, end: endDate };
-        }}
-        slotMinTime="08:00:00"
-        slotMaxTime="22:30:00"
-        selectLongPressDelay={0}
-        dateClick={(info) => {
-          addEventOnClick(info);
-        }}
-        slotLabelFormat={{ hour: 'numeric', minute: '2-digit', hour12: false }}
-        eventTimeFormat={{ hour: 'numeric', minute: '2-digit', hour12: false }}
+        courts={courts}
+        onDateClick={addEventOnClick}
+        onEventClick={openEventDetails}
       />
 
       <ReservationDialog
         open={openDialog}
         startDate={startDate}
-        onClose={(endDate) => handleDialogClose(endDate)}
+        onClose={(endDate) => setEndDate(endDate)}
       />
+
+      <EventDetailDialog
+        open={eventDetails !== undefined}
+        eventDetails={eventDetails}
+        onClose={() => setEventDetails(undefined)}
+      />
+
     </div>
   )
+}
+
+export interface EventDetailDialogProps {
+  startDate: Date | null;
+  endDate: Date | null;
+  court: string;
 }
