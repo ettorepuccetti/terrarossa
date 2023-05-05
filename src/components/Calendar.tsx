@@ -12,6 +12,7 @@ import { type ResourceInput } from "@fullcalendar/resource";
 import FullCalendarWrapper from "./FullCalendarWrapper";
 import EventDetailDialog from './EventDetailDialog';
 import { useSession } from 'next-auth/react';
+import { type EventImpl } from '@fullcalendar/core/internal';
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -52,6 +53,13 @@ export default function Calendar() {
    * ---------- end of trpc procedures ----------------
    */
 
+
+    /**
+   * -------------------------------------
+   *      ----- DB Queries -----
+   * -------------------------------------
+   */
+
   const getCourtsFromDb = useCallback(() => {
     if (courtQuery.error) {
       console.error("Error: ", courtQuery.error);
@@ -79,23 +87,23 @@ export default function Calendar() {
           end: reservation.endTime,
           allDay: false,
           resourceId: reservation.courtId,
+          extendedProps: {
+            userId: reservation.user.id,
+          }
         }
       }))
     }
   }, [reservationQuery.data])
 
+  /**
+   * ---------- end of DB Queries ----------------
+   */
 
-  function deleteEvent(eventClickInfo: EventClickArg): void {
 
-    const calendarApi = eventClickInfo.view.calendar;
-    const event = calendarApi.getEventById(eventClickInfo.event.id);
-    if (!event) {
-      console.log("Event not found, id: ", eventClickInfo.event.id);
-      return;
-    }
-    event.remove();
-    console.log("deleteItem: ", eventClickInfo.event.id);
-    reservationDelete.mutate(eventClickInfo.event.id);
+  function deleteEvent(eventId: string): void {
+    console.log("delete Event: ", eventId);
+    reservationDelete.mutate(eventId);
+    setEventDetails(undefined);
   }
 
 
@@ -116,11 +124,7 @@ export default function Calendar() {
 
   const openEventDetails = (eventClickInfo: EventClickArg) => {
     console.log("eventClickInfo: ", eventClickInfo);
-    setEventDetails({
-      startDate: eventClickInfo.event.start,
-      endDate: eventClickInfo.event.end,
-      court: eventClickInfo.event.getResources()[0]?.title || "",
-    })
+    setEventDetails(eventClickInfo.event)
   }
 
 
@@ -151,7 +155,7 @@ export default function Calendar() {
   const [openDialog, setOpenDialog] = useState(false);
   const [startDate, setStartDate] = useState<Date>();
   const [courtId, setCourtId] = useState<string>();
-  const [eventDetails, setEventDetails] = useState<EventDetailDialogProps>();
+  const [eventDetails, setEventDetails] = useState<EventImpl>();
 
   useEffect(() => {
     getCourtsFromDb();
@@ -181,15 +185,11 @@ export default function Calendar() {
       <EventDetailDialog
         open={eventDetails !== undefined}
         eventDetails={eventDetails}
-        onClose={() => setEventDetails(undefined)}
+        onDialogClose={() => setEventDetails(undefined)}
+        sessionData={sessionData}
+        onReservationDelete={(id) => deleteEvent(id)}
       />
 
     </div>
   )
-}
-
-export interface EventDetailDialogProps {
-  startDate: Date | null;
-  endDate: Date | null;
-  court: string;
 }
