@@ -30,22 +30,17 @@ export default function Calendar() {
    *      ----- trpc procedures -----
    * -------------------------------------
    */
-
-  const utils = api.useContext();
-
   const reservationQuery = api.reservation.getAll.useQuery();
   const courtQuery = api.court.getAll.useQuery();
 
   const reservationAdd = api.reservation.insertOne.useMutation({
     async onSuccess() {
       await reservationQuery.refetch()
-      // await utils.reservation.invalidate()
     },
   })
   const reservationDelete = api.reservation.deleteOne.useMutation({
     async onSuccess() {
       await reservationQuery.refetch()
-      // await utils.reservation.()
     },
   })
 
@@ -54,11 +49,11 @@ export default function Calendar() {
    */
 
 
-    /**
-   * -------------------------------------
-   *      ----- DB Queries -----
-   * -------------------------------------
-   */
+  /**
+ * -------------------------------------
+ *      ----- DB Queries -----
+ * -------------------------------------
+ */
 
   const getCourtsFromDb = useCallback(() => {
     if (courtQuery.error) {
@@ -108,13 +103,6 @@ export default function Calendar() {
    */
 
 
-  function deleteEvent(eventId: string): void {
-    console.log("delete Event: ", eventId);
-    reservationDelete.mutate(eventId);
-    setEventDetails(undefined);
-  }
-
-
   const openReservationDialog = (selectInfo: DateClickArg) => {
     console.log(selectInfo.dateStr);
     console.log("resouceId: ", selectInfo.resource?.id);
@@ -125,7 +113,6 @@ export default function Calendar() {
     if (selectInfo.resource === undefined) {
       throw new Error("No court selected");
     }
-
     setDateClick(selectInfo);
   }
 
@@ -134,16 +121,11 @@ export default function Calendar() {
     setEventDetails(eventClickInfo.event)
   }
 
-
-  const addEvent = (endDate: Date | undefined) => {
+  const addEvent = (endDate: Date) => {
     console.log("endDate in calendar: ", endDate);
     console.log("court: ", dateClick?.resource?.title);
 
     setDateClick(undefined);
-
-    if (!endDate) {
-      return; // completly fine, user just closed the dialog
-    }
 
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
@@ -156,9 +138,21 @@ export default function Calendar() {
     })
   };
 
+  function deleteEvent(eventId: string): void {
+    console.log("delete Event: ", eventId);
+    reservationDelete.mutate(eventId);
+    setEventDetails(undefined);
+  }
+
   const [eventDetails, setEventDetails] = useState<EventImpl>();
   const [dateClick, setDateClick] = useState<DateClickArg>();
 
+
+  /**
+   * -------------------------------------
+   * ---------- Rendering ---------------
+   * -------------------------------------
+   */
 
   if (courtQuery.isLoading || reservationQuery.isLoading) {
     return <div>Loading...</div>
@@ -176,6 +170,7 @@ export default function Calendar() {
       <ReservationDialog
         open={dateClick !== undefined}
         dateClick={dateClick}
+        onDialogClose={() => setDateClick(undefined)}
         onDurationSelected={(endDate) => addEvent(endDate)}
       />
 

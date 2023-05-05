@@ -4,31 +4,29 @@ import { extractTimeFromDate } from "~/utils/formatter";
 
 export interface SimpleDialogProps {
   open: boolean;
-  onDurationSelected: (value: Date | undefined) => void;
   dateClick: DateClickArg | undefined;
+  onDurationSelected: (value: Date) => void;
+  onDialogClose: () => void;
 }
 
 export default function ReservationDialog(props: SimpleDialogProps) {
   const { open, dateClick } = props;
 
-  const durationSelection = (hours: number | undefined) => {
+  const durationSelection = (hours: number) => {
     if (!dateClick?.date) {
       throw new Error("Date is undefined");
     }
     const endDate = new Date(dateClick.date);
-    if (hours) {
-      endDate.setHours(endDate.getHours() + hours);
-      console.log("startDate in calendar: ", dateClick?.date);
-      console.log("endDate from dialog: ", endDate);
-      props.onDurationSelected(endDate);
-    } else {
-      props.onDurationSelected(undefined);
-    }
+    endDate.setHours(endDate.getHours() + hours);
+    console.log("startDate in calendar: ", dateClick?.date);
+    console.log("endDate from dialog: ", endDate);
+    props.onDurationSelected(endDate);
+
   };
 
   return (
     <>
-      <Dialog open={open} onClose={() => durationSelection(undefined)}>
+      <Dialog open={open} onClose={() => props.onDialogClose()}>
         <DialogTitle> Prenota </DialogTitle>
         <div> Data: {dateClick?.date?.toDateString()}</div>
         <div> Orario di Inizio: {extractTimeFromDate(dateClick?.date)}</div>
