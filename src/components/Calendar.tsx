@@ -95,6 +95,14 @@ export default function Calendar() {
     }
   }, [reservationQuery.data])
 
+  const [courts, setCourts] = useState<ResourceInput[]>([]);
+  const [events, setEvents] = useState<EventInput[]>([]);
+
+  useEffect(() => {
+    getCourtsFromDb();
+    getEventsFromDb();
+  }, [getEventsFromDb, getCourtsFromDb])
+
   /**
    * ---------- end of DB Queries ----------------
    */
@@ -107,9 +115,10 @@ export default function Calendar() {
   }
 
 
-  const addEventOnClick = (selectInfo: DateClickArg) => {
+  const openReservationDialog = (selectInfo: DateClickArg) => {
     console.log(selectInfo.dateStr);
     console.log("resouceId: ", selectInfo.resource?.id);
+
     const calendarApi = selectInfo.view.calendar
     calendarApi.unselect() // clear date selection
 
@@ -117,50 +126,38 @@ export default function Calendar() {
       throw new Error("No court selected");
     }
 
-    setCourtId(selectInfo.resource.id);
-    setStartDate(new Date(selectInfo.dateStr));
-    setOpenDialog(true);
+    setDateClick(selectInfo);
   }
 
-  const openEventDetails = (eventClickInfo: EventClickArg) => {
+  const openEventDialog = (eventClickInfo: EventClickArg) => {
     console.log("eventClickInfo: ", eventClickInfo);
     setEventDetails(eventClickInfo.event)
   }
 
 
-  const setEndDate = (endDate: Date | undefined) => {
-    console.log("startDate in calendar: ", startDate);
+  const addEvent = (endDate: Date | undefined) => {
     console.log("endDate in calendar: ", endDate);
-    console.log("courtId: ", courtId)
+    console.log("court: ", dateClick?.resource?.title);
 
-    setOpenDialog(false);
+    setDateClick(undefined);
 
     if (!endDate) {
-      return;
+      return; // completly fine, user just closed the dialog
     }
 
-    if (!startDate || !courtId) {
-      throw new Error(`startDate or courtId is undefined`);
+    if (dateClick?.resource === undefined || dateClick?.date === undefined) {
+      throw new Error("No court or date selected");
     }
 
     reservationAdd.mutate({
-      courtId: courtId,
-      startDateTime: startDate,
+      courtId: dateClick.resource.id,
+      startDateTime: dateClick.date,
       endDateTime: endDate
     })
   };
 
-  const [courts, setCourts] = useState<ResourceInput[]>([]);
-  const [events, setEvents] = useState<EventInput[]>([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [startDate, setStartDate] = useState<Date>();
-  const [courtId, setCourtId] = useState<string>();
   const [eventDetails, setEventDetails] = useState<EventImpl>();
-
-  useEffect(() => {
-    getCourtsFromDb();
-    getEventsFromDb();
-  }, [getEventsFromDb, getCourtsFromDb])
+  const [dateClick, setDateClick] = useState<DateClickArg>();
 
 
   if (courtQuery.isLoading || reservationQuery.isLoading) {
@@ -172,14 +169,14 @@ export default function Calendar() {
       <FullCalendarWrapper
         events={events}
         courts={courts}
-        onDateClick={addEventOnClick}
-        onEventClick={openEventDetails}
+        onDateClick={openReservationDialog}
+        onEventClick={openEventDialog}
       />
 
       <ReservationDialog
-        open={openDialog}
-        startDate={startDate}
-        onClose={(endDate) => setEndDate(endDate)}
+        open={dateClick !== undefined}
+        dateClick={dateClick}
+        onDurationSelected={(endDate) => addEvent(endDate)}
       />
 
       <EventDetailDialog
