@@ -30,10 +30,13 @@ export default function EventDetailDialog(props: DialogProps) {
 
         <button
           hidden={
-            !(sessionData !== null) //&& sessionData.user.id === props.userId
+            !(sessionData !== null && (
+              sessionData.user.role === "ADMIN" ||
+              sessionData.user.id === props.eventDetails?.extendedProps?.userId
+            ))
           }
           onClick={() => props.onReservationDelete(eventDetails.id)}
-        > 
+        >
           Cancella
         </button>
       </Dialog>

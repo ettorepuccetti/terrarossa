@@ -1,5 +1,6 @@
 import { type DateClickArg } from "@fullcalendar/interaction";
 import { Dialog, DialogTitle, ListItem, ListItemButton } from "@mui/material";
+import { type Session } from "next-auth";
 import { extractTimeFromDate } from "~/utils/formatter";
 
 export interface SimpleDialogProps {
@@ -7,6 +8,7 @@ export interface SimpleDialogProps {
   dateClick: DateClickArg | undefined;
   onDurationSelected: (value: Date) => void;
   onDialogClose: () => void;
+  sessionData: Session | null;
 }
 
 export default function ReservationDialog(props: SimpleDialogProps) {
@@ -24,12 +26,15 @@ export default function ReservationDialog(props: SimpleDialogProps) {
 
   };
 
+
   return (
     <>
       <Dialog open={open} onClose={() => props.onDialogClose()}>
         <DialogTitle> Prenota </DialogTitle>
         <div> Data: {dateClick?.date?.toDateString()}</div>
         <div> Orario di Inizio: {extractTimeFromDate(dateClick?.date)}</div>
+
+        {(props.sessionData) ?
         <ListItem disableGutters>
           <ListItemButton onClick={() => durationSelection(1)}>
             un&apos;ora
@@ -37,7 +42,9 @@ export default function ReservationDialog(props: SimpleDialogProps) {
           <ListItemButton onClick={() => durationSelection(2)}>
             due ore
           </ListItemButton>
-        </ListItem>
+        </ListItem> : 
+        <div> Effettua il login per prenotare </div>}   
+
       </Dialog>
     </>
   )

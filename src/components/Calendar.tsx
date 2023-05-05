@@ -172,6 +172,7 @@ export default function Calendar() {
         dateClick={dateClick}
         onDialogClose={() => setDateClick(undefined)}
         onDurationSelected={(endDate) => addEvent(endDate)}
+        sessionData={sessionData}
       />
 
       <EventDetailDialog
