@@ -1,0 +1,21 @@
+.footerContainer {
+  display: flex;
+  align-items: center;
+  min-height: 10vh;
+  padding: 20px;
+  justify-content: center;
+  background-color: #f2f0f1;
+  flex-direction: column;
+  width: 100%;
+  /* stick the footer at the bootom of the page */
+  position: absolute;
+  bottom: 0;
+}
+
+.footerText {
+  padding-bottom: 10px;
+}
+
+.footerDate {
+  opacity: 0.4;
+}
