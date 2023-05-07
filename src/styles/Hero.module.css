@@ -1,7 +1,7 @@
 .heroBox {
   width: 100%;
   display: flex;
-  min-height: 600px;
+  min-height: 800px;
   align-items: center;
   justify-content: center;
 }

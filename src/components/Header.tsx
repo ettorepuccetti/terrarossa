@@ -62,7 +62,7 @@ const Header = () => {
         <Toolbar className={styles.toolbar}>
           <Link href="#" underline="none">
             <Typography variant="h5" className={styles.logo}>
-              MUI Sample
+              Terrarouge
             </Typography>
           </Link>
 

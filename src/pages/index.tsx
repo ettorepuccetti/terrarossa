@@ -15,7 +15,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
         <meta name="google-site-verification" content="o13uxXhXF5TtrrsmtA8H3Uqy9eNimvm29w24v1bhUOs" />
       </Head>
-      <main className={styles.main}>
+      <main className={styles.wrapper}>
         <Header />
         <Hero />
          {/* <Section />
