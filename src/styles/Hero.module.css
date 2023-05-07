@@ -1,0 +1,29 @@
+.heroBox {
+  width: 100%;
+  display: flex;
+  min-height: 600px;
+  align-items: center;
+  justify-content: center;
+}
+
+.gridContainer {
+  display: flex;
+  align-items: center;
+  max-width: 1300px;
+  padding: 50px;
+}
+
+.title {
+  padding-bottom: 15px;
+}
+
+.subtitle {
+  opacity: 0.4;
+  padding-bottom: 30px;
+}
+
+.largeImage {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}

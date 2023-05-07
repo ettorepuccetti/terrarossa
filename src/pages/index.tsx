@@ -1,8 +1,9 @@
 import styles from "./index.module.css";
 import { type NextPage } from "next";
 import Head from "next/head";
-import { signIn, signOut, useSession } from "next-auth/react";
-import Calendar from "~/components/Calendar";
+import Link from "next/link";
+import Header from "~/components/Header";
+import Hero from "~/components/Hero";
 
 const Home: NextPage = () => {
 
@@ -15,31 +16,16 @@ const Home: NextPage = () => {
         <meta name="google-site-verification" content="o13uxXhXF5TtrrsmtA8H3Uqy9eNimvm29w24v1bhUOs" />
       </Head>
       <main className={styles.main}>
-        <Calendar />
-        <div className={styles.showcaseContainer}>
-          <AuthShowcase />
-        </div>
+        <Header />
+        <Hero />
+        {/* <Section />
+        <AboutUs />
+        <Testimonial />
+        <ContactUs />
+        <Footer /> */}
       </main>
     </>
   );
 };
 
 export default Home;
-
-const AuthShowcase: React.FC = () => {
-  const { data: sessionData } = useSession();
-
-  return (
-    <div className={styles.authContainer}>
-      <p className={styles.showcaseText}>
-        {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-      </p>
-      <button
-        className={styles.loginButton}
-        onClick={sessionData ? () => void signOut() : () => void signIn()}
-      >
-        {sessionData ? "Sign out" : "Sign in"}
-      </button>
-    </div>
-  );
-};

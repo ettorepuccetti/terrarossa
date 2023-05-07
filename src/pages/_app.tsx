@@ -34,13 +34,13 @@ const MyApp: AppType<MyAppType> = ({
 }) => {
   return (
     <CacheProvider value={emotionCache}>
-      <ThemeProvider theme={lightTheme}>
-        <SessionProvider session={session}>
-          <CssBaseline />
-          <Component {...pageProps} />
-        </SessionProvider>
-      </ThemeProvider>
-    </CacheProvider>
+        <ThemeProvider theme={lightTheme}>
+          <SessionProvider session={session}>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </SessionProvider>
+        </ThemeProvider>
+    </CacheProvider >
   );
 };
 

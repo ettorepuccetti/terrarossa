@@ -1,0 +1,20 @@
+.toolbar {
+  height: 10vh;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: white;
+}
+
+.logo {
+  color: blue;
+  cursor: pointer;
+}
+
+.link {
+  color: #000;
+}
+
+.menuIcon {
+  color: #000;
+}

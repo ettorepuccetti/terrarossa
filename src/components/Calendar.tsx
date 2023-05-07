@@ -122,15 +122,12 @@ export default function Calendar() {
   }
 
   const addEvent = (endDate: Date) => {
-    console.log("endDate in calendar: ", endDate);
-    console.log("court: ", dateClick?.resource?.title);
-
     setDateClick(undefined);
 
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
     }
-
+    
     reservationAdd.mutate({
       courtId: dateClick.resource.id,
       startDateTime: dateClick.date,
