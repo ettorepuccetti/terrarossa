@@ -1,20 +1,21 @@
-import { type DateClickArg } from '@fullcalendar/interaction'
-import { api } from "~/utils/api";
+import { type DateClickArg } from '@fullcalendar/interaction';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
-import React, { useCallback, useEffect, useState } from "react";
-import ReservationDialog from "~/components/ReservationDialog";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import ReserveDialog from "~/components/ReserveDialog";
+import { api } from "~/utils/api";
 
 import {
   type EventClickArg,
   type EventInput,
-} from '@fullcalendar/core'
-import { type ResourceInput } from "@fullcalendar/resource";
-import FullCalendarWrapper from "./FullCalendarWrapper";
-import EventDetailDialog from './EventDetailDialog';
-import { useSession } from 'next-auth/react';
+} from '@fullcalendar/core';
 import { type EventImpl } from '@fullcalendar/core/internal';
+import { type ResourceInput } from "@fullcalendar/resource";
 import { LocalizationProvider } from '@mui/x-date-pickers';
+import { useSession } from 'next-auth/react';
+import EventDetailDialog from './EventDetailDialog';
+import FullCalendarWrapper from "./FullCalendarWrapper";
+import { Backdrop, CircularProgress } from '@mui/material';
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -129,7 +130,7 @@ export default function Calendar() {
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
     }
-    
+
     reservationAdd.mutate({
       courtId: dateClick.resource.id,
       startDateTime: dateClick.date,
@@ -153,12 +154,19 @@ export default function Calendar() {
    * -------------------------------------
    */
 
-  if (courtQuery.isLoading || reservationQuery.isLoading) {
-    return <div>Loading...</div>
-  }
+  // if (courtQuery.isLoading || reservationQuery.isLoading) {
+  //   return <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}></Backdrop>
+  // }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
+
+      <Backdrop
+        open={reservationAdd.isLoading || reservationDelete.isLoading || courtQuery.isLoading || reservationQuery.isLoading}
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <FullCalendarWrapper
         events={events}
         courts={courts}
@@ -166,7 +174,7 @@ export default function Calendar() {
         onEventClick={openEventDialog}
       />
 
-      <ReservationDialog
+      <ReserveDialog
         open={dateClick !== undefined}
         dateClick={dateClick}
         onDialogClose={() => setDateClick(undefined)}
