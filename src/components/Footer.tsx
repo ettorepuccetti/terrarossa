@@ -3,7 +3,6 @@ import { Box, Typography, Link } from '@mui/material';
 import styles from '../styles/Footer.module.css';
 
 const Footer = () => {
-  const date = new Date().getFullYear();
 
   return (
     <Box sx={{ flexGrow: 1 }} className={styles.footerContainer}>

@@ -1,7 +1,9 @@
 import { type DateClickArg } from "@fullcalendar/interaction";
-import { Dialog, DialogTitle, ListItem, ListItemButton } from "@mui/material";
+import { Box, Button, Dialog, DialogTitle } from "@mui/material";
+import { TimeField, TimePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 import { type Session } from "next-auth";
-import { extractTimeFromDate } from "~/utils/formatter";
+import { useState } from "react";
 
 export interface SimpleDialogProps {
   open: boolean;
@@ -13,38 +15,54 @@ export interface SimpleDialogProps {
 
 export default function ReservationDialog(props: SimpleDialogProps) {
   const { open, dateClick } = props;
+  const [endDate, setEndDate] = useState<Date | null>(dateClick?.date ?? null);
 
-  const durationSelection = (hours: number) => {
-    if (!dateClick?.date) {
-      throw new Error("Date is undefined");
+  const onConfirm = () => {
+    if (!endDate) {
+      console.error("endDate: ", endDate);
+      return;
     }
-    const endDate = new Date(dateClick.date);
-    endDate.setHours(endDate.getHours() + hours);
     console.log("startDate in calendar: ", dateClick?.date);
     console.log("endDate from dialog: ", endDate);
-    props.onDurationSelected(endDate);
 
+    props.onDurationSelected(dayjs(endDate).toDate());
+    setEndDate(null);
   };
 
 
   return (
     <>
-      <Dialog open={open} onClose={() => props.onDialogClose()}>
-        <DialogTitle> Prenota </DialogTitle>
-        <div> Data: {dateClick?.date?.toDateString()}</div>
-        <div> Orario di Inizio: {extractTimeFromDate(dateClick?.date)}</div>
-
-        {(props.sessionData) ?
-        <ListItem disableGutters>
-          <ListItemButton onClick={() => durationSelection(1)}>
-            un&apos;ora
-          </ListItemButton>
-          <ListItemButton onClick={() => durationSelection(2)}>
-            due ore
-          </ListItemButton>
-        </ListItem> : 
-        <div> Effettua il login per prenotare </div>}   
-
+      <Dialog open={open} onClose={() => { setEndDate(null); props.onDialogClose() }}>
+        <Box sx={{ padding: '1rem' }}>
+          <DialogTitle textAlign={'center'}> Prenota </DialogTitle>
+          <Box display={"flex"} flexDirection={"column"} gap={1.5}>
+            <TimeField
+              value={dateClick?.date}
+              label={"Orario di inizio"}
+              readOnly={true}
+              ampm={false}
+              size="small"
+            />
+            <TimePicker
+              value={endDate}
+              label={"Orario di fine"}
+              onChange={(value) => setEndDate(value)}
+              ampm={false}
+              minutesStep={30}
+              skipDisabled={true}
+              minTime={dayjs(dateClick?.date) as unknown as Date}
+              maxTime={dayjs(dateClick?.date).add(2, 'hours') as unknown as Date}
+            />
+            {(props.sessionData)
+              ?
+              <Button onClick={() => onConfirm()} disabled={!endDate}> Prenota </Button>
+              :
+              <Box display={"flex"} alignItems={'center'} justifyContent={"center"}>
+                <Button> Effettua il login </Button>
+              </Box>
+            }
+          </Box>
+        </Box>
       </Dialog>
     </>
   )

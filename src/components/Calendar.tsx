@@ -3,6 +3,7 @@ import { api } from "~/utils/api";
 import { z } from "zod";
 import React, { useCallback, useEffect, useState } from "react";
 import ReservationDialog from "~/components/ReservationDialog";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import {
   type EventClickArg,
@@ -13,6 +14,7 @@ import FullCalendarWrapper from "./FullCalendarWrapper";
 import EventDetailDialog from './EventDetailDialog';
 import { useSession } from 'next-auth/react';
 import { type EventImpl } from '@fullcalendar/core/internal';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -156,7 +158,7 @@ export default function Calendar() {
   }
 
   return (
-    <div>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
       <FullCalendarWrapper
         events={events}
         courts={courts}
@@ -180,6 +182,6 @@ export default function Calendar() {
         onReservationDelete={(id) => deleteEvent(id)}
       />
 
-    </div>
+    </LocalizationProvider>
   )
 }
