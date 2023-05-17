@@ -1,7 +1,7 @@
-import { Button, Dialog, DialogTitle, useTheme } from "@mui/material";
-import { extractTimeFromDate } from "~/utils/formatter";
-import { type Session } from "next-auth";
 import { type EventImpl } from "@fullcalendar/core/internal";
+import { Button, Dialog } from "@mui/material";
+import { type Session } from "next-auth";
+import { extractTimeFromDate } from "~/utils/formatter";
 import DialogLayout from "./DialogLayout";
 
 interface DialogProps {
@@ -15,7 +15,6 @@ interface DialogProps {
 export default function EventDetailDialog(props: DialogProps) {
 
   const { open, eventDetails, sessionData } = props;
-  const theme = useTheme();
 
   if (!eventDetails) {
     return null;

@@ -1,5 +1,5 @@
 import { type DateClickArg } from "@fullcalendar/interaction";
-import { Box, Button, Dialog, DialogActions, DialogTitle, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, Typography } from "@mui/material";
 import { TimeField, TimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
@@ -28,7 +28,12 @@ export default function ReserveDialog(props: SimpleDialogProps) {
     console.log("startDate in calendar: ", dateClick?.date);
     console.log("endDate from dialog: ", endDate);
 
-    props.onDurationSelected(dayjs(endDate).toDate());
+    // clean seconds and milliseconds from endDate - issue with dayJS
+    const cleanedEndDate = dayjs(endDate).toDate();
+    cleanedEndDate.setMilliseconds(0);
+    cleanedEndDate.setSeconds(0);
+
+    props.onDurationSelected(cleanedEndDate);
     setEndDate(null);
   };
 

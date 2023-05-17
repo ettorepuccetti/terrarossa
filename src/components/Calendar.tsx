@@ -11,11 +11,11 @@ import {
 } from '@fullcalendar/core';
 import { type EventImpl } from '@fullcalendar/core/internal';
 import { type ResourceInput } from "@fullcalendar/resource";
+import { Alert, Backdrop, CircularProgress } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { useSession } from 'next-auth/react';
 import EventDetailDialog from './EventDetailDialog';
 import FullCalendarWrapper from "./FullCalendarWrapper";
-import { Backdrop, CircularProgress } from '@mui/material';
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -41,6 +41,7 @@ export default function Calendar() {
       await reservationQuery.refetch()
     },
   })
+
   const reservationDelete = api.reservation.deleteOne.useMutation({
     async onSuccess() {
       await reservationQuery.refetch()
@@ -126,16 +127,16 @@ export default function Calendar() {
 
   const addEvent = (endDate: Date) => {
     setDateClick(undefined);
-
+    setShowPotentialError(true);
+    
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
     }
-
-    reservationAdd.mutate({
-      courtId: dateClick.resource.id,
-      startDateTime: dateClick.date,
-      endDateTime: endDate
-    })
+      reservationAdd.mutate({
+        courtId: dateClick.resource.id,
+        startDateTime: dateClick.date,
+        endDateTime: endDate
+      })
   };
 
   function deleteEvent(eventId: string): void {
@@ -146,20 +147,24 @@ export default function Calendar() {
 
   const [eventDetails, setEventDetails] = useState<EventImpl>();
   const [dateClick, setDateClick] = useState<DateClickArg>();
-
-
+  const [showPotentialError, setShowPotentialError] = useState(true);
   /**
    * -------------------------------------
    * ---------- Rendering ---------------
    * -------------------------------------
    */
 
-  // if (courtQuery.isLoading || reservationQuery.isLoading) {
-  //   return <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}></Backdrop>
-  // }
-
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
+
+      {(reservationAdd.error !== null && showPotentialError) && 
+      <Backdrop
+        open={reservationAdd.error !== null}
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <Alert severity="error" onClose={() => setShowPotentialError(false)}>
+          {reservationAdd.error?.message}
+        </Alert>
+      </Backdrop>}
 
       <Backdrop
         open={reservationAdd.isLoading || reservationDelete.isLoading || courtQuery.isLoading || reservationQuery.isLoading}
