@@ -11,12 +11,11 @@ import {
 } from '@fullcalendar/core';
 import { type EventImpl } from '@fullcalendar/core/internal';
 import { type ResourceInput } from "@fullcalendar/resource";
-import { Alert, Backdrop, CircularProgress } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { useSession } from 'next-auth/react';
+import ErrorAlert from './ErrorAlert';
 import EventDetailDialog from './EventDetailDialog';
 import FullCalendarWrapper from "./FullCalendarWrapper";
-import ErrorAlert from './ErrorAlert';
 import Spinner from './Spinner';
 
 export const ReservationInputSchema = z.object({

@@ -1,10 +1,10 @@
 import { type DateClickArg } from "@fullcalendar/interaction";
-import { Box, Button, Dialog, DialogActions, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, TextField, Typography } from "@mui/material";
 import { DateField, TimeField, TimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import DialogLayout from "./DialogLayout";
 
 export interface SimpleDialogProps {
@@ -19,6 +19,10 @@ export default function ReserveDialog(props: SimpleDialogProps) {
 
   const { open, dateClick } = props;
   const [endDate, setEndDate] = useState<Date | null>(dateClick?.date ?? null);
+
+  useEffect(() => {
+    setEndDate(dayjs(dateClick?.date).add(1, "hour") as unknown as Date ?? null);
+  }, [dateClick]);
 
   const onConfirm = () => {
     if (!endDate) {
@@ -63,12 +67,14 @@ export default function ReserveDialog(props: SimpleDialogProps) {
               <TimePicker
                 value={endDate}
                 label={"Orario di fine"}
-                onChange={(value) => setEndDate(value)}
+                onChange={(dayJsDate) => setEndDate(dayJsDate)} // value is DayJS object
                 ampm={false}
                 minutesStep={30}
                 skipDisabled={true}
                 minTime={dayjs(dateClick?.date).add(1, 'hours') as unknown as Date}
                 maxTime={dayjs(dateClick?.date).add(2, 'hours') as unknown as Date}
+                autoFocus={true}
+                // renderInput={(props) => <TextField {...props} />}
               />
               <Button onClick={() => onConfirm()} disabled={!endDate}> Prenota </Button>
             </>
