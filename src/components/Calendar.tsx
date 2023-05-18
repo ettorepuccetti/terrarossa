@@ -16,6 +16,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { useSession } from 'next-auth/react';
 import EventDetailDialog from './EventDetailDialog';
 import FullCalendarWrapper from "./FullCalendarWrapper";
+import ErrorAlert from './ErrorAlert';
+import Spinner from './Spinner';
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -128,15 +130,15 @@ export default function Calendar() {
   const addEvent = (endDate: Date) => {
     setDateClick(undefined);
     setShowPotentialError(true);
-    
+
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
     }
-      reservationAdd.mutate({
-        courtId: dateClick.resource.id,
-        startDateTime: dateClick.date,
-        endDateTime: endDate
-      })
+    reservationAdd.mutate({
+      courtId: dateClick.resource.id,
+      startDateTime: dateClick.date,
+      endDateTime: endDate
+    })
   };
 
   function deleteEvent(eventId: string): void {
@@ -157,20 +159,15 @@ export default function Calendar() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
 
-      {(reservationAdd.error !== null && showPotentialError) && 
-      <Backdrop
-        open={reservationAdd.error !== null}
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Alert severity="error" onClose={() => setShowPotentialError(false)}>
-          {reservationAdd.error?.message}
-        </Alert>
-      </Backdrop>}
+      {(reservationAdd.error !== null && showPotentialError) &&
+        <ErrorAlert
+          error={reservationAdd.error}
+          onClose={() => setShowPotentialError(false)}
+        />}
 
-      <Backdrop
-        open={reservationAdd.isLoading || reservationDelete.isLoading || courtQuery.isLoading || reservationQuery.isLoading}
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
+      <Spinner
+        isLoading={reservationAdd.isLoading || reservationDelete.isLoading || courtQuery.isLoading || reservationQuery.isLoading}
+      />
 
       <FullCalendarWrapper
         events={events}
