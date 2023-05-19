@@ -1,10 +1,10 @@
 import { type DateClickArg } from "@fullcalendar/interaction";
-import { Box, Button, Dialog, DialogActions, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, Typography } from "@mui/material";
 import { DateField, TimeField, TimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import { signIn } from "next-auth/react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DialogLayout from "./DialogLayout";
 
 export interface SimpleDialogProps {

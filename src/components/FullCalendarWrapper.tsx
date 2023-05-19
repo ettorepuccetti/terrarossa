@@ -1,11 +1,13 @@
-import FullCalendar from "@fullcalendar/react";
-import interactionPlugin, { type DateClickArg } from '@fullcalendar/interaction'
-import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import {
   type EventClickArg,
+  type EventContentArg,
   type EventInput,
-} from '@fullcalendar/core'
+} from '@fullcalendar/core';
+import interactionPlugin, { type DateClickArg } from '@fullcalendar/interaction';
+import FullCalendar from "@fullcalendar/react";
 import { type ResourceInput } from "@fullcalendar/resource";
+import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
+import { Avatar, Box } from '@mui/material';
 
 interface FullCalendarWrapperProps {
   events: EventInput[];
@@ -46,6 +48,23 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       slotLabelFormat={{ hour: 'numeric', minute: '2-digit', hour12: false }}
       eventTimeFormat={{ hour: 'numeric', minute: '2-digit', hour12: false }}
       allDaySlot={false}
+      eventContent={renderEventContent}
     />
+  )
+}
+
+
+function renderEventContent(eventInfo: EventContentArg) {
+  return (
+    <Box display={'flex'} gap={1} className={'fc-event-main'} alignItems={'center'}>
+      {eventInfo.event.extendedProps.userImg
+        &&
+        /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
+        <Avatar alt={eventInfo.event.title} src={eventInfo.event.extendedProps.userImg} />}
+      <Box maxHeight={"100%"} overflow={'hidden'}>
+        <Box className="fc-event-time">{eventInfo.timeText} </Box>
+        <Box className="fc-event-title fc-sticky">{eventInfo.event.title} </Box>
+      </Box>
+    </Box>
   )
 }

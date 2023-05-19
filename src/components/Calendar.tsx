@@ -55,10 +55,10 @@ export default function Calendar() {
 
 
   /**
- * -------------------------------------
- *      ----- DB Queries -----
- * -------------------------------------
- */
+   * -------------------------------------
+   *      ----- DB Queries -----
+   * -------------------------------------
+   */
 
   const getCourtsFromDb = useCallback(() => {
     if (courtQuery.error) {
@@ -89,6 +89,7 @@ export default function Calendar() {
           resourceId: reservation.courtId,
           extendedProps: {
             userId: reservation.user.id,
+            userImg: reservation.user.image,
           }
         }
       }))

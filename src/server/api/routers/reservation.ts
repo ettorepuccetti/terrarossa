@@ -15,6 +15,7 @@ export const reservationRouter = createTRPCRouter({
               role: true,
               name: true,
               email: true,
+              image: true
             }
           }
         },
