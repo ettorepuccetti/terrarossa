@@ -63,7 +63,7 @@ function renderEventContent(eventInfo: EventContentArg) {
         <Avatar alt={eventInfo.event.title} src={eventInfo.event.extendedProps.userImg} />}
       <Box maxHeight={"100%"} overflow={'hidden'}>
         <Box className="fc-event-time">{eventInfo.timeText} </Box>
-        <Box className="fc-event-title fc-sticky">{eventInfo.event.title} </Box>
+        <Box className="fc-event-title">{eventInfo.event.title} </Box>
       </Box>
     </Box>
   )
