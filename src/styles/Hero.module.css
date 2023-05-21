@@ -1,7 +1,7 @@
 .heroBox {
   width: 100%;
   display: flex;
-  min-height: 800px;
+  min-height: calc(82vh); /* 70px is the height of the header. To be removed when add addition content */
   align-items: center;
   justify-content: center;
 }

@@ -1,18 +1,26 @@
 import React from 'react';
 import { Box, Typography, Link } from '@mui/material';
 import styles from '../styles/Footer.module.css';
+import NextLink from 'next/link';
 
 const Footer = () => {
 
   return (
-    <Box sx={{ flexGrow: 1 }} className={styles.footerContainer}>
-      <Typography className={styles.footerText}>
-        Provided by{' '}
-        <Link href="https://appseed.us" target="_blank" underline="none">
-          AppSeed
+    <Box className={styles.footerContainer}>
+      {/* <Typography className={styles.footerText}>
+        Provided with ❤️ by{' '}
+        <Link href="https://github.com/ettorepuccetti" target="_blank" underline="none">
+          EP
         </Link>
-      </Typography>
-      <Typography className={styles.footerDate}>Open-Source Sample - Buit with MUI</Typography>
+      </Typography> */}
+      <Box display={'flex'} gap={2.5}>
+      <NextLink href={"/terms"}>
+        <Typography className={styles.footerDate} sx={{textDecoration: "underline"}}> Terms of Service </Typography>
+      </NextLink>
+      <NextLink href={"/privacy"}>
+        <Typography className={styles.footerDate} sx={{textDecoration: "underline"}}> Privacy Policy </Typography>
+      </NextLink>
+      </Box>
     </Box>
   );
 };

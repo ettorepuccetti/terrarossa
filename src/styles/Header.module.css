@@ -1,3 +1,7 @@
+.marginBottom {
+  margin-bottom: 10vh;
+}
+
 .toolbar {
   height: 10vh;
   display: flex;
@@ -7,8 +11,9 @@
 }
 
 .logo {
-  color: blue;
+  color: #C23B22;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .link {

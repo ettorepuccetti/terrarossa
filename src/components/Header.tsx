@@ -1,104 +1,55 @@
+import MenuIcon from '@mui/icons-material/Menu';
+
 import {
   AppBar,
-  Typography,
-  Link,
   Box,
-  Toolbar,
-  List,
-  ListItem,
-  ListItemText,
   IconButton,
-  Drawer,
+  Toolbar,
+  Typography
 } from '@mui/material';
+import NextLink from 'next/link';
 import React from 'react';
-import MenuIcon from '@mui/icons-material/Menu';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import styles from '~/styles/Header.module.css';
+import HomeDrawer from './Drawer';
 
 
 const Header = () => {
-  const links = [
-    { id: 1, route: 'About', url: 'https://blog.appseed.us/mui-react-coding-landing-page/' },
-    { id: 2, route: 'More Apps', url: 'https://appseed.us/apps/react' },
-  ];
-
-  const [state, setState] = React.useState(false);
-
-  const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return;
-    }
-
-    setState(open);
-  };
-
-  const list = () => (
-    <Box
-      sx={{ width: 250 }}
-      role="presentation"
-      onClick={(_e) => setState(false)}
-      onKeyDown={toggleDrawer(false)}
-    >
-      <List>
-        {links.map((link) => (
-          <ListItem button key={link.id}>
-            <ListItemText primary={link.route} />
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
-
-  const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.down('sm'));
+  const [openDrawer, setOpenDrawer] = React.useState(false);
 
   return (
-    <Box sx={{ marginBottom: '70px' }}>
+    <Box className={styles.marginBottom}>
       <AppBar>
         <Toolbar className={styles.toolbar}>
-          <Link href="#" underline="none">
+
+          {/* Menu icon that open the drawer */}
+          <Box>
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={(_e) => setOpenDrawer(true)}
+            >
+              <MenuIcon className={styles.menuIcon} />
+            </IconButton>
+
+            <HomeDrawer open={openDrawer} setOpen={setOpenDrawer} />
+          </Box>
+
+          {/* Logo with link to home */}
+          <NextLink href="#">
             <Typography variant="h5" className={styles.logo}>
               Terrarouge
             </Typography>
-          </Link>
+          </NextLink>
 
-          {matches ? (
-            <Box>
-              <IconButton
-                size="large"
-                edge="end"
-                color="inherit"
-                aria-label="menu"
-                onClick={(_e) => setState(true)}
-              >
-                <MenuIcon className={styles.menuIcon} />
-              </IconButton>
+          {/* empty box to position logo in the center */}
+          <Box>
+            <IconButton size='large'></IconButton>
+            <MenuIcon></MenuIcon>
+          </Box>
 
-              <Drawer
-                anchor="right"
-                open={state}
-                onClose={toggleDrawer(false)}
-              >
-                {list()}
-              </Drawer>
-            </Box>
-          ) : <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              flexGrow: '0.1',
-            }}
-          >
-            {links.map((link) => (
-              <Link href={link.url} target="_blank" underline="none" key={link.id}>
-                <Typography className={styles.link}>{link.route}</Typography>
-              </Link>
-            ))}
-          </Box>}
+
 
         </Toolbar>
       </AppBar>

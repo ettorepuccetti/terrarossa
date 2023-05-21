@@ -1,6 +1,6 @@
 export default function Terms() {
   return (
-    <>
+    <div style={{padding: "1rem"}}>
       <h1>Terms and Conditions</h1>
       <p>Last updated: May 01, 2023</p>
       <p>Please read these terms and conditions carefully before using Our Service.</p>
@@ -83,6 +83,6 @@ export default function Terms() {
       <ul>
         <li>By email: terrarouge.vercel@gmail.com</li>
       </ul>
-    </>
+    </div>
   )
 }

@@ -1,7 +1,7 @@
 .footerContainer {
   display: flex;
   align-items: center;
-  min-height: 10vh;
+  min-height: 8vh;
   padding: 20px;
   justify-content: center;
   background-color: #f2f0f1;

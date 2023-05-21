@@ -1,6 +1,6 @@
 export default function Privacy() {
   return (
-    <>
+    <div style={{padding: "1rem"}}>
       <h1>Privacy Policy</h1>
       <p>Last updated: May 01, 2023</p>
       <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
@@ -190,6 +190,6 @@ export default function Privacy() {
       <ul>
         <li>By email: terrarouge.vercel@gmail.com</li>
       </ul>
-    </>
+    </div>
   )
 }
