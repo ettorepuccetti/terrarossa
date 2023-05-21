@@ -15,14 +15,15 @@ export default function ReservationHeader() {
   const [openDrawer, setOpenDrawer] = React.useState(false);
   return (
     <>
-      <AppBar position={'fixed'} >
+  
+      <AppBar position={'fixed'}  /*  sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} */ >
         <Toolbar sx={toolbarStyle} disableGutters>
           <IconButton
             size="large"
             edge="start"
             color="inherit"
             sx={{ mr: 2 }}
-            onClick={(_e) => setOpenDrawer(true)}
+            onClick={(_e) => setOpenDrawer(!openDrawer)}
           >
             <MenuIcon sx={{ color: "black"}} />
           </IconButton>

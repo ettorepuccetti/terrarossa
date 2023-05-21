@@ -8,6 +8,7 @@ import FullCalendar from "@fullcalendar/react";
 import { type ResourceInput } from "@fullcalendar/resource";
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import { Avatar, Box } from '@mui/material';
+import { useRef } from 'react';
 
 interface FullCalendarWrapperProps {
   events: EventInput[];
@@ -17,9 +18,13 @@ interface FullCalendarWrapperProps {
 }
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
+  
+  const calendarRef = useRef<FullCalendar>(null);
+  const calendarApi = calendarRef.current?.getApi();
 
   return (
     <FullCalendar
+      ref={calendarRef}
       schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
       plugins={[interactionPlugin, resourceTimeGridPlugin]}
       initialView="resourceTimeGridDay"
@@ -49,6 +54,8 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       eventTimeFormat={{ hour: 'numeric', minute: '2-digit', hour12: false }}
       allDaySlot={false}
       eventContent={renderEventContent}
+      titleFormat={{ month: 'short', day: 'numeric' }}
+      locale={'it-it'}
     />
   )
 }
