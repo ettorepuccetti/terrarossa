@@ -1,8 +1,6 @@
 import styled from "@emotion/styled";
-import { DateRange, Logout } from "@mui/icons-material";
-import { Drawer, Box, List, ListItemButton, Typography, ListItemText, Divider } from "@mui/material";
-import { signIn, signOut, useSession } from "next-auth/react";
-import Login from "./Login";
+import { DateRange } from "@mui/icons-material";
+import { Box, Drawer, List, ListItemButton, ListItemText } from "@mui/material";
 import NextLink from "next/link";
 import LoginDrawerButton from "./LoginDrawerButton";
 
@@ -17,8 +15,6 @@ export const ListItemButtonStyled = styled(ListItemButton)(() => ({
 
 export default function HomeDrawer(props: DrawerProps) {
 
-  const { data: sessionData } = useSession();
-
   return (
     <Drawer
       anchor="left"
@@ -32,7 +28,7 @@ export default function HomeDrawer(props: DrawerProps) {
       >
         <List>
 
-          {/* Login / Logout button */}
+          {/* Login - Logout button */}
           <LoginDrawerButton />
 
           {/* Link to reservation page */}

@@ -10,10 +10,10 @@ import {
 import NextLink from 'next/link';
 import React from 'react';
 import styles from '~/styles/Header.module.css';
-import HomeDrawer from './Drawer';
+import HomeDrawer from './HomeDrawer';
 
 
-const Header = () => {
+const HomeHeader = () => {
   const [openDrawer, setOpenDrawer] = React.useState(false);
 
   return (
@@ -57,4 +57,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default HomeHeader;

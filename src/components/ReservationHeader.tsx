@@ -1,4 +1,3 @@
-import { s } from '@fullcalendar/core/internal-common';
 import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
 import IconButton from '@mui/material/IconButton';
@@ -12,7 +11,7 @@ const toolbarStyle = {
   height:"10vh"
 }
 
-export default function NewHeader() {
+export default function ReservationHeader() {
   const [openDrawer, setOpenDrawer] = React.useState(false);
   return (
     <>
