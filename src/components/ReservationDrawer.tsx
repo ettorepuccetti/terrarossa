@@ -1,21 +1,17 @@
-import styled from "@emotion/styled";
-import { Logout } from "@mui/icons-material";
-import { Box, Divider, Drawer, List, ListItemButton, ListItemText, Typography } from "@mui/material";
-import { signIn, signOut, useSession } from "next-auth/react";
-import Login from "./Login";
+import { HomeOutlined } from "@mui/icons-material";
+import { Box, Drawer, List, ListItemText } from "@mui/material";
+import NextLink from "next/link";
+import { ListItemButtonStyled } from "./HomeDrawer";
+import LoginDrawerButton from "./LoginDrawerButton";
 
 interface DrawerProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ListItemButtonStyled = styled(ListItemButton)(() => ({
-  gap: '1rem'
-}));
 
 export default function ReservationDrawer(props: DrawerProps) {
 
-  const { data: sessionData } = useSession();
 
   return (
     <Drawer
@@ -30,31 +26,15 @@ export default function ReservationDrawer(props: DrawerProps) {
       >
         <List>
 
-          {/* User already logged in */}
-          {sessionData && (<>
-            <ListItemButtonStyled >
-              <Typography variant="h6">
-                {sessionData.user?.name}
-              </Typography>
-            </ListItemButtonStyled>
-            <Divider />
-            <ListItemButtonStyled>
-              <Logout />
-              <ListItemText
-                primary=" Logout"
-                onClick={() => void signOut()} />
-            </ListItemButtonStyled>
-          </>)}
+          <LoginDrawerButton />
 
-          {/* User not logged in */}
-          {!sessionData && (<>
+          {/* Link to reservation page */}
+          <NextLink href="/">
             <ListItemButtonStyled >
-              <Login />
-              <ListItemText
-                primary="Login"
-                onClick={() => void signIn()} />
+              <HomeOutlined />
+              <ListItemText primary="Home" />
             </ListItemButtonStyled>
-          </>)}
+          </NextLink>
 
         </List>
       </Box>
