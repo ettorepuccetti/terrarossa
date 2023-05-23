@@ -1,30 +1,31 @@
 import { type DateClickArg } from "@fullcalendar/interaction";
-import { Box, Button, Dialog, DialogActions, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, TextField, Typography } from "@mui/material";
 import { DateField, TimeField, TimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { type Session } from "next-auth";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import DialogLayout from "./DialogLayout";
+import { UserRoles } from "~/utils/constants";
 
 export interface SimpleDialogProps {
   open: boolean;
   dateClick: DateClickArg | undefined;
-  onDurationSelected: (value: Date) => void;
+  onConfirm: (endDate: Date, overwrittenName?: string) => void;
   onDialogClose: () => void;
-  sessionData: Session | null;
 }
 
 export default function ReserveDialog(props: SimpleDialogProps) {
 
   const { open, dateClick } = props;
   const [endDate, setEndDate] = useState<Date | null>(dateClick?.date ?? null);
+  const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
+  const {data: sessionData} = useSession();
 
   useEffect(() => {
     setEndDate(dayjs(dateClick?.date).add(1, "hour") as unknown as Date ?? null);
   }, [dateClick]);
 
-  const onConfirm = () => {
+  const onInternalConfirm = () => {
     if (!endDate) {
       console.error("endDate: ", endDate);
       return;
@@ -37,20 +38,37 @@ export default function ReserveDialog(props: SimpleDialogProps) {
     cleanedEndDate.setMilliseconds(0);
     cleanedEndDate.setSeconds(0);
 
-    props.onDurationSelected(cleanedEndDate);
+    props.onConfirm(cleanedEndDate, overwriteName !== "" ? overwriteName : undefined);
     setEndDate(null);
+    setOverwriteName("");
   };
 
+  const canOverwriteReservationName = (sessionData && sessionData.user?.role === UserRoles.ADMIN);
 
   return (
     <>
-      <Dialog open={open} onClose={() => { setEndDate(null); props.onDialogClose() }}>
+      <Dialog open={open} onClose={() => { setEndDate(null); setOverwriteName(""); props.onDialogClose() }}>
         <DialogLayout title="Prenota">
-          {(props.sessionData) ?
+
+          {/* if not login only show login button with no other fields */}
+          {(sessionData) ? 
+
             <>
+              {/* court name */}
               <DialogActions>
                 <Typography gutterBottom> {dateClick?.resource?.title} </Typography>
               </DialogActions>
+
+              {/* overwrite name, only if admin mode */}
+              { canOverwriteReservationName && <TextField
+                variant="outlined"
+                placeholder="Nome"
+                label="Nome prenotazione"
+                value={overwriteName}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOverwriteName(e.target.value)}
+              />}
+
+              {/* date */}
               <DateField
                 value={dayjs(dateClick?.date)}
                 readOnly={true}
@@ -76,7 +94,7 @@ export default function ReserveDialog(props: SimpleDialogProps) {
                 autoFocus={true}
                 // renderInput={(props) => <TextField {...props} />}
               />
-              <Button onClick={() => onConfirm()} disabled={!endDate}> Prenota </Button>
+              <Button onClick={() => onInternalConfirm()} disabled={!endDate}> Prenota </Button>
             </>
             :
             <Box display={"flex"} alignItems={'center'} justifyContent={"center"}>

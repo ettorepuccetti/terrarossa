@@ -76,9 +76,10 @@ model Reservation {
   startTime DateTime
   endTime   DateTime
   court     Court    @relation(fields: [courtId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   courtId   String
-  userId    String
+  userId    String?
+  overwriteName String?
 
   @@index([courtId])
   @@index([userId])

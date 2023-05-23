@@ -3,9 +3,10 @@ import { Box, Button, Dialog, DialogActions, Typography } from "@mui/material";
 import { DateField, TimeField } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
-import DialogLayout from "./DialogLayout";
 import React from "react";
 import ConfirmationAlert from "./ConfirmationAlert";
+import DialogLayout from "./DialogLayout";
+import { UserRoles } from "~/utils/constants";
 
 interface DialogProps {
   open: boolean;
@@ -24,6 +25,10 @@ export default function EventDetailDialog(props: DialogProps) {
     return null;
   }
 
+  const canDelete = (sessionData !== null && (
+    sessionData.user.role === UserRoles.ADMIN ||
+    sessionData.user.id === props.eventDetails?.extendedProps?.userId
+  ));
 
   return (
     <>
@@ -57,18 +62,13 @@ export default function EventDetailDialog(props: DialogProps) {
             />
           </Box>
 
-          <Button
-            hidden={
-              !(sessionData !== null && (
-                sessionData.user.role === "ADMIN" ||
-                sessionData.user.id === props.eventDetails?.extendedProps?.userId
-              ))
-            }
+          {canDelete && <Button
             onClick={() => setConfirmationOpen(true)}
             color={"error"}
           >
             Cancella
-          </Button>
+          </Button>}
+
           <ConfirmationAlert
             open={confirmationOpen}
             title={"Cancellazione"}

@@ -22,6 +22,7 @@ export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
   endDateTime: z.date(),
   courtId: z.string(),
+  overwriteName: z.string().optional(),
 });
 
 
@@ -34,7 +35,7 @@ export default function Calendar() {
    *      ----- trpc procedures -----
    * -------------------------------------
    */
-  const reservationQuery = api.reservation.getAll.useQuery();
+  const reservationQuery = api.reservation.getAllVisibleInCalendar.useQuery();
   const courtQuery = api.court.getAll.useQuery();
 
   const reservationAdd = api.reservation.insertOne.useMutation({
@@ -82,14 +83,14 @@ export default function Calendar() {
       setEvents(reservationFromDb.map((reservation) => {
         return {
           id: reservation.id.toString(),
-          title: reservation.user.name || "", //user.name can be null
+          title: reservation.overwriteName? reservation.overwriteName : (reservation.user?.name || "[deleted user]"), //user.name can be null or user can be null
           start: reservation.startTime,
           end: reservation.endTime,
-          allDay: false,
           resourceId: reservation.courtId,
+          // color: reservation.user?.role === "ADMIN" ? "red" : "green",
           extendedProps: {
-            userId: reservation.user.id,
-            userImg: reservation.user.image,
+            userId: reservation.user?.id, 
+            userImg: reservation.user?.image,
           }
         }
       }))
@@ -127,7 +128,7 @@ export default function Calendar() {
     setEventDetails(eventClickInfo.event)
   }
 
-  const addEvent = (endDate: Date) => {
+  const addEvent = (endDate: Date, overwrittenName?: string) => {
     setDateClick(undefined);
     setShowPotentialError(true);
 
@@ -137,7 +138,8 @@ export default function Calendar() {
     reservationAdd.mutate({
       courtId: dateClick.resource.id,
       startDateTime: dateClick.date,
-      endDateTime: endDate
+      endDateTime: endDate,
+      overwriteName: overwrittenName,
     })
   };
 
@@ -180,8 +182,7 @@ export default function Calendar() {
         open={dateClick !== undefined}
         dateClick={dateClick}
         onDialogClose={() => setDateClick(undefined)}
-        onDurationSelected={(endDate) => addEvent(endDate)}
-        sessionData={sessionData}
+        onConfirm={(endDate, overwrittenName?) => addEvent(endDate, overwrittenName)}
       />
 
       <EventDetailDialog
