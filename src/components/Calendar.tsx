@@ -111,11 +111,13 @@ export default function Calendar() {
 
 
   const openReservationDialog = (selectInfo: DateClickArg) => {
-    console.log(selectInfo.dateStr);
-    console.log("resouceId: ", selectInfo.resource?.id);
+    console.log("selected date: ", selectInfo.dateStr);
+    console.log("resouce: ", selectInfo.resource?.title);
 
-    const calendarApi = selectInfo.view.calendar
-    calendarApi.unselect() // clear date selection
+    if (selectInfo.date < new Date()) {
+      console.warn("date is in the past");
+      return;
+    }
 
     if (selectInfo.resource === undefined) {
       throw new Error("No court selected");
