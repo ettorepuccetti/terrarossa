@@ -61,6 +61,7 @@ model User {
   sessions      Session[]
   role          String        @default("USER")
   Reservation   Reservation[]
+  createdAt     DateTime      @default(now())
 }
 
 model VerificationToken {
@@ -72,13 +73,13 @@ model VerificationToken {
 }
 
 model Reservation {
-  id        String   @id @unique @default(cuid())
-  startTime DateTime
-  endTime   DateTime
-  court     Court    @relation(fields: [courtId], references: [id])
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  courtId   String
-  userId    String?
+  id            String   @id @unique @default(cuid())
+  startTime     DateTime
+  endTime       DateTime
+  court         Court    @relation(fields: [courtId], references: [id])
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  courtId       String
+  userId        String?
   overwriteName String?
 
   @@index([courtId])

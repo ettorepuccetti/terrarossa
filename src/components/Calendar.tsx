@@ -156,10 +156,6 @@ export default function Calendar() {
   const [showPotentialErrorOnAdd, setShowPotentialErrorOnAdd] = useState(true);
   const [showPotentialErrorOnDel, setShowPotentialErrorOnDel] = useState(true);
 
-  const isLoading = reservationAdd.isLoading ||
-    reservationDelete.isLoading ||
-    courtQuery.isLoading ||
-    reservationQuery.isLoading;
   /**
    * -------------------------------------
    * ---------- Rendering ---------------

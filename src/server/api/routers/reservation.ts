@@ -36,6 +36,13 @@ export const reservationRouter = createTRPCRouter({
       return ctx.prisma.reservation.findMany({
         where: {
           userId: ctx.session.user.id
+        },
+        include: {
+          court: {
+            select: {
+              name: true,
+            }
+          },
         }
       });
     }),
