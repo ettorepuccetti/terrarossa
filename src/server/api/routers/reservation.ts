@@ -79,13 +79,22 @@ export const reservationRouter = createTRPCRouter({
   deleteOne: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
+      
       const reservationToDelete = await ctx.prisma.reservation.findUnique({ where: { id: input } });
+      
       if (reservationToDelete === null) {
         throw new Error("Reservation does not exist. Id: " + input.toString());
       }
       if (reservationToDelete?.userId !== ctx.session.user.id && ctx.session.user.role !== UserRoles.ADMIN) {
-        throw new Error("You are not authorized to delete this reservation");
+        throw new TRPCClientError("You are not authorized to delete this reservation");
       }
+      // reservation cannot be deleted six hours before the start time, using dayJS to add 6 hours to the start time
+      // exception: admin can delete reservations at any time
+      const sixHoursBeforeStart = dayjs(reservationToDelete.startTime).add(-6, "hour");
+      if (sixHoursBeforeStart.isBefore(Date.now()) && ctx.session.user.role !== UserRoles.ADMIN) {
+        throw new TRPCClientError("Server: Reservations cannot be deleted 6 hours before the start time");
+      }
+
       return ctx.prisma.reservation.delete({
         where: {
           id: input,

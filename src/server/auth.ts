@@ -1,16 +1,17 @@
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
-  type NextAuthOptions,
   type DefaultSession,
+  type NextAuthOptions,
 } from "next-auth";
-import GoogleProvider from "next-auth/providers/google"
-import FacebookProvider from "next-auth/providers/facebook"
-import GitHubProvider from "next-auth/providers/github"
-import Auth0Provider from "next-auth/providers/auth0"
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import Auth0Provider from "next-auth/providers/auth0";
+import FacebookProvider from "next-auth/providers/facebook";
+import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
+import { type UserRole } from "~/utils/constants";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -20,12 +21,6 @@ import { prisma } from "~/server/db";
  */
 
 declare module "next-auth" {
-  enum UserRoles {
-    ADMIN = "ADMIN",
-    USER = "USER",
-  }
-
-  type UserRole = UserRoles.ADMIN | UserRoles.USER;
 
   interface Session extends DefaultSession {
     user: {

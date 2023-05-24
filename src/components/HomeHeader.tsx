@@ -39,7 +39,7 @@ const HomeHeader = () => {
           {/* Logo with link to home */}
           <NextLink href="#">
             <Typography variant="h5" className={styles.logo}>
-              Terrarouge
+              Terrarossa
             </Typography>
           </NextLink>
 

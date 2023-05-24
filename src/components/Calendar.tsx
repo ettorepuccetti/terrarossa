@@ -83,13 +83,13 @@ export default function Calendar() {
       setEvents(reservationFromDb.map((reservation) => {
         return {
           id: reservation.id.toString(),
-          title: reservation.overwriteName? reservation.overwriteName : (reservation.user?.name || "[deleted user]"), //user.name can be null or user can be null
+          title: reservation.overwriteName ? reservation.overwriteName : (reservation.user?.name || "[deleted user]"), //user.name can be null or user can be null
           start: reservation.startTime,
           end: reservation.endTime,
           resourceId: reservation.courtId,
           // color: reservation.user?.role === "ADMIN" ? "red" : "green",
           extendedProps: {
-            userId: reservation.user?.id, 
+            userId: reservation.user?.id,
             userImg: reservation.user?.image,
           }
         }
@@ -126,13 +126,12 @@ export default function Calendar() {
   }
 
   const openEventDialog = (eventClickInfo: EventClickArg) => {
-    console.log("eventClickInfo: ", eventClickInfo);
     setEventDetails(eventClickInfo.event)
   }
 
   const addEvent = (endDate: Date, overwrittenName?: string) => {
     setDateClick(undefined);
-    setShowPotentialError(true);
+    setShowPotentialErrorOnAdd(true);
 
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
@@ -146,14 +145,21 @@ export default function Calendar() {
   };
 
   function deleteEvent(eventId: string): void {
+    setEventDetails(undefined);
+    setShowPotentialErrorOnDel(true);
     console.log("delete Event: ", eventId);
     reservationDelete.mutate(eventId);
-    setEventDetails(undefined);
   }
 
   const [eventDetails, setEventDetails] = useState<EventImpl>();
   const [dateClick, setDateClick] = useState<DateClickArg>();
-  const [showPotentialError, setShowPotentialError] = useState(true);
+  const [showPotentialErrorOnAdd, setShowPotentialErrorOnAdd] = useState(true);
+  const [showPotentialErrorOnDel, setShowPotentialErrorOnDel] = useState(true);
+
+  const isLoading = reservationAdd.isLoading ||
+    reservationDelete.isLoading ||
+    courtQuery.isLoading ||
+    reservationQuery.isLoading;
   /**
    * -------------------------------------
    * ---------- Rendering ---------------
@@ -163,14 +169,23 @@ export default function Calendar() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
 
-      {(reservationAdd.error !== null && showPotentialError) &&
+      {(reservationAdd.error !== null && showPotentialErrorOnAdd) &&
         <ErrorAlert
           error={reservationAdd.error}
-          onClose={() => setShowPotentialError(false)}
+          onClose={() => setShowPotentialErrorOnAdd(false)}
+        />}
+
+      {(reservationDelete.error !== null && showPotentialErrorOnDel) &&
+        <ErrorAlert
+          error={reservationDelete.error}
+          onClose={() => setShowPotentialErrorOnDel(false)}
         />}
 
       <Spinner
-        isLoading={reservationAdd.isLoading || reservationDelete.isLoading || courtQuery.isLoading || reservationQuery.isLoading}
+        isLoading={reservationAdd.isLoading ||
+          reservationDelete.isLoading ||
+          courtQuery.isLoading ||
+          reservationQuery.isLoading}
       />
 
       <FullCalendarWrapper

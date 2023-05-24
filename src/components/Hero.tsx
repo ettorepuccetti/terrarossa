@@ -15,7 +15,7 @@ const Hero = () => {
             Prenota ora il tuo campo da tennis
           </Typography>
           <Typography variant="h6" className={styles.subtitle}>
-            Con Terrarogue.
+            Con Terrarossa
           </Typography>
           <Link href="/prenota">
             <Button
