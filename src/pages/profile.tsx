@@ -29,11 +29,11 @@ const Prenota = () => {
   })
 
   const columns: GridColDef[] = [
-    { field: 'col1', headerName: 'Giorno', width: 100 },
-    { field: 'col2', headerName: 'Ora inizio', width: 100 },
-    { field: 'col3', headerName: 'Ora fine', width: 100 },
-    { field: 'col4', headerName: 'Campo', width: 100 },
-    { field: 'col5', headerName: 'FullDate', width: 100 },
+    { field: 'col1', headerName: 'Giorno', sortable: false, flex: 1, minWidth: 105},
+    { field: 'col2', headerName: 'Ora inizio', sortable: false, flex: 1,minWidth: 85 },
+    { field: 'col3', headerName: 'Ora fine', sortable: false, flex: 1, minWidth: 85},
+    { field: 'col4', headerName: 'Campo', sortable: false, flex: 1, minWidth: 100, maxWidth: 120},
+    { field: 'col5', headerName: 'FullDate', sortable: false, flex: 1, minWidth: 100},
   ];
 
   const initialState: GridInitialStateCommunity = {
@@ -68,7 +68,7 @@ const Prenota = () => {
 
 
         {authData?.user.image &&
-          <Avatar src={authData?.user.image} sx={{ width: 70, height: 'auto' }} />
+          <Avatar src={authData?.user.image} sx={{ width: 70, height: 70 }} />
         }
         <TextField
           variant="standard"
@@ -102,12 +102,13 @@ const Prenota = () => {
         {myReservationsQuery.isLoading ?
           <Skeleton variant="rectangular" width={"100%"} height={400} />
           :
-          <Box width={"100%"} height={600} maxWidth={700}>
+          <Box width={"100%"} height={500} maxWidth={700}>
             <DataGrid
               rows={rows ? rows : []}
               columns={columns}
               autoPageSize={true}
               initialState={initialState}
+              disableColumnMenu
             />
           </Box>
         }
