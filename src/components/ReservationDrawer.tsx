@@ -1,4 +1,4 @@
-import { HomeOutlined, PersonOutline } from "@mui/icons-material";
+import { DateRange, HomeOutlined, PersonOutline } from "@mui/icons-material";
 import { Box, Drawer, List, ListItemText } from "@mui/material";
 import NextLink from "next/link";
 import { ListItemButtonStyled } from "./HomeDrawer";
@@ -28,11 +28,19 @@ export default function ReservationDrawer(props: DrawerProps) {
 
           <LoginDrawerButton />
 
-          {/* Link to reservation page */}
+          {/* Link to home page */}
           <NextLink href="/">
             <ListItemButtonStyled >
               <HomeOutlined />
               <ListItemText primary="Home" />
+            </ListItemButtonStyled>
+          </NextLink>
+
+          {/* Link to reservation page */}
+          <NextLink href="/prenota">
+            <ListItemButtonStyled >
+              <DateRange />
+              <ListItemText primary="Prenota" />
             </ListItemButtonStyled>
           </NextLink>
 

@@ -3,6 +3,8 @@ import { DataGrid, type GridColDef, type GridRowsProp } from "@mui/x-data-grid";
 import { type GridInitialStateCommunity } from "@mui/x-data-grid/models/gridStateCommunity";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import DeleteAccount from "~/components/DeleteAccount";
 import ReservationHeader from "~/components/ReservationHeader";
 import Spinner from "~/components/Spinner";
 import { api } from "~/utils/api";
@@ -17,6 +19,7 @@ const Prenota = () => {
   const userQuery = api.user.getInfo.useQuery();
   const myReservationsQuery = api.reservation.getMine.useQuery();
 
+
   const rows: GridRowsProp | undefined = myReservationsQuery.data?.map((reservation, index) => {
     return {
       id: index,
@@ -29,11 +32,11 @@ const Prenota = () => {
   })
 
   const columns: GridColDef[] = [
-    { field: 'col1', headerName: 'Giorno', sortable: false, flex: 1, minWidth: 105},
-    { field: 'col2', headerName: 'Ora inizio', sortable: false, flex: 1,minWidth: 85 },
-    { field: 'col3', headerName: 'Ora fine', sortable: false, flex: 1, minWidth: 85},
-    { field: 'col4', headerName: 'Campo', sortable: false, flex: 1, minWidth: 100, maxWidth: 120},
-    { field: 'col5', headerName: 'FullDate', sortable: false, flex: 1, minWidth: 100},
+    { field: 'col1', headerName: 'Giorno', sortable: false, flex: 1, minWidth: 105 },
+    { field: 'col2', headerName: 'Ora inizio', sortable: false, flex: 1, minWidth: 85 },
+    { field: 'col3', headerName: 'Ora fine', sortable: false, flex: 1, minWidth: 85 },
+    { field: 'col4', headerName: 'Campo', sortable: false, flex: 1, minWidth: 100, maxWidth: 120 },
+    { field: 'col5', headerName: 'FullDate', sortable: false, flex: 1, minWidth: 100 },
   ];
 
   const initialState: GridInitialStateCommunity = {
@@ -47,16 +50,13 @@ const Prenota = () => {
     }
   };
 
-  if (status === "loading") {
+  
+  if (status === "loading" || userQuery.isLoading) {
     return <Spinner isLoading={true} />
   }
 
-  if (!userQuery.isLoading) {
-    <Spinner isLoading={true} />
-  }
-
-  if (!userQuery.data) {
-    return "error";
+  if (userQuery.isError || myReservationsQuery.isError) {
+    return "errore";
   }
 
   return (
@@ -87,6 +87,7 @@ const Prenota = () => {
           fullWidth
         />
 
+
         <TextField
           variant="standard"
           label="iscritto dal"
@@ -112,6 +113,7 @@ const Prenota = () => {
             />
           </Box>
         }
+        <DeleteAccount />
       </Box>
     </>
   )

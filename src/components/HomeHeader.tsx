@@ -11,6 +11,7 @@ import NextLink from 'next/link';
 import React from 'react';
 import styles from '~/styles/Header.module.css';
 import HomeDrawer from './HomeDrawer';
+import ReservationDrawer from './ReservationDrawer';
 
 
 const HomeHeader = () => {
@@ -33,7 +34,7 @@ const HomeHeader = () => {
               <MenuIcon className={styles.menuIcon} />
             </IconButton>
 
-            <HomeDrawer open={openDrawer} setOpen={setOpenDrawer} />
+            <ReservationDrawer open={openDrawer} setOpen={setOpenDrawer} />
           </Box>
 
           {/* Logo with link to home */}
