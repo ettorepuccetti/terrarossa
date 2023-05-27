@@ -1,5 +1,5 @@
 import { type EventImpl } from "@fullcalendar/core/internal";
-import { Box, Button, Dialog, DialogActions, Typography } from "@mui/material";
+import { Alert, Box, Button, Dialog, DialogActions, Typography } from "@mui/material";
 import { DateField, TimeField } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
@@ -29,6 +29,8 @@ export default function EventDetailDialog(props: DialogProps) {
     sessionData.user.role === UserRoles.ADMIN ||
     sessionData.user.id === props.eventDetails?.extendedProps?.userId
   ));
+
+  const tooLateToCancel = dayjs(eventDetails.start).isBefore(dayjs().add(6, "hour"));
 
   return (
     <>
@@ -62,9 +64,14 @@ export default function EventDetailDialog(props: DialogProps) {
             />
           </Box>
 
+          {canDelete && tooLateToCancel &&
+            <Alert severity="warning"> Non puoi cancellare una prenotazione meno di 6 ore prima dell{"'"}inizio </Alert>
+          }
+
           {canDelete && <Button
             onClick={() => setConfirmationOpen(true)}
             color={"error"}
+            disabled={tooLateToCancel}
           >
             Cancella
           </Button>}
