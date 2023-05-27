@@ -114,11 +114,6 @@ export default function Calendar() {
     console.log("selected date: ", selectInfo.dateStr);
     console.log("resouce: ", selectInfo.resource?.title);
 
-    if (selectInfo.date < new Date()) {
-      console.warn("date is in the past");
-      return;
-    }
-
     if (selectInfo.resource === undefined) {
       throw new Error("No court selected");
     }
@@ -155,7 +150,6 @@ export default function Calendar() {
   const [dateClick, setDateClick] = useState<DateClickArg>();
   const [showPotentialErrorOnAdd, setShowPotentialErrorOnAdd] = useState(true);
   const [showPotentialErrorOnDel, setShowPotentialErrorOnDel] = useState(true);
-
   /**
    * -------------------------------------
    * ---------- Rendering ---------------
@@ -176,6 +170,7 @@ export default function Calendar() {
           error={reservationDelete.error}
           onClose={() => setShowPotentialErrorOnDel(false)}
         />}
+        
 
       <Spinner
         isLoading={reservationAdd.isLoading ||

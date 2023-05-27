@@ -1,7 +1,7 @@
-import { createTRPCRouter } from "~/server/api/trpc";
 import { exampleRouter } from "~/server/api/routers/example";
-import { reservationRouter } from "./routers/reservation";
+import { createTRPCRouter } from "~/server/api/trpc";
 import { courtRouter } from "./routers/court";
+import { reservationRouter } from "./routers/reservation";
 import { userRouter } from "./routers/user";
 
 /**

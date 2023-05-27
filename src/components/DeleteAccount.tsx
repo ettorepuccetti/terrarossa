@@ -1,9 +1,9 @@
 import { Box, Button, Typography } from "@mui/material";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { api } from "~/utils/api";
 import ConfirmationAlert from "./ConfirmationAlert";
-import { signOut } from "next-auth/react";
 
 export default function DeleteAccount() {
 
