@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { api } from "~/utils/api";
 import ConfirmationAlert from "./ConfirmationAlert";
+import { signOut } from "next-auth/react";
 
 export default function DeleteAccount() {
 
@@ -31,7 +32,7 @@ export default function DeleteAccount() {
           il gestore del circolo potrà ancora vedere il tuo nome sulla prenotazione."
         }
         onDialogClose={() => { setConfirmOpen(false) }}
-        onConfirm={() => { deleteUser.mutate(); void router.push("/") }}
+        onConfirm={() => {void router.push("/").then(() => signOut()).then(() => deleteUser.mutate()); }}
       />
     </Box>
   )

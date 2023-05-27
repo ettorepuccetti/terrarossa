@@ -10,7 +10,6 @@ import {
 import NextLink from 'next/link';
 import React from 'react';
 import styles from '~/styles/Header.module.css';
-import HomeDrawer from './HomeDrawer';
 import ReservationDrawer from './ReservationDrawer';
 
 

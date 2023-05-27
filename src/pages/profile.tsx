@@ -2,8 +2,7 @@ import { Avatar, Box, Skeleton, TextField, Typography } from "@mui/material";
 import { DataGrid, type GridColDef, type GridRowsProp } from "@mui/x-data-grid";
 import { type GridInitialStateCommunity } from "@mui/x-data-grid/models/gridStateCommunity";
 import dayjs from "dayjs";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { signIn, useSession } from "next-auth/react";
 import DeleteAccount from "~/components/DeleteAccount";
 import ReservationHeader from "~/components/ReservationHeader";
 import Spinner from "~/components/Spinner";
@@ -13,7 +12,10 @@ const Prenota = () => {
 
   // make sure the user is authenticated, otherwise redirect to login page
   const { data: authData, status } = useSession({
-    required: true
+    required: true,
+    onUnauthenticated() {
+      void signIn("auth0");
+    }
   })
 
   const userQuery = api.user.getInfo.useQuery();
