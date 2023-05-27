@@ -98,10 +98,10 @@ export default function ReserveDialog(props: SimpleDialogProps) {
             </>
             :
             <Box display={"flex"} alignItems={'center'} justifyContent={"center"}>
-              <Button onClick={() => void signIn()}> Effettua il login </Button>
+              <Button onClick={() => void signIn("auth0")}> Effettua il login </Button>
             </Box>
           }
-        </DialogLayout>
+        </DialogLayout> 
       </Dialog >
     </>
   )
