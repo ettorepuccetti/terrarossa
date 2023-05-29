@@ -33,8 +33,8 @@ export default function Calendar() {
    *      ----- trpc procedures -----
    * -------------------------------------
    */
-  const reservationQuery = api.reservation.getAllVisibleInCalendar.useQuery();
-  const courtQuery = api.court.getAll.useQuery();
+  const reservationQuery = api.reservation.getAllVisibleInCalendar.useQuery(undefined, { refetchOnWindowFocus: false});
+  const courtQuery = api.court.getAll.useQuery(undefined, { refetchOnWindowFocus: false });
 
   const reservationAdd = api.reservation.insertOne.useMutation({
     async onSuccess() {
@@ -112,7 +112,6 @@ export default function Calendar() {
           error={reservationDelete.error}
           onClose={() => setShowPotentialErrorOnDel(false)}
         />}
-
 
       <Spinner
         isLoading={reservationAdd.isLoading ||
