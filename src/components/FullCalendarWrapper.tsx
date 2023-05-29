@@ -1,26 +1,55 @@
 import {
   type EventClickArg,
   type EventContentArg,
-  type EventInput,
+  type EventInput
 } from '@fullcalendar/core';
 import interactionPlugin, { type DateClickArg } from '@fullcalendar/interaction';
 import FullCalendar from "@fullcalendar/react";
-import { type ResourceInput } from "@fullcalendar/resource";
+import { type ResourceInput } from '@fullcalendar/resource';
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import { Avatar, Box } from '@mui/material';
+import { type inferRouterOutputs } from '@trpc/server';
 import { useRef } from 'react';
+import { type AppRouter } from '~/server/api/root';
+
+type RouterOutput = inferRouterOutputs<AppRouter>;
+type ReservationFromDb = RouterOutput['reservation']['getAllVisibleInCalendar'][0];
+type CourtFromDb = RouterOutput['court']['getAll'][0];
 
 interface FullCalendarWrapperProps {
-  events: EventInput[];
-  courts: ResourceInput[];
+  reservationData: ReservationFromDb[];
+  courtsData: CourtFromDb[];
   onEventClick: (eventClickInfo: EventClickArg) => void;
   onDateClick: (dateClickInfo: DateClickArg) => void;
 }
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
-  
+
   const calendarRef = useRef<FullCalendar>(null);
-  const calendarApi = calendarRef.current?.getApi();
+  // const calendarApi = calendarRef.current?.getApi();
+
+  const reservationToEvent = (reservation: ReservationFromDb): EventInput => {
+    return {
+      id: reservation.id.toString(),
+      title: reservation.overwriteName ? reservation.overwriteName : (reservation.user?.name || "[deleted user]"), //user.name can be null or user can be null
+      start: reservation.startTime,
+      end: reservation.endTime,
+      resourceId: reservation.courtId,
+      // color: reservation.user?.role === "ADMIN" ? "red" : "green",
+      extendedProps: {
+        userId: reservation.user?.id,
+        userImg: reservation.user?.image,
+      }
+    }
+  }
+
+  const courtToResource = (court: CourtFromDb): ResourceInput  => {
+    return {
+      id: court.id,
+      title: court.name,
+    }
+  }
+
 
   return (
     <FullCalendar
@@ -34,8 +63,8 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         left: 'prev,next today',
         right: 'title',
       }}
-      events={props.events}
-      resources={props.courts}
+      events={props.reservationData.map(reservationToEvent)}
+      resources={props.courtsData.map(courtToResource)}
       eventClick={(eventClickInfo) => props.onEventClick(eventClickInfo)}
       dateClick={(info) => { props.onDateClick(info) }}
       selectable={false}

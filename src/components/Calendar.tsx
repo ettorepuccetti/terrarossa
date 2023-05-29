@@ -1,16 +1,14 @@
 import { type DateClickArg } from '@fullcalendar/interaction';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
 import { api } from "~/utils/api";
 
 import {
-  type EventClickArg,
-  type EventInput,
+  type EventClickArg
 } from '@fullcalendar/core';
 import { type EventImpl } from '@fullcalendar/core/internal';
-import { type ResourceInput } from "@fullcalendar/resource";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { useSession } from 'next-auth/react';
 import ErrorAlert from './ErrorAlert';
@@ -53,62 +51,6 @@ export default function Calendar() {
   /**
    * ---------- end of trpc procedures ----------------
    */
-
-
-  /**
-   * -------------------------------------
-   *      ----- DB Queries -----
-   * -------------------------------------
-   */
-
-  const getCourtsFromDb = useCallback(() => {
-    if (courtQuery.error) {
-      console.error("Error: ", courtQuery.error);
-    }
-    if (!courtQuery.data) {
-      return;
-    }
-    setCourts(courtQuery.data.map((court) => {
-      return {
-        id: court.id,
-        title: court.name,
-      }
-    }))
-  }, [courtQuery.data, courtQuery.error])
-
-
-  const getEventsFromDb = useCallback(() => {
-    const reservationFromDb = reservationQuery.data;
-    if (reservationFromDb) {
-      setEvents(reservationFromDb.map((reservation) => {
-        return {
-          id: reservation.id.toString(),
-          title: reservation.overwriteName ? reservation.overwriteName : (reservation.user?.name || "[deleted user]"), //user.name can be null or user can be null
-          start: reservation.startTime,
-          end: reservation.endTime,
-          resourceId: reservation.courtId,
-          // color: reservation.user?.role === "ADMIN" ? "red" : "green",
-          extendedProps: {
-            userId: reservation.user?.id,
-            userImg: reservation.user?.image,
-          }
-        }
-      }))
-    }
-  }, [reservationQuery.data])
-
-  const [courts, setCourts] = useState<ResourceInput[]>([]);
-  const [events, setEvents] = useState<EventInput[]>([]);
-
-  useEffect(() => {
-    getCourtsFromDb();
-    getEventsFromDb();
-  }, [getEventsFromDb, getCourtsFromDb])
-
-  /**
-   * ---------- end of DB Queries ----------------
-   */
-
 
   const openReservationDialog = (selectInfo: DateClickArg) => {
     console.log("selected date: ", selectInfo.dateStr);
@@ -170,7 +112,7 @@ export default function Calendar() {
           error={reservationDelete.error}
           onClose={() => setShowPotentialErrorOnDel(false)}
         />}
-        
+
 
       <Spinner
         isLoading={reservationAdd.isLoading ||
@@ -179,12 +121,14 @@ export default function Calendar() {
           reservationQuery.isLoading}
       />
 
-      <FullCalendarWrapper
-        events={events}
-        courts={courts}
-        onDateClick={openReservationDialog}
-        onEventClick={openEventDialog}
-      />
+      {reservationQuery.isSuccess && courtQuery.isSuccess &&
+        <FullCalendarWrapper
+          reservationData={reservationQuery.data}
+          courtsData={courtQuery.data}
+          onDateClick={openReservationDialog}
+          onEventClick={openEventDialog}
+        />
+      }
 
       <ReserveDialog
         open={dateClick !== undefined}
