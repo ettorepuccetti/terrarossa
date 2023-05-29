@@ -14,7 +14,7 @@ import { useSession } from 'next-auth/react';
 import ErrorAlert from './ErrorAlert';
 import EventDetailDialog from './EventDetailDialog';
 import FullCalendarWrapper from "./FullCalendarWrapper";
-import Spinner from './Spinner';
+import SpinnerPartial from './SpinnerPartial';
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -33,7 +33,7 @@ export default function Calendar() {
    *      ----- trpc procedures -----
    * -------------------------------------
    */
-  const reservationQuery = api.reservation.getAllVisibleInCalendar.useQuery(undefined, { refetchOnWindowFocus: false});
+  const reservationQuery = api.reservation.getAllVisibleInCalendar.useQuery(undefined, { refetchOnWindowFocus: false });
   const courtQuery = api.court.getAll.useQuery(undefined, { refetchOnWindowFocus: false });
 
   const reservationAdd = api.reservation.insertOne.useMutation({
@@ -113,20 +113,22 @@ export default function Calendar() {
           onClose={() => setShowPotentialErrorOnDel(false)}
         />}
 
-      <Spinner
-        isLoading={reservationAdd.isLoading ||
-          reservationDelete.isLoading ||
-          courtQuery.isLoading ||
-          reservationQuery.isLoading}
-      />
+      {<SpinnerPartial open={
+        reservationQuery.isLoading ||
+        courtQuery.isLoading ||
+        reservationAdd.isLoading ||
+        reservationDelete.isLoading
+      }>
 
-      {reservationQuery.isSuccess && courtQuery.isSuccess &&
-        <FullCalendarWrapper
-          reservationData={reservationQuery.data}
-          courtsData={courtQuery.data}
-          onDateClick={openReservationDialog}
-          onEventClick={openEventDialog}
-        />
+        {reservationQuery.isSuccess && courtQuery.isSuccess &&
+          <FullCalendarWrapper
+            reservationData={reservationQuery.data}
+            courtsData={courtQuery.data}
+            onDateClick={openReservationDialog}
+            onEventClick={openEventDialog}
+          />
+        }
+      </SpinnerPartial>
       }
 
       <ReserveDialog
