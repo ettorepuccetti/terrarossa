@@ -119,15 +119,12 @@ export default function Calendar() {
         reservationAdd.isLoading ||
         reservationDelete.isLoading
       }>
-
-        {reservationQuery.isSuccess && courtQuery.isSuccess &&
           <FullCalendarWrapper
-            reservationData={reservationQuery.data}
-            courtsData={courtQuery.data}
+            reservationData={reservationQuery.data ?? []}
+            courtsData={courtQuery.data ?? []}
             onDateClick={openReservationDialog}
             onEventClick={openEventDialog}
           />
-        }
       </SpinnerPartial>
       }
 
