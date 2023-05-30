@@ -14,3 +14,20 @@ a {
 * {
   box-sizing: border-box;
 }
+
+/*
+ .fc table{
+  table-layout: auto;
+}
+.fc-view > table{  
+  min-width: 0;
+  width: auto;
+}
+.fc-axis{
+  min-width:100px; 
+  width:100px; 
+}
+.fc-day,.fc-resource-cell,.fc-content-col{
+  min-width:300px;
+  width:300px;
+} */

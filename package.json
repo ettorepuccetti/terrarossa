@@ -21,6 +21,7 @@
     "@fullcalendar/react": "^6.1.4",
     "@fullcalendar/resource": "^6.1.4",
     "@fullcalendar/resource-timegrid": "^6.1.4",
+    "@fullcalendar/scrollgrid": "^6.1.8",
     "@fullcalendar/timegrid": "^6.1.4",
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.14",

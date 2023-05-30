@@ -3,6 +3,7 @@ import {
   type EventContentArg,
   type EventInput
 } from '@fullcalendar/core';
+import ScrollGrid from '@fullcalendar/scrollgrid';
 import interactionPlugin, { type DateClickArg } from '@fullcalendar/interaction';
 import FullCalendar from "@fullcalendar/react";
 import { type ResourceInput } from '@fullcalendar/resource';
@@ -85,7 +86,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       <FullCalendar
         ref={calendarRef}
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
-        plugins={[interactionPlugin, resourceTimeGridPlugin]}
+        plugins={[interactionPlugin, resourceTimeGridPlugin, ScrollGrid]}
         initialView="resourceTimeGridDay"
         navLinks={true}
         height="auto"
@@ -116,6 +117,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         eventContent={renderEventContent}
         titleFormat={{ month: 'short', day: 'numeric' }}
         locale={'it-it'}
+        dayMinWidth={300}
       />
     </Box>
   )
