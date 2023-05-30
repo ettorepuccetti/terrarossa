@@ -117,7 +117,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         eventContent={renderEventContent}
         titleFormat={{ month: 'short', day: 'numeric' }}
         locale={'it-it'}
-        dayMinWidth={300}
+        dayMinWidth={150}
       />
     </Box>
   )
