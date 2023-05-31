@@ -93,6 +93,16 @@ model Court {
   surface     String?
   beginTime   BeginTime?    @default(BOTH)
   Reservation Reservation[]
+  Club        Club?         @relation(fields: [clubId], references: [id])
+  clubId      String?
+
+  @@index([clubId])
+}
+
+model Club {
+  id     String  @id @unique @default(cuid())
+  name   String  @unique
+  courts Court[]
 }
 
 enum BeginTime {
