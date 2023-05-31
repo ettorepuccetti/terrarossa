@@ -3,17 +3,16 @@ import {
   type EventContentArg,
   type EventInput
 } from '@fullcalendar/core';
-import ScrollGrid from '@fullcalendar/scrollgrid';
 import interactionPlugin, { type DateClickArg } from '@fullcalendar/interaction';
 import FullCalendar from "@fullcalendar/react";
 import { type ResourceInput } from '@fullcalendar/resource';
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
-import { Avatar, Box, Button, Typography } from '@mui/material';
+import ScrollGrid from '@fullcalendar/scrollgrid';
+import { Avatar, Box } from '@mui/material';
 import { type inferRouterOutputs } from '@trpc/server';
-import dayjs from 'dayjs';
-import { useRef, useState } from 'react';
+import { useRef, type RefObject } from 'react';
 import { type AppRouter } from '~/server/api/root';
-require('dayjs/locale/it');
+import CalendarHeader from './CalendarHeader';
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type ReservationFromDb = RouterOutput['reservation']['getAllVisibleInCalendar'][0];
@@ -28,7 +27,7 @@ interface FullCalendarWrapperProps {
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
 
-  const calendarRef = useRef<FullCalendar>(null);
+  const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
 
   const reservationToEvent = (reservation: ReservationFromDb): EventInput => {
     return {
@@ -52,37 +51,11 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     }
   }
 
-  // useless, but it's a workaround to make the calendar rerender when the date changes
-  // any change to the state would make the date change
-  // to investigate how useRef works
-  const [displayDate, setDisplayDate] = useState<Date | undefined>(calendarRef.current?.getApi().getDate());
-
   return (
     <Box width={"100%"} display={'flex'} flexDirection={'column'}>
-      <Box marginY={1} flexGrow={1} display={'flex'} alignItems={'center'} justifyContent={"space-between"}>
-        <Box display={'flex'} gap={1}>
-          <Button
-            variant='outlined'
-            onClick={() => {
-              calendarRef.current?.getApi().prev();
-              setDisplayDate(calendarRef.current?.getApi().getDate())
-            }}>prev</Button>
-          <Button
-            variant='outlined'
-            onClick={() => {
-              calendarRef.current?.getApi().next();
-              setDisplayDate(calendarRef.current?.getApi().getDate())
-            }}>next</Button>
-          <Button
-            variant='outlined'
-            onClick={() => {
-              calendarRef.current?.getApi().today();
-              setDisplayDate(calendarRef.current?.getApi().getDate())
-            }}>today</Button>
-        </Box>
-        <Typography variant='h6'> {dayjs(displayDate).locale('it').format("DD MMM")} </Typography>
 
-      </Box>
+      <CalendarHeader calendarRef={calendarRef} />
+
       <FullCalendar
         ref={calendarRef}
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
@@ -90,11 +63,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         initialView="resourceTimeGridDay"
         navLinks={true}
         height="auto"
-        headerToolbar={
-          false
-          // left: 'prev,next today',
-          // right: 'title',
-        }
+        headerToolbar={false}
         events={props.reservationData.map(reservationToEvent)}
         resources={props.courtsData.map(courtToResource)}
         eventClick={(eventClickInfo) => props.onEventClick(eventClickInfo)}
