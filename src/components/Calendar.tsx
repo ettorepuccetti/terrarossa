@@ -14,6 +14,7 @@ import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
 import SpinnerPartial from "./SpinnerPartial";
+import { Skeleton, Typography } from "@mui/material";
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -30,7 +31,7 @@ export default function Calendar() {
   const { data: sessionData } = useSession();
   const [clubId, setClubId] = useState<string | undefined>(undefined);
 
-  //get the club name from the router
+  //get the club name from the router when is available
   const router = useRouter();
 
   useEffect(() => {
@@ -44,6 +45,8 @@ export default function Calendar() {
    *      ----- trpc procedures -----
    * -------------------------------------
    */
+
+  const clubQuery = api.club.getByClubId.useQuery({clubId: clubId}, { enabled: clubId !== undefined });
 
   const courtQuery = api.court.getAllByClubId.useQuery(
     { clubId: clubId },
@@ -139,6 +142,13 @@ export default function Calendar() {
           onClose={() => setShowPotentialErrorOnDel(false)}
         />
       )}
+
+      <Typography variant="h5" fontWeight={600} textAlign={'center'}>
+        {clubQuery.isLoading?
+          <Skeleton variant="text" width={300} height={50} />
+          :
+          clubQuery.data?.name}
+      </Typography>
 
       {
         <SpinnerPartial
