@@ -1,7 +1,7 @@
 import { Login, Logout } from "@mui/icons-material";
 import { Divider, ListItemText, Typography } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { ListItemButtonStyled } from "./HomeDrawer";
+import { ListItemButtonStyled } from "./ReservationDrawer";
 import { useRouter } from "next/router";
 
 export default function LoginDrawerButton() {

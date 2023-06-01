@@ -1,7 +1,13 @@
-import { DateRange, HomeOutlined, PersonOutline } from "@mui/icons-material";
-import { Box, Drawer, List, ListItemText } from "@mui/material";
+import { HomeOutlined, PersonOutline } from "@mui/icons-material";
+import {
+  Box,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemText,
+  styled,
+} from "@mui/material";
 import NextLink from "next/link";
-import { ListItemButtonStyled } from "./HomeDrawer";
 import LoginDrawerButton from "./LoginDrawerButton";
 
 interface DrawerProps {
@@ -9,10 +15,11 @@ interface DrawerProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+export const ListItemButtonStyled = styled(ListItemButton)(() => ({
+  gap: "1rem",
+}));
 
 export default function ReservationDrawer(props: DrawerProps) {
-
-
   return (
     <Drawer
       anchor="left"
@@ -25,33 +32,31 @@ export default function ReservationDrawer(props: DrawerProps) {
         onClick={(_e) => props.setOpen(false)}
       >
         <List>
-
           <LoginDrawerButton />
 
           {/* Link to home page */}
           <NextLink href="/">
-            <ListItemButtonStyled >
+            <ListItemButtonStyled>
               <HomeOutlined />
               <ListItemText primary="Home" />
             </ListItemButtonStyled>
           </NextLink>
 
-          {/* Link to reservation page */}
-          <NextLink href="/prenota">
+          {/* Link to reservation page  -- disabled temporarly*/}
+          {/* <NextLink href="/prenota">
             <ListItemButtonStyled >
               <DateRange />
               <ListItemText primary="Prenota" />
             </ListItemButtonStyled>
-          </NextLink>
+          </NextLink> */}
 
           {/* Link to profile page */}
           <NextLink href="/profile">
-            <ListItemButtonStyled >
+            <ListItemButtonStyled>
               <PersonOutline />
               <ListItemText primary="Profilo" />
             </ListItemButtonStyled>
           </NextLink>
-
         </List>
       </Box>
     </Drawer>
