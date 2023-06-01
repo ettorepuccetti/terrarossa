@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Typography, Button, Box } from "@mui/material";
+import { Grid, Typography, Button, Box, Skeleton } from "@mui/material";
 import styles from "../styles/Hero.module.css";
 import Image from "next/image";
 import heroSrc from "../../public/images/myteam.jpg";
@@ -30,25 +30,35 @@ const Hero = () => {
             <Typography variant="h6" sx={{ opacity: 0.4 }}>
               Scegli il tuo Circolo:
             </Typography>
-            {clubQuery.data?.map((club, index) => {
-              return (
-                <Link
-                  key={index}
-                  href={{
-                    pathname: "prenota",
-                    query: { clubId: club.id },
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    sx={{ width: "200px", fontSize: "16px" }}
+
+            {clubQuery.data ? (
+              clubQuery.data.map((club, index) => {
+                return (
+                  <Link
+                    key={index}
+                    href={{
+                      pathname: "prenota",
+                      query: { clubId: club.id },
+                    }}
                   >
-                    {club.name}
-                  </Button>
-                </Link>
-              );
-            })}
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      sx={{ width: "200px", fontSize: "16px" }}
+                    >
+                      {club.name}
+                    </Button>
+                  </Link>
+                );
+              })
+            ) : (
+              <Skeleton
+                variant="rectangular"
+                width={250}
+                height={200}
+                animation="wave"
+              />
+            )}
           </Box>
         </Grid>
         <Grid item xs={12} sm={8} md={6}>

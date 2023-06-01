@@ -1,29 +1,46 @@
 import type FullCalendar from "@fullcalendar/react";
-import { ArrowBackIosNewRounded, ArrowForwardIosRounded, Menu } from "@mui/icons-material";
+import {
+  ArrowBackIosNewRounded,
+  ArrowForwardIosRounded,
+  Menu,
+} from "@mui/icons-material";
 import { Box, Button, IconButton, Typography } from "@mui/material";
-import { type RefObject, useState } from "react";
-import ReservationDrawer from "./ReservationDrawer";
 import dayjs from "dayjs";
-require('dayjs/locale/it');
+import { useState, type RefObject } from "react";
+import ReservationDrawer from "./Drawer";
+require("dayjs/locale/it");
 
-
-export default function CalendarHeader(props: { calendarRef: RefObject<FullCalendar> }) {
-
+export default function CalendarHeader(props: {
+  calendarRef: RefObject<FullCalendar>;
+}) {
   // useless, but it's a workaround to make the date rerender when the date changes
   // any change to the state would make the date change
   // to investigate how useRef works
-  const [displayDate, setDisplayDate] = useState<Date | undefined>(props.calendarRef.current?.getApi().getDate());
+  const [displayDate, setDisplayDate] = useState<Date | undefined>(
+    props.calendarRef.current?.getApi().getDate()
+  );
   const [openDrawer, setOpenDrawer] = useState(false);
 
-  const isToday = dayjs(displayDate).isSame(dayjs(), 'day');
-  const canGoBackward = dayjs(displayDate).isAfter(dayjs().add(-2, "days"), 'day');
-  const canGoForward = dayjs(displayDate).isBefore(dayjs().add(7, "days"), 'day');
+  const isToday = dayjs(displayDate).isSame(dayjs(), "day");
+  const canGoBackward = dayjs(displayDate).isAfter(
+    dayjs().add(-2, "days"),
+    "day"
+  );
+  const canGoForward = dayjs(displayDate).isBefore(
+    dayjs().add(7, "days"),
+    "day"
+  );
 
   return (
-
-    <Box marginY={1} display={'flex'} alignItems={'center'} justifyContent={"space-between"}>
-
-      <Box display={'flex'} alignItems={'center'} flex={1} mr={"auto"}> {/* for centering the middle element */}
+    <Box
+      marginY={1}
+      display={"flex"}
+      alignItems={"center"}
+      justifyContent={"space-between"}
+    >
+      <Box display={"flex"} alignItems={"center"} flex={1} mr={"auto"}>
+        {" "}
+        {/* for centering the middle element */}
         <IconButton
           size="large"
           // edge="start"
@@ -36,13 +53,15 @@ export default function CalendarHeader(props: { calendarRef: RefObject<FullCalen
         <ReservationDrawer open={openDrawer} setOpen={setOpenDrawer} />
       </Box>
 
-      <Box display={'flex'} gap={1} justifyContent={"center"} flex={1}>  {/* for centering the middle element */}
+      <Box display={"flex"} gap={1} justifyContent={"center"} flex={1}>
+        {" "}
+        {/* for centering the middle element */}
         <Button
           sx={{ padding: 0, minWidth: "6vh", height: "6vh" }}
-          variant='outlined'
+          variant="outlined"
           onClick={() => {
             props.calendarRef.current?.getApi().prev();
-            setDisplayDate(props.calendarRef.current?.getApi().getDate())
+            setDisplayDate(props.calendarRef.current?.getApi().getDate());
           }}
           disabled={!canGoBackward}
         >
@@ -50,10 +69,10 @@ export default function CalendarHeader(props: { calendarRef: RefObject<FullCalen
         </Button>
         <Button
           sx={{ padding: 0, minWidth: "6vh", height: "6vh" }}
-          variant='outlined'
+          variant="outlined"
           onClick={() => {
             props.calendarRef.current?.getApi().next();
-            setDisplayDate(props.calendarRef.current?.getApi().getDate())
+            setDisplayDate(props.calendarRef.current?.getApi().getDate());
           }}
           disabled={!canGoForward}
         >
@@ -61,22 +80,25 @@ export default function CalendarHeader(props: { calendarRef: RefObject<FullCalen
         </Button>
         <Button
           sx={{ padding: "0 1.5vh", minWidth: "6vh", height: "6vh" }}
-          variant='outlined'
+          variant="outlined"
           onClick={() => {
             props.calendarRef.current?.getApi().today();
-            setDisplayDate(props.calendarRef.current?.getApi().getDate())
+            setDisplayDate(props.calendarRef.current?.getApi().getDate());
           }}
-          disabled={isToday}>
+          disabled={isToday}
+        >
           Oggi
         </Button>
       </Box>
 
-      <Box display={'flex'} justifyContent={"flex-end"} flex={1} ml={"auto"}>  {/* for centering the middle element */}
-        <Typography sx={{}} variant='h6'> {dayjs(displayDate).locale('it').format("DD MMM")} </Typography>
+      <Box display={"flex"} justifyContent={"flex-end"} flex={1} ml={"auto"}>
+        {" "}
+        {/* for centering the middle element */}
+        <Typography sx={{}} variant="h6">
+          {" "}
+          {dayjs(displayDate).locale("it").format("DD MMM")}{" "}
+        </Typography>
       </Box>
-
     </Box>
-
-
-  )
+  );
 }
