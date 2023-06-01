@@ -76,7 +76,7 @@ model Reservation {
   id            String   @id @unique @default(cuid())
   startTime     DateTime
   endTime       DateTime
-  court         Court    @relation(fields: [courtId], references: [id])
+  court         Court    @relation(fields: [courtId], references: [id], onDelete: Cascade)
   user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   courtId       String
   userId        String?
@@ -93,7 +93,7 @@ model Court {
   surface     String?
   beginTime   BeginTime?    @default(BOTH)
   Reservation Reservation[]
-  Club        Club?         @relation(fields: [clubId], references: [id])
+  Club        Club?         @relation(fields: [clubId], references: [id], onDelete: Cascade)
   clubId      String?
 
   @@unique([name, clubId])
