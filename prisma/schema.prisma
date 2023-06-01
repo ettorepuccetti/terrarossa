@@ -88,7 +88,7 @@ model Reservation {
 
 model Court {
   id          String        @id @unique @default(cuid())
-  name        String        @unique
+  name        String
   indoor      Boolean?
   surface     String?
   beginTime   BeginTime?    @default(BOTH)
@@ -96,6 +96,7 @@ model Court {
   Club        Club?         @relation(fields: [clubId], references: [id])
   clubId      String?
 
+  @@unique([name, clubId])
   @@index([clubId])
 }
 

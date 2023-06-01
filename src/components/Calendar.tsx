@@ -1,20 +1,19 @@
-import { type DateClickArg } from '@fullcalendar/interaction';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useState } from "react";
+import { type DateClickArg } from "@fullcalendar/interaction";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
 import { api } from "~/utils/api";
 
-import {
-  type EventClickArg
-} from '@fullcalendar/core';
-import { type EventImpl } from '@fullcalendar/core/internal';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { useSession } from 'next-auth/react';
-import ErrorAlert from './ErrorAlert';
-import EventDetailDialog from './EventDetailDialog';
+import { type EventClickArg } from "@fullcalendar/core";
+import { type EventImpl } from "@fullcalendar/core/internal";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import ErrorAlert from "./ErrorAlert";
+import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
-import SpinnerPartial from './SpinnerPartial';
+import SpinnerPartial from "./SpinnerPartial";
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -23,30 +22,57 @@ export const ReservationInputSchema = z.object({
   overwriteName: z.string().optional(),
 });
 
+export const ClubIdInputSchema = z.object({
+  clubId: z.union([z.string(), z.string().array(), z.undefined()]),
+});
 
 export default function Calendar() {
-
   const { data: sessionData } = useSession();
+  const [clubId, setClubId] = useState<string | undefined>(undefined);
+
+  //get the club name from the router
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.isReady) {
+      setClubId(router.query.clubId as string);
+    }
+  }, [router.isReady, router.query.clubId]);
 
   /**
    * -------------------------------------
    *      ----- trpc procedures -----
    * -------------------------------------
    */
-  const reservationQuery = api.reservation.getAllVisibleInCalendar.useQuery(undefined, { refetchOnWindowFocus: false });
-  const courtQuery = api.court.getAll.useQuery(undefined, { refetchOnWindowFocus: false });
+
+  const courtQuery = api.court.getAllByClubId.useQuery(
+    { clubId: clubId },
+    {
+      refetchOnWindowFocus: false,
+      enabled: clubId !== undefined,
+    }
+  );
+
+  const reservationQuery =
+    api.reservation.getAllVisibleInCalendarByClubId.useQuery(
+      { clubId: clubId },
+      {
+        refetchOnWindowFocus: false,
+        enabled: clubId !== undefined,
+      }
+    );
 
   const reservationAdd = api.reservation.insertOne.useMutation({
     async onSuccess() {
-      await reservationQuery.refetch()
+      await reservationQuery.refetch();
     },
-  })
+  });
 
   const reservationDelete = api.reservation.deleteOne.useMutation({
     async onSuccess() {
-      await reservationQuery.refetch()
+      await reservationQuery.refetch();
     },
-  })
+  });
 
   /**
    * ---------- end of trpc procedures ----------------
@@ -60,11 +86,11 @@ export default function Calendar() {
       throw new Error("No court selected");
     }
     setDateClick(selectInfo);
-  }
+  };
 
   const openEventDialog = (eventClickInfo: EventClickArg) => {
-    setEventDetails(eventClickInfo.event)
-  }
+    setEventDetails(eventClickInfo.event);
+  };
 
   const addEvent = (endDate: Date, overwrittenName?: string) => {
     setDateClick(undefined);
@@ -78,7 +104,7 @@ export default function Calendar() {
       startDateTime: dateClick.date,
       endDateTime: endDate,
       overwriteName: overwrittenName,
-    })
+    });
   };
 
   function deleteEvent(eventId: string): void {
@@ -100,39 +126,45 @@ export default function Calendar() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-
-      {(reservationAdd.error !== null && showPotentialErrorOnAdd) &&
+      {reservationAdd.error !== null && showPotentialErrorOnAdd && (
         <ErrorAlert
           error={reservationAdd.error}
           onClose={() => setShowPotentialErrorOnAdd(false)}
-        />}
+        />
+      )}
 
-      {(reservationDelete.error !== null && showPotentialErrorOnDel) &&
+      {reservationDelete.error !== null && showPotentialErrorOnDel && (
         <ErrorAlert
           error={reservationDelete.error}
           onClose={() => setShowPotentialErrorOnDel(false)}
-        />}
+        />
+      )}
 
-      {<SpinnerPartial open={
-        reservationQuery.isLoading ||
-        courtQuery.isLoading ||
-        reservationAdd.isLoading ||
-        reservationDelete.isLoading
-      }>
+      {
+        <SpinnerPartial
+          open={
+            reservationQuery.isLoading ||
+            courtQuery.isLoading ||
+            reservationAdd.isLoading ||
+            reservationDelete.isLoading
+          }
+        >
           <FullCalendarWrapper
             reservationData={reservationQuery.data ?? []}
             courtsData={courtQuery.data ?? []}
             onDateClick={openReservationDialog}
             onEventClick={openEventDialog}
           />
-      </SpinnerPartial>
+        </SpinnerPartial>
       }
 
       <ReserveDialog
         open={dateClick !== undefined}
         dateClick={dateClick}
         onDialogClose={() => setDateClick(undefined)}
-        onConfirm={(endDate, overwrittenName?) => addEvent(endDate, overwrittenName)}
+        onConfirm={(endDate, overwrittenName?) =>
+          addEvent(endDate, overwrittenName)
+        }
       />
 
       <EventDetailDialog
@@ -142,7 +174,6 @@ export default function Calendar() {
         sessionData={sessionData}
         onReservationDelete={(id) => deleteEvent(id)}
       />
-
     </LocalizationProvider>
-  )
+  );
 }
