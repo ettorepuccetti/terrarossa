@@ -39,7 +39,6 @@ export default function CalendarHeader(props: {
       justifyContent={"space-between"}
     >
       <Box display={"flex"} alignItems={"center"} flex={1} mr={"auto"}>
-        {" "}
         {/* for centering the middle element */}
         <IconButton
           size="large"
@@ -54,7 +53,6 @@ export default function CalendarHeader(props: {
       </Box>
 
       <Box display={"flex"} gap={1} justifyContent={"center"} flex={1}>
-        {" "}
         {/* for centering the middle element */}
         <Button
           sx={{ padding: 0, minWidth: "6vh", height: "6vh" }}
@@ -92,11 +90,9 @@ export default function CalendarHeader(props: {
       </Box>
 
       <Box display={"flex"} justifyContent={"flex-end"} flex={1} ml={"auto"}>
-        {" "}
         {/* for centering the middle element */}
         <Typography sx={{}} variant="h6">
-          {" "}
-          {dayjs(displayDate).locale("it").format("DD MMM")}{" "}
+          {dayjs(displayDate).locale("it").format("DD MMM")}
         </Typography>
       </Box>
     </Box>

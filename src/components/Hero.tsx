@@ -5,9 +5,14 @@ import Image from "next/image";
 import heroSrc from "../../public/images/myteam.jpg";
 import Link from "next/link";
 import { api } from "~/utils/api";
+import ErrorAlert from "./ErrorAlert";
 
 const Hero = () => {
   const clubQuery = api.club.getAll.useQuery();
+
+  if (clubQuery.isError) {
+    return <ErrorAlert onClose={() => {void clubQuery.refetch()}} error={clubQuery.error} />;
+  }
 
   return (
     <Box className={styles.heroBox}>
@@ -31,7 +36,14 @@ const Hero = () => {
               Scegli il tuo Circolo:
             </Typography>
 
-            {clubQuery.data ? (
+            {clubQuery.isLoading ? (
+              <Skeleton
+                variant="rectangular"
+                width={250}
+                height={200}
+                animation="wave"
+              />
+            ) : (
               clubQuery.data.map((club, index) => {
                 return (
                   <Link
@@ -51,13 +63,6 @@ const Hero = () => {
                   </Link>
                 );
               })
-            ) : (
-              <Skeleton
-                variant="rectangular"
-                width={250}
-                height={200}
-                animation="wave"
-              />
             )}
           </Box>
         </Grid>
