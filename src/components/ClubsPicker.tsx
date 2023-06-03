@@ -7,7 +7,7 @@ export default function ClubsPicker() {
   const clubQuery = api.club.getAll.useQuery(undefined, { retry: 0 });
 
   if (clubQuery.isError) {
-    return <ErrorAlert onClose={() => null} error={clubQuery.error} />;
+    return <ErrorAlert onClose={() => clubQuery.remove} error={clubQuery.error} />;
   }
 
   return (
