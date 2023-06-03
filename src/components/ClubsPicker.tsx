@@ -4,17 +4,10 @@ import { Box, Button, Skeleton, Typography } from "@mui/material";
 import Link from "next/link";
 
 export default function ClubsPicker() {
-  const clubQuery = api.club.getAll.useQuery();
+  const clubQuery = api.club.getAll.useQuery(undefined, { retry: 0 });
 
   if (clubQuery.isError) {
-    return (
-      <ErrorAlert
-        onClose={() => {
-          void clubQuery.refetch();
-        }}
-        error={clubQuery.error}
-      />
-    );
+    return <ErrorAlert onClose={() => null} error={clubQuery.error} />;
   }
 
   return (
