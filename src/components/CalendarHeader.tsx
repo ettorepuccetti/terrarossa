@@ -1,9 +1,7 @@
 import type FullCalendar from "@fullcalendar/react";
-import {
-  ArrowBackIosNewRounded,
-  ArrowForwardIosRounded,
-  Menu,
-} from "@mui/icons-material";
+import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
+import MenuIcon from "@mui/icons-material/Menu";
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useState, type RefObject } from "react";
@@ -47,7 +45,7 @@ export default function CalendarHeader(props: {
           sx={{}}
           onClick={(_e) => setOpenDrawer(!openDrawer)}
         >
-          <Menu sx={{ color: "black" }} />
+          <MenuIcon sx={{ color: "black" }} />
         </IconButton>
         <ReservationDrawer open={openDrawer} setOpen={setOpenDrawer} />
       </Box>
@@ -63,7 +61,7 @@ export default function CalendarHeader(props: {
           }}
           disabled={!canGoBackward}
         >
-          <ArrowBackIosNewRounded />
+          <ArrowBackIosNewRoundedIcon />
         </Button>
         <Button
           sx={{ padding: 0, minWidth: "6vh", height: "6vh" }}
@@ -74,7 +72,7 @@ export default function CalendarHeader(props: {
           }}
           disabled={!canGoForward}
         >
-          <ArrowForwardIosRounded />
+          <ArrowForwardIosRoundedIcon />
         </Button>
         <Button
           sx={{ padding: "0 1.5vh", minWidth: "6vh", height: "6vh" }}

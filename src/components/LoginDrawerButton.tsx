@@ -1,4 +1,5 @@
-import { Login, Logout } from "@mui/icons-material";
+import LoginIcon from "@mui/icons-material/Login";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { Divider, ListItemText, Typography } from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -18,7 +19,7 @@ export default function LoginDrawerButton() {
           </ListItemButtonStyled>
           <Divider />
           <ListItemButtonStyled>
-            <Logout />
+            <LogoutIcon />
             <ListItemText
               primary=" Logout"
               onClick={() => {
@@ -33,7 +34,7 @@ export default function LoginDrawerButton() {
       {!sessionData && (
         <>
           <ListItemButtonStyled>
-            <Login />
+            <LoginIcon />
             <ListItemText
               primary="Login"
               onClick={() => void signIn("auth0")}

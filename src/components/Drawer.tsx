@@ -1,4 +1,5 @@
-import { HomeOutlined, PersonOutline } from "@mui/icons-material";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import {
   Box,
   Drawer,
@@ -37,7 +38,7 @@ export default function ReservationDrawer(props: DrawerProps) {
           {/* Link to home page */}
           <NextLink href="/">
             <ListItemButtonStyled>
-              <HomeOutlined />
+              <HomeOutlinedIcon />
               <ListItemText primary="Home" />
             </ListItemButtonStyled>
           </NextLink>
@@ -53,7 +54,7 @@ export default function ReservationDrawer(props: DrawerProps) {
           {/* Link to profile page */}
           <NextLink href="/profile">
             <ListItemButtonStyled>
-              <PersonOutline />
+              <PersonOutlineIcon />
               <ListItemText primary="Profilo" />
             </ListItemButtonStyled>
           </NextLink>
