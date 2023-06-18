@@ -1,5 +1,5 @@
 import MenuIcon from "@mui/icons-material/Menu";
-import { Box, Typography, type SxProps } from "@mui/material";
+import { Box, Typography, useTheme, type SxProps } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
@@ -15,14 +15,18 @@ const toolbarStyle: SxProps = {
   display: "flex",
 };
 
-const logoStyle = {
-  color: "#C23B22",
-  cursor: "pointer",
-  fontWeight: 500,
-};
+
 
 export default function ReservationHeader() {
   const [openDrawer, setOpenDrawer] = React.useState(false);
+  const theme = useTheme();
+
+  const logoStyle = {
+    color: theme.palette.primary.main,
+    cursor: "pointer",
+    fontWeight: 500,
+  };
+  
   return (
     <>
       <AppBar

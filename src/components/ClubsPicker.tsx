@@ -1,13 +1,15 @@
-import { api } from "~/utils/api";
-import ErrorAlert from "./ErrorAlert";
 import { Box, Button, Skeleton, Typography } from "@mui/material";
 import Link from "next/link";
+import { api } from "~/utils/api";
+import ErrorAlert from "./ErrorAlert";
 
 export default function ClubsPicker() {
   const clubQuery = api.club.getAll.useQuery(undefined, { retry: 0 });
 
   if (clubQuery.isError) {
-    return <ErrorAlert onClose={() => clubQuery.remove} error={clubQuery.error} />;
+    return (
+      <ErrorAlert onClose={() => clubQuery.remove} error={clubQuery.error} />
+    );
   }
 
   return (
