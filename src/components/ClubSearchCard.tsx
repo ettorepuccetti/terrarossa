@@ -1,8 +1,8 @@
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import { Box, ListItemText } from "@mui/material";
+import { Box, ListItemText, ListItemButton } from "@mui/material";
 import { type Club } from "@prisma/client";
 import Link from "next/link";
-import ListItemButton from "@mui/material";
+
 
 export const ClubSearchCard = ({ club }: { club: Club }) => {
   const style = {
