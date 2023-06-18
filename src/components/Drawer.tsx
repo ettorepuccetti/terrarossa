@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import NextLink from "next/link";
 import LoginDrawerButton from "./LoginDrawerButton";
-import { DateRange } from "@mui/icons-material";
+import DateRange from "@mui/icons-material/DateRange";
 
 interface DrawerProps {
   open: boolean;
