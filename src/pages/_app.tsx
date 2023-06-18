@@ -1,6 +1,6 @@
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-import { AppProps } from "next/app";
+import { type AppProps } from "next/app";
 
 import { api } from "~/utils/api";
 
@@ -18,12 +18,12 @@ import "@fontsource/roboto/700.css";
 
 const clientSideEmotionCache = createEmotionCache();
 
-interface MyAppType extends AppProps {
+interface MyAppProps extends AppProps {
   session: Session | null;
   emotionCache: EmotionCache;
 }
 
-const MyApp = (props: MyAppType) => {
+const MyApp = (props: MyAppProps) => {
   const {
     Component,
     session,

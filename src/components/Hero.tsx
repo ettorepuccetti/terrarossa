@@ -1,8 +1,8 @@
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import Image from "next/image";
+import Link from "next/link";
 import heroSrc from "../../public/images/myteam.jpg";
 import styles from "../styles/Hero.module.css";
-import ClubsPicker from "./ClubsPicker";
 
 const Hero = () => {
   return (
@@ -17,9 +17,14 @@ const Hero = () => {
           <Typography variant="h3" fontWeight={700} className={styles.title}>
             Prenota ora il tuo campo da tennis
           </Typography>
-          <Grid item xs={12} md={6}>
-            <ClubsPicker />
-          </Grid>
+          <Typography variant="h6" className={styles.subtitle}>
+            con Terrarossa
+          </Typography>
+          <Link href={"/search"}>
+            <Button color="secondary" variant="contained">
+              Prenota
+            </Button>
+          </Link>
         </Grid>
         <Grid item xs={12} sm={8} md={6}>
           <Image src={heroSrc} alt="My Team" className={styles.largeImage} />

@@ -7,6 +7,7 @@ import { api } from "~/utils/api";
 
 import { type EventClickArg } from "@fullcalendar/core";
 import { type EventImpl } from "@fullcalendar/core/internal";
+import { Skeleton, Typography } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -14,7 +15,6 @@ import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
 import SpinnerPartial from "./SpinnerPartial";
-import { Skeleton, Typography } from "@mui/material";
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -46,7 +46,10 @@ export default function Calendar() {
    * -------------------------------------
    */
 
-  const clubQuery = api.club.getByClubId.useQuery({clubId: clubId}, { enabled: clubId !== undefined });
+  const clubQuery = api.club.getByClubId.useQuery(
+    { clubId: clubId },
+    { enabled: clubId !== undefined }
+  );
 
   const courtQuery = api.court.getAllByClubId.useQuery(
     { clubId: clubId },
@@ -97,7 +100,7 @@ export default function Calendar() {
 
   const addEvent = (endDate: Date, overwrittenName?: string) => {
     setDateClick(undefined);
-    setShowPotentialErrorOnAdd(true);
+    // setShowPotentialErrorOnAdd(true);
 
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
@@ -112,15 +115,13 @@ export default function Calendar() {
 
   function deleteEvent(eventId: string): void {
     setEventDetails(undefined);
-    setShowPotentialErrorOnDel(true);
     console.log("delete Event: ", eventId);
     reservationDelete.mutate(eventId);
   }
 
   const [eventDetails, setEventDetails] = useState<EventImpl>();
   const [dateClick, setDateClick] = useState<DateClickArg>();
-  const [showPotentialErrorOnAdd, setShowPotentialErrorOnAdd] = useState(true);
-  const [showPotentialErrorOnDel, setShowPotentialErrorOnDel] = useState(true);
+
   /**
    * -------------------------------------
    * ---------- Rendering ---------------
@@ -129,25 +130,26 @@ export default function Calendar() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {reservationAdd.error !== null && showPotentialErrorOnAdd && (
+      {reservationAdd.error !== null && (
         <ErrorAlert
           error={reservationAdd.error}
-          onClose={() => setShowPotentialErrorOnAdd(false)}
+          onClose={() => reservationAdd.reset()}
         />
       )}
 
-      {reservationDelete.error !== null && showPotentialErrorOnDel && (
+      {reservationDelete.error !== null && (
         <ErrorAlert
           error={reservationDelete.error}
-          onClose={() => setShowPotentialErrorOnDel(false)}
+          onClose={() => reservationDelete.reset()}
         />
       )}
 
-      <Typography variant="h5" fontWeight={600} textAlign={'center'}>
-        {clubQuery.isLoading?
+      <Typography variant="h5" fontWeight={600} textAlign={"center"}>
+        {clubQuery.isLoading ? (
           <Skeleton variant="text" width={300} height={50} />
-          :
-          clubQuery.data?.name}
+        ) : (
+          clubQuery.data?.name
+        )}
       </Typography>
 
       {

@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import NextLink from "next/link";
 import LoginDrawerButton from "./LoginDrawerButton";
+import { DateRange } from "@mui/icons-material";
 
 interface DrawerProps {
   open: boolean;
@@ -44,12 +45,12 @@ export default function ReservationDrawer(props: DrawerProps) {
           </NextLink>
 
           {/* Link to reservation page  -- disabled temporarly*/}
-          {/* <NextLink href="/prenota">
+          <NextLink href="/search">
             <ListItemButtonStyled >
               <DateRange />
               <ListItemText primary="Prenota" />
             </ListItemButtonStyled>
-          </NextLink> */}
+          </NextLink>
 
           {/* Link to profile page */}
           <NextLink href="/profile">
