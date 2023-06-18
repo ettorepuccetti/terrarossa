@@ -19,10 +19,6 @@ const Home: NextPage = () => {
       <main className={styles.wrapper}>
         <Header />
         <Hero />
-        {/* <Section />
-        <AboutUs />
-        <Testimonial />
-        <ContactUs /> */}
         <Footer />
       </main>
     </>

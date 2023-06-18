@@ -17,8 +17,9 @@ const Hero = () => {
           <Typography variant="h3" fontWeight={700} className={styles.title}>
             Prenota ora il tuo campo da tennis
           </Typography>
-
-          <ClubsPicker />
+          <Grid item xs={12} md={6}>
+            <ClubsPicker />
+          </Grid>
         </Grid>
         <Grid item xs={12} sm={8} md={6}>
           <Image src={heroSrc} alt="My Team" className={styles.largeImage} />
