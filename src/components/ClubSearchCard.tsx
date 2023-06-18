@@ -1,4 +1,4 @@
-import { Home } from "@mui/icons-material";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { Box, ListItemText } from "@mui/material";
 import { type Club } from "@prisma/client";
 import Link from "next/link";
@@ -21,7 +21,7 @@ export const ClubSearchCard = ({ club }: { club: Club }) => {
         }}
       >
         <ListItemButtonStyled>
-          <Home />
+          <HomeOutlinedIcon />
           <ListItemText primary={club.name} />
         </ListItemButtonStyled>
       </Link>
