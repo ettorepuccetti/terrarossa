@@ -2,7 +2,7 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { Box, ListItemText } from "@mui/material";
 import { type Club } from "@prisma/client";
 import Link from "next/link";
-import { ListItemButtonStyled } from "./Drawer";
+import ListItemButton from "@mui/material";
 
 export const ClubSearchCard = ({ club }: { club: Club }) => {
   const style = {
@@ -20,10 +20,10 @@ export const ClubSearchCard = ({ club }: { club: Club }) => {
           query: { clubId: club.id },
         }}
       >
-        <ListItemButtonStyled>
+        <ListItemButton>
           <HomeOutlinedIcon />
           <ListItemText primary={club.name} />
-        </ListItemButtonStyled>
+        </ListItemButton>
       </Link>
     </Box>
   );
