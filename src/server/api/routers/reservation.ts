@@ -205,6 +205,5 @@ async function collision(
       ],
     },
   });
-  console.log("Reservations collisions: ", reservations);
   return reservations.length !== 0;
 }

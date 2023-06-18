@@ -1,7 +1,7 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import Footer from "~/components/Footer";
-import ReservationHeader from "~/components/Header";
+import Header from "~/components/Header";
 import Hero from "~/components/Hero";
 import styles from "~/styles/index.module.css";
 
@@ -17,7 +17,7 @@ const Home: NextPage = () => {
         />
       </Head>
       <main className={styles.wrapper}>
-        <ReservationHeader />
+        <Header />
         <Hero />
         {/* <Section />
         <AboutUs />

@@ -4,7 +4,7 @@ import { type GridInitialStateCommunity } from "@mui/x-data-grid/models/gridStat
 import dayjs from "dayjs";
 import { signIn, useSession } from "next-auth/react";
 import DeleteAccount from "~/components/DeleteAccount";
-import ReservationHeader from "~/components/Header";
+import Header from "~/components/Header";
 import Spinner from "~/components/Spinner";
 import { api } from "~/utils/api";
 
@@ -93,7 +93,7 @@ const Prenota = () => {
 
   return (
     <>
-      <ReservationHeader />
+      <Header />
       <Box
         padding={5}
         display={"flex"}

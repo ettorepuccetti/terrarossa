@@ -15,9 +15,7 @@ const toolbarStyle: SxProps = {
   display: "flex",
 };
 
-
-
-export default function ReservationHeader() {
+export default function Header() {
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const theme = useTheme();
 
@@ -26,7 +24,7 @@ export default function ReservationHeader() {
     cursor: "pointer",
     fontWeight: 500,
   };
-  
+
   return (
     <>
       <AppBar

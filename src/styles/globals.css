@@ -6,28 +6,11 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-a {
+/* a {
   color: inherit;
   text-decoration: none;
-}
+} */
 
 * {
   box-sizing: border-box;
 }
-
-/*
- .fc table{
-  table-layout: auto;
-}
-.fc-view > table{  
-  min-width: 0;
-  width: auto;
-}
-.fc-axis{
-  min-width:100px; 
-  width:100px; 
-}
-.fc-day,.fc-resource-cell,.fc-content-col{
-  min-width:300px;
-  width:300px;
-} */

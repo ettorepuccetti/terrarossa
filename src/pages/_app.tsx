@@ -4,7 +4,7 @@ import { SessionProvider } from "next-auth/react";
 
 import { api } from "~/utils/api";
 
-import "~/styles/globals.css";
+// import "~/styles/globals.css";
 import { CacheProvider, type EmotionCache } from "@emotion/react";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 
