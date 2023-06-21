@@ -58,7 +58,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
 
   return (
     <Box width={"100%"} display={"flex"} flexDirection={"column"}>
-      <CalendarHeader calendarRef={calendarRef} />
+      {/* <CalendarHeader calendarRef={calendarRef} /> */}
       <HorizonalDatePicker calendarRef={calendarRef}/>
       <FullCalendar
         ref={calendarRef}
