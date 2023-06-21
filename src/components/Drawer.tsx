@@ -44,7 +44,7 @@ export default function ReservationDrawer(props: DrawerProps) {
             </ListItemButtonStyled>
           </NextLink>
 
-          {/* Link to reservation page  -- disabled temporarly*/}
+          {/* Link to reservation page */}
           <NextLink href="/search">
             <ListItemButtonStyled >
               <DateRange />

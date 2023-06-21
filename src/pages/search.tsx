@@ -1,10 +1,11 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import { type Club } from "@prisma/client";
 import { type NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { ClubSearchCard } from "~/components/ClubSearchCard";
 import ErrorAlert from "~/components/ErrorAlert";
+import Header from "~/components/Header";
 import SearchBar from "~/components/SearchBar";
 import { api } from "~/utils/api";
 
@@ -43,10 +44,8 @@ const Search: NextPage = () => {
         <meta name="description" content="" />
       </Head>
 
-      <Container sx={{ mt: 1 }}>
-        <Typography textAlign={"center"} variant="h6" sx={{ opacity: 0.6 }}>
-          Cerca il tuo Circolo:
-        </Typography>
+      <Header />
+      <Container sx={{ mt: 3 }}>
         <SearchBar onSearch={onSearch} />
 
         <Box display={"flex"} flexDirection={"column"} gap={1.5} mt={3}>

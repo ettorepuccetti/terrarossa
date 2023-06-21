@@ -6,8 +6,9 @@ import Toolbar from "@mui/material/Toolbar";
 import NextLink from "next/link";
 import React from "react";
 import ReservationDrawer from "./Drawer";
+import Image from "next/image";
 
-const toolbarStyle: SxProps = {
+const   toolbarStyle: SxProps = {
   backgroundColor: "white",
   padding: "20px",
   height: "10vh",
@@ -33,6 +34,7 @@ export default function Header() {
         } /*  sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} */
       >
         <Toolbar sx={toolbarStyle} disableGutters>
+          <Box display={"flex"} flex={1}>
           <IconButton
             size="large"
             edge="start"
@@ -42,19 +44,19 @@ export default function Header() {
             <MenuIcon sx={{ color: "black" }} />
           </IconButton>
           <ReservationDrawer open={openDrawer} setOpen={setOpenDrawer} />
-
-          {/* Logo with link to home */}
-          <NextLink href="#">
+          </Box>
+          {/* Name */}
+          <NextLink href="/">
             <Typography variant="h5" sx={logoStyle}>
               Terrarossa
             </Typography>
           </NextLink>
 
-          {/* empty box to position logo in the center */}
-          <Box>
-            <IconButton size="large"></IconButton>
-            <MenuIcon></MenuIcon>
+          {/* Logo */}
+          <Box display={"flex"} flex={1} justifyContent={"flex-end"} >
+            <Image src="/mstile-144x144.png" alt="logo" width={50} height={50} />
           </Box>
+
         </Toolbar>
       </AppBar>
 

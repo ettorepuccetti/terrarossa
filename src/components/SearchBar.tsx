@@ -23,7 +23,7 @@ export default function SearchBar(props: { onSearch: (term: string) => void }) {
     <TextField
       id="search"
       type="search"
-      label="Search"
+      label="Cerca il tuo circolo"
       value={searchTerm}
       onChange={onSearch}
       fullWidth

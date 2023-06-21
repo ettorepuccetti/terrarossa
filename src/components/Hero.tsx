@@ -13,7 +13,7 @@ const Hero = () => {
         className={styles.gridContainer}
         justifyContent={"center"}
       >
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} pt={"0!important"}>
           <Typography variant="h3" fontWeight={700} className={styles.title}>
             Prenota ora il tuo campo da tennis
           </Typography>

@@ -1,12 +1,10 @@
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import { Box, ListItemText, ListItemButton } from "@mui/material";
+import { Box, ListItemButton, ListItemText } from "@mui/material";
 import { type Club } from "@prisma/client";
 import Link from "next/link";
 
-
 export const ClubSearchCard = ({ club }: { club: Club }) => {
   const style = {
-    // borderColor: "primary.main",
     borderRadius: 1,
     border: 0.5,
     backgroundOpacity: 0.01,
@@ -21,8 +19,10 @@ export const ClubSearchCard = ({ club }: { club: Club }) => {
         }}
       >
         <ListItemButton>
-          <HomeOutlinedIcon />
-          <ListItemText primary={club.name} />
+          <Box display={"flex"} gap={1} alignItems={"center"}>
+            <HomeOutlinedIcon color="secondary" />
+            <ListItemText primary={club.name} />
+          </Box>
         </ListItemButton>
       </Link>
     </Box>
