@@ -45,6 +45,7 @@ export default function Header() {
           </IconButton>
           <ReservationDrawer open={openDrawer} setOpen={setOpenDrawer} />
           </Box>
+          
           {/* Name */}
           <NextLink href="/">
             <Typography variant="h5" sx={logoStyle}>

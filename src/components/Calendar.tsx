@@ -152,23 +152,21 @@ export default function Calendar() {
         )}
       </Typography>
 
-      {
-        <SpinnerPartial
-          open={
-            reservationQuery.isLoading ||
-            courtQuery.isLoading ||
-            reservationAdd.isLoading ||
-            reservationDelete.isLoading
-          }
-        >
-          <FullCalendarWrapper
-            reservationData={reservationQuery.data ?? []}
-            courtsData={courtQuery.data ?? []}
-            onDateClick={openReservationDialog}
-            onEventClick={openEventDialog}
-          />
-        </SpinnerPartial>
-      }
+      <SpinnerPartial
+        open={
+          reservationQuery.isLoading ||
+          courtQuery.isLoading ||
+          reservationAdd.isLoading ||
+          reservationDelete.isLoading
+        }
+      >
+        <FullCalendarWrapper
+          reservationData={reservationQuery.data ?? []}
+          courtsData={courtQuery.data ?? []}
+          onDateClick={openReservationDialog}
+          onEventClick={openEventDialog}
+        />
+      </SpinnerPartial>
 
       <ReserveDialog
         open={dateClick !== undefined}
