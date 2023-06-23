@@ -101,9 +101,11 @@ model Court {
 }
 
 model Club {
-  id     String  @id @unique @default(cuid())
-  name   String  @unique
-  courts Court[]
+  id       String  @id @unique @default(cuid())
+  name     String  @unique
+  courts   Court[]
+  imageSrc String?
+  logoSrc  String?
 }
 
 enum BeginTime {

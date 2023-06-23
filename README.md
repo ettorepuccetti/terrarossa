@@ -19,6 +19,8 @@ riavviare npm run dev
 npx prisma push db 
 npx prisma generate
 (reminder: cambiamenti ai prisma tag non richiedono deployment, si riflettono solo su prisma studio e prisma generate)
+mergiare da planetscale.com
+
 
 ## Privacy policy
 generated using https://www.freeprivacypolicy.com/free-terms-and-conditions-generator/

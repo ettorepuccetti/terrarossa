@@ -93,6 +93,7 @@ export default function ReserveDialog(props: SimpleDialogProps) {
                 minTime={dayjs(dateClick?.date).add(1, 'hours') as unknown as Date}
                 maxTime={dayjs(dateClick?.date).add(2, 'hours') as unknown as Date}
                 autoFocus={true}
+                disabled={reservationInThePast}
               />
 
               {reservationInThePast &&

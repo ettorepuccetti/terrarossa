@@ -11,7 +11,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { UserRoles } from "~/utils/constants";
+import { UserRoles, reservationConstraints } from "~/utils/constants";
 
 export const reservationRouter = createTRPCRouter({
   getAllVisibleInCalendarByClubId: publicProcedure
@@ -29,8 +29,12 @@ export const reservationRouter = createTRPCRouter({
             // retrieve only reservations that are in the visible time windows (2 days in the past, 1 week in the future)
             {
               startTime: {
-                gte: dayjs().subtract(2, "day").toDate(),
-                lte: dayjs().add(8, "day").toDate(),
+                gte: dayjs()
+                  .subtract(reservationConstraints.dayInThePastVisible, "day")
+                  .toDate(),
+                lte: dayjs()
+                  .add(reservationConstraints.daysInTheFutureVisible, "day")
+                  .toDate(),
               },
             },
           ],

@@ -3,12 +3,13 @@ import { Box, Typography, useTheme, type SxProps } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
+import Image from "next/image";
 import NextLink from "next/link";
 import React from "react";
+import { appNameInHeader, defaultLogoSrc } from "~/utils/constants";
 import ReservationDrawer from "./Drawer";
-import Image from "next/image";
 
-const   toolbarStyle: SxProps = {
+const toolbarStyle: SxProps = {
   backgroundColor: "white",
   padding: "20px",
   height: "10vh",
@@ -16,47 +17,57 @@ const   toolbarStyle: SxProps = {
   display: "flex",
 };
 
-export default function Header() {
+export default function Header({
+  headerName,
+  logoSrc,
+}: {
+  headerName?: string | undefined;
+  logoSrc?: string | undefined | null;
+}) {
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const theme = useTheme();
 
   const logoStyle = {
-    color: theme.palette.primary.main,
     cursor: "pointer",
     fontWeight: 500,
   };
 
   return (
     <>
-      <AppBar
-        position={
-          "fixed"
-        } /*  sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} */
-      >
+      <AppBar position={"fixed"}>
         <Toolbar sx={toolbarStyle} disableGutters>
           <Box display={"flex"} flex={1}>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            onClick={(_e) => setOpenDrawer(!openDrawer)}
-          >
-            <MenuIcon sx={{ color: "black" }} />
-          </IconButton>
-          <ReservationDrawer open={openDrawer} setOpen={setOpenDrawer} />
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              onClick={(_e) => setOpenDrawer(!openDrawer)}
+            >
+              <MenuIcon sx={{ color: "black" }} />
+            </IconButton>
+            <ReservationDrawer open={openDrawer} setOpen={setOpenDrawer} />
           </Box>
+
           {/* Name */}
-          <NextLink href="/">
-            <Typography variant="h5" sx={logoStyle}>
-              Terrarossa
+          <NextLink href="#">
+            <Typography
+              variant="h5"
+              sx={logoStyle}
+              color={headerName ? "black" : theme.palette.primary.main}
+            >
+              {headerName ?? appNameInHeader}
             </Typography>
           </NextLink>
 
           {/* Logo */}
-          <Box display={"flex"} flex={1} justifyContent={"flex-end"} >
-            <Image src="/mstile-144x144.png" alt="logo" width={50} height={50} />
+          <Box display={"flex"} flex={1} justifyContent={"flex-end"}>
+            <Image
+              src={logoSrc ?? defaultLogoSrc}
+              alt="logo"
+              width={50}
+              height={50}
+            />
           </Box>
-
         </Toolbar>
       </AppBar>
 

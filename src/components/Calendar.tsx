@@ -11,9 +11,11 @@ import { Skeleton, Typography } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { defaultLogoSrc } from "~/utils/constants";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
+import Header from "./Header";
 import SpinnerPartial from "./SpinnerPartial";
 
 export const ReservationInputSchema = z.object({
@@ -144,31 +146,26 @@ export default function Calendar() {
         />
       )}
 
-      <Typography variant="h5" fontWeight={600} textAlign={"center"}>
-        {clubQuery.isLoading ? (
-          <Skeleton variant="text" width={300} height={50} />
-        ) : (
-          clubQuery.data?.name
-        )}
-      </Typography>
-
-      {
-        <SpinnerPartial
-          open={
-            reservationQuery.isLoading ||
-            courtQuery.isLoading ||
-            reservationAdd.isLoading ||
-            reservationDelete.isLoading
-          }
-        >
-          <FullCalendarWrapper
-            reservationData={reservationQuery.data ?? []}
-            courtsData={courtQuery.data ?? []}
-            onDateClick={openReservationDialog}
-            onEventClick={openEventDialog}
-          />
-        </SpinnerPartial>
-      }
+      <SpinnerPartial
+        open={
+          clubQuery.isLoading ||
+          reservationQuery.isLoading ||
+          courtQuery.isLoading ||
+          reservationAdd.isLoading ||
+          reservationDelete.isLoading
+        }
+      >
+        <Header
+          headerName={clubQuery.data?.name}
+          logoSrc={clubQuery.data?.logoSrc}
+        />
+        <FullCalendarWrapper
+          reservationData={reservationQuery.data ?? []}
+          courtsData={courtQuery.data ?? []}
+          onDateClick={openReservationDialog}
+          onEventClick={openEventDialog}
+        />
+      </SpinnerPartial>
 
       <ReserveDialog
         open={dateClick !== undefined}
