@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { type Dayjs } from "dayjs";
 
 export const DayCard = (props: {
@@ -21,6 +21,7 @@ export const DayCard = (props: {
 
       }}
     >
+      {/* upper part of the card, contain day of the week, red background */}
       <Box
         display={"flex"}
         justifyContent={"center"}
@@ -34,6 +35,8 @@ export const DayCard = (props: {
       >
         {props.day.format("ddd").toUpperCase()}
       </Box>
+
+      {/* lower part of the card, contain day of the month, white background */}
       <Box
         display={"flex"}
         justifyContent={"center"}
@@ -47,7 +50,7 @@ export const DayCard = (props: {
             : "white",
         }}
       >
-        {props.day.format("DD")}
+        <Typography fontSize={18}>{props.day.format("DD")}</Typography>
       </Box>
     </Box>
   );

@@ -20,5 +20,17 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+
+  // to allow images from r2.dev
+  images: {
+    remotePatterns: [
+        {
+            protocol: 'https',
+            hostname: '**.r2.dev',
+            port: '',
+            pathname: '**',
+        },
+    ],
+},
 };
 export default config;
