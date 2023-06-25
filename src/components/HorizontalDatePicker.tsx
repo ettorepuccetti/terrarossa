@@ -31,7 +31,8 @@ export const HorizonalDatePicker = ({
   };
 
   return (
-    <Box paddingY={2} display={"flex"} flexDirection={"column"} gap={1}>
+    <Box paddingY={2} display={"flex"} flexDirection={"column"}>
+      {/* Horizontal scrollable list of dates - double Box needed for layout */}
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Box
           sx={{
@@ -55,6 +56,8 @@ export const HorizonalDatePicker = ({
           })}
         </Box>
       </Box>
+
+      {/* Selected date extended */}
       <Typography variant={"h6"} sx={{ textAlign: "center" }}>
         {capitalise(selectedDate.format("dddd DD MMMM YYYY"))}
       </Typography>
