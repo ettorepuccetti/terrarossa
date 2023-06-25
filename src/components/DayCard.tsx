@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
 
 export const DayCard = (props: {
@@ -7,7 +7,6 @@ export const DayCard = (props: {
   onBoxClick: () => void;
 }) => {
   const today = dayjs();
-  const theme = useTheme();
 
   return (
     <Box

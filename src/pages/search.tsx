@@ -45,7 +45,7 @@ const Search: NextPage = () => {
       </Head>
 
       <Header />
-      <Container sx={{ mt: 3 }}>
+      <Container maxWidth={"md"} sx={{ mt: 3}}>
         <SearchBar onSearch={onSearch} />
 
         <Box display={"flex"} flexDirection={"column"} gap={1.5} mt={3}>
