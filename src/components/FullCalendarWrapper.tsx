@@ -14,7 +14,7 @@ import { Avatar, Box } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useRef, type RefObject } from "react";
 import { type AppRouter } from "~/server/api/root";
-import CalendarHeader from "./CalendarHeader";
+import { defaultImg } from "~/utils/constants";
 import { HorizonalDatePicker } from "./HorizontalDatePicker";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
@@ -23,6 +23,7 @@ type ReservationFromDb =
 type CourtFromDb = RouterOutput["court"]["getAllByClubId"][0];
 
 interface FullCalendarWrapperProps {
+  clubData: RouterOutput["club"]["getByClubId"] | undefined;
   reservationData: ReservationFromDb[];
   courtsData: CourtFromDb[];
   onEventClick: (eventClickInfo: EventClickArg) => void;
@@ -56,10 +57,40 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     };
   };
 
+  function renderEventContent(eventInfo: EventContentArg) {
+    return (
+      <Box
+        display={"flex"}
+        gap={1}
+        className={"fc-event-main"}
+        alignItems={"center"}
+      >
+        {eventInfo.event.extendedProps.userImg && (
+          <Avatar
+            alt={eventInfo.event.title}
+            src={eventInfo.event.extendedProps.userImg as string}
+          />
+        )}
+        <Box maxHeight={"100%"} overflow={"hidden"}>
+          <Box className="fc-event-time">{eventInfo.timeText} </Box>
+          <Box
+            textOverflow={"ellipsis"}
+            className="fc-event-title"
+            lineHeight={"22px"}
+          >
+            {eventInfo.event.title}{" "}
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box width={"100%"} display={"flex"} flexDirection={"column"}>
-      {/* <CalendarHeader calendarRef={calendarRef} /> */}
-      <HorizonalDatePicker calendarRef={calendarRef}/>
+      <HorizonalDatePicker
+        calendarRef={calendarRef}
+        clubImg={props.clubData?.imageSrc ?? defaultImg}
+      />
       <FullCalendar
         ref={calendarRef}
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
@@ -75,14 +106,6 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
           props.onDateClick(info);
         }}
         selectable={false}
-        validRange={function (currentDate) {
-          const startDate = new Date(currentDate.valueOf());
-          const endDate = new Date(currentDate.valueOf());
-          // Adjust the start & end dates, respectively
-          startDate.setDate(startDate.getDate() - 2); // Two days into the past
-          endDate.setDate(endDate.getDate() + 7); // Seven days into the future
-          return { start: startDate, end: endDate };
-        }}
         slotMinTime="08:00:00"
         slotMaxTime="23:00:00"
         selectLongPressDelay={0}
@@ -94,34 +117,6 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         locale={"it-it"}
         dayMinWidth={150}
       />
-    </Box>
-  );
-}
-
-function renderEventContent(eventInfo: EventContentArg) {
-  return (
-    <Box
-      display={"flex"}
-      gap={1}
-      className={"fc-event-main"}
-      alignItems={"center"}
-    >
-      {eventInfo.event.extendedProps.userImg && (
-        <Avatar
-          alt={eventInfo.event.title}
-          src={eventInfo.event.extendedProps.userImg as string}
-        />
-      )}
-      <Box maxHeight={"100%"} overflow={"hidden"}>
-        <Box className="fc-event-time">{eventInfo.timeText} </Box>
-        <Box
-          textOverflow={"ellipsis"}
-          className="fc-event-title"
-          lineHeight={"22px"}
-        >
-          {eventInfo.event.title}{" "}
-        </Box>
-      </Box>
     </Box>
   );
 }

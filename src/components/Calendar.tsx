@@ -7,11 +7,9 @@ import { api } from "~/utils/api";
 
 import { type EventClickArg } from "@fullcalendar/core";
 import { type EventImpl } from "@fullcalendar/core/internal";
-import { Skeleton, Typography } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { defaultLogoSrc } from "~/utils/constants";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
@@ -102,7 +100,6 @@ export default function Calendar() {
 
   const addEvent = (endDate: Date, overwrittenName?: string) => {
     setDateClick(undefined);
-    // setShowPotentialErrorOnAdd(true);
 
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
@@ -160,6 +157,7 @@ export default function Calendar() {
           logoSrc={clubQuery.data?.logoSrc}
         />
         <FullCalendarWrapper
+          clubData={clubQuery.data}
           reservationData={reservationQuery.data ?? []}
           courtsData={courtQuery.data ?? []}
           onDateClick={openReservationDialog}
