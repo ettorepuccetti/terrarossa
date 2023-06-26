@@ -54,7 +54,7 @@ export const HorizonalDatePicker = ({
             left: 0,
             bottom: "-1px", // for hiding the bottom border
             backgroundImage:
-              "linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))", //fade to white
+              "linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 70%,  rgba(255, 255, 255, 1) 100%)", //fade to white
             height: "9rem", // to increase the fading effect
             alignItems: "flex-end",
           }}
