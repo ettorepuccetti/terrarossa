@@ -19,7 +19,7 @@ import { HorizonalDatePicker } from "./HorizontalDatePicker";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type ReservationFromDb =
-  RouterOutput["reservation"]["getAllVisibleInCalendarByClubId"][0];
+  RouterOutput["reservationQuery"]["getAllVisibleInCalendarByClubId"][0];
 type CourtFromDb = RouterOutput["court"]["getAllByClubId"][0];
 
 interface FullCalendarWrapperProps {

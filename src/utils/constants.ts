@@ -12,7 +12,8 @@ export const appNameInHeader = "Terrarossa";
 export const reservationConstraints = {
   dayInThePastVisible: 2,
   daysInTheFutureVisible: 7,
-  totalDaysVisible: 7 + 2
+  totalDaysVisible: 7 + 2,
+  hoursBeforeDeleting: 6,
 };
 
 export const capitalise = (s: string) => {

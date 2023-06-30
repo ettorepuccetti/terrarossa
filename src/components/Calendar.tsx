@@ -24,7 +24,7 @@ export const ReservationInputSchema = z.object({
 });
 
 export const ClubIdInputSchema = z.object({
-  clubId: z.union([z.string(), z.string().array(), z.undefined()]),
+  clubId: z.union([z.string(), z.string().array(), z.undefined()]), //router param can also be undefined or array of strings
 });
 
 export default function Calendar() {
@@ -33,7 +33,6 @@ export default function Calendar() {
 
   //get the club name from the router when is available
   const router = useRouter();
-
   useEffect(() => {
     if (router.isReady) {
       setClubId(router.query.clubId as string);
@@ -60,7 +59,7 @@ export default function Calendar() {
   );
 
   const reservationQuery =
-    api.reservation.getAllVisibleInCalendarByClubId.useQuery(
+    api.reservationQuery.getAllVisibleInCalendarByClubId.useQuery(
       { clubId: clubId },
       {
         refetchOnWindowFocus: false,
@@ -68,13 +67,13 @@ export default function Calendar() {
       }
     );
 
-  const reservationAdd = api.reservation.insertOne.useMutation({
+  const reservationAdd = api.reservationMutation.insertOne.useMutation({
     async onSuccess() {
       await reservationQuery.refetch();
     },
   });
 
-  const reservationDelete = api.reservation.deleteOne.useMutation({
+  const reservationDelete = api.reservationMutation.deleteOne.useMutation({
     async onSuccess() {
       await reservationQuery.refetch();
     },

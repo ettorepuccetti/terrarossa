@@ -18,7 +18,7 @@ const Prenota = () => {
   });
 
   const userQuery = api.user.getInfo.useQuery();
-  const myReservationsQuery = api.reservation.getMine.useQuery();
+  const myReservationsQuery = api.reservationQuery.getMine.useQuery();
 
   const rows: GridRowsProp | undefined = myReservationsQuery.data?.map(
     (reservation, index) => {

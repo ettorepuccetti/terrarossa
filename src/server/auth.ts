@@ -21,16 +21,17 @@ import { type UserRole } from "~/utils/constants";
  */
 
 declare module "next-auth" {
-
   interface Session extends DefaultSession {
     user: {
       id: string;
       role: UserRole;
+      clubId?: string;
     } & DefaultSession["user"];
   }
 
   interface User {
     role: UserRole;
+    clubId?: string;
   }
 }
 
@@ -45,6 +46,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = user.id;
         session.user.role = user.role; // <-- put other properties on the session here
+        session.user.clubId = user.clubId;
       }
       return session;
     },
@@ -61,13 +63,13 @@ export const authOptions: NextAuthOptions = {
     }),
     GitHubProvider({
       clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET
+      clientSecret: env.GITHUB_CLIENT_SECRET,
     }),
     Auth0Provider({
       clientId: env.AUTH0_CLIENT_ID,
       clientSecret: env.AUTH0_CLIENT_SECRET,
       issuer: env.AUTH0_ISSUER,
-    })
+    }),
   ],
 };
 

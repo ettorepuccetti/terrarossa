@@ -72,6 +72,8 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// --- end of Next auth models
+
 model Reservation {
   id            String   @id @unique @default(cuid())
   startTime     DateTime
