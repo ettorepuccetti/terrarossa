@@ -81,12 +81,11 @@ export const HorizonalDatePicker = ({
             })}
           </Box>
         </Box>
-
-        {/* Selected date extended */}
-        <Typography variant={"h6"} sx={{ textAlign: "center" }}>
-          {capitalise(selectedDate.format("dddd DD MMMM YYYY"))}
-        </Typography>
       </Box>
+      {/* Selected date extended */}
+      <Typography variant={"h6"} textAlign={'center'}>
+        {capitalise(selectedDate.format("dddd DD MMMM YYYY"))}
+      </Typography>
     </Box>
   );
 };
