@@ -171,6 +171,7 @@ export default function Calendar() {
         onConfirm={(endDate, overwrittenName?) =>
           addEvent(endDate, overwrittenName)
         }
+        clubId={clubId}
       />
 
       <EventDetailDialog
@@ -179,6 +180,7 @@ export default function Calendar() {
         onDialogClose={() => setEventDetails(undefined)}
         sessionData={sessionData}
         onReservationDelete={(id) => deleteEvent(id)}
+        clubId={clubId}
       />
     </LocalizationProvider>
   );

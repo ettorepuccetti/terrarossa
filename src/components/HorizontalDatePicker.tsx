@@ -4,8 +4,9 @@ import { Box, Typography } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
 import Image from "next/image";
 import { useState } from "react";
-import { capitalise, reservationConstraints } from "~/utils/constants";
+import { reservationConstraints } from "~/utils/constants";
 import { DayCard } from "./DayCard";
+import { capitalise } from "~/utils/utils";
 require("dayjs/locale/it");
 dayjs.locale("it");
 
@@ -83,7 +84,7 @@ export const HorizonalDatePicker = ({
         </Box>
       </Box>
       {/* Selected date extended */}
-      <Typography variant={"h6"} textAlign={'center'}>
+      <Typography variant={"h6"} textAlign={"center"}>
         {capitalise(selectedDate.format("dddd DD MMMM YYYY"))}
       </Typography>
     </Box>

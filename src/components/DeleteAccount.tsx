@@ -3,18 +3,22 @@ import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { api } from "~/utils/api";
-import ConfirmationAlert from "./ConfirmationAlert";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 export default function DeleteAccount() {
-
   const deleteUser = api.user.deleteUser.useMutation();
   const router = useRouter();
 
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
-    <Box sx={{ backgroundColor: "error" }} display={'flex'}
-      alignItems={'center'} justifyContent={"space-between"} gap={2}>
+    <Box
+      sx={{ backgroundColor: "error" }}
+      display={"flex"}
+      alignItems={"center"}
+      justifyContent={"space-between"}
+      gap={2}
+    >
       <Typography>Elimina il mio account</Typography>
       <Button
         variant={"contained"}
@@ -23,7 +27,7 @@ export default function DeleteAccount() {
       >
         Elimina
       </Button>
-      <ConfirmationAlert
+      <ConfirmationDialog
         open={confirmOpen}
         title={"Elimina account"}
         message={
@@ -31,9 +35,16 @@ export default function DeleteAccount() {
           Le tue prenotazioni NON verranno cancellate, \
           il gestore del circolo potrà ancora vedere il tuo nome sulla prenotazione."
         }
-        onDialogClose={() => { setConfirmOpen(false) }}
-        onConfirm={() => {void router.push("/").then(() => signOut()).then(() => deleteUser.mutate()); }}
+        onDialogClose={() => {
+          setConfirmOpen(false);
+        }}
+        onConfirm={() => {
+          void router
+            .push("/")
+            .then(() => signOut())
+            .then(() => deleteUser.mutate());
+        }}
       />
     </Box>
-  )
+  );
 }

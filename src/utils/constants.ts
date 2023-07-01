@@ -16,8 +16,4 @@ export const reservationConstraints = {
   hoursBeforeDeleting: 6,
 };
 
-export const capitalise = (s: string) => {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-export const defaultImg = "/images/myteam.jpg"
+export const defaultImg = "/images/myteam.jpg";

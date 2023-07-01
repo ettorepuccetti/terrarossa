@@ -1,15 +1,20 @@
-import { type PrismaClient } from "@prisma/client";
+import { type Prisma, type PrismaClient } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
 import dayjs from "dayjs";
 import { z } from "zod";
 import { ReservationInputSchema } from "~/components/Calendar";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { UserRoles, reservationConstraints } from "~/utils/constants";
+import {
+  UserRoles,
+  reservationConstraints,
+  type UserRole,
+} from "~/utils/constants";
 
 export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
     .input(ReservationInputSchema)
     .mutation(async ({ ctx, input }) => {
+      //collision check
       if (
         await collision(
           ctx.prisma,
@@ -21,12 +26,13 @@ export const reservationMutationRouter = createTRPCRouter({
         throw new TRPCClientError("Error: Reservation collision");
       }
 
+      // start date before end date
       if (input.startDateTime.getTime() > input.endDateTime.getTime()) {
         throw new TRPCClientError("Error: Start date cannot be after end date");
       }
 
       //checks for NON ADMIN user
-      if (!(ctx.session.user.role === UserRoles.ADMIN)) {
+      if (!(await isUserAdminOfClub(ctx, input.courtId))) {
         // reservation length
         if (!checkDuration(input.startDateTime, input.endDateTime)) {
           throw new TRPCClientError(
@@ -67,26 +73,28 @@ export const reservationMutationRouter = createTRPCRouter({
         where: { id: input },
       });
 
-      if (reservationToDelete === null) {
+      if (!reservationToDelete) {
         throw new Error("Reservation does not exist. Id: " + input.toString());
       }
-      if (
-        reservationToDelete?.userId !== ctx.session.user.id &&
-        ctx.session.user.role !== UserRoles.ADMIN
-      ) {
-        throw new TRPCClientError(
-          "You are not authorized to delete this reservation"
-        );
-      }
-      // reservation deleting timewindow
-      if (
-        dayjs(reservationToDelete?.startTime)
-          .add(reservationConstraints.hoursBeforeDeleting, "hour")
-          .isBefore(Date.now())
-      ) {
-        throw new TRPCClientError(
-          "Error: Reservations cannot be deleted 6 hours before the start time"
-        );
+
+      if (!(await isUserAdminOfClub(ctx, reservationToDelete?.courtId))) {
+        // delete reservation of other users
+        if (reservationToDelete?.userId !== ctx.session.user.id) {
+          throw new TRPCClientError(
+            "You are not authorized to delete this reservation"
+          );
+        }
+
+        // reservation deleting timewindow
+        if (
+          dayjs(reservationToDelete?.startTime)
+            .add(reservationConstraints.hoursBeforeDeleting, "hour")
+            .isBefore(Date.now())
+        ) {
+          throw new TRPCClientError(
+            `Error: Reservations cannot be deleted ${reservationConstraints.hoursBeforeDeleting} hours before the start time`
+          );
+        }
       }
 
       return ctx.prisma.reservation.delete({
@@ -96,6 +104,24 @@ export const reservationMutationRouter = createTRPCRouter({
       });
     }),
 });
+
+async function isUserAdminOfClub(ctx: CtxType, courtId: string) {
+  const clubIdFromCourt = (
+    await ctx.prisma.court.findUnique({
+      where: { id: courtId },
+    })
+  )?.clubId;
+
+  if (!clubIdFromCourt) {
+    throw new Error(
+      "Error: Court has not clubId associated. CourtId: " + courtId
+    );
+  }
+  return (
+    ctx.session.user.role === UserRoles.ADMIN &&
+    ctx.session.user.clubId === clubIdFromCourt
+  );
+}
 
 function checkDuration(startDateTime: Date, endDateTime: Date) {
   const timeDuration = endDateTime.getTime() - startDateTime.getTime();
@@ -145,3 +171,23 @@ async function collision(
   });
   return reservations.length !== 0;
 }
+
+type CtxType = {
+  prisma: PrismaClient<
+    Prisma.PrismaClientOptions,
+    never,
+    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+  >;
+  session: {
+    user: {
+      id: string;
+      role: UserRole;
+      clubId?: string | undefined;
+    } & {
+      name?: string | null | undefined;
+      email?: string | null | undefined;
+      image?: string | null | undefined;
+    };
+    expires: string;
+  };
+};
