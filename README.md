@@ -1,32 +1,25 @@
 # Terrarossa
 
-## Next.js
+Book tennis courts in your favourite clubs
 
-npm run dev
+## Installation
 
-## DB
+1. Clone the repository: `git clone https://github.com/ettorepuccetti/terrarossa`
+2. Install dependencies: `npm install`
 
-### Planetscale
+## Usage
 
-(optional)
-brew install planetscale/tap/pscale
-pscale connect terrarossa main --port 3309
-altrimenti connettersi direttamente con DATABASE_URL in .env
+1. Start the development server: `npm run dev`
+2. Open [http://localhost:3000](http://localhost:3000) in a web browser.
 
-### Prisma studio
+## Contributing
 
-npx prisma studio
+1. Fork the repository.
+2. Create a new branch: `git checkout -b my-branch-name`
+3. Make changes and commit them: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-branch-name`
+5. Submit a pull request.
 
-### DB changes
+## License
 
-in .env cambiare il DATABASE_URL a quello del branch
-riavviare npm run dev
-npx prisma db push
-npx prisma generate
-(reminder: cambiamenti ai prisma tag non richiedono deployment, si riflettono solo su prisma studio e prisma generate)
-mergiare da planetscale.com
-
-## Privacy policy
-
-generated using https://www.freeprivacypolicy.com/free-terms-and-conditions-generator/
-account: terrarouge.vercel@gmail.com
+This project is licensed under the [MIT License](LICENSE).
