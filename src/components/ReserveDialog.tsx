@@ -130,7 +130,7 @@ export default function ReserveDialog(props: SimpleDialogProps) {
                 }
                 autoFocus={true}
                 disabled={!canBook}
-                sx={{ width: "100%" }}
+                sx={{ width: "100%", }}
               />
 
               {!canBook && (
@@ -144,6 +144,7 @@ export default function ReserveDialog(props: SimpleDialogProps) {
               <Button
                 onClick={() => onConfirmButton()}
                 disabled={!endDate || !canBook}
+                color="info"
               >
                 Prenota
               </Button>
