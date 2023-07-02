@@ -19,7 +19,7 @@ npx prisma studio
 
 ### Docker
 
-docker run --name mysql -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql
+docker run --name mysql-terrarossa -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql
 
 ### DB changes
 
