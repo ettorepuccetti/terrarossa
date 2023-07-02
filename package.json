@@ -7,7 +7,8 @@
     "dev": "next",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "cypress": "cypress open"
   },
   "dependencies": {
     "@emotion/cache": "^11.10.5",
@@ -50,6 +51,7 @@
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
+    "cypress": "^12.16.0",
     "eslint": "^8.34.0",
     "eslint-config-next": "^13.2.1",
     "prettier": "2.8.8",
