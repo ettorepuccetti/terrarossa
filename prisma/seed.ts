@@ -8,6 +8,8 @@ async function main() {
       name: "Foro Italico",
       logoSrc:
         "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/bnl-logo.png",
+      imageSrc:
+        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/bnl-image.jpg",
       courts: {
         create: [
           {

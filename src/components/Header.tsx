@@ -7,7 +7,7 @@ import Image from "next/image";
 import NextLink from "next/link";
 import React from "react";
 import { appNameInHeader, defaultLogoSrc } from "~/utils/constants";
-import ReservationDrawer from "./Drawer";
+import Drawer from "./DrawerWrapper";
 
 const toolbarStyle: SxProps = {
   backgroundColor: "white",
@@ -45,7 +45,7 @@ export default function Header({
             >
               <MenuIcon sx={{ color: "black" }} />
             </IconButton>
-            <ReservationDrawer open={openDrawer} setOpen={setOpenDrawer} />
+            <Drawer open={openDrawer} setOpen={setOpenDrawer} />
           </Box>
 
           {/* Name */}

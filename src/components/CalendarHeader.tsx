@@ -5,7 +5,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useState, type RefObject } from "react";
-import ReservationDrawer from "./Drawer";
+import Drawer from "./DrawerWrapper";
 require("dayjs/locale/it");
 
 export default function CalendarHeader(props: {
@@ -45,7 +45,7 @@ export default function CalendarHeader(props: {
         >
           <MenuIcon sx={{ color: "black" }} />
         </IconButton>
-        <ReservationDrawer open={openDrawer} setOpen={setOpenDrawer} />
+        <Drawer open={openDrawer} setOpen={setOpenDrawer} />
       </Box>
 
       <Box display={"flex"} gap={1} justifyContent={"center"} flex={1}>

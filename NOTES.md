@@ -34,3 +34,13 @@ mergiare da planetscale.com
 
 generated using https://www.freeprivacypolicy.com/free-terms-and-conditions-generator/
 account: terrarouge.vercel@gmail.com
+
+## Cypress
+
+to avoid missing env variables, in package.json use:
+
+```
+"scripts": {
+  "cypress": "NODE_ENV='test' cypress open"
+}
+```
