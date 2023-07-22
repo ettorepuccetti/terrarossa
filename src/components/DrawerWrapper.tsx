@@ -21,7 +21,7 @@ export const ListItemButtonStyled = styled(ListItemButton)(() => ({
   gap: "1rem",
 }));
 
-export default function ReservationDrawer(props: DrawerProps) {
+export default function DrawerWrapper(props: DrawerProps) {
   return (
     <Drawer
       anchor="left"

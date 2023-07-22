@@ -19,7 +19,7 @@ npx prisma studio
 
 ### Docker
 
-docker run --name mysql -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql
+docker run --name mysql-terrarossa -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql
 
 ### DB changes
 
@@ -34,3 +34,13 @@ mergiare da planetscale.com
 
 generated using https://www.freeprivacypolicy.com/free-terms-and-conditions-generator/
 account: terrarouge.vercel@gmail.com
+
+## Cypress
+
+to avoid missing env variables, in package.json use:
+
+```
+"scripts": {
+  "cypress": "NODE_ENV='test' cypress open"
+}
+```

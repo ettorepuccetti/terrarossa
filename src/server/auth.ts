@@ -6,9 +6,6 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import Auth0Provider from "next-auth/providers/auth0";
-import FacebookProvider from "next-auth/providers/facebook";
-import GitHubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 import { type UserRole } from "~/utils/constants";
@@ -53,18 +50,18 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    FacebookProvider({
-      clientId: env.FACEBOOK_CLIENT_ID,
-      clientSecret: env.FACEBOOK_CLIENT_SECRET,
-    }),
-    GoogleProvider({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-    }),
-    GitHubProvider({
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
-    }),
+    // FacebookProvider({
+    //   clientId: env.FACEBOOK_CLIENT_ID,
+    //   clientSecret: env.FACEBOOK_CLIENT_SECRET,
+    // }),
+    // GoogleProvider({
+    //   clientId: env.GOOGLE_CLIENT_ID,
+    //   clientSecret: env.GOOGLE_CLIENT_SECRET,
+    // }),
+    // GitHubProvider({
+    //   clientId: env.GITHUB_CLIENT_ID,
+    //   clientSecret: env.GITHUB_CLIENT_SECRET,
+    // }),
     Auth0Provider({
       clientId: env.AUTH0_CLIENT_ID,
       clientSecret: env.AUTH0_CLIENT_SECRET,

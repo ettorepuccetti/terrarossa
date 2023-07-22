@@ -16,4 +16,4 @@ export const reservationConstraints = {
   hoursBeforeDeleting: 6,
 };
 
-export const defaultImg = "/images/myteam.jpg";
+export const defaultImg = "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/default-club.jpg";

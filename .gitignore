@@ -42,3 +42,9 @@ yarn-error.log*
 *.tsbuildinfo
 
 .vscode
+
+# cypress
+cypress.env.json
+cypress/videos
+cypress/screenshots
+cypress/downloads

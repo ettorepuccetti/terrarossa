@@ -166,7 +166,8 @@ export default function Calendar() {
 
       <ReserveDialog
         open={dateClick !== undefined}
-        dateClick={dateClick}
+        date={dateClick?.date}
+        resource={dateClick?.resource?.title}
         onDialogClose={() => setDateClick(undefined)}
         onConfirm={(endDate, overwrittenName?) =>
           addEvent(endDate, overwrittenName)
