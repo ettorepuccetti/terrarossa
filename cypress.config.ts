@@ -42,7 +42,6 @@ export default defineConfig({
           return prisma.club.findMany();
         },
         "prisma:queryFilteredClubs"(filter: string) {
-          console.log("filter", filter);
           return prisma.club.findMany({
             where: {
               name: {
