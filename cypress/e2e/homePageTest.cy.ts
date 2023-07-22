@@ -1,6 +1,13 @@
 export {};
 
 describe("homepage", () => {
+
+  beforeEach(() => {
+    cy.clearLocalStorage();
+    cy.clearCookies();
+    cy.clearAllSessionStorage();
+  });
+
   it("layout", () => {
     cy.visit("http://localhost:3000");
     cy.get('.MuiPaper-root > .MuiToolbar-root').should('be.visible'); //the toolbar is visible
@@ -10,9 +17,12 @@ describe("homepage", () => {
 
   it("login", () => {
     cy.visit("/");
-    cy.get('.css-13pmxen > .MuiButtonBase-root').click(); //open drawer
-    cy.get('.MuiList-root').contains('Login').click(); //click on login
+
     cy.loginToAuth0(Cypress.env('AUTH0_USER') as string, Cypress.env('AUTH0_PW') as string); //login
-    cy.visit("/"); //reload page
+    cy.visit("/");
+
+    cy.get('.css-13pmxen > .MuiButtonBase-root').click(); //open drawer
+    cy.get('.MuiList-root').contains('Logout'); //check if the logout button is visible
+    cy.get('.MuiList-root > :nth-child(1)').should("contain", Cypress.env("username") ); //check the username is displayed
   });
 });

@@ -157,7 +157,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
               alignItems={"center"}
               justifyContent={"center"}
             >
-              <Button onClick={() => void signIn("auth0")}>
+              <Button onClick={() => void signIn("auth0")} data-test="login">
                 Effettua il login
               </Button>
             </Box>

@@ -1,6 +1,6 @@
 export {};
 
-function loginToAuth0 (username: string, password: string) {
+function loginToAuth0(username: string, password: string) {
   const log = Cypress.log({
     displayName: "AUTH0 LOGIN",
     message: [`🔐 Authenticating | ${username}`],
@@ -14,17 +14,18 @@ function loginToAuth0 (username: string, password: string) {
   cy.session(
     `auth0-${username}`,
     () => {
-      // App landing page redirects to Auth0.
-      cy.visit("/");
-
+      cy.visit("/api/auth/signin/auth0");
+      cy.get("button").click();
       // Login on Auth0.
       cy.origin(
-        Cypress.env("auth0_domain") as string,
+        Cypress.env("AUTH0_ISSUER") as string,
         { args },
         ({ username, password }) => {
           cy.get("input#username").type(username);
           cy.get("input#password").type(password);
-          cy.contains("button[value=default]", "Continue").click();
+          cy.get("button[value=default]")
+            .filter("[data-action-button-primary='true']")
+            .click();
         }
       );
 
@@ -34,10 +35,10 @@ function loginToAuth0 (username: string, password: string) {
     {
       validate: () => {
         // Validate presence of access token in localStorage.
-        cy.window()
-          .its("localStorage")
-          .invoke("getItem", "authState")
-          .should("exist");
+        cy.request("/api/auth/session")
+          .its("body")
+          .its("user")
+          .should("include", { email: username });
       },
     }
   );
@@ -47,3 +48,11 @@ function loginToAuth0 (username: string, password: string) {
 }
 
 Cypress.Commands.add("loginToAuth0", loginToAuth0);
+
+Cypress.Commands.add("queryClubs", () => {
+  return cy.task("prisma:queryClubs");
+});
+
+Cypress.Commands.add("queryFilteredClubs", (filter) => {
+  return cy.task("prisma:queryFilteredClubs", filter);
+});

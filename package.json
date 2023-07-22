@@ -39,6 +39,7 @@
     "@trpc/react-query": "^10.9.0",
     "@trpc/server": "^10.9.0",
     "dayjs": "^1.11.7",
+    "dotenv": "^16.3.1",
     "next": "^13.2.1",
     "next-auth": "^4.22.1",
     "nodemailer": "^6.9.1",

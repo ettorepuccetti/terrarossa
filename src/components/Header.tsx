@@ -4,7 +4,6 @@ import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Image from "next/image";
-import NextLink from "next/link";
 import React from "react";
 import { appNameInHeader, defaultLogoSrc } from "~/utils/constants";
 import Drawer from "./DrawerWrapper";
@@ -27,11 +26,6 @@ export default function Header({
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const theme = useTheme();
 
-  const logoStyle = {
-    cursor: "pointer",
-    fontWeight: 500,
-  };
-
   return (
     <>
       <AppBar position={"fixed"}>
@@ -49,15 +43,13 @@ export default function Header({
           </Box>
 
           {/* Name */}
-          <NextLink href="#">
-            <Typography
-              variant="h5"
-              sx={logoStyle}
-              color={headerName ? "black" : theme.palette.primary.main}
-            >
-              {headerName ?? appNameInHeader}
-            </Typography>
-          </NextLink>
+          <Typography
+            variant="h5"
+            fontWeight={500}
+            color={headerName ? "black" : theme.palette.primary.main}
+          >
+            {headerName ?? appNameInHeader}
+          </Typography>
 
           {/* Logo */}
           <Box display={"flex"} flex={1} justifyContent={"flex-end"}>
