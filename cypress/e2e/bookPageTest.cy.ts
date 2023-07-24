@@ -18,6 +18,7 @@ beforeEach("Initial clean up and retrieve clubId from clubName", () => {
       throw new Error("No clubs found");
     }
     cy.wrap(clubs[0].id).as("clubId");
+    cy.log(`Deleting all reservation for clubId: ${this.clubId as string}`);
     cy.deleteAllReservationOfClub(this.clubId as string);
   });
 });
@@ -55,7 +56,7 @@ describe("Logged user", () => {
     });
   });
 
-  it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", () => {
+  it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
     const twoDaysInFuture = dateInTheFuture(2).getDate().toString();
 
     // select a date two day in the future
@@ -81,13 +82,15 @@ describe("Logged user", () => {
     // reserve and close the dialog
     cy.get("button").filter("[data-test='reserve']").click();
 
-    // check on the reservation card if startTime, endTime and username are correct
+    // check on the reservation card if the username is correct
+    cy.get('[data-test="calendar-event"]').should("contain", this.username);
+
+    // check on the reservation card if startTime and endTime are correct
+    // need to wrap the assertion in a then() because startTime and endTime are set in this scope
     cy.get('[data-test="calendar-event"]').then(function ($element) {
       cy.wrap($element)
         .contains(this.startTime as string)
         .contains(this.endTime as string);
-      //for unknown reason, I need to break the contains chain after the first two checks
-      cy.wrap($element).contains(this.username as string);
     });
   });
 });
