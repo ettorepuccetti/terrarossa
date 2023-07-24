@@ -5,11 +5,12 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export default defineConfig({
+  nodeVersion: "system",
   e2e: {
     supportFile: "cypress/support/e2e.ts",
     baseUrl: "http://localhost:3000",
     chromeWebSecurity: false,
-    watchForFileChanges: true,
+    watchForFileChanges: false,
     env: {
       DATABASE_URL: process.env.DATABASE_URL,
       NODE_ENV: "test",
@@ -46,7 +47,16 @@ export default defineConfig({
             where: {
               name: {
                 contains: filter,
-              }
+              },
+            },
+          });
+        },
+        "prisma:deleteAllReservationOfClub"(clubId: string) {
+          return prisma.reservation.deleteMany({
+            where: {
+              court: {
+                clubId: clubId,
+              },
             },
           });
         },

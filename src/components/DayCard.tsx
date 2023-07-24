@@ -22,6 +22,7 @@ export const DayCard = (props: {
         props.onBoxClick();
         console.log("HorizontalDatePicker - daySelected: ", props.day.toDate());
       }}
+      data-test="day-card"
     >
       {/* upper part of the card, contain day of the week, red background */}
       <Box

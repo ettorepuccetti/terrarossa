@@ -57,6 +57,11 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     };
   };
 
+  /**
+   * Render the calendar event containing the reservation
+   * @param eventInfo 
+   * @returns 
+   */
   function renderEventContent(eventInfo: EventContentArg) {
     return (
       <Box
@@ -64,6 +69,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         gap={1}
         className={"fc-event-main"}
         alignItems={"center"}
+        data-test="calendar-event"
       >
         {eventInfo.event.extendedProps.userImg && (
           <Avatar

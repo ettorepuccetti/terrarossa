@@ -36,10 +36,11 @@ export default function Header({
               edge="start"
               color="inherit"
               onClick={(_e) => setOpenDrawer(!openDrawer)}
+              data-test="drawer-button"
             >
               <MenuIcon sx={{ color: "black" }} />
             </IconButton>
-            <Drawer open={openDrawer} setOpen={setOpenDrawer} />
+            <Drawer open={openDrawer} setOpen={setOpenDrawer}/>
           </Box>
 
           {/* Name */}

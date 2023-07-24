@@ -17,7 +17,7 @@ describe("<Reservation Dialog />", () => {
         <ReserveDialog
           open={true}
           clubId="clubId"
-          date={undefined}
+          startDate={undefined}
           resource={undefined}
           onConfirm={() => null}
           onDialogClose={() => null}
@@ -53,7 +53,7 @@ describe("<Reservation Dialog />", () => {
           <ReserveDialog
             open={true}
             clubId="clubId"
-            date={startDate.toDate()}
+            startDate={startDate.toDate()}
             resource={"Campo 1"}
             onConfirm={(endDate) => console.log("end date :", endDate)}
             onDialogClose={() => null}
@@ -101,7 +101,7 @@ describe("<Reservation Dialog />", () => {
           <ReserveDialog
             open={true}
             clubId="clubId"
-            date={startDate.toDate()}
+            startDate={startDate.toDate()}
             resource={"Campo 1"}
             onConfirm={(endDate) => console.log("end date :", endDate)}
             onDialogClose={() => null}
@@ -148,7 +148,7 @@ describe("<Reservation Dialog />", () => {
           <ReserveDialog
             open={true}
             clubId="clubId"
-            date={startDate.toDate()}
+            startDate={startDate.toDate()}
             resource={"Campo 1"}
             onConfirm={(endDate) => console.log("end date :", endDate)}
             onDialogClose={() => null}

@@ -4,7 +4,7 @@
     "target": "es5",
     "module": "commonjs",
     "lib": ["es5", "dom"],
-    "types": ["cypress", "node", "./support"],
+    "types": ["cypress", "node", "./support"]
   },
   "include": ["**/*.ts", "../node_modules/cypress"]
 }

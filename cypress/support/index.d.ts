@@ -1,7 +1,6 @@
 /// <reference types="cypress" />
 import { type Club } from "@prisma/client";
-
-import "./command";
+import "./commands";
 
 declare global {
   namespace Cypress {
@@ -12,6 +11,10 @@ declare global {
       queryClubs(): Chainable<Club[]>;
 
       queryFilteredClubs(filter: string): Chainable<Club[]>;
+
+      deleteAllReservationOfClub(clubId: string): Chainable<void>;
+
+      getUsername(): Chainable<string>;
     }
   }
 }

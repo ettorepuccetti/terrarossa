@@ -16,7 +16,7 @@ import DialogLayout from "./DialogLayout";
 
 export interface ReserveDialogProps {
   open: boolean;
-  date: Date | undefined;
+  startDate: Date | undefined;
   resource: string | undefined;
   onConfirm: (endDate: Date, overwrittenName?: string) => void;
   onDialogClose: () => void;
@@ -24,14 +24,14 @@ export interface ReserveDialogProps {
 }
 
 export default function ReserveDialog(props: ReserveDialogProps) {
-  const { open, date, resource } = props;
+  const { open, startDate, resource } = props;
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
   const { data: sessionData } = useSession();
 
   useEffect(() => {
-    setEndDate((dayjs(date).add(1, "hour") as unknown as Date) ?? null);
-  }, [date]);
+    setEndDate((dayjs(startDate).add(1, "hour") as unknown as Date) ?? null);
+  }, [startDate]);
 
   const onConfirmButton = () => {
     if (!endDate) {
@@ -39,7 +39,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
         "Non è stato possibile impostare la data di fine prenotazione. Per favore riprova."
       );
     }
-    console.log("startDate in calendar: ", date);
+    console.log("startDate in calendar: ", startDate);
     console.log("endDate from dialog: ", endDate);
 
     // clean seconds and milliseconds from endDate - issue with dayJS
@@ -56,7 +56,8 @@ export default function ReserveDialog(props: ReserveDialogProps) {
   };
 
   const canBook =
-    isAdminOfTheClub(sessionData, props.clubId) || dayjs(date).isAfter(dayjs());
+    isAdminOfTheClub(sessionData, props.clubId) ||
+    dayjs(startDate).isAfter(dayjs());
 
   return (
     <>
@@ -95,7 +96,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
               {/* date */}
               <DateField
                 inputProps={{ "data-test": "date" }} //used to test the component
-                value={dayjs(date)}
+                value={dayjs(startDate)}
                 readOnly={true}
                 label={"Data"}
                 format="DD/MM/YYYY"
@@ -105,7 +106,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
               />
               <TimeField
                 inputProps={{ "data-test": "startTime" }} //used to test the component
-                value={date}
+                value={startDate}
                 label={"Orario di inizio"}
                 readOnly={true}
                 ampm={false}
@@ -124,11 +125,11 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                 ampm={false}
                 minutesStep={30}
                 skipDisabled={true}
-                minTime={dayjs(date).add(1, "hours") as unknown as Date}
+                minTime={dayjs(startDate).add(1, "hours") as unknown as Date}
                 maxTime={
                   isAdminOfTheClub(sessionData, props.clubId)
                     ? undefined
-                    : (dayjs(date).add(2, "hours") as unknown as Date)
+                    : (dayjs(startDate).add(2, "hours") as unknown as Date)
                 }
                 autoFocus={true}
                 disabled={!canBook}
@@ -147,6 +148,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                 onClick={() => onConfirmButton()}
                 disabled={!endDate || !canBook}
                 color="info"
+                data-test="reserve"
               >
                 Prenota
               </Button>
