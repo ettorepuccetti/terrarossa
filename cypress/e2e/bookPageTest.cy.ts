@@ -82,15 +82,13 @@ describe("Logged user", () => {
     // reserve and close the dialog
     cy.get("button").filter("[data-test='reserve']").click();
 
-    // check on the reservation card if the username is correct
-    cy.get('[data-test="calendar-event"]').should("contain", this.username);
-
-    // check on the reservation card if startTime and endTime are correct
+    // check on the reservation card if username, startTime and endTime are correct
     // need to wrap the assertion in a then() because startTime and endTime are set in this scope
     cy.get('[data-test="calendar-event"]').then(function ($element) {
       cy.wrap($element)
-        .contains(this.startTime as string)
-        .contains(this.endTime as string);
+        .should("contain", this.username)
+        .should("contain", this.startTime)
+        .should("contain", this.endTime);
     });
   });
 });
