@@ -11,7 +11,11 @@ npm run dev
 (optional)
 brew install planetscale/tap/pscale
 pscale connect terrarossa main --port 3309
+
 altrimenti connettersi direttamente con DATABASE_URL in .env
+
+### Prisma seed
+npx prisma db seed
 
 ### Prisma studio
 
