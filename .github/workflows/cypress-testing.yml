@@ -29,6 +29,6 @@ jobs:
           AUTH_BASE_URL: ${{vars.AUTH_BASE_URL}}
         uses: cypress-io/github-action@v5
         with:
-          build: npm run build
+          build: npm run build:ci
           start: npm start
           browser: chrome
