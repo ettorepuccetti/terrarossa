@@ -15,6 +15,8 @@ declare global {
       deleteAllReservationOfClub(clubId: string): Chainable<void>;
 
       getUsername(): Chainable<string>;
+
+      dbSeed(): void;
     }
   }
 }

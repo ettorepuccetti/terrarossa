@@ -71,3 +71,7 @@ Cypress.Commands.add("getUsername", () => {
     }
   );
 });
+
+Cypress.Commands.add("dbSeed", () => {
+  cy.exec('npx prisma db seed').its('code').should('eq', 0)
+});
