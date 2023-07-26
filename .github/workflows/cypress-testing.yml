@@ -1,0 +1,27 @@
+name: Cypress CI with GitHub Actions
+run-name: ${{ github.actor }} is testing with cypress
+on: [push]
+jobs:
+  mysql-in-docker-and-cypress:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: terrarossa
+        ports:
+          # - 32574:3306
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Cypress run
+        uses: cypress-io/github-action@v5
+        with:
+          build: npm run build
+          start: npm start
+          browser: chrome
+
