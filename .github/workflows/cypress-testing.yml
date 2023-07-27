@@ -27,6 +27,10 @@ jobs:
           AUTH0_CLIENT_SECRET: ${{secrets.AUTH0_CLIENT_SECRET}}
           AUTH0_ISSUER: ${{vars.AUTH0_ISSUER}}
           AUTH_BASE_URL: ${{vars.AUTH_BASE_URL}}
+          CYPRESS_AUTH0_USER: ${{secrets.CYPRESS_AUTH0_USER}}
+          CYPRESS_AUTH0_PW: ${{secrets.CYPRESS_AUTH0_PW}}
+          CYPRESS_username: ${{secrets.CYPRESS_username}}
+
         uses: cypress-io/github-action@v5
         with:
           build: npm run build:ci
