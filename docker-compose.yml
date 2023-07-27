@@ -6,7 +6,7 @@ services:
     container_name: mysql-terrarossa
     ports:
       - 3306:3306
-    # User/password for local dev: root/password
+    # User/password for local dev: root/password, if not overwritten by command line option when starting the container
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: terrarossa

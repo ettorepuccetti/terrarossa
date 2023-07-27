@@ -22,6 +22,7 @@ npx prisma db seed
 npx prisma studio
 
 ### Docker
+In DATABASE_URL cambiare `username`=`root` e `password`=`secret`
 
 docker run --name mysql-terrarossa -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql
 
