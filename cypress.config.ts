@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export default defineConfig({
-  nodeVersion: "system",
   e2e: {
     supportFile: "cypress/support/e2e.ts",
     baseUrl: "http://localhost:3000",
@@ -23,6 +22,7 @@ export default defineConfig({
     },
     setupNodeEvents(on, config) {
       //TODO: figure out how to use trpc in cypress
+
       // async function queryClubs(): Promise<Club[]> {
       // const client = createTRPCProxyClient<AppRouter>({
       //   transformer: superjson,

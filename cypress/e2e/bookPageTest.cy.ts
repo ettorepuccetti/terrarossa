@@ -67,20 +67,18 @@ describe("Logged user", () => {
     ).click(); // click on a random slot
 
     // save endTime
-    cy.get("input")
-      .filter("[data-test='endTime']")
+    cy.get("[data-test='endTime']")
       .wait(200) //wait for the rerender
       .invoke("val")
       .as("endTime");
 
     // save startTime
-    cy.get("input")
-      .filter("[data-test='startTime']")
+    cy.get("[data-test='startTime']")
       .invoke("val")
       .as("startTime");
 
     // reserve and close the dialog
-    cy.get("button").filter("[data-test='reserve']").click();
+    cy.get("[data-test='reserve']").click();
 
     // check on the reservation card if username, startTime and endTime are correct
     // need to wrap the assertion in a then() because startTime and endTime are set in this scope
