@@ -1,6 +1,11 @@
 name: Cypress CI with GitHub Actions
 run-name: ${{ github.actor }} is testing with cypress
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
   mysql-in-docker-and-cypress:
     runs-on: ubuntu-latest
@@ -30,7 +35,6 @@ jobs:
           CYPRESS_AUTH0_USER: ${{secrets.CYPRESS_AUTH0_USER}}
           CYPRESS_AUTH0_PW: ${{secrets.CYPRESS_AUTH0_PW}}
           CYPRESS_username: ${{secrets.CYPRESS_username}}
-
         uses: cypress-io/github-action@v5
         with:
           build: npm run build:ci
