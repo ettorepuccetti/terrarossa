@@ -173,11 +173,7 @@ async function collision(
 }
 
 type CtxType = {
-  prisma: PrismaClient<
-    Prisma.PrismaClientOptions,
-    never,
-    Prisma.RejectPerOperation | undefined
-  >;
+  prisma: PrismaClient<Prisma.PrismaClientOptions, never | undefined>;
   session: {
     user: {
       id: string;

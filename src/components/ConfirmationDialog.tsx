@@ -1,4 +1,4 @@
-import { Alert, Button, Dialog, DialogActions, Typography } from "@mui/material";
+import { Alert, Button, Dialog, DialogActions } from "@mui/material";
 import DialogLayout from "./DialogLayout";
 
 interface DialogProps {
@@ -16,7 +16,7 @@ export default function ConfirmationDialog(props: DialogProps) {
     <>
       <Dialog open={open} onClose={() => props.onDialogClose()}>
         <DialogLayout title={title}>
-            <Alert severity="error">{message}</Alert>
+          <Alert severity="error">{message}</Alert>
           <DialogActions>
             <Button onClick={() => props.onDialogClose()} color="info">
               Annulla
