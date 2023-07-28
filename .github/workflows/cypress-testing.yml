@@ -1,5 +1,5 @@
 name: Cypress CI with GitHub Actions
-run-name: branch {${{ github.head_ref || github.ref_name }}} | commit {${{ github.event.head_commit.message }}}
+run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message }}}
 on:
   push:
     branches: [ main ]
