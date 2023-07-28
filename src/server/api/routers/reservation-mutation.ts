@@ -176,7 +176,7 @@ type CtxType = {
   prisma: PrismaClient<
     Prisma.PrismaClientOptions,
     never,
-    Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+    Prisma.RejectPerOperation | undefined
   >;
   session: {
     user: {

@@ -16,9 +16,7 @@ export default function ConfirmationDialog(props: DialogProps) {
     <>
       <Dialog open={open} onClose={() => props.onDialogClose()}>
         <DialogLayout title={title}>
-          <Typography color={"HighlightText"} gutterBottom>
             <Alert severity="error">{message}</Alert>
-          </Typography>
           <DialogActions>
             <Button onClick={() => props.onDialogClose()} color="info">
               Annulla

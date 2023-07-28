@@ -59,8 +59,8 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
 
   /**
    * Render the calendar event containing the reservation
-   * @param eventInfo 
-   * @returns 
+   * @param eventInfo
+   * @returns
    */
   function renderEventContent(eventInfo: EventContentArg) {
     return (
@@ -84,7 +84,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
             className="fc-event-title"
             lineHeight={"22px"}
           >
-            {eventInfo.event.title}{" "}
+            {eventInfo.event.title}
           </Box>
         </Box>
       </Box>
