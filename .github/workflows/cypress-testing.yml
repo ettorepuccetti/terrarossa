@@ -1,29 +1,87 @@
-name: Cypress CI with GitHub Actions
+name: Cypress Parallel Tests
 run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message }}}
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  mysql-in-docker-and-cypress:
+  install:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:latest
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: terrarossa
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    container:
+      image: cypress/browsers:latest
+      options: --user 1001 #needed?
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Cypress run
+      - name: Cypress install
+        uses: cypress-io/github-action@v5
+        with:
+          build: npm run build:ci
+          runTests: false
+
+      - name: Save build folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          if-no-files-found: error
+          path: build
+
+  ui-chrome-tests:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/browsers:latest
+      options: --user 1001 #needed?
+    needs: install
+    strategy:
+      # when one test fails, DO NOT cancel the other
+      # containers, because this will kill Cypress processes
+      # leaving Cypress Cloud hanging ...
+      # https://github.com/cypress-io/github-action/issues/48
+      fail-fast: false
+      matrix:
+        # run copies of the current job in parallel
+        containers: [1, 2, 3]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download the build folders
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: build
+
+      - name: Cypress info
+        run: npx cypress info
+
+      - name: Node info
+        run: node -v
+
+      - name: __e Dir
+        run: ls /__e
+
+      - name: "UI Tests - Chrome"
+        uses: cypress-io/github-action@v5
+        with:
+          start: npm start
+          wait-on: "http://localhost:3000"
+          wait-on-timeout: 120
+          browser: chrome
+          # record: true
+          parallel: true
+          group: "UI - Chrome"
+          spec: cypress/tests/ui/*
+          config-file: cypress.config.ts
         env:
+          # CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          # CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEBUG: "cypress:server:args"
           DATABASE_URL: ${{vars.DATABASE_URL}}
           NEXTAUTH_SECRET: ${{secrets.NEXTAUTH_SECRET}}
           NEXTAUTH_URL: ${{vars.NEXTAUTH_URL}}
@@ -33,9 +91,3 @@ jobs:
           AUTH_BASE_URL: ${{vars.AUTH_BASE_URL}}
           CYPRESS_AUTH0_USER: ${{secrets.CYPRESS_AUTH0_USER}}
           CYPRESS_AUTH0_PW: ${{secrets.CYPRESS_AUTH0_PW}}
-          CYPRESS_username: ${{secrets.CYPRESS_username}}
-        uses: cypress-io/github-action@v5
-        with:
-          build: npm run build:ci
-          start: npm start
-          browser: chrome

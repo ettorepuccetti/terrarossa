@@ -36,9 +36,8 @@ describe("homepage", () => {
     //check if the logout button is visible
     cy.get(".MuiList-root").contains("Logout");
     //check the username is displayed
-    cy.get(".MuiList-root > :nth-child(1)").should(
-      "contain",
-      Cypress.env("username")
-    );
+    cy.getUsername().then((username) => {
+      cy.get(".MuiList-root > :nth-child(1)").should("contain", username);
+    });
   });
 });
