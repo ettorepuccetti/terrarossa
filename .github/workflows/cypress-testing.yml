@@ -1,5 +1,5 @@
 name: Cypress Parallel Tests
-run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message }}}
+run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message || github.event.pull_request.head.sha}}}
 on:
   push:
     branches: [main]
@@ -17,7 +17,7 @@ env:
   AUTH_BASE_URL: ${{vars.AUTH_BASE_URL}}
   CYPRESS_AUTH0_USER: ${{secrets.CYPRESS_AUTH0_USER}}
   CYPRESS_AUTH0_PW: ${{secrets.CYPRESS_AUTH0_PW}}
-  
+
 jobs:
   install:
     runs-on: ubuntu-latest
@@ -45,15 +45,22 @@ jobs:
   ui-chrome-tests:
     timeout-minutes: 15
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: terrarossa
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     container:
       image: cypress/browsers:latest
       options: --user 1001 #needed?
     needs: install
     strategy:
-      # when one test fails, DO NOT cancel the other
-      # containers, because this will kill Cypress processes
-      # leaving Cypress Cloud hanging ...
-      # https://github.com/cypress-io/github-action/issues/48
       fail-fast: false
       matrix:
         # run copies of the current job in parallel
