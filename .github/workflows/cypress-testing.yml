@@ -20,7 +20,9 @@ env:
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
 jobs:
+  # diabled for now
   install:
+    if: false
     runs-on: ubuntu-latest
     container:
       image: cypress/browsers:latest
@@ -63,31 +65,23 @@ jobs:
     needs: install
     strategy:
       fail-fast: false
+      #parallel: 3
       matrix:
-        # run copies of the current job in parallel
         containers: [1, 2, 3]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Download the build folders
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-          path: .next
-
-      - name: Cypress info
-        run: npx cypress info
-
-      - name: Node info
-        run: node -v
-
-      - name: __e Dir
-        run: ls /__e
+      # - name: Download the build folders
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: build
+      #     path: .next
 
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v5
         with:
+          build: npm run build:ci
           start: npm start
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
