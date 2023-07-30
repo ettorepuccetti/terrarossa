@@ -17,6 +17,7 @@ env:
   AUTH_BASE_URL: ${{vars.AUTH_BASE_URL}}
   CYPRESS_AUTH0_USER: ${{secrets.CYPRESS_AUTH0_USER}}
   CYPRESS_AUTH0_PW: ${{secrets.CYPRESS_AUTH0_PW}}
+  CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
 jobs:
   install:
@@ -91,7 +92,7 @@ jobs:
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           browser: chrome
-          # record: true
+          record: true
           parallel: true
           group: "UI - Chrome"
           spec: cypress/tests/ui/*
