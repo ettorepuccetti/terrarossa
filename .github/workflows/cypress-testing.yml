@@ -84,9 +84,6 @@ jobs:
       - name: __e Dir
         run: ls /__e
 
-      - name: db seed
-        run: npx prisma db seed
-
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v5
         with:
