@@ -1,5 +1,5 @@
 name: Cypress Parallel Tests
-run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message || github.event.pull_request.head.sha}}}
+run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message || 'pull_request'}}}
 on:
   push:
     branches: [main]
@@ -32,7 +32,7 @@ jobs:
       - name: Cypress install
         uses: cypress-io/github-action@v5
         with:
-          build: npm run build:ci
+          build: npm run build
           runTests: false
 
       - name: Save build folder
@@ -83,6 +83,9 @@ jobs:
 
       - name: __e Dir
         run: ls /__e
+
+      - name: db seed
+        run: npx prisma db seed
 
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v5
