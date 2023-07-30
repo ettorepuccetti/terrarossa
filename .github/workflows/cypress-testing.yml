@@ -62,7 +62,7 @@ jobs:
     container:
       image: cypress/browsers:latest
       options: --user 1001 #needed?
-    needs: install
+    # needs: install
     strategy:
       fail-fast: false
       #parallel: 3
