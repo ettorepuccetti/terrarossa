@@ -1,5 +1,5 @@
 name: Cypress Parallel Tests
-run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message || 'pull_request'}}}
+run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message || 'pull request'}}}
 on:
   push:
     branches: [main]
@@ -40,7 +40,7 @@ jobs:
         with:
           name: build
           if-no-files-found: error
-          path: build
+          path: .next
 
   ui-chrome-tests:
     timeout-minutes: 15
@@ -73,7 +73,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-          path: build
+          path: .next
 
       - name: Cypress info
         run: npx cypress info
