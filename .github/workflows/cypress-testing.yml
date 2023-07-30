@@ -84,9 +84,6 @@ jobs:
       - name: __e Dir
         run: ls /__e
 
-      - name: install prisma@5 and ts-node
-        run: npm i -g prisma@5 ts-node
-        
       - name: db seed
         run: npx prisma db seed
 

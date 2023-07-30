@@ -10,6 +10,8 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
+    "start:ci": "next start",
+    "prestart:ci": "npx prisma db push && npx prisma db seed",
     "cypress": "NODE_ENV='test' cypress open"
   },
   "prisma": {
