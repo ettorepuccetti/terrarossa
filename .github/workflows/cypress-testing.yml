@@ -95,5 +95,4 @@ jobs:
           record: true
           parallel: true
           group: "UI - Chrome"
-          spec: cypress/tests/ui/*
           config-file: cypress.config.ts
