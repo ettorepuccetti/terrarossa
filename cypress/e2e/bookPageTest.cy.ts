@@ -1,13 +1,13 @@
 import { type Club } from "@prisma/client";
 
-const dateInTheFuture = (nOfDays: number): Date => {
+const nextDaysAsString = (nOfDays: number): string => {
   const now = new Date();
   const futureDate = new Date(
     now.getFullYear(),
     now.getMonth(),
     now.getDate() + nOfDays
   );
-  return futureDate;
+  return futureDate.getDate().toString().padStart(2, "0");
 };
 
 beforeEach("Initial clean up and retrieve clubId from clubName", () => {
@@ -49,33 +49,33 @@ describe("Logged user", () => {
       Cypress.env("AUTH0_PW") as string
     );
 
-    cy.visit(`/prenota?clubId=${this.clubId as string}`);
-
     cy.getUsername().then((username) => {
       cy.wrap(username).should("be.a", "string").as("username");
     });
+
+    cy.visit(`/prenota?clubId=${this.clubId as string}`);
+    cy.get(".MuiContainer-root").should("be.visible");
   });
 
   it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
-    const twoDaysInFuture = dateInTheFuture(2).getDate().toString();
+    cy.log("current date: " + new Date().getDate().toString());
+    cy.log("Selecting day of the month: " + nextDaysAsString(2));
 
     // select a date two day in the future
-    cy.get("[data-test='day-card']").contains(twoDaysInFuture).click();
+    cy.get("[data-test='day-card']").contains(nextDaysAsString(2)).click();
 
     cy.get(
       ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
     ).click(); // click on a random slot
 
+    // save startTime
+    cy.get("[data-test='startTime']").invoke("val").as("startTime");
+   
     // save endTime
     cy.get("[data-test='endTime']")
       .wait(200) //wait for the rerender
       .invoke("val")
       .as("endTime");
-
-    // save startTime
-    cy.get("[data-test='startTime']")
-      .invoke("val")
-      .as("startTime");
 
     // reserve and close the dialog
     cy.get("[data-test='reserve']").click();
