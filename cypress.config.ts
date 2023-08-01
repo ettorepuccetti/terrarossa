@@ -67,6 +67,7 @@ export default defineConfig({
   },
 
   component: {
+    watchForFileChanges: false,
     env: {
       NODE_ENV: "test",
     },
