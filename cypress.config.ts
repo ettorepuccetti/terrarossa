@@ -67,6 +67,9 @@ export default defineConfig({
   },
 
   component: {
+    env: {
+      NODE_ENV: "test",
+    },
     devServer: {
       framework: "next",
       bundler: "webpack",
