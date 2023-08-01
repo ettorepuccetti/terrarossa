@@ -22,9 +22,7 @@ env:
   NODE_ENV: "test"
 
 jobs:
-  # diabled for now
   install:
-    if: false
     runs-on: ubuntu-latest
     container:
       image: cypress/browsers:latest
@@ -44,6 +42,7 @@ jobs:
           path: .next
 
   ui-chrome-tests:
+    needs: install
     runs-on: ubuntu-latest
     services:
       mysql-service:
@@ -58,24 +57,17 @@ jobs:
       image: cypress/browsers:latest
     strategy:
       fail-fast: false
-      # set 3 workers in parallel
       matrix:
         containers: [1, 2, 3]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      # - name: Download the build folders
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: build
-      #     path: .next
       - name: npm install
         run: npm install
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v5
         with:
-          build: npm run build
-          start: npm run postbuild:ci, npm start
+          start: npm run db:seed, npm start
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           browser: chrome
@@ -85,6 +77,7 @@ jobs:
           config-file: cypress.config.ts
 
   ui-chrome-mobile-tests:
+    needs: install
     runs-on: ubuntu-latest
     services:
       mysql-service:
@@ -97,23 +90,21 @@ jobs:
       image: cypress/browsers:latest
     strategy:
       fail-fast: false
-      # set 3 workers in parallel
       matrix:
         containers: [1, 2, 3]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      # - name: Download the build folders
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: build
-      #     path: .next
+      - name: Download the build folders
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: .next
       - name: "UI Tests - Chrome - Mobile"
         uses: cypress-io/github-action@v5
         with:
           config: "viewportWidth=375,viewportHeight=667"
-          build: npm run build:ci
-          start: npm start
+          start: npm run db:seed, npm start
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           browser: chrome
@@ -121,10 +112,20 @@ jobs:
           parallel: true
           group: "UI - Chrome - Mobile"
           config-file: cypress.config.ts
+
+  component-testing:
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download the build folders
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: .next
       - name: Run Component Testing
         uses: cypress-io/github-action@v5
         with:
-          # we have already installed everything
-          install: false
           component: true
           config-file: cypress.config.ts

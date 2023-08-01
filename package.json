@@ -4,13 +4,12 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "build:ci": "next build",
-    "postbuild:ci": "npx prisma db push && npx prisma db seed",
     "dev": "next",
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "cypress": "NODE_ENV='test' cypress open"
+    "cypress": "NODE_ENV='test' cypress open",
+    "db:seed": "npx prisma db push && npx prisma db seed"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
