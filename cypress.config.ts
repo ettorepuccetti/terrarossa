@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export default defineConfig({
+  projectId: "y4edyf",
   e2e: {
     supportFile: "cypress/support/e2e.ts",
     baseUrl: "http://localhost:3000",
@@ -66,6 +67,7 @@ export default defineConfig({
   },
 
   component: {
+    watchForFileChanges: false,
     devServer: {
       framework: "next",
       bundler: "webpack",

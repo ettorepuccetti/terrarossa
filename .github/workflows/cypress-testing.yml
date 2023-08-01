@@ -1,16 +1,51 @@
-name: Cypress CI with GitHub Actions
-run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message }}}
+name: Cypress CI
+run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message || 'pull request'}}}
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  DEBUG: "cypress:server:args"
+  #address of services is the name of the service if both on containers and no port map needed
+  DATABASE_URL: "mysql://root:root@mysql-service/terrarossa" 
+  NEXTAUTH_SECRET: ${{secrets.NEXTAUTH_SECRET}}
+  NEXTAUTH_URL: ${{vars.NEXTAUTH_URL}}
+  AUTH0_CLIENT_ID: ${{secrets.AUTH0_CLIENT_ID}}
+  AUTH0_CLIENT_SECRET: ${{secrets.AUTH0_CLIENT_SECRET}}
+  AUTH0_ISSUER: ${{vars.AUTH0_ISSUER}}
+  AUTH_BASE_URL: ${{vars.AUTH_BASE_URL}}
+  CYPRESS_AUTH0_USER: ${{secrets.CYPRESS_AUTH0_USER}}
+  CYPRESS_AUTH0_PW: ${{secrets.CYPRESS_AUTH0_PW}}
+  CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+  NODE_ENV: "test"
 
 jobs:
-  mysql-in-docker-and-cypress:
+  install:
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/browsers:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Cypress install
+        uses: cypress-io/github-action@v5
+        with:
+          build: npm run build
+          runTests: false
+      - name: Save build folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          if-no-files-found: error
+          path: .next
+
+  ui-chrome-tests:
+    needs: install
     runs-on: ubuntu-latest
     services:
-      mysql:
+      mysql-service:
         image: mysql:latest
         env:
           MYSQL_ROOT_PASSWORD: root
@@ -18,24 +53,82 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    container:
+      image: cypress/browsers:latest
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Cypress run
-        env:
-          DATABASE_URL: ${{vars.DATABASE_URL}}
-          NEXTAUTH_SECRET: ${{secrets.NEXTAUTH_SECRET}}
-          NEXTAUTH_URL: ${{vars.NEXTAUTH_URL}}
-          AUTH0_CLIENT_ID: ${{secrets.AUTH0_CLIENT_ID}}
-          AUTH0_CLIENT_SECRET: ${{secrets.AUTH0_CLIENT_SECRET}}
-          AUTH0_ISSUER: ${{vars.AUTH0_ISSUER}}
-          AUTH_BASE_URL: ${{vars.AUTH_BASE_URL}}
-          CYPRESS_AUTH0_USER: ${{secrets.CYPRESS_AUTH0_USER}}
-          CYPRESS_AUTH0_PW: ${{secrets.CYPRESS_AUTH0_PW}}
-          CYPRESS_username: ${{secrets.CYPRESS_username}}
+      - name: Download the build folders
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: .next
+      - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v5
         with:
-          build: npm run build:ci
-          start: npm start
+          start: npm run db:seed, npm start
+          wait-on: "http://localhost:3000"
+          wait-on-timeout: 120
           browser: chrome
+          record: true
+          parallel: true
+          group: "UI - Chrome"
+          config-file: cypress.config.ts
+
+  ui-chrome-mobile-tests:
+    needs: install
+    runs-on: ubuntu-latest
+    services:
+      mysql-service:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: terrarossa
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    container:
+      image: cypress/browsers:latest
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download the build folders
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: .next
+      - name: "UI Tests - Chrome - Mobile"
+        uses: cypress-io/github-action@v5
+        with:
+          config: "viewportWidth=375,viewportHeight=667"
+          start: npm run db:seed, npm start
+          wait-on: "http://localhost:3000"
+          wait-on-timeout: 120
+          browser: chrome
+          record: true
+          parallel: true
+          group: "UI - Chrome - Mobile"
+          config-file: cypress.config.ts
+
+  component-testing:
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download the build folders
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: .next
+      - name: Run Component Testing
+        uses: cypress-io/github-action@v5
+        with:
+          component: true
+          config-file: cypress.config.ts
