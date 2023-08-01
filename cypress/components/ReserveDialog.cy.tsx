@@ -38,7 +38,7 @@ describe("<Reservation Dialog />", () => {
     },
   };
 
-  it("GIVEN I am logged in, WHEN I reserve one hour in the future THEN succed", () => {
+  it("GIVEN logged user, WHEN reserve one hour in the future THEN can press reserve button", () => {
     // fixed time of a future date.
     const startDate = dayjs()
       .add(1, "day")
@@ -82,11 +82,9 @@ describe("<Reservation Dialog />", () => {
       .should("have.value", startDate.hour(14).minute(30).format("HH:mm")); //end date is updated
 
     cy.get("button").contains("Prenota").should("be.enabled");
-
-    //check that the dialog is closed
   });
 
-  it("GIVEN I am logged in, WHEN I try to reserve one hour in the past THEN show warning and not succeed", () => {
+  it("GIVEN logged user, WHEN reserve one hour in the past THEN show warning and cannot press button", () => {
     // fixed time of a PAST date.
     const startDate = dayjs()
       .add(-1, "day")
@@ -129,11 +127,9 @@ describe("<Reservation Dialog />", () => {
     );
 
     cy.get("button").contains("Prenota").should("have.attr", "disabled");
-
-    //check that the dialog is closed
   });
 
-  it.skip("GIVEN I am logged in, WHEN I reserve more than 2 hours in the future THEN not succeed", () => {
+  it.skip("GIVEN logged user, WHEN reserve more than 2 hours in the future THEN show warning and cannot press button", () => {
     // fixed time of a future date.
     const startDate = dayjs()
       .add(1, "day")

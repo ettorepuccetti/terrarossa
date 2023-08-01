@@ -17,7 +17,7 @@ describe("homepage", () => {
       .should("have.attr", "href", "/search"); //the button "Prenota" has the correct href
   });
 
-  it("GIVEN not logged in WHEN Login from drawer THEN show logout and username in drawer", () => {
+  it("GIVEN not logged in user WHEN login from drawer THEN show logout and username in drawer", () => {
     //open drawer
     cy.get("button").filter("[data-test='drawer-button']").click();
     //click on login button
