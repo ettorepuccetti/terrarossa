@@ -49,3 +49,7 @@ to avoid missing env variables, in package.json use:
   "cypress": "NODE_ENV='test' cypress open"
 }
 ```
+
+## Github Actions
+### Skip pull request and push workflows
+If any commit message in your push or the HEAD commit of your PR contains the strings `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]`, or `[actions skip]` workflows triggered on the push or pull_request events will be skipped.

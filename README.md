@@ -1,5 +1,7 @@
 # Terrarossa
 
+[![Cypress CI](https://github.com/ettorepuccetti/terrarossa/actions/workflows/cypress-testing.yml/badge.svg)](https://github.com/ettorepuccetti/terrarossa/actions/workflows/cypress-testing.yml)
+
 Book tennis courts in your favourite clubs
 
 ## Installation
