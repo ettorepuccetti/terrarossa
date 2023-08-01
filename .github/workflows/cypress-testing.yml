@@ -78,7 +78,7 @@ jobs:
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v5
         with:
-          build: npm run build:ci
+          build: npm run build
           start: npm run postbuild:ci, npm start
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
@@ -96,8 +96,6 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: terrarossa
-        ports:
-          - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     container:
@@ -120,6 +118,7 @@ jobs:
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v5
         with:
+          config: "viewportWidth=375,viewportHeight=667"
           build: npm run build:ci
           start: npm start
           wait-on: "http://localhost:3000"
@@ -136,3 +135,4 @@ jobs:
           # we have already installed everything
           install: false
           component: true
+          config-file: cypress.config.ts
