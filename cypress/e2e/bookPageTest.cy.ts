@@ -70,7 +70,7 @@ describe("Logged user", () => {
 
     // save startTime
     cy.get("[data-test='startTime']").invoke("val").as("startTime");
-   
+
     // save endTime
     cy.get("[data-test='endTime']")
       .wait(200) //wait for the rerender

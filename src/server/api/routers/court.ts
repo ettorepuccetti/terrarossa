@@ -5,7 +5,8 @@ export const courtRouter = createTRPCRouter({
   getAllByClubId: publicProcedure
     .input(ClubIdInputSchema)
     .query(async ({ ctx, input }) => {
-      if (typeof input.clubId !== "string") { //clubId come from the router, so it can also be an array of strings, or undefined
+      //clubId come from the router, so it can also be an array of strings, or undefined
+      if (typeof input.clubId !== "string") {
         throw new Error(`Server: invalid clubId`);
       }
       return await ctx.prisma.court.findMany({

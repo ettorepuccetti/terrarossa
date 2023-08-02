@@ -6,7 +6,10 @@ describe("<ErrorAlert />", () => {
     // see: https://on.cypress.io/mounting-react
     const errorMessage = "test";
     cy.mount(
-      <ErrorAlert error={new TRPCClientError(errorMessage)} onClose={() => null} />
+      <ErrorAlert
+        error={new TRPCClientError(errorMessage)}
+        onClose={() => null}
+      />
     );
     cy.get(".MuiAlert-message").should("contain", errorMessage);
   });

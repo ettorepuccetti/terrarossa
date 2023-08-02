@@ -6,10 +6,10 @@ import heroSrc from "../../public/images/myteam.jpg";
 const Hero = () => {
   return (
     <Box
-    display={"flex"}
-    alignItems={"center"}
-    justifyContent={"center"}
-    minHeight={"82vh"} // 100vh - 10vh (header) - 8vh (footer)
+      display={"flex"}
+      alignItems={"center"}
+      justifyContent={"center"}
+      minHeight={"82vh"} // 100vh - 10vh (header) - 8vh (footer)
     >
       <Grid
         container
@@ -24,7 +24,7 @@ const Hero = () => {
           <Typography variant="h3" fontWeight={700} paddingBottom={"15px"}>
             Prenota ora il tuo campo da tennis
           </Typography>
-          <Typography variant="h6" paddingBottom={"30px"} sx={{opacity: 0.4}}>
+          <Typography variant="h6" paddingBottom={"30px"} sx={{ opacity: 0.4 }}>
             con Terrarossa
           </Typography>
           <Link href={"/search"}>

@@ -40,7 +40,7 @@ export default function Header({
             >
               <MenuIcon sx={{ color: "black" }} />
             </IconButton>
-            <Drawer open={openDrawer} setOpen={setOpenDrawer}/>
+            <Drawer open={openDrawer} setOpen={setOpenDrawer} />
           </Box>
 
           {/* Name */}

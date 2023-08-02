@@ -10,11 +10,12 @@ interface ErrorAlertProps<T extends DefaultErrorShape> {
 export default function ErrorAlert(props: ErrorAlertProps<DefaultErrorShape>) {
   return (
     <Backdrop
-        open={props.error !== null}
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Alert severity="error" onClose={() => props.onClose()}>
-          {props.error?.message}
-        </Alert>
-      </Backdrop>
-  )
+      open={props.error !== null}
+      sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+    >
+      <Alert severity="error" onClose={() => props.onClose()}>
+        {props.error?.message}
+      </Alert>
+    </Backdrop>
+  );
 }

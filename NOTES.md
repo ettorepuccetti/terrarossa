@@ -15,6 +15,7 @@ pscale connect terrarossa main --port 3309
 altrimenti connettersi direttamente con DATABASE_URL in .env
 
 ### Prisma seed
+
 npx prisma db seed
 
 ### Prisma studio
@@ -22,6 +23,7 @@ npx prisma db seed
 npx prisma studio
 
 ### Docker
+
 In DATABASE_URL cambiare `username`=`root` e `password`=`secret`
 
 docker run --name mysql-terrarossa -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql
@@ -51,5 +53,7 @@ to avoid missing env variables, in package.json use:
 ```
 
 ## Github Actions
+
 ### Skip pull request and push workflows
+
 If any commit message in your push or the HEAD commit of your PR contains the strings `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]`, or `[actions skip]` workflows triggered on the push or pull_request events will be skipped.

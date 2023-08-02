@@ -27,8 +27,8 @@ describe("search", () => {
     const filterString = "All engl";
     cy.visit("/search");
     cy.get("input#search").type(filterString); // note case insensitivity
-    cy.queryFilteredClubs(filterString).then((clubs: Club[]) =>
-      assert(clubs.length === 0) //check that effectively no club is present in DB
+    cy.queryFilteredClubs(filterString).then(
+      (clubs: Club[]) => assert(clubs.length === 0) //check that effectively no club is present in DB
     );
     cy.get(".MuiCardContent-root").should("not.exist"); // check that no club is displayed in the UI
   });

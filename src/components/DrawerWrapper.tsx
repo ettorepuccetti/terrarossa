@@ -46,7 +46,7 @@ export default function DrawerWrapper(props: DrawerProps) {
 
           {/* Link to reservation page */}
           <NextLink href="/search">
-            <ListItemButtonStyled >
+            <ListItemButtonStyled>
               <DateRange />
               <ListItemText primary="Prenota" />
             </ListItemButtonStyled>

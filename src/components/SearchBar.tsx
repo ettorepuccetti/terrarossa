@@ -3,7 +3,6 @@ import { InputAdornment, TextField } from "@mui/material";
 import { useState } from "react";
 import useDebounce from "~/hooks/UseDebounce";
 
-
 export default function SearchBar(props: { onSearch: (term: string) => void }) {
   const [searchTerm, setSearchTerm] = useState("");
 

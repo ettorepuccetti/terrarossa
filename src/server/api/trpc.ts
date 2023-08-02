@@ -112,7 +112,11 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
 
 /** Reusable middleware that enforces users are ADMIN of the club */
 const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user || !(ctx.session.user.role===UserRoles.ADMIN)) {
+  if (
+    !ctx.session ||
+    !ctx.session.user ||
+    !(ctx.session.user.role === UserRoles.ADMIN)
+  ) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
