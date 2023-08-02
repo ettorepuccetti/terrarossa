@@ -1,6 +1,7 @@
 # Terrarossa
 
 [![Cypress CI](https://github.com/ettorepuccetti/terrarossa/actions/workflows/cypress-testing.yml/badge.svg)](https://github.com/ettorepuccetti/terrarossa/actions/workflows/cypress-testing.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/ettorepuccetti/terrarossa/badge)](https://www.codefactor.io/repository/github/ettorepuccetti/terrarossa)
 
 Book tennis courts in your favourite clubs
 

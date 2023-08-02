@@ -26,12 +26,12 @@ export default function DrawerWrapper(props: DrawerProps) {
     <Drawer
       anchor="left"
       open={props.open}
-      onClose={(_e) => props.setOpen(false)}
+      onClose={() => props.setOpen(false)}
     >
       <Box
         sx={{ width: 250 }}
         role="presentation"
-        onClick={(_e) => props.setOpen(false)}
+        onClick={() => props.setOpen(false)}
       >
         <List>
           <LoginDrawerButton />
