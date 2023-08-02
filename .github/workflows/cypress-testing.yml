@@ -70,7 +70,8 @@ jobs:
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v5
         with:
-          start: npm run db:seed, npm start
+          build: npm run db:seed #use build step to seed the database, build is already done in install job 
+          start: npm start
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           browser: chrome
