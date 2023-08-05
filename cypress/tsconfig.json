@@ -2,9 +2,10 @@
   "compilerOptions": {
     "strict": true,
     "target": "es5",
-    "module": "commonjs",
+    "module": "NodeNext",
     "lib": ["es5", "dom"],
-    "types": ["cypress", "node", "./support"]
+    "types": ["cypress", "node", "./support"],
+    "jsx": "preserve"
   },
-  "include": ["**/*.ts", "../node_modules/cypress"]
+  "include": ["**/*.ts", "**/*.tsx", "../node_modules/cypress"]
 }

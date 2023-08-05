@@ -44,6 +44,10 @@ account: terrarouge.vercel@gmail.com
 
 ## Cypress
 
+```
+npm run cypress
+```
+
 to avoid missing env variables, in package.json use:
 
 ```
@@ -51,6 +55,18 @@ to avoid missing env variables, in package.json use:
   "cypress": "NODE_ENV='test' cypress open"
 }
 ```
+
+flaky VSCode type error in .tsx file, how to temp solve:
+
+in tsconfig.json add:
+
+```
+"module": "NodeNext",
+"jsx": "preserve",
+"include": [..., "**/*.tsx"]
+```
+
+and in each .tsx file import using relative path:
 
 ## Github Actions
 
@@ -63,15 +79,23 @@ If any commit message in your push or the HEAD commit of your PR contains the st
 install husky and pretty-quick:
 
 ```
+
 npx husky-init
 npm install --save-dev pretty-quick
 npx husky set .husky/pre-commit "npx pretty-quick --staged"
+
 ```
 
 run once:
 
 ```
+
 npm run prepare
+
 ```
 
 On each commit, husky will run pretty-quick, which will run prettier on all staged files.
+
+```
+
+```

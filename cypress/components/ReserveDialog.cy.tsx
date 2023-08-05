@@ -2,8 +2,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { SessionProvider } from "next-auth/react";
-import ReserveDialog from "~/components/ReserveDialog";
-import { UserRoles } from "~/utils/constants";
+import ReserveDialog from "../../src/components/ReserveDialog";
+import { UserRoles } from "../../src/utils/constants";
 
 describe("<Reservation Dialog />", () => {
   beforeEach(() => {
@@ -38,7 +38,7 @@ describe("<Reservation Dialog />", () => {
     },
   };
 
-  it("GIVEN logged user, WHEN reserve one hour in the future THEN can press reserve button", () => {
+  it("GIVEN logged user WHEN reserve one hour in the future THEN can press reserve button", () => {
     // fixed time of a future date.
     const startDate = dayjs()
       .add(1, "day")
@@ -84,7 +84,7 @@ describe("<Reservation Dialog />", () => {
     cy.get("button").contains("Prenota").should("be.enabled");
   });
 
-  it("GIVEN logged user, WHEN reserve one hour in the past THEN show warning and cannot press button", () => {
+  it("GIVEN logged user WHEN reservation start time is in the past THEN show warning and cannot press button", () => {
     // fixed time of a PAST date.
     const startDate = dayjs()
       .add(-1, "day")
@@ -129,7 +129,7 @@ describe("<Reservation Dialog />", () => {
     cy.get("button").contains("Prenota").should("have.attr", "disabled");
   });
 
-  it.skip("GIVEN logged user, WHEN reserve more than 2 hours in the future THEN show warning and cannot press button", () => {
+  it.skip("GIVEN logged user WHEN reservation is longer than 2 hours THEN show warning and cannot press button", () => {
     // fixed time of a future date.
     const startDate = dayjs()
       .add(1, "day")
