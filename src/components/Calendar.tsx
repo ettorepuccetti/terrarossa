@@ -131,14 +131,20 @@ export default function Calendar() {
       {reservationAdd.error !== null && (
         <ErrorAlert
           error={reservationAdd.error}
-          onClose={() => reservationAdd.reset()}
+          onClose={() => {
+            reservationAdd.reset();
+            void reservationQuery.refetch();
+          }}
         />
       )}
 
       {reservationDelete.error !== null && (
         <ErrorAlert
           error={reservationDelete.error}
-          onClose={() => reservationDelete.reset()}
+          onClose={() => {
+            reservationDelete.reset();
+            void reservationQuery.refetch();
+          }}
         />
       )}
 
@@ -146,6 +152,7 @@ export default function Calendar() {
         open={
           clubQuery.isLoading ||
           reservationQuery.isLoading ||
+          reservationQuery.isRefetching ||
           courtQuery.isLoading ||
           reservationAdd.isLoading ||
           reservationDelete.isLoading

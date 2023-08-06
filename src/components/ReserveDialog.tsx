@@ -29,6 +29,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
   const { data: sessionData } = useSession();
 
+  // to set endDate to startDate + 1 hour, when component is mounted
   useEffect(() => {
     setEndDate((dayjs(startDate).add(1, "hour") as unknown as Date) ?? null);
   }, [startDate]);
@@ -49,7 +50,8 @@ export default function ReserveDialog(props: ReserveDialogProps) {
 
     props.onConfirm(
       cleanedEndDate,
-      overwriteName !== "" ? overwriteName : undefined //manage overwriteName limitation about controlled component
+      //manage overwriteName limitation about controlled component
+      overwriteName !== "" ? overwriteName : undefined
     );
     setEndDate(null);
     setOverwriteName("");

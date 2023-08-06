@@ -23,7 +23,9 @@ export const reservationMutationRouter = createTRPCRouter({
           input.courtId
         )
       ) {
-        throw new TRPCClientError("Error: Reservation collision");
+        throw new TRPCClientError(
+          "La tua prenotazione non puo' essere efettuata. Per favore, scegli un orario in cui il campo è libero"
+        );
       }
 
       // start date before end date
