@@ -2,8 +2,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { SessionProvider } from "next-auth/react";
-import ReserveDialog from "../../src/components/ReserveDialog";
-import { UserRoles } from "../../src/utils/constants";
+import ReserveDialog from "~/components/ReserveDialog";
+import { UserRoles } from "~/utils/constants";
 
 describe("<Reservation Dialog />", () => {
   beforeEach(() => {

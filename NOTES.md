@@ -64,9 +64,11 @@ in tsconfig.json add:
 "module": "NodeNext",
 "jsx": "preserve",
 "include": [..., "**/*.tsx"]
+"baseUrl": "..",
+    "paths": {
+      "~/*": ["./src/*"]
+    },
 ```
-
-and in each .tsx file import using relative path:
 
 ## Github Actions
 

@@ -1,5 +1,5 @@
 import { TRPCClientError } from "@trpc/client";
-import ErrorAlert from "../../src/components/ErrorAlert";
+import ErrorAlert from "~/components/ErrorAlert";
 
 describe("<ErrorAlert />", () => {
   it("renders", () => {

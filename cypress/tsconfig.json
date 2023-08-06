@@ -5,7 +5,11 @@
     "module": "NodeNext",
     "lib": ["es5", "dom"],
     "types": ["cypress", "node", "./support"],
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "baseUrl": "..",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx", "../node_modules/cypress"]
 }
