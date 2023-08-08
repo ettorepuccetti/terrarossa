@@ -98,6 +98,7 @@ export default function EventDetailDialog(props: DialogProps) {
               onClick={() => setConfirmationOpen(true)}
               color={"error"}
               disabled={tooLateToCancel}
+              data-test="delete-button"
             >
               Cancella
             </Button>

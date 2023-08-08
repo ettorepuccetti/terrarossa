@@ -22,21 +22,6 @@ export default defineConfig({
       AUTH0_BASE_URL: process.env.AUTH_BASE_URL,
     },
     setupNodeEvents(on, config) {
-      //TODO: figure out how to use trpc in cypress
-
-      // async function queryClubs(): Promise<Club[]> {
-      // const client = createTRPCProxyClient<AppRouter>({
-      //   transformer: superjson,
-      //   links: [
-      //     loggerLink({ enabled: () => true }),
-      //     httpBatchLink({
-      //       url: "http://localhost:3000/trpc",
-      //     }),
-      //   ],
-      // });
-      // const result = await client.club.getAll.query();
-      // }
-
       const prisma = new PrismaClient();
 
       on("task", {
@@ -53,10 +38,40 @@ export default defineConfig({
           });
         },
         "prisma:deleteAllReservationOfClub"(clubId: string) {
+          if (!clubId) throw new Error("clubId is undefined");
           return prisma.reservation.deleteMany({
             where: {
               court: {
                 clubId: clubId,
+              },
+            },
+          });
+        },
+        async "prisma:makeReservation"({
+          startTime,
+          endTime,
+          clubId,
+          userId,
+        }: {
+          startTime: Date;
+          endTime: Date;
+          clubId: string;
+          userId?: string;
+        }) {
+          const court = await prisma.court.findFirst({
+            where: {
+              clubId: clubId,
+            },
+          });
+          if (!court) throw new Error("Court not found");
+          return await prisma.reservation.create({
+            data: {
+              startTime: startTime,
+              endTime: endTime,
+              court: {
+                connect: {
+                  id: court.id,
+                },
               },
             },
           });

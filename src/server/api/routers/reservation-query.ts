@@ -14,6 +14,21 @@ export const reservationQueryRouter = createTRPCRouter({
       if (typeof input.clubId !== "string") {
         throw new Error(`Server: invalid clubId`);
       }
+      const fromDate = dayjs()
+        .subtract(reservationConstraints.daysInThePastVisible, "day")
+        .set("hour", 0)
+        .set("minute", 0)
+        .set("second", 0)
+        .set("millisecond", 0);
+      const toDate = dayjs()
+        .add(reservationConstraints.daysInTheFutureVisible + 1, "day")
+        .set("hour", 0)
+        .set("minute", 0)
+        .set("second", 0)
+        .set("millisecond", 0);
+      console.log("toDate: ", toDate.toDate());
+      console.log("fromDate: ", fromDate.locale("it").toDate());
+
       return await ctx.prisma.reservation.findMany({
         where: {
           AND: [
@@ -23,12 +38,8 @@ export const reservationQueryRouter = createTRPCRouter({
             // retrieve only reservations that are in the visible time windows
             {
               startTime: {
-                gte: dayjs()
-                  .subtract(reservationConstraints.dayInThePastVisible, "day")
-                  .toDate(),
-                lte: dayjs()
-                  .add(reservationConstraints.daysInTheFutureVisible, "day")
-                  .toDate(),
+                gte: fromDate.toDate(),
+                lte: toDate.toDate(),
               },
             },
           ],

@@ -12,9 +12,15 @@ declare global {
 
       queryFilteredClubs(filter: string): Chainable<Club[]>;
 
-      deleteAllReservationOfClub(clubId: string): Chainable<void>;
+      deleteAllReservationOfClub(clubId: string): void;
 
       getUsername(): Chainable<string>;
+
+      /**
+       * In the calendar page, click on the dateCard to select a date `n` days in the future or in the past (if `n` is negative)
+       * @param n Number of days from today to navigate to (negative to go in the past)
+       */
+      navigateDaysFromToday(n: number): void;
     }
   }
 }

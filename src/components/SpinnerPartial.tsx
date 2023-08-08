@@ -19,7 +19,7 @@ const SpinnerPartial = ({
         }}
         open={open}
       >
-        <CircularProgress color="inherit" />
+        <CircularProgress color="inherit" data-test="spinner" />
       </Backdrop>
       {children}
     </div>

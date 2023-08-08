@@ -5,8 +5,8 @@ import dayjs, { type Dayjs } from "dayjs";
 import Image from "next/image";
 import { useState } from "react";
 import { reservationConstraints } from "~/utils/constants";
-import { DayCard } from "./DayCard";
 import { capitalise } from "~/utils/utils";
+import { DayCard } from "./DayCard";
 require("dayjs/locale/it");
 dayjs.locale("it");
 
@@ -22,10 +22,15 @@ export const HorizonalDatePicker = ({
 
   // create an array of dates from today to today - daysInThePastVisible to today + daysInTheFutureVisible
   const dates: Dayjs[] = Array.from(
-    { length: reservationConstraints.totalDaysVisible },
+    {
+      length:
+        reservationConstraints.daysInThePastVisible +
+        reservationConstraints.daysInTheFutureVisible +
+        1,
+    },
     (_, i) => {
       return today
-        .subtract(reservationConstraints.dayInThePastVisible, "day")
+        .subtract(reservationConstraints.daysInThePastVisible, "day")
         .add(i, "day");
     }
   );
@@ -70,11 +75,11 @@ export const HorizonalDatePicker = ({
               overflowX: "scroll",
             }}
           >
-            {dates.map((day, index) => {
+            {dates.map((day) => {
               return (
                 <DayCard
                   selected={selectedDate}
-                  key={index}
+                  key={day.toISOString()}
                   day={day}
                   onBoxClick={() => onDateClick(day)}
                 />

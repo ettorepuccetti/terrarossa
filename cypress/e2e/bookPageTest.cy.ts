@@ -1,14 +1,6 @@
 import { type Club } from "@prisma/client";
-
-const nextDaysAsString = (nOfDays: number): string => {
-  const now = new Date();
-  const futureDate = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + nOfDays
-  );
-  return futureDate.getDate().toString().padStart(2, "0");
-};
+import dayjs from "dayjs";
+import { reservationConstraints } from "~/utils/constants";
 
 beforeEach("Initial clean up and retrieve clubId from clubName", () => {
   const clubFilter = "foro italico";
@@ -17,17 +9,24 @@ beforeEach("Initial clean up and retrieve clubId from clubName", () => {
     if (clubs[0] === undefined) {
       throw new Error("No clubs found");
     }
-    cy.wrap(clubs[0].id).as("clubId");
-    cy.log(`Deleting all reservation for clubId: ${this.clubId as string}`);
-    cy.deleteAllReservationOfClub(this.clubId as string);
+    cy.wrap(clubs[0].id)
+      .as("clubId")
+      .then(() => {
+        cy.log(`Deleting all reservation for clubId: ${this.clubId as string}`);
+        cy.deleteAllReservationOfClub(this.clubId as string);
+      });
   });
 });
 
 describe("Not logged user", () => {
-  it("GIVEN not logged in user WHEN click on available slot THEN show login button", function () {
-    cy.wrap(this.clubId).should("be.a", "string");
+  beforeEach("visit calendar page", function () {
     cy.visit(`/prenota?clubId=${this.clubId as string}`);
+    cy.get(".MuiContainer-root").should("be.visible");
+    cy.wait(100);
+    cy.get("[data-test='spinner']").should("not.be.visible");
+  });
 
+  it("GIVEN not logged in user WHEN click on available slot THEN show login button", function () {
     // select a random slot
     cy.get(
       ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
@@ -38,7 +37,31 @@ describe("Not logged user", () => {
       .filter("[data-test='login']")
       .should("contain", "Effettua il login");
 
-    cy.get("input").should("not.exist");
+    cy.get("[data-test='startTime']").should("not.exist");
+  });
+
+  it("GIVEN user WHEN navigate calendar THEN can go in the past and future according to club settings", function () {
+    //check first selectable day is visible
+    const firstSelectableDay = dayjs()
+      .add(-reservationConstraints.daysInThePastVisible, "day")
+      .date()
+      .toString()
+      .padStart(2, "0");
+
+    cy.get("[data-test='day-card']")
+      .first()
+      .should("contain", firstSelectableDay);
+
+    //check if the last selectable day is visible
+    const lastSelectableDay = dayjs()
+      .add(reservationConstraints.daysInTheFutureVisible, "day")
+      .date()
+      .toString()
+      .padStart(2, "0");
+
+    cy.get("[data-test='day-card']")
+      .last()
+      .should("contain", lastSelectableDay);
   });
 });
 
@@ -55,14 +78,12 @@ describe("Logged user", () => {
 
     cy.visit(`/prenota?clubId=${this.clubId as string}`);
     cy.get(".MuiContainer-root").should("be.visible");
+    cy.wait(100);
+    cy.get("[data-test='spinner']").should("not.be.visible");
   });
 
   it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
-    cy.log("current date: " + new Date().getDate().toString());
-    cy.log("Selecting day of the month: " + nextDaysAsString(2));
-
-    // select a date two day in the future
-    cy.get("[data-test='day-card']").contains(nextDaysAsString(2)).click();
+    cy.navigateDaysFromToday(2);
 
     cy.get(
       ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
@@ -88,5 +109,66 @@ describe("Logged user", () => {
         .should("contain", this.startTime)
         .should("contain", this.endTime);
     });
+  });
+
+  it("GIVEN club with max reservation time WHEN reserve last time slot THEN reservation is within allowed time window", function () {
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :nth-child(1) > .fc-timegrid-slot"
+    ).click(); // click on first slot
+
+    // check startTime
+    cy.get("[data-test='startTime']").should(
+      "have.value",
+      reservationConstraints.slotMinTime
+    );
+
+    // click outside the dialog to close it
+    cy.get(".MuiDialog-container").click(5, 5);
+
+    // select the last slot clickable
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot"
+    ).click();
+
+    // check startTime
+    cy.get("[data-test='endTime']").should(
+      "have.value",
+      reservationConstraints.slotMaxTime
+    );
+  });
+
+  it.only("GIVEN club with max day in the past and future WHEN reserve in first and last visible day THEN reservation shown", function () {
+    cy.navigateDaysFromToday(reservationConstraints.daysInTheFutureVisible);
+
+    // select the last slot clickable
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot"
+    ).click();
+
+    // reserve and close the dialog
+    cy.get("[data-test='reserve']").click();
+
+    // reservation should be visible
+    cy.get('[data-test="calendar-event"]').should("be.visible");
+
+    const startDate = dayjs()
+      .subtract(reservationConstraints.daysInThePastVisible, "day")
+      .hour(parseInt(reservationConstraints.slotMinTime.split(":")[0]))
+      .minute(parseInt(reservationConstraints.slotMinTime.split(":")[1]))
+      .second(0)
+      .millisecond(0);
+
+    cy.task("prisma:makeReservation", {
+      startTime: startDate.toDate(),
+      endTime: startDate.add(1, "hour").toDate(),
+      clubId: this.clubId as string,
+    });
+
+    cy.reload();
+
+    cy.navigateDaysFromToday(-reservationConstraints.daysInThePastVisible);
+
+    // reservation in the past should be visible
+    cy.get('[data-test="calendar-event"]').should("be.visible");
   });
 });

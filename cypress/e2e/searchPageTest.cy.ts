@@ -15,7 +15,7 @@ describe("search", () => {
   it("GIVEN clubs in db WHEN search an existing club THEN club is displayed", () => {
     const filterString = "foro it";
     cy.visit("/search");
-    cy.get("input#search").type(filterString); // note case insensitivity
+    cy.get("input#search").type(filterString); // note case insensitive
     cy.queryFilteredClubs(filterString).then((clubs: Club[]) => {
       clubs.forEach((club) => {
         cy.get(".MuiCardContent-root").should("contain", club.name);

@@ -71,3 +71,21 @@ Cypress.Commands.add("getUsername", () => {
     }
   );
 });
+
+Cypress.Commands.add("navigateDaysFromToday", (n: number) => {
+  const nextDaysAsString = (nOfDays: number): string => {
+    const now = new Date();
+    const futureDate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + nOfDays
+    );
+    return futureDate.getDate().toString().padStart(2, "0");
+  };
+
+  cy.log("current date: " + new Date().getDate().toString());
+  cy.log("Selecting day of the month: " + nextDaysAsString(n));
+
+  // select a date two day in the future
+  cy.get("[data-test='day-card']").contains(nextDaysAsString(n)).click();
+});
