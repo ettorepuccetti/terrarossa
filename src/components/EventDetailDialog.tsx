@@ -45,7 +45,11 @@ export default function EventDetailDialog(props: DialogProps) {
 
   return (
     <>
-      <Dialog open={open} onClose={() => props.onDialogClose()}>
+      <Dialog
+        data-test="event-detail-dialog"
+        open={open}
+        onClose={() => props.onDialogClose()}
+      >
         <DialogLayout title="Prenotazione">
           {/* Court name */}
           <DialogActions>

@@ -150,7 +150,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                 onClick={() => onConfirmButton()}
                 disabled={!endDate || !canBook}
                 color="info"
-                data-test="reserve"
+                data-test="reserve-button"
               >
                 Prenota
               </Button>

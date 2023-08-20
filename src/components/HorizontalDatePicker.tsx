@@ -5,7 +5,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import Image from "next/image";
 import { useState } from "react";
 import { reservationConstraints } from "~/utils/constants";
-import { capitalise } from "~/utils/utils";
+import { capitaliseFirstChar } from "~/utils/utils";
 import { DayCard } from "./DayCard";
 require("dayjs/locale/it");
 dayjs.locale("it");
@@ -90,7 +90,7 @@ export const HorizonalDatePicker = ({
       </Box>
       {/* Selected date extended */}
       <Typography variant={"h6"} textAlign={"center"}>
-        {capitalise(selectedDate.format("dddd DD MMMM YYYY"))}
+        {capitaliseFirstChar(selectedDate.format("dddd DD MMMM YYYY"))}
       </Typography>
     </Box>
   );

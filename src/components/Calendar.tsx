@@ -10,6 +10,8 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { reservationConstraints } from "~/utils/constants";
+import { isSelectableSlot } from "~/utils/utils";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
@@ -89,6 +91,15 @@ export default function Calendar() {
 
     if (selectInfo.resource === undefined) {
       throw new Error("No court selected");
+    }
+    if (
+      isSelectableSlot(
+        selectInfo.date,
+        reservationConstraints.getMaxReservationHour(),
+        reservationConstraints.getMaxReservationMinutes()
+      )
+    ) {
+      return;
     }
     setDateClick(selectInfo);
   };

@@ -95,7 +95,7 @@ describe("Logged user", () => {
       .as("endTime");
 
     // reserve and close the dialog
-    cy.get("[data-test='reserve']").click();
+    cy.get("[data-test='reserve-button']").click();
 
     // check on the reservation card if username, startTime and endTime are correct
     // need to wrap the assertion in a then() because startTime and endTime are set in this scope
@@ -107,15 +107,15 @@ describe("Logged user", () => {
     });
   });
 
-  it("GIVEN club with max reservation time WHEN reserve last time slot THEN reservation is within allowed time window", function () {
+  it("GIVEN club with reservation time constrains WHEN select first and (second)last time slot THEN constrains respected", function () {
     cy.get(
       ".fc-timegrid-slots > table > tbody > :nth-child(1) > .fc-timegrid-slot"
     ).click(); // click on first slot
 
-    // check startTime
+    // check startTime of first bookable slot
     cy.get("[data-test='startTime']").should(
       "have.value",
-      reservationConstraints.slotMinTime
+      reservationConstraints.getSlotMinTime()
     );
 
     // click outside the dialog to close it
@@ -126,10 +126,10 @@ describe("Logged user", () => {
       ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot"
     ).click();
 
-    // check startTime
+    // check endTime of last bookable slot
     cy.get("[data-test='endTime']").should(
       "have.value",
-      reservationConstraints.slotMaxTime
+      reservationConstraints.getSlotMaxTime()
     );
   });
 
@@ -137,8 +137,8 @@ describe("Logged user", () => {
     // create PAST reservation
     const firstVisibleStartDate = dayjs()
       .subtract(reservationConstraints.daysInThePastVisible, "day")
-      .hour(parseInt(reservationConstraints.slotMinTime.split(":")[0]))
-      .minute(parseInt(reservationConstraints.slotMinTime.split(":")[1]))
+      .hour(reservationConstraints.getMinReservationHour())
+      .minute(reservationConstraints.getMinReservationMinutes())
       .second(0)
       .millisecond(0);
 
@@ -154,8 +154,8 @@ describe("Logged user", () => {
     // create FUTURE reservation
     const lastVisibleStartDate = dayjs()
       .add(reservationConstraints.daysInTheFutureVisible, "day")
-      .hour(parseInt(reservationConstraints.slotMaxTime.split(":")[0]) - 1) // -1 because slotMaxTime is the closing time of the club
-      .minute(parseInt(reservationConstraints.slotMaxTime.split(":")[1]))
+      .hour(reservationConstraints.getMaxReservationHour() - 1) // -1 because slotMaxTime is the closing time of the club
+      .minute(reservationConstraints.getMaxReservationMinutes())
       .second(0)
       .millisecond(0);
 
@@ -176,5 +176,13 @@ describe("Logged user", () => {
 
     cy.navigateDaysFromToday(reservationConstraints.daysInTheFutureVisible);
     cy.get('[data-test="calendar-event"]').should("be.visible");
+  });
+  it("GIVEN club with max reservation time WHEN click on very last slot THEN no reservation dialog showed", function () {
+    // click on the last slot
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :last-child > .fc-timegrid-slot"
+    ).click();
+
+    cy.get("[data-test='event-detail-dialog']").should("not.exist");
   });
 });
