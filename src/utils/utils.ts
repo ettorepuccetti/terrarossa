@@ -31,7 +31,7 @@ export function isAdminOfTheClub(
  * @param selectedStartDate startDate of the selected slot
  * @param clubClosingHour closing hour of the club
  * @param clubClosingMinutes closing minutes of the club
- * @returns true if the slot is not the last one, false if instead is the last clickable slot that cannot fit the minimum duration of a reservation
+ * @returns `true` if the slot is not the last one, `false` if instead is the last clickable slot that cannot fit the minimum duration of a reservation
  */
 export function isSelectableSlot(
   selectedStartDate: Date,
@@ -41,7 +41,7 @@ export function isSelectableSlot(
   return dayjs()
     .set("hours", selectedStartDate.getHours())
     .set("minutes", selectedStartDate.getMinutes())
-    .isAfter(
+    .isBefore(
       //last bookable hour
       dayjs().set("hours", clubClosingHour).set("minutes", clubClosingMinutes)
     );

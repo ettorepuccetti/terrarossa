@@ -93,12 +93,13 @@ export default function Calendar() {
       throw new Error("No court selected");
     }
     if (
-      isSelectableSlot(
+      !isSelectableSlot(
         selectInfo.date,
         reservationConstraints.getMaxReservationHour(),
         reservationConstraints.getMaxReservationMinutes()
       )
     ) {
+      console.log("last slot is not selectable");
       return;
     }
     setDateClick(selectInfo);
