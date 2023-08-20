@@ -3,9 +3,7 @@ import dayjs from "dayjs";
 import { reservationConstraints } from "~/utils/constants";
 
 beforeEach("Initial clean up and retrieve clubId from clubName", () => {
-  const clubFilter = "foro italico";
-
-  cy.queryFilteredClubs(clubFilter).then(function (clubs: Club[]) {
+  cy.queryFilteredClubs("foro italico").then(function (clubs: Club[]) {
     if (clubs[0] === undefined) {
       throw new Error("No clubs found");
     }
@@ -20,10 +18,9 @@ beforeEach("Initial clean up and retrieve clubId from clubName", () => {
 
 describe("Not logged user", () => {
   beforeEach("visit calendar page", function () {
-    cy.visit(`/prenota?clubId=${this.clubId as string}`);
-    cy.get(".MuiContainer-root").should("be.visible");
-    cy.wait(100);
-    cy.get("[data-test='spinner']").should("not.be.visible");
+    cy.visit(
+      `/prenota?clubId=${this.clubId as string}`
+    ).waitForCalendarPageToLoad();
   });
 
   it("GIVEN not logged in user WHEN click on available slot THEN show login button", function () {
@@ -76,10 +73,9 @@ describe("Logged user", () => {
       cy.wrap(username).should("be.a", "string").as("username");
     });
 
-    cy.visit(`/prenota?clubId=${this.clubId as string}`);
-    cy.get(".MuiContainer-root").should("be.visible");
-    cy.wait(100);
-    cy.get("[data-test='spinner']").should("not.be.visible");
+    cy.visit(
+      `/prenota?clubId=${this.clubId as string}`
+    ).waitForCalendarPageToLoad();
   });
 
   it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
@@ -137,38 +133,48 @@ describe("Logged user", () => {
     );
   });
 
-  it.only("GIVEN club with max day in the past and future WHEN reserve in first and last visible day THEN reservation shown", function () {
-    cy.navigateDaysFromToday(reservationConstraints.daysInTheFutureVisible);
-
-    // select the last slot clickable
-    cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot"
-    ).click();
-
-    // reserve and close the dialog
-    cy.get("[data-test='reserve']").click();
-
-    // reservation should be visible
-    cy.get('[data-test="calendar-event"]').should("be.visible");
-
-    const startDate = dayjs()
+  it("GIVEN club with max day in the past and future WHEN reserve in first and last visible day THEN reservation shown", function () {
+    // create PAST reservation
+    const firstVisibleStartDate = dayjs()
       .subtract(reservationConstraints.daysInThePastVisible, "day")
       .hour(parseInt(reservationConstraints.slotMinTime.split(":")[0]))
       .minute(parseInt(reservationConstraints.slotMinTime.split(":")[1]))
       .second(0)
       .millisecond(0);
 
-    cy.task("prisma:makeReservation", {
-      startTime: startDate.toDate(),
-      endTime: startDate.add(1, "hour").toDate(),
-      clubId: this.clubId as string,
-    });
+    cy.createReservation(
+      firstVisibleStartDate.toDate(),
+      firstVisibleStartDate.add(1, "hour").toDate(),
+      this.clubId as string,
+      "Pietrangeli",
+      Cypress.env("AUTH0_USER") as string,
+      Cypress.env("AUTH0_PW") as string
+    );
 
-    cy.reload();
+    // create FUTURE reservation
+    const lastVisibleStartDate = dayjs()
+      .add(reservationConstraints.daysInTheFutureVisible, "day")
+      .hour(parseInt(reservationConstraints.slotMaxTime.split(":")[0]) - 1) // -1 because slotMaxTime is the closing time of the club
+      .minute(parseInt(reservationConstraints.slotMaxTime.split(":")[1]))
+      .second(0)
+      .millisecond(0);
+
+    cy.createReservation(
+      lastVisibleStartDate.toDate(),
+      lastVisibleStartDate.add(1, "hour").toDate(),
+      this.clubId as string,
+      "Pietrangeli",
+      Cypress.env("AUTH0_USER") as string,
+      Cypress.env("AUTH0_PW") as string
+    );
+
+    // CHECKS
+    cy.reload().waitForCalendarPageToLoad();
 
     cy.navigateDaysFromToday(-reservationConstraints.daysInThePastVisible);
+    cy.get('[data-test="calendar-event"]').should("be.visible");
 
-    // reservation in the past should be visible
+    cy.navigateDaysFromToday(reservationConstraints.daysInTheFutureVisible);
     cy.get('[data-test="calendar-event"]').should("be.visible");
   });
 });

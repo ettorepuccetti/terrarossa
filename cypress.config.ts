@@ -47,30 +47,43 @@ export default defineConfig({
             },
           });
         },
+        async "prisma:getUserIdFromUsername"(username: string) {
+          const user = await prisma.user.findUnique({
+            where: {
+              email: username,
+            },
+          });
+          if (!user) throw new Error("User not found");
+          return user.id;
+        },
         async "prisma:makeReservation"({
           startTime,
           endTime,
           clubId,
-          userId,
+          courtName,
+          userMail,
         }: {
           startTime: Date;
           endTime: Date;
           clubId: string;
-          userId?: string;
+          courtName: string;
+          userMail: string;
         }) {
-          const court = await prisma.court.findFirst({
-            where: {
-              clubId: clubId,
-            },
-          });
-          if (!court) throw new Error("Court not found");
           return await prisma.reservation.create({
             data: {
               startTime: startTime,
               endTime: endTime,
+              user: {
+                connect: {
+                  email: userMail,
+                },
+              },
               court: {
                 connect: {
-                  id: court.id,
+                  name_clubId: {
+                    clubId: clubId,
+                    name: courtName,
+                  },
                 },
               },
             },

@@ -83,9 +83,33 @@ Cypress.Commands.add("navigateDaysFromToday", (n: number) => {
     return futureDate.getDate().toString().padStart(2, "0");
   };
 
-  cy.log("current date: " + new Date().getDate().toString());
   cy.log("Selecting day of the month: " + nextDaysAsString(n));
 
   // select a date two day in the future
   cy.get("[data-test='day-card']").contains(nextDaysAsString(n)).click();
+});
+
+Cypress.Commands.add(
+  "createReservation",
+  (
+    startDate: Date,
+    endDate: Date,
+    clubId: string,
+    courtName: string,
+    userName: string
+  ) => {
+    cy.task("prisma:makeReservation", {
+      startTime: startDate,
+      endTime: endDate,
+      clubId: clubId,
+      courtName: courtName,
+      userMail: userName,
+    });
+  }
+);
+
+Cypress.Commands.add("waitForCalendarPageToLoad", () => {
+  cy.get(".MuiContainer-root").should("be.visible");
+  cy.wait(100);
+  cy.get("[data-test='spinner']").should("not.be.visible");
 });
