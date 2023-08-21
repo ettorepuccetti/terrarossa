@@ -23,7 +23,7 @@ declare global {
       navigateDaysFromToday(n: number): void;
 
       /**
-       * Make a reservation
+       * Insert a reservation directly in the database
        * @param {Date} startDate start date of the reservation
        * @param {Date} endDate end date of the reservation
        * @param {string} clubId clubId of the club to make the reservation for
@@ -41,6 +41,13 @@ declare global {
       ): void;
 
       waitForCalendarPageToLoad(): void;
+
+      /**
+       * Click on the selected slot in the calendar. The slot is identified by crossing the coordinates of the slot time and the court name
+       * @param courtName display name of the court
+       * @param hour start time of the slot in the format HH:mm
+       */
+      clickOnCalendarSlot(courtName: string, hour: string): void;
     }
   }
 }

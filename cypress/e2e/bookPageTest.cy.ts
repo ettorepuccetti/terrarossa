@@ -209,4 +209,45 @@ describe("Logged user", () => {
     // check that no reservation has been added
     cy.get("[data-test='calendar-event']").should("not.exist");
   });
+
+  it.only("GIVEN logged user WHEN reserve with a clash THEN show error banner and reservation not added", function () {
+    // create a reservation in the next day, for avoiding `reservation in the past` warning
+    const startDate = dayjs()
+      .add(1, "day")
+      .hour(12)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+
+    cy.createReservation(
+      startDate.toDate(),
+      startDate.add(1, "hour").toDate(),
+      this.clubId as string,
+      "Pietrangeli",
+      Cypress.env("AUTH0_USER") as string,
+      Cypress.env("AUTH0_PW") as string
+    );
+
+    cy.reload().waitForCalendarPageToLoad();
+
+    cy.navigateDaysFromToday(1);
+
+    cy.clickOnCalendarSlot("Pietrangeli", "11:00");
+
+    cy.get("[data-test='endTime']").clear().type("12:30");
+
+    cy.get("[data-test='reserve-button']").click();
+
+    cy.get("[data-test='error-alert']")
+      .should("be.visible")
+      .and(
+        "have.text",
+        "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero"
+      );
+    // close the error dialog
+    cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
+
+    // check that no reservation has been added
+    cy.get("[data-test='calendar-event']").should("have.length", 1);
+  });
 });

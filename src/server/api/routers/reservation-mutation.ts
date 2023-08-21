@@ -24,7 +24,7 @@ export const reservationMutationRouter = createTRPCRouter({
         )
       ) {
         throw new TRPCClientError(
-          "La tua prenotazione non puo' essere efettuata. Per favore, scegli un orario in cui il campo è libero"
+          "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero"
         );
       }
 

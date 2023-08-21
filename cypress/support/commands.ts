@@ -113,3 +113,37 @@ Cypress.Commands.add("waitForCalendarPageToLoad", () => {
   cy.wait(100);
   cy.get("[data-test='spinner']").should("not.be.visible");
 });
+
+Cypress.Commands.add(
+  "clickOnCalendarSlot",
+  (courtName: string, hour: string) => {
+    cy.scrollTo("top");
+
+    cy.get(".fc-timegrid-slot-label-cushion")
+      .contains(hour)
+      .then(($row) => {
+        cy.log("getting Y:", $row[0].getBoundingClientRect().y.toString());
+        cy.wrap(
+          $row[0].getBoundingClientRect().top +
+            $row[0].getBoundingClientRect().height / 2
+        ).as("slotY");
+      });
+    cy.get(".fc-scrollgrid-sync-inner")
+      .contains(courtName)
+      .then(($row) => {
+        cy.log("getting X:", $row[0].getBoundingClientRect().x.toString());
+        cy.wrap(
+          $row[0].getBoundingClientRect().left +
+            $row[0].getBoundingClientRect().width / 2
+        ).as("slotX");
+      });
+
+    cy.scrollTo("top");
+    cy.get("body").then(function ($el) {
+      cy.wrap($el).click(this.slotX as number, this.slotY as number);
+    });
+
+    cy.get("[data-test='reserve-dialog']").should("be.visible");
+    cy.get("[data-test='startTime']").should("have.value", hour);
+  }
+);

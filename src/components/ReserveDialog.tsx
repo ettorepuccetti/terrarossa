@@ -64,6 +64,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
   return (
     <>
       <Dialog
+        data-test="reserve-dialog"
         open={open}
         onClose={() => {
           setEndDate(null);
