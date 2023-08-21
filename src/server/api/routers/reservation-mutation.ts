@@ -30,7 +30,19 @@ export const reservationMutationRouter = createTRPCRouter({
 
       // start date before end date
       if (input.startDateTime.getTime() > input.endDateTime.getTime()) {
-        throw new TRPCClientError("Error: Start date cannot be after end date");
+        throw new TRPCClientError(
+          "L'orario di inizio deve essere prima di quello di fine"
+        );
+      }
+
+      // start and end time must be `00` or `30`
+      if (
+        input.startDateTime.getMinutes() % 30 !== 0 ||
+        input.endDateTime.getMinutes() % 30 !== 0
+      ) {
+        throw new TRPCClientError(
+          "L'orario di inizio e di fine deve essere un multiplo di 30 minuti"
+        );
       }
 
       //checks for NON ADMIN user

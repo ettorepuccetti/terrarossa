@@ -95,8 +95,8 @@ export default function Calendar() {
     if (
       !isSelectableSlot(
         selectInfo.date,
-        reservationConstraints.getMaxReservationHour(),
-        reservationConstraints.getMaxReservationMinutes()
+        reservationConstraints.getLastBookableHour(),
+        reservationConstraints.getLastBookableMinute()
       )
     ) {
       console.log("last slot is not selectable");

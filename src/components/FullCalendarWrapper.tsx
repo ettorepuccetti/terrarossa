@@ -112,8 +112,8 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
           props.onDateClick(info);
         }}
         selectable={false}
-        slotMinTime={reservationConstraints.getSlotMinTime()}
-        slotMaxTime={reservationConstraints.getSlotMaxTime()}
+        slotMinTime={reservationConstraints.getClubOpeningTime()}
+        slotMaxTime={reservationConstraints.getClubClosingTime()}
         selectLongPressDelay={0}
         slotLabelFormat={{ hour: "numeric", minute: "2-digit", hour12: false }}
         eventTimeFormat={{ hour: "numeric", minute: "2-digit", hour12: false }}

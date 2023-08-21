@@ -13,7 +13,11 @@ export default function ErrorAlert(props: ErrorAlertProps<DefaultErrorShape>) {
       open={props.error !== null}
       sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
     >
-      <Alert severity="error" onClose={() => props.onClose()}>
+      <Alert
+        data-test="error-alert"
+        severity="error"
+        onClose={() => props.onClose()}
+      >
         {props.error?.message}
       </Alert>
     </Backdrop>

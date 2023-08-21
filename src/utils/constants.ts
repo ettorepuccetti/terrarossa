@@ -14,39 +14,45 @@ export const reservationConstraints = {
   daysInThePastVisible: 2,
   daysInTheFutureVisible: 7,
   hoursBeforeDeleting: 6,
-  minTimeHours: 8,
-  minTimeMinutes: 0,
-  maxTimeHours: 22,
-  maxTimeMinutes: 0,
-  getSlotMinTime: () => {
-    return `${reservationConstraints.minTimeHours
+  firstBookableHour: 8,
+  firstBookableMinute: 0,
+  lastBookableHour: 22,
+  lastBookableMinute: 0,
+
+  /**
+   * Calculate the opening time of the club, from the `firstBookableHour` and `firstBookableMinute` constants
+   * @returns the opening time of the club (first available slot) in the format HH:MM
+   * @example 08:00
+   */
+  getClubOpeningTime: (): string => {
+    return `${reservationConstraints.firstBookableHour
       .toString()
-      .padStart(2, "0")}:${reservationConstraints.minTimeMinutes
+      .padStart(2, "0")}:${reservationConstraints.firstBookableMinute
       .toString()
       .padStart(2, "0")}`;
   },
   /**
-   * calculate the closing time of the club, from the `maxTimeHours` + 1 and `maxTimeMinutes` constants
+   * Calculate the closing time of the club, from the `lastBookableHour` + 1 and `lastBookableMinute` constants
    * @returns the closing time of the club (not even show in calendar) in the format HH:MM
    * @example 22:00
    */
-  getSlotMaxTime: () => {
-    return `${(reservationConstraints.maxTimeHours + 1)
+  getClubClosingTime: (): string => {
+    return `${(reservationConstraints.lastBookableHour + 1)
       .toString()
-      .padStart(2, "0")}:${reservationConstraints.maxTimeMinutes
+      .padStart(2, "0")}:${reservationConstraints.lastBookableMinute
       .toString()
       .padStart(2, "0")}`;
   },
-  getMaxReservationHour: () => {
-    return reservationConstraints.maxTimeHours;
+  getLastBookableHour: () => {
+    return reservationConstraints.lastBookableHour;
   },
-  getMaxReservationMinutes: () => {
-    return reservationConstraints.maxTimeMinutes;
+  getLastBookableMinute: () => {
+    return reservationConstraints.lastBookableMinute;
   },
-  getMinReservationHour: () => {
-    return reservationConstraints.minTimeHours;
+  getFirstBookableHour: () => {
+    return reservationConstraints.firstBookableHour;
   },
-  getMinReservationMinutes: () => {
-    return reservationConstraints.minTimeMinutes;
+  getFirstBookableMinute: () => {
+    return reservationConstraints.firstBookableMinute;
   },
 };

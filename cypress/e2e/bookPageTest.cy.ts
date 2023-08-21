@@ -90,7 +90,7 @@ describe("Logged user", () => {
 
     // save endTime
     cy.get("[data-test='endTime']")
-      .wait(200) //wait for the rerender
+      .wait(100) //wait for the rerender
       .invoke("val")
       .as("endTime");
 
@@ -115,7 +115,7 @@ describe("Logged user", () => {
     // check startTime of first bookable slot
     cy.get("[data-test='startTime']").should(
       "have.value",
-      reservationConstraints.getSlotMinTime()
+      reservationConstraints.getClubOpeningTime()
     );
 
     // click outside the dialog to close it
@@ -129,7 +129,7 @@ describe("Logged user", () => {
     // check endTime of last bookable slot
     cy.get("[data-test='endTime']").should(
       "have.value",
-      reservationConstraints.getSlotMaxTime()
+      reservationConstraints.getClubClosingTime()
     );
   });
 
@@ -137,8 +137,8 @@ describe("Logged user", () => {
     // create PAST reservation
     const firstVisibleStartDate = dayjs()
       .subtract(reservationConstraints.daysInThePastVisible, "day")
-      .hour(reservationConstraints.getMinReservationHour())
-      .minute(reservationConstraints.getMinReservationMinutes())
+      .hour(reservationConstraints.getFirstBookableHour())
+      .minute(reservationConstraints.getFirstBookableMinute())
       .second(0)
       .millisecond(0);
 
@@ -154,8 +154,8 @@ describe("Logged user", () => {
     // create FUTURE reservation
     const lastVisibleStartDate = dayjs()
       .add(reservationConstraints.daysInTheFutureVisible, "day")
-      .hour(reservationConstraints.getMaxReservationHour() - 1) // -1 because slotMaxTime is the closing time of the club
-      .minute(reservationConstraints.getMaxReservationMinutes())
+      .hour(reservationConstraints.getLastBookableHour() - 1) // -1 because slotMaxTime is the closing time of the club
+      .minute(reservationConstraints.getLastBookableMinute())
       .second(0)
       .millisecond(0);
 
@@ -177,6 +177,7 @@ describe("Logged user", () => {
     cy.navigateDaysFromToday(reservationConstraints.daysInTheFutureVisible);
     cy.get('[data-test="calendar-event"]').should("be.visible");
   });
+
   it("GIVEN club with max reservation time WHEN click on very last slot THEN no reservation dialog showed", function () {
     // click on the last slot
     cy.get(
@@ -184,5 +185,28 @@ describe("Logged user", () => {
     ).click();
 
     cy.get("[data-test='event-detail-dialog']").should("not.exist");
+  });
+
+  it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", function () {
+    cy.navigateDaysFromToday(2);
+
+    // click on a random slot
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
+    ).click();
+
+    // insert wrong endTime
+    cy.get("[data-test='endTime']").clear().type("12:15");
+
+    // try to reserve by clicking confirm button
+    cy.get("[data-test='reserve-button']").click();
+
+    cy.get("[data-test='error-alert']").should("be.visible");
+
+    // close the error dialog
+    cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
+
+    // check that no reservation has been added
+    cy.get("[data-test='calendar-event']").should("not.exist");
   });
 });

@@ -27,22 +27,29 @@ export function isAdminOfTheClub(
 
 /**
  * Check if a given slot starting at `selectedStartDate` is selectable.
- * A slot is selectable if it is not the last one, because the last one cannot fit the minimum duration of a reservation
+ * A slot (of 30 min) is selectable if it is not the last one, because the last one cannot fit the minimum duration of a reservation
  * @param selectedStartDate startDate of the selected slot
- * @param clubClosingHour closing hour of the club
- * @param clubClosingMinutes closing minutes of the club
+ * @param lastBookableHour closing hour of the club
+ * @param lastBookableMinute closing minutes of the club
  * @returns `true` if the slot is not the last one, `false` if instead is the last clickable slot that cannot fit the minimum duration of a reservation
  */
 export function isSelectableSlot(
   selectedStartDate: Date,
-  clubClosingHour: number,
-  clubClosingMinutes: number
+  lastBookableHour: number,
+  lastBookableMinute: number
 ): boolean {
-  return dayjs()
-    .set("hours", selectedStartDate.getHours())
-    .set("minutes", selectedStartDate.getMinutes())
-    .isBefore(
-      //last bookable hour
-      dayjs().set("hours", clubClosingHour).set("minutes", clubClosingMinutes)
-    );
+  const fixedDate = dayjs();
+  // !(selectedStartDate > lastBookableHour)
+  return !(
+    //selected start date
+    fixedDate
+      .set("hours", selectedStartDate.getHours())
+      .set("minutes", selectedStartDate.getMinutes())
+      .isAfter(
+        //last bookable hour
+        fixedDate
+          .set("hours", lastBookableHour)
+          .set("minutes", lastBookableMinute)
+      )
+  );
 }
