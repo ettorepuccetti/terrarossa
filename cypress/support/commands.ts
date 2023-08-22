@@ -156,8 +156,10 @@ Cypress.Commands.add(
     cy.get("[data-test='reserve-dialog']").should("be.visible");
     cy.get("[data-test='startTime']").should("have.value", hour);
 
-    const hourInt = parseInt(hour.split(":")[0]);
-    const minuteInt = parseInt(hour.split(":")[1]);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const hourInt = parseInt(hour.split(":")[0]!);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const minuteInt = parseInt(hour.split(":")[1]!);
     cy.get("[data-test='endTime']").should(
       "have.value",
       dayjs().hour(hourInt).minute(minuteInt).add(1, "h").format("HH:mm")
