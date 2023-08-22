@@ -9,6 +9,7 @@
     "lint": "next lint",
     "start": "next start",
     "cypress": "NODE_ENV='test' cypress open",
+    "cypress:mobile": "NODE_ENV='test' cypress open --config viewportWidth=375,viewportHeight=667",
     "db:seed": "npx prisma db push && npx prisma db seed",
     "prettier": "prettier --write .",
     "prepare": "husky install",

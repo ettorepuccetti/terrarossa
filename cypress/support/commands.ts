@@ -121,8 +121,11 @@ Cypress.Commands.add(
 
     cy.get(".fc-timegrid-slot-label-cushion")
       .contains(hour)
-      .then(($row) => {
-        cy.log("getting Y:", $row[0].getBoundingClientRect().y.toString());
+      .then(function ($row) {
+        // cy.log("getting Y:", $row[0].getBoundingClientRect().y.toString());
+        if (!$row || !$row[0]) {
+          throw new Error("Hour not found");
+        }
         cy.wrap(
           $row[0].getBoundingClientRect().top +
             $row[0].getBoundingClientRect().height / 2
@@ -130,11 +133,14 @@ Cypress.Commands.add(
       });
     cy.get(".fc-scrollgrid-sync-inner")
       .contains(courtName)
-      .then(($row) => {
-        cy.log("getting X:", $row[0].getBoundingClientRect().x.toString());
+      .then(($column) => {
+        if (!$column || !$column[0]) {
+          throw new Error("Court not found");
+        }
+        cy.log("getting X:", $column[0].getBoundingClientRect().x.toString());
         cy.wrap(
-          $row[0].getBoundingClientRect().left +
-            $row[0].getBoundingClientRect().width / 2
+          $column[0].getBoundingClientRect().left +
+            $column[0].getBoundingClientRect().width / 2
         ).as("slotX");
       });
 
