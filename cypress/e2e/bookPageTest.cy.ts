@@ -196,7 +196,12 @@ describe("Logged user", () => {
     ).click();
 
     // insert wrong endTime
-    cy.get("[data-test='endTime']").clear().type("12:15");
+    cy.get("[data-test='endTime']").focus().clear().type("12:15");
+
+    cy.get(".MuiFormHelperText-root").should(
+      "have.text",
+      "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+    );
 
     // try to reserve by clicking confirm button
     cy.get("[data-test='reserve-button']").should("be.disabled");
@@ -240,7 +245,7 @@ describe("Logged user", () => {
 
     cy.clickOnCalendarSlot("Pietrangeli", "11:00");
 
-    cy.get("[data-test='endTime']").clear().type("12:30");
+    cy.get("[data-test='endTime']").focus().clear().type("12:30");
 
     cy.get("[data-test='reserve-button']").click();
 
