@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export {};
 function loginToAuth0(username: string, password: string) {
   const log = Cypress.log({
@@ -86,11 +88,13 @@ Cypress.Commands.add("navigateDaysFromToday", (n: number) => {
   cy.log("Selecting day of the month: " + nextDaysAsString(n));
 
   // select a date two day in the future
-  cy.get("[data-test='day-card']").contains(nextDaysAsString(n)).click();
+  cy.get("[data-test='day-card']")
+    .contains(nextDaysAsString(n))
+    .click({ force: true });
 });
 
 Cypress.Commands.add(
-  "createReservation",
+  "addReservationToDB",
   (
     startDate: Date,
     endDate: Date,
@@ -151,5 +155,12 @@ Cypress.Commands.add(
 
     cy.get("[data-test='reserve-dialog']").should("be.visible");
     cy.get("[data-test='startTime']").should("have.value", hour);
+
+    const hourInt = parseInt(hour.split(":")[0]);
+    const minuteInt = parseInt(hour.split(":")[1]);
+    cy.get("[data-test='endTime']").should(
+      "have.value",
+      dayjs().hour(hourInt).minute(minuteInt).add(1, "h").format("HH:mm")
+    );
   }
 );

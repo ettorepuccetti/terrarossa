@@ -142,7 +142,7 @@ describe("Logged user", () => {
       .second(0)
       .millisecond(0);
 
-    cy.createReservation(
+    cy.addReservationToDB(
       firstVisibleStartDate.toDate(),
       firstVisibleStartDate.add(1, "hour").toDate(),
       this.clubId as string,
@@ -159,7 +159,7 @@ describe("Logged user", () => {
       .second(0)
       .millisecond(0);
 
-    cy.createReservation(
+    cy.addReservationToDB(
       lastVisibleStartDate.toDate(),
       lastVisibleStartDate.add(1, "hour").toDate(),
       this.clubId as string,
@@ -199,18 +199,24 @@ describe("Logged user", () => {
     cy.get("[data-test='endTime']").clear().type("12:15");
 
     // try to reserve by clicking confirm button
-    cy.get("[data-test='reserve-button']").click();
+    cy.get("[data-test='reserve-button']").should("be.disabled");
 
-    cy.get("[data-test='error-alert']").should("be.visible");
+    //TODO: force call the API and check the error message
+    // cy.get("[data-test='error-alert']")
+    //   .should("be.visible")
+    //   .and(
+    //     "have.text",
+    //     "L'orario di inizio e di fine deve essere un multiplo di 30 minuti"
+    //   );
 
-    // close the error dialog
-    cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
+    // // close the error dialog
+    // cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
 
-    // check that no reservation has been added
-    cy.get("[data-test='calendar-event']").should("not.exist");
+    // // check that no reservation has been added
+    // cy.get("[data-test='calendar-event']").should("not.exist");
   });
 
-  it.only("GIVEN logged user WHEN reserve with a clash THEN show error banner and reservation not added", function () {
+  it("GIVEN logged user WHEN reserve with a clash THEN show error banner and reservation not added", function () {
     // create a reservation in the next day, for avoiding `reservation in the past` warning
     const startDate = dayjs()
       .add(1, "day")
@@ -219,7 +225,7 @@ describe("Logged user", () => {
       .second(0)
       .millisecond(0);
 
-    cy.createReservation(
+    cy.addReservationToDB(
       startDate.toDate(),
       startDate.add(1, "hour").toDate(),
       this.clubId as string,
@@ -249,5 +255,22 @@ describe("Logged user", () => {
 
     // check that no reservation has been added
     cy.get("[data-test='calendar-event']").should("have.length", 1);
+  });
+
+  it("GIVEN logged user WHEN reservation is longer than 2 hours THEN show error and cannot press button", function () {
+    cy.navigateDaysFromToday(2);
+
+    cy.clickOnCalendarSlot("Pietrangeli", "11:00");
+
+    // insert endTime longer than 2 hours
+    cy.get("[data-test='endTime']").focus().clear().type("14:00");
+
+    // try to reserve by clicking confirm button
+    cy.get("[data-test='reserve-button']").should("be.disabled");
+
+    cy.get(".MuiFormHelperText-root").should(
+      "have.text",
+      "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+    );
   });
 });

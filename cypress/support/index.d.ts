@@ -31,7 +31,7 @@ declare global {
        * @param {string} userMail email of the user to make the reservation for
        * @param {string} userPassword password of the user to make the reservation for
        */
-      createReservation(
+      addReservationToDB(
         startDate: Date,
         endDate: Date,
         clubId: string,

@@ -57,6 +57,10 @@ export default function ReserveDialog(props: ReserveDialogProps) {
     setOverwriteName("");
   };
 
+  const [endDateError, setEndDateError] = useState<string | undefined>(
+    undefined
+  );
+
   const canBook =
     isAdminOfTheClub(sessionData, props.clubId) ||
     dayjs(startDate).isAfter(dayjs());
@@ -98,7 +102,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
 
               {/* date */}
               <DateField
-                inputProps={{ "data-test": "date" }} //used to test the component
+                inputProps={{ "data-test": "date" }}
                 value={dayjs(startDate)}
                 readOnly={true}
                 label={"Data"}
@@ -108,7 +112,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                 color="info"
               />
               <TimeField
-                inputProps={{ "data-test": "startTime" }} //used to test the component
+                inputProps={{ "data-test": "startTime" }}
                 value={startDate}
                 label={"Orario di inizio"}
                 readOnly={true}
@@ -118,9 +122,12 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                 color="info"
               />
               <TimePicker
-                data-test="endTime"
                 slotProps={{
-                  textField: { inputProps: { "data-test": "endTime" } }, //used to test the component
+                  textField: {
+                    inputProps: { "data-test": "endTime" },
+                    color: "info",
+                    helperText: endDateError,
+                  },
                 }}
                 value={endDate}
                 label={"Orario di fine"}
@@ -134,9 +141,13 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                     ? undefined
                     : (dayjs(startDate).add(2, "hours") as unknown as Date)
                 }
-                autoFocus={true}
                 disabled={!canBook}
                 sx={{ width: "100%" }}
+                onError={(error) => {
+                  setEndDateError(
+                    error ? "Prenota 1 ora, 1 ora e mezzo o 2 ore" : undefined
+                  );
+                }}
               />
 
               {!canBook && (
@@ -149,7 +160,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
 
               <Button
                 onClick={() => onConfirmButton()}
-                disabled={!endDate || !canBook}
+                disabled={!endDate || !canBook || !!endDateError}
                 color="info"
                 data-test="reserve-button"
               >
