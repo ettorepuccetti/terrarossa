@@ -126,7 +126,6 @@ Cypress.Commands.add(
     cy.get(".fc-timegrid-slot-label-cushion")
       .contains(hour)
       .then(function ($row) {
-        // cy.log("getting Y:", $row[0].getBoundingClientRect().y.toString());
         if (!$row || !$row[0]) {
           throw new Error("Hour not found");
         }
@@ -148,8 +147,8 @@ Cypress.Commands.add(
         ).as("slotX");
       });
 
-    cy.scrollTo("top");
     cy.get("body").then(function ($el) {
+      cy.scrollTo("top");
       cy.wrap($el).click(this.slotX as number, this.slotY as number);
     });
 
