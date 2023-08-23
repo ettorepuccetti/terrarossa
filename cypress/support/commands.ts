@@ -137,9 +137,9 @@ Cypress.Commands.add(
     cy.get(`[data-time="${startTimeString}:00"]`)
       .filter(".fc-timegrid-slot-lane")
       .then(function ($elem) {
-        // if (!$elem || !$elem[0]) {
-        //   throw new Error("Time slot not found: " + startTimeString);
-        // }
+        if (!$elem || !$elem[0]) {
+          throw new Error("Time slot not found: " + startTimeString);
+        }
         const offsetLeft = $elem[0].getBoundingClientRect().left;
         const slotY = $elem[0].getBoundingClientRect().height / 2;
         cy.wrap($elem).click(this.slotX - offsetLeft, slotY);
