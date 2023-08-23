@@ -142,6 +142,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                     : (dayjs(startDate).add(2, "hours") as unknown as Date)
                 }
                 disabled={!canBook}
+                autoFocus
                 sx={{ width: "100%" }}
                 onError={(error) => {
                   setEndDateError(

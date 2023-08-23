@@ -74,7 +74,6 @@ describe("<Reservation Dialog />", () => {
     cy.get("input")
       .filter("[data-test='endTime']")
       .should("have.value", startDate.add(1, "hour").format("HH:mm")) //default duration is 1 hour
-      .focus()
       .type("14:30");
 
     cy.get("input")
@@ -129,7 +128,7 @@ describe("<Reservation Dialog />", () => {
     cy.get("button").contains("Prenota").should("have.attr", "disabled");
   });
 
-  it.skip("GIVEN logged user WHEN reservation is longer than 2 hours THEN show warning and cannot press button", () => {
+  it("GIVEN logged user WHEN reservation is longer than 2 hours THEN show warning and cannot press button", () => {
     // fixed time of a future date.
     const startDate = dayjs()
       .add(1, "day")
@@ -163,7 +162,7 @@ describe("<Reservation Dialog />", () => {
       .should("have.value", startDate.format("HH:mm"));
 
     //2:30 hour, not allowed
-    cy.get("input").filter("[data-test='endTime']").focus().type("15:30");
+    cy.get("input").filter("[data-test='endTime']").type("15:30");
 
     cy.get("input")
       .filter("[data-test='endTime']")
@@ -171,6 +170,6 @@ describe("<Reservation Dialog />", () => {
       .should("have.value", startDate.hour(15).minute(30).format("HH:mm"))
       .should("have.attr", "aria-invalid", "true");
 
-    cy.get("button").contains("Prenota").should("have.attr", "disabled");
+    cy.get("[data-test='reserve-button']").should("be.disabled");
   });
 });

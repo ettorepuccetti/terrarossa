@@ -11,5 +11,10 @@
       "~/*": ["./src/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "../node_modules/cypress"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../node_modules/cypress",
+    "../eslintrc.cjs"
+  ]
 }

@@ -193,7 +193,7 @@ describe("Logged user", () => {
     cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
 
     // insert wrong endTime
-    cy.get("[data-test='endTime']").focus().clear().type("12:15");
+    cy.get("[data-test='endTime']").type("12:15");
 
     cy.get(".MuiFormHelperText-root").should(
       "have.text",
@@ -242,7 +242,7 @@ describe("Logged user", () => {
 
     cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
 
-    cy.get("[data-test='endTime']").focus().clear().type("12:30");
+    cy.get("[data-test='endTime']").type("12:30");
 
     cy.get("[data-test='reserve-button']").click();
 
@@ -265,7 +265,7 @@ describe("Logged user", () => {
     cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
 
     // insert endTime longer than 2 hours
-    cy.get("[data-test='endTime']").focus().clear().type("14:00");
+    cy.get("[data-test='endTime']").type("14:00");
 
     // try to reserve by clicking confirm button
     cy.get("[data-test='reserve-button']").should("be.disabled");
@@ -274,5 +274,10 @@ describe("Logged user", () => {
       "have.text",
       "Prenota 1 ora, 1 ora e mezzo o 2 ore"
     );
+  });
+  it.only("debug", function () {
+    cy.navigateDaysFromToday(2);
+    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
+    cy.get("[data-test='endTime']").type("12:30");
   });
 });
