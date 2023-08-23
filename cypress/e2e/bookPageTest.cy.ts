@@ -275,9 +275,4 @@ describe("Logged user", () => {
       "Prenota 1 ora, 1 ora e mezzo o 2 ore"
     );
   });
-  it.only("debug", function () {
-    cy.navigateDaysFromToday(2);
-    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
-    cy.get("[data-test='endTime']").type("12:30");
-  });
 });
