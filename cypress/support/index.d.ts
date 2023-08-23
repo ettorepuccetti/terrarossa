@@ -47,7 +47,11 @@ declare global {
        * @param courtName display name of the court
        * @param hour start time of the slot in the format HH:mm
        */
-      clickOnCalendarSlot(courtName: string, hour: string): void;
+      clickOnCalendarSlot(
+        courtName: string,
+        hour: number,
+        minute: number
+      ): void;
     }
   }
 }

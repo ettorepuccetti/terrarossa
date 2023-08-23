@@ -120,48 +120,36 @@ Cypress.Commands.add("waitForCalendarPageToLoad", () => {
 
 Cypress.Commands.add(
   "clickOnCalendarSlot",
-  (courtName: string, hour: string) => {
-    cy.scrollTo("top");
-
-    cy.get(".fc-timegrid-slot-label-cushion")
-      .contains(hour)
-      .then(function ($row) {
-        if (!$row || !$row[0]) {
-          throw new Error("Hour not found");
-        }
-        cy.wrap(
-          $row[0].getBoundingClientRect().top +
-            $row[0].getBoundingClientRect().height / 2
-        ).as("slotY");
-      });
+  (courtName: string, hour: number, minute: number) => {
+    const startTimeString = `${hour}:${minute.toString().padStart(2, "0")}`;
     cy.get(".fc-scrollgrid-sync-inner")
       .contains(courtName)
       .then(($column) => {
         if (!$column || !$column[0]) {
           throw new Error("Court not found");
         }
-        cy.log("getting X:", $column[0].getBoundingClientRect().x.toString());
         cy.wrap(
           $column[0].getBoundingClientRect().left +
             $column[0].getBoundingClientRect().width / 2
         ).as("slotX");
       });
 
-    cy.get("body").then(function ($el) {
-      cy.scrollTo("top");
-      cy.wrap($el).click(this.slotX as number, this.slotY as number);
-    });
+    cy.get(`[data-time="${startTimeString}:00"]`)
+      .filter(".fc-timegrid-slot-lane")
+      .then(function ($elem) {
+        const offsetLeft = $elem[0].getBoundingClientRect().left;
+        const slotY = $elem[0].getBoundingClientRect().height / 2;
+        cy.wrap($elem).click(this.slotX - offsetLeft, slotY);
+        cy.get("[data-test='reserve-dialog']").should("be.visible");
+        cy.get("[data-test='startTime']").should("have.value", startTimeString);
+      });
 
-    cy.get("[data-test='reserve-dialog']").should("be.visible");
-    cy.get("[data-test='startTime']").should("have.value", hour);
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const hourInt = parseInt(hour.split(":")[0]!);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const minuteInt = parseInt(hour.split(":")[1]!);
     cy.get("[data-test='endTime']").should(
       "have.value",
-      dayjs().hour(hourInt).minute(minuteInt).add(1, "h").format("HH:mm")
+      dayjs()
+        .hour(hour + 1)
+        .minute(minute)
+        .format("HH:mm")
     );
   }
 );

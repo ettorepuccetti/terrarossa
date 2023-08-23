@@ -190,7 +190,7 @@ describe("Logged user", () => {
   it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", function () {
     cy.navigateDaysFromToday(2);
 
-    cy.clickOnCalendarSlot("Pietrangeli", "11:00");
+    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
 
     // insert wrong endTime
     cy.get("[data-test='endTime']").focus().clear().type("12:15");
@@ -240,7 +240,7 @@ describe("Logged user", () => {
 
     cy.navigateDaysFromToday(1);
 
-    cy.clickOnCalendarSlot("Pietrangeli", "11:00");
+    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
 
     cy.get("[data-test='endTime']").focus().clear().type("12:30");
 
@@ -262,7 +262,7 @@ describe("Logged user", () => {
   it("GIVEN logged user WHEN reservation is longer than 2 hours THEN show error and cannot press button", function () {
     cy.navigateDaysFromToday(2);
 
-    cy.clickOnCalendarSlot("Pietrangeli", "11:00");
+    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
 
     // insert endTime longer than 2 hours
     cy.get("[data-test='endTime']").focus().clear().type("14:00");
