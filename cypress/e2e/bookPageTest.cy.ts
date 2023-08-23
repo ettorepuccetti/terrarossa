@@ -190,10 +190,7 @@ describe("Logged user", () => {
   it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", function () {
     cy.navigateDaysFromToday(2);
 
-    // click on a random slot
-    cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
-    ).click();
+    cy.clickOnCalendarSlot("Pietrangeli", "11:00");
 
     // insert wrong endTime
     cy.get("[data-test='endTime']").focus().clear().type("12:15");
