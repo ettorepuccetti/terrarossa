@@ -14,6 +14,16 @@ beforeEach("Initial clean up and retrieve clubId from clubName", () => {
         cy.deleteAllReservationOfClub(this.clubId as string);
       });
   });
+
+  cy.wrap(
+    Cypress.automation("remote:debugger:protocol", {
+      command: "Emulation.setEmulatedMedia",
+      params: {
+        media: "all",
+        features: [{ name: "pointer", value: "fine" }],
+      },
+    })
+  );
 });
 
 describe("Not logged user", () => {
