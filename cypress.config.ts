@@ -22,8 +22,13 @@ export default defineConfig({
       AUTH0_BASE_URL: process.env.AUTH_BASE_URL,
     },
     setupNodeEvents(on, config) {
+      on("before:browser:launch", (browser, launchOptions) => {
+        if (browser.family === "chromium" && browser.name !== "electron") {
+          launchOptions.args.push("--blink-settings=primaryPointerType=4");
+          return launchOptions;
+        }
+      });
       const prisma = new PrismaClient();
-
       on("task", {
         "prisma:queryClubs"() {
           return prisma.club.findMany();
