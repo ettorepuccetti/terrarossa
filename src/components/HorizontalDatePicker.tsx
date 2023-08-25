@@ -41,7 +41,7 @@ export const HorizonalDatePicker = ({
   };
 
   return (
-    <Box paddingBottom={2} display={"flex"} flexDirection={"column"}>
+    <Box display={"flex"} flexDirection={"column"}>
       <Box position={"relative"} height={250}>
         <Image
           alt={""}
