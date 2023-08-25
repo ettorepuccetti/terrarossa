@@ -81,9 +81,7 @@ describe("Logged user", () => {
   it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
     cy.navigateDaysFromToday(2);
 
-    cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
-    ).click(); // click on a random slot
+    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
 
     // save startTime
     cy.get("[data-test='startTime']").invoke("val").as("startTime");

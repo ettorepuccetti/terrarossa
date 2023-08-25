@@ -70,6 +70,51 @@ in tsconfig.json add:
     },
 ```
 
+### MUI pickers and Cypress on Github Actions
+
+Since chrome in Github actions run in headless mode, it has `pointer: none`. This make MUI pickers render in mobile mode, and do not accept text input (readonly, it render instead a visual clock for touch commands).
+
+#### Working solution
+
+To configure chrome to always use `pointer: fine`, let's add a configuration string to chrome's launch command.
+Put this in `cypress.config.js`, in the section `setupNodeEvents(on, config) {...}`
+
+```
+on("before:browser:launch", (browser, launchOptions) => {
+  if (browser.family === "chromium" && browser.name !== "electron") {
+    launchOptions.args.push("--blink-settings=primaryPointerType=4");
+    return launchOptions;
+  }
+});
+```
+
+#### Not working solution
+
+Another approach would be to use the Chrome Devtools Protocol (CDP). Something like this:
+
+```
+Cypress.automation("remote:debugger:protocol", {
+  command: 'Emulation.setTouchEmulationEnabled',
+  params: {
+    enabled: true
+  }
+})
+```
+
+or
+
+```
+Cypress.automation("remote:debugger:protocol", {
+  command: "Emulation.setEmulatedMedia",
+  params: {
+    media: "all",
+    features: [{ name: "pointer", value: "fine" }],
+  },
+})
+```
+
+However, I didn't find how to emulate the pointer type media query correctly.
+
 ## Github Actions
 
 ### Skip pull request and push workflows
