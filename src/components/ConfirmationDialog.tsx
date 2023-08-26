@@ -18,10 +18,18 @@ export default function ConfirmationDialog(props: DialogProps) {
         <DialogLayout title={title}>
           <Alert severity="error">{message}</Alert>
           <DialogActions>
-            <Button onClick={() => props.onDialogClose()} color="info">
+            <Button
+              data-test="cancel-button"
+              onClick={() => props.onDialogClose()}
+              color="info"
+            >
               Annulla
             </Button>
-            <Button onClick={() => props.onConfirm()} color="error">
+            <Button
+              data-test="confirm-button"
+              onClick={() => props.onConfirm()}
+              color="error"
+            >
               Conferma
             </Button>
           </DialogActions>

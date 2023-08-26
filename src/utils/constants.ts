@@ -18,6 +18,7 @@ export const reservationConstraints = {
   firstBookableMinute: 0,
   lastBookableHour: 22,
   lastBookableMinute: 0,
+  maxActiveReservationsPerUser: 4,
 
   /**
    * Calculate the opening time of the club, from the `firstBookableHour` and `firstBookableMinute` constants
