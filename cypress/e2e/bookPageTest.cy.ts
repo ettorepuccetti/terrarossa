@@ -11,6 +11,10 @@ beforeEach("Initial clean up and retrieve clubId from clubName", () => {
       cy.wrap(clubs[0].id)
         .as(aliasName)
         .then(() => {
+          if (clubs[0] === undefined) {
+            //already checked, but build fails otherwise
+            throw new Error("No clubs found");
+          }
           cy.deleteAllReservationOfClub(clubs[0].id);
         });
     });
