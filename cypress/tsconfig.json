@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
     "strict": true,
-    "target": "es5",
+    "target": "es2017",
     "module": "NodeNext",
     "lib": ["es5", "dom"],
     "types": ["cypress", "node", "./support"],
     "jsx": "preserve",
+    "noUncheckedIndexedAccess": true,
     "baseUrl": "..",
     "paths": {
       "~/*": ["./src/*"]

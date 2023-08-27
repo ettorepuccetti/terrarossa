@@ -70,6 +70,14 @@ in tsconfig.json add:
     },
 ```
 
+### Missing linting in cypress files
+
+I got several build failures because VSCode or eslint does not checking for "possible undefined" related errros. To have those checking, I added this option to `cypress/tsconfig.json`
+
+```
+    "noUncheckedIndexedAccess": true,
+```
+
 ### MUI pickers and Cypress on Github Actions
 
 Since chrome in Github actions run in headless mode, it has `pointer: none`. This make MUI pickers render in mobile mode, and do not accept text input (readonly, it render instead a visual clock for touch commands).
