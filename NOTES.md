@@ -1,41 +1,79 @@
-# Terrarossa
+# Terrarossa notes
 
 ## Next.js
 
+```
 npm run dev
+```
 
 ## DB
 
 ### Planetscale
 
 (optional)
+
+```
 brew install planetscale/tap/pscale
 pscale connect terrarossa main --port 3309
+```
 
-altrimenti connettersi direttamente con DATABASE_URL in .env
+altrimenti connettersi direttamente con `DATABASE_URL` in `.env`
 
 ### Prisma seed
 
+```
 npx prisma db seed
+```
 
 ### Prisma studio
 
+```
 npx prisma studio
+```
 
 ### Docker
 
-In DATABASE_URL cambiare `username`=`root` e `password`=`secret`
+For local development and testing.
+In `DATABASE_URL` cambiare username: `root` e password: `secret`
 
-docker run --name mysql-terrarossa -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql
+`docker run --name mysql-terrarossa -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql`
 
 ### DB changes
 
-in .env cambiare il DATABASE_URL a quello del branch
-riavviare npm run dev
+in `.env` cambiare il `DATABASE_URL` a quello del branch
+riavviare `npm run dev`
+
+```
 npx prisma db push
 npx prisma generate
-(reminder: cambiamenti ai prisma tag non richiedono deployment, si riflettono solo su prisma studio e prisma generate)
-mergiare da planetscale.com
+```
+
+(reminder: cambiamenti ai prisma tag non richiedono deployment, si riflettono solo su prisma studio e prisma generate).
+Mergiare da planetscale.com
+
+#### Incorporating databases into your ci cd pipeline
+
+From [webinar](https://planetscale.com/media/incorporating-databases-into-your-ci-cd-pipeline):<br>
+Schema before code (almost always). <br> Two github actions:
+
+Run db migration:
+
+- if pull request opened and changes to schema file:
+  - create a new db branch (check if exists, since this workflow is triggered on subsequent pushes on same PR)
+  - run the migration (change the DATABASE_URL to point at the new db branch, prisma db push)
+  - comment on the PR the diff in schema changes (_very_ optional)
+  - open DR on planetscale (branch name of DB = branch name on GH)
+
+Deploy schema then code:
+
+- if the PR has been merged and there's a DR with same branch name:
+  - merge the DR on Planetscale (and wait for it)
+  - deploy to vercel
+
+What I need to do vercel side:
+
+- figure out how to deploy manually
+- create additional GH action when push on master (just for deploy, without schame change stuff)
 
 ## Privacy policy
 
@@ -68,6 +106,14 @@ in tsconfig.json add:
     "paths": {
       "~/*": ["./src/*"]
     },
+```
+
+### Missing linting in cypress files
+
+I got several build failures because VSCode or eslint does not checking for "possible undefined" related errros. To have those checking, I added this option to `cypress/tsconfig.json`
+
+```
+    "noUncheckedIndexedAccess": true,
 ```
 
 ### MUI pickers and Cypress on Github Actions
@@ -136,13 +182,7 @@ npx husky set .husky/pre-commit "npx pretty-quick --staged"
 run once:
 
 ```
-
 npm run prepare
-
 ```
 
 On each commit, husky will run pretty-quick, which will run prettier on all staged files.
-
-```
-
-```
