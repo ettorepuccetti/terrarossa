@@ -19,7 +19,7 @@ export default defineConfig({
       AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
       AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
       AUTH0_ISSUER: process.env.AUTH0_ISSUER,
-      AUTH0_BASE_URL: process.env.AUTH_BASE_URL,
+      AUTH0_BASE_URL: process.env.AUTH0_BASE_URL,
     },
     setupNodeEvents(on, config) {
       on("before:browser:launch", (browser, launchOptions) => {
