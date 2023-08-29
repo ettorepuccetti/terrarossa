@@ -1,0 +1,61 @@
+name: Planetscale deploy request
+run-name: ${{ github.head_ref}}
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - prisma/schema.prisma
+env:
+  PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+  PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+jobs:
+  planetscale:
+    permissions:
+      pull-requests: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: install
+        run: npm install
+      - name: Set DB branch name
+        run: echo "PSCALE_BRANCH_NAME=$(echo ${{ github.head_ref }} | tr -cd '[:alnum:]-'| tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      - name: Setup pscale
+        uses: planetscale/setup-pscale-action@v1
+      - name: Create a branch
+        uses: planetscale/create-branch-action@v4
+        id: create_branch
+        with:
+          org_name: ${{ secrets.PLANETSCALE_ORG_NAME }}
+          database_name: ${{ secrets.PLANETSCALE_DATABASE_NAME }}
+          branch_name: ${{ env.PSCALE_BRANCH_NAME }}
+          from: main
+          check_exists: true
+          wait: true
+
+      - name: connect to DB branch and run migration
+        run: |
+          pscale connect ${{secrets.PLANETSCALE_DATABASE_NAME}} ${{ env.PSCALE_BRANCH_NAME }} --port 3309 &
+          sleep 10
+          npx prisma db push --skip-generate > migration-output.txt
+          kill %1
+        env:
+          DATABASE_URL: "mysql://root@127.0.0.1:3309/${{secrets.PLANETSCALE_DATABASE_NAME}}"
+
+      - name: Open DR if migrations
+        run: |
+          if grep -q "Your database is now in sync with your Prisma schema" migration-output.txt; then
+            echo "DB_MIGRATED=true" >> $GITHUB_ENV
+            if pscale deploy-request create ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }}; then
+              echo "DR_OPENED=true" >> $GITHUB_ENV
+              echo "Deploy request successfully opened"
+            else
+              echo "Error: Deployment request failed"
+              exit 1
+            fi
+          else
+            echo "Did not open a DR since no changes found"
+            cat migration-output.txt
+            exit 0
+          fi

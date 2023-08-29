@@ -15,6 +15,7 @@ npm run dev
 ```
 brew install planetscale/tap/pscale
 pscale connect terrarossa main --port 3309
+How can
 ```
 
 altrimenti connettersi direttamente con `DATABASE_URL` in `.env`
@@ -59,8 +60,9 @@ Schema before code (almost always). <br> Two github actions:
 Run db migration:
 
 - if pull request opened and changes to schema file:
-  - create a new db branch (check if exists, since this workflow is triggered on subsequent pushes on same PR)
-  - run the migration (change the DATABASE_URL to point at the new db branch, prisma db push)
+  - create a new db branch (check if already exists, since this workflow is triggered on subsequent pushes on same PR)
+  - proxy the db connection to the new created branch on planetscale
+  - run the migration (prisma db push)
   - comment on the PR the diff in schema changes (_very_ optional)
   - open DR on planetscale (branch name of DB = branch name on GH)
 
