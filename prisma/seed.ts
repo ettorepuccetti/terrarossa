@@ -32,8 +32,27 @@ async function main() {
       },
     },
   });
+
+  const clubProva = await prisma.club.upsert({
+    where: { name: "Club Prova" },
+    update: {},
+    create: {
+      name: "Club Prova",
+      courts: {
+        create: [
+          {
+            name: "campo prova",
+            surface: "Clay",
+            indoor: false,
+          },
+        ],
+      },
+    },
+  });
+
   console.log("Seeding database...");
   console.log(foroItalico);
+  console.log(clubProva);
 }
 
 main()
