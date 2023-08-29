@@ -54,6 +54,29 @@ jobs:
             fi
           else
             echo "Did not open a DR since no changes found"
+            echo "> 'prisma db push' output:\n"
             cat migration-output.txt
             exit 0
           fi
+
+      - name: Get Deploy Requests
+        if: ${{ env.DR_OPENED }}
+        run: |
+          deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} | jq -r '.number')
+          echo "DEPLOY_REQUEST_NUMBER=$deploy_request_number" >> $GITHUB_ENV
+
+      - name: DB migrated - create diff file
+        if: ${{ env.DR_OPENED }}
+        run: |
+          sleep 2
+          echo "Deploy request opened: https://app.planetscale.com/${{ secrets.PLANETSCALE_ORG_NAME }}/${{ secrets.PLANETSCALE_DATABASE_NAME }}/deploy-requests/${{ env.DEPLOY_REQUEST_NUMBER }}" >> migration-message.txt
+          echo "" >> migration-message.txt
+          echo "\`\`\`diff" >> migration-message.txt
+          pscale deploy-request diff ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.DEPLOY_REQUEST_NUMBER }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -r '.[].raw' >> migration-message.txt
+          echo "\`\`\`" >> migration-message.txt
+
+      - name: DB migrated - comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        if: ${{ env.DR_OPENED }}
+        with:
+          filePath: migration-message.txt
