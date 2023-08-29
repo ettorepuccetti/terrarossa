@@ -33,7 +33,6 @@ jobs:
           from: main
           check_exists: true
           wait: true
-
       - name: connect to DB branch and run migration
         run: |
           pscale connect ${{secrets.PLANETSCALE_DATABASE_NAME}} ${{ env.PSCALE_BRANCH_NAME }} --port 3309 --org ${{ secrets.PLANETSCALE_ORG_NAME }} &
@@ -42,12 +41,11 @@ jobs:
           kill %1
         env:
           DATABASE_URL: "mysql://root@127.0.0.1:3309/${{secrets.PLANETSCALE_DATABASE_NAME}}"
-
       - name: Open DR if migrations
         run: |
           if grep -q "Your database is now in sync with your Prisma schema" migration-output.txt; then
             echo "DB_MIGRATED=true" >> $GITHUB_ENV
-            if pscale deploy-request create ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }}; then
+            if pscale deploy-request create ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }}; then
               echo "DR_OPENED=true" >> $GITHUB_ENV
               echo "Deploy request successfully opened"
             else
