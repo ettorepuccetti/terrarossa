@@ -36,7 +36,7 @@ jobs:
 
       - name: connect to DB branch and run migration
         run: |
-          pscale connect ${{secrets.PLANETSCALE_DATABASE_NAME}} ${{ env.PSCALE_BRANCH_NAME }} --port 3309 &
+          pscale connect ${{secrets.PLANETSCALE_DATABASE_NAME}} ${{ env.PSCALE_BRANCH_NAME }} --port 3309 --org ${{ secrets.PLANETSCALE_ORG_NAME }} &
           sleep 10
           npx prisma db push --skip-generate > migration-output.txt
           kill %1
