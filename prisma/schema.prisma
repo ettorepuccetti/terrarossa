@@ -107,12 +107,22 @@ model Court {
 }
 
 model Club {
-  id       String  @id @unique @default(cuid())
-  name     String  @unique
-  courts   Court[]
-  imageSrc String?
-  logoSrc  String?
-  Admin    User[]
+  id                String           @id @unique @default(cuid())
+  name              String           @unique
+  courts            Court[]
+  imageSrc          String?
+  logoSrc           String?
+  Admin             User[]
+  // one-to-one relation with ClubPreferences, defined here so I enforce each club to have a ClubPreferences
+  ClubPreferences   ClubPreferences? @relation(fields: [clubPreferencesId], references: [id])
+  clubPreferencesId String?          //@unique
+
+  @@index([clubPreferencesId])
+}
+
+model ClubPreferences {
+  id   String @id @unique @default(cuid())
+  clubs Club[]
 }
 
 enum BeginTime {
