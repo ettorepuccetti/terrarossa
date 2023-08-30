@@ -59,11 +59,11 @@ jobs:
         run: |
           pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} 2> check_dr_stderr.txt
           if grep -q "error" check_dr_stderr.txt; then
-            echo "No DR found";
+            echo "Not found any DR to close";
           else
             echo "DR found, closing it before proceeding";
             deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} | jq -r '.number')
-            pscale deploy-request close ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} $deploy_request_number --org ${{ secrets.PLANETSCALE_ORG_NAME }};
+            pscale deploy-request close ${{ secrets.PLANETSCALE_DATABASE_NAME }} $deploy_request_number --org ${{ secrets.PLANETSCALE_ORG_NAME }};
           fi
 
       - name: Open DR if migrations
