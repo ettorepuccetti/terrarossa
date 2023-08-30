@@ -40,7 +40,8 @@ jobs:
           npx prisma db push --skip-generate > migration-output.txt
           kill %1
           if grep -q "Your database is now in sync with your Prisma schema" migration-output.txt; then
-            echo "DB_MIGRATED=true" >> $GITHUB_ENV
+            echo "DB_MIGRATED=true" >> $GITHUB_ENV;
+          fi
         env:
           DATABASE_URL: "mysql://root@127.0.0.1:3309/${{secrets.PLANETSCALE_DATABASE_NAME}}"
 
