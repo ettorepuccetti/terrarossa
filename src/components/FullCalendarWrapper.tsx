@@ -97,32 +97,42 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         calendarRef={calendarRef}
         clubImg={props.clubData?.imageSrc ?? defaultImg}
       />
-      <FullCalendar
-        ref={calendarRef}
-        schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
-        plugins={[interactionPlugin, resourceTimeGridPlugin, ScrollGrid]}
-        initialView="resourceTimeGridDay"
-        navLinks={true}
-        height="auto"
-        headerToolbar={false}
-        events={props.reservationData.map(reservationToEvent)}
-        resources={props.courtsData.map(courtToResource)}
-        eventClick={(eventClickInfo) => props.onEventClick(eventClickInfo)}
-        dateClick={(info) => {
-          props.onDateClick(info);
-        }}
-        selectable={false}
-        slotMinTime={reservationConstraints.getClubOpeningTime()}
-        slotMaxTime={reservationConstraints.getClubClosingTime()}
-        selectLongPressDelay={0}
-        slotLabelFormat={{ hour: "numeric", minute: "2-digit", hour12: false }}
-        eventTimeFormat={{ hour: "numeric", minute: "2-digit", hour12: false }}
-        allDaySlot={false}
-        eventContent={renderEventContent}
-        titleFormat={{ month: "short", day: "numeric" }}
-        locale={"it-it"}
-        dayMinWidth={150}
-      />
+      <Box padding={"0.5rem"}>
+        <FullCalendar
+          ref={calendarRef}
+          schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
+          plugins={[interactionPlugin, resourceTimeGridPlugin, ScrollGrid]}
+          initialView="resourceTimeGridDay"
+          navLinks={true}
+          height="auto"
+          headerToolbar={false}
+          events={props.reservationData.map(reservationToEvent)}
+          resources={props.courtsData.map(courtToResource)}
+          eventClick={(eventClickInfo) => props.onEventClick(eventClickInfo)}
+          dateClick={(info) => {
+            props.onDateClick(info);
+          }}
+          selectable={false}
+          slotMinTime={reservationConstraints.getClubOpeningTime()}
+          slotMaxTime={reservationConstraints.getClubClosingTime()}
+          selectLongPressDelay={0}
+          slotLabelFormat={{
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: false,
+          }}
+          eventTimeFormat={{
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: false,
+          }}
+          allDaySlot={false}
+          eventContent={renderEventContent}
+          titleFormat={{ month: "short", day: "numeric" }}
+          locale={"it-it"}
+          dayMinWidth={150}
+        />
+      </Box>
     </Box>
   );
 }

@@ -3,17 +3,24 @@ import dayjs from "dayjs";
 import { reservationConstraints } from "~/utils/constants";
 
 beforeEach("Initial clean up and retrieve clubId from clubName", () => {
-  cy.queryFilteredClubs("foro italico").then(function (clubs: Club[]) {
-    if (clubs[0] === undefined) {
-      throw new Error("No clubs found");
-    }
-    cy.wrap(clubs[0].id)
-      .as("clubId")
-      .then(() => {
-        cy.log(`Deleting all reservation for clubId: ${this.clubId as string}`);
-        cy.deleteAllReservationOfClub(this.clubId as string);
-      });
-  });
+  function saveClubIdAndCleanReservations(clubName: string, aliasName: string) {
+    cy.queryFilteredClubs(clubName).then(function (clubs: Club[]) {
+      if (clubs[0] === undefined) {
+        throw new Error("No clubs found");
+      }
+      cy.wrap(clubs[0].id)
+        .as(aliasName)
+        .then(() => {
+          if (clubs[0] === undefined) {
+            //already checked, but build fails otherwise
+            throw new Error("No clubs found");
+          }
+          cy.deleteAllReservationOfClub(clubs[0].id);
+        });
+    });
+  }
+  saveClubIdAndCleanReservations("foro italico", "clubId");
+  saveClubIdAndCleanReservations("club prova", "clubIdCircoloProva");
 });
 
 describe("Not logged user", () => {
@@ -145,8 +152,7 @@ describe("Logged user", () => {
       firstVisibleStartDate.add(1, "hour").toDate(),
       this.clubId as string,
       "Pietrangeli",
-      Cypress.env("AUTH0_USER") as string,
-      Cypress.env("AUTH0_PW") as string
+      Cypress.env("AUTH0_USER") as string
     );
 
     // create FUTURE reservation
@@ -162,8 +168,7 @@ describe("Logged user", () => {
       lastVisibleStartDate.add(1, "hour").toDate(),
       this.clubId as string,
       "Pietrangeli",
-      Cypress.env("AUTH0_USER") as string,
-      Cypress.env("AUTH0_PW") as string
+      Cypress.env("AUTH0_USER") as string
     );
 
     // CHECKS
@@ -230,8 +235,7 @@ describe("Logged user", () => {
       startDate.add(1, "hour").toDate(),
       this.clubId as string,
       "Pietrangeli",
-      Cypress.env("AUTH0_USER") as string,
-      Cypress.env("AUTH0_PW") as string
+      Cypress.env("AUTH0_USER") as string
     );
 
     cy.reload().waitForCalendarPageToLoad();
@@ -271,6 +275,78 @@ describe("Logged user", () => {
     cy.get(".MuiFormHelperText-root").should(
       "have.text",
       "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+    );
+  });
+
+  it("GIVEN logged user WHEN exceed max active reservations THEN show warning and cannot reserve", function () {
+    const maxActiveReservationsPerUser =
+      reservationConstraints.maxActiveReservationsPerUser;
+    const startDate = dayjs()
+      .add(2, "days")
+      .hour(reservationConstraints.firstBookableHour)
+      .minute(reservationConstraints.firstBookableMinute)
+      .second(0)
+      .millisecond(0);
+    // reach the max number of reservations
+    for (let i = 0; i < maxActiveReservationsPerUser; i++) {
+      cy.addReservationToDB(
+        startDate.add(i, "hour").toDate(),
+        startDate.add(i + 1, "hour").toDate(),
+        this.clubId as string,
+        i % 2 === 0 ? "Pietrangeli" : "Centrale",
+        Cypress.env("AUTH0_USER") as string
+      );
+    }
+    // check that all reservation have been added
+    cy.reload();
+    cy.waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(2);
+    cy.get("[data-test='calendar-event']").should(
+      "have.length",
+      reservationConstraints.maxActiveReservationsPerUser
+    );
+
+    // try to add another reservation, fairly far from the others.
+    cy.clickOnCalendarSlot("Pietrangeli", 20, 0);
+    cy.get("[data-test='reserve-button']").click();
+
+    //Error expected
+    cy.get("[data-test='error-alert']").should(
+      "have.text",
+      `Hai raggiunto il numero massimo di prenotazioni attive (${reservationConstraints.maxActiveReservationsPerUser})`
+    );
+    // Number of reservations should not change
+    cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
+    cy.get("[data-test='calendar-event']").should(
+      "have.length",
+      reservationConstraints.maxActiveReservationsPerUser
+    );
+
+    // delete one reservation and try again
+    cy.get("[data-test='calendar-event']").first().click();
+    cy.get("[data-test='delete-button']").click();
+    cy.get("[data-test='confirm-button']").click();
+    cy.get("[data-test='calendar-event']").should(
+      "have.length",
+      reservationConstraints.maxActiveReservationsPerUser - 1
+    );
+
+    //add reservation in different club and check that does not affect the count
+    cy.addReservationToDB(
+      dayjs().add(1, "day").set("hour", 20).toDate(),
+      dayjs().add(1, "day").set("hour", 21).toDate(),
+      this.clubIdCircoloProva as string,
+      "campo prova",
+      Cypress.env("AUTH0_USER") as string
+    );
+
+    // try again, succeed this time
+    cy.clickOnCalendarSlot("Pietrangeli", 20, 0);
+    cy.get("[data-test='reserve-button']").click();
+    cy.get("[data-test='error-alert']").should("not.exist");
+    cy.get("[data-test='calendar-event']").should(
+      "have.length",
+      reservationConstraints.maxActiveReservationsPerUser
     );
   });
 });

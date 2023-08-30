@@ -15,6 +15,7 @@ npm run dev
 ```
 brew install planetscale/tap/pscale
 pscale connect terrarossa main --port 3309
+How can
 ```
 
 altrimenti connettersi direttamente con `DATABASE_URL` in `.env`
@@ -59,9 +60,11 @@ Schema before code (almost always). <br> Two github actions:
 Run db migration:
 
 - if pull request opened and changes to schema file:
-  - create a new db branch (check if exists, since this workflow is triggered on subsequent pushes on same PR)
-  - run the migration (change the DATABASE_URL to point at the new db branch, prisma db push)
+  - create a new db branch (check if already exists, since this workflow is triggered on subsequent pushes on same PR)
+  - proxy the db connection to the new created branch on planetscale
+  - run the migration (prisma db push)
   - comment on the PR the diff in schema changes (_very_ optional)
+  - check if the DR already exists and close it, in that case
   - open DR on planetscale (branch name of DB = branch name on GH)
 
 Deploy schema then code:
@@ -166,6 +169,17 @@ However, I didn't find how to emulate the pointer type media query correctly.
 ### Skip pull request and push workflows
 
 If any commit message in your push or the HEAD commit of your PR contains the strings `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]`, or `[actions skip]` workflows triggered on the push or pull_request events will be skipped.
+
+### Vercel manual deploy
+
+How to get secrets for vercel,
+from [this guide](https://vercel.com/guides/how-can-i-use-github-actions-with-vercel):
+
+- Retrieve your Vercel [Access Token](https://vercel.com/guides/how-do-i-use-a-vercel-api-access-token)
+- Install the [Vercel CLI](https://vercel.com/cli) and run `vercel login`
+- Inside your folder, run `vercel link` to create a new Vercel project
+- Inside the generated `.vercel` folder, save the `projectId` and `orgId` from the `project.json`
+- Inside GitHub, add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` as secrets
 
 ## Linting before commit
 

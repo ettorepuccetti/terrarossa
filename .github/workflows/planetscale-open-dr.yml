@@ -1,0 +1,100 @@
+name: Planetscale - open deploy request
+run-name: ${{ github.head_ref}}
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - prisma/schema.prisma
+env:
+  PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+  PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+jobs:
+  planetscale:
+    permissions:
+      pull-requests: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: install
+        # install only prisma
+        run: npm install prisma --no-save
+      - name: Set DB branch name
+        run: echo "PSCALE_BRANCH_NAME=$(echo ${{ github.head_ref }} | tr -cd '[:alnum:]-'| tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      - name: Setup pscale
+        uses: planetscale/setup-pscale-action@v1
+      - name: Create a branch
+        uses: planetscale/create-branch-action@v4
+        id: create_branch
+        with:
+          org_name: ${{ secrets.PLANETSCALE_ORG_NAME }}
+          database_name: ${{ secrets.PLANETSCALE_DATABASE_NAME }}
+          branch_name: ${{ env.PSCALE_BRANCH_NAME }}
+          from: main
+          check_exists: true
+          wait: true
+      - name: connect to DB branch and run migration
+        run: |
+          pscale connect ${{secrets.PLANETSCALE_DATABASE_NAME}} ${{ env.PSCALE_BRANCH_NAME }} --port 3309 --org ${{ secrets.PLANETSCALE_ORG_NAME }} &
+          sleep 10
+          npx prisma db push --skip-generate > migration-output.txt
+          kill %1
+          if grep -q "Your database is now in sync with your Prisma schema" migration-output.txt; then
+            echo "DB_MIGRATED=true" >> $GITHUB_ENV;
+          fi
+        env:
+          DATABASE_URL: "mysql://root@127.0.0.1:3309/${{secrets.PLANETSCALE_DATABASE_NAME}}"
+
+      - name: Migration not needed
+        if: ${{ !env.DB_MIGRATED }}
+        run: |
+          echo "Did not open a DR since no changes found"
+          echo "> 'prisma db push' output:\n"
+          cat migration-output.txt
+          exit 0
+
+      - name: Close existing DR if any
+        if: ${{ env.DB_MIGRATED }}
+        run: |
+          pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} 2> check_dr_stderr.txt
+          if grep -q "error" check_dr_stderr.txt; then
+            echo "Not found any DR to close";
+          else
+            echo "DR found, closing it before proceeding";
+            deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} | jq -r '.number')
+            pscale deploy-request close ${{ secrets.PLANETSCALE_DATABASE_NAME }} $deploy_request_number --org ${{ secrets.PLANETSCALE_ORG_NAME }};
+          fi
+
+      - name: Open DR if migrations
+        if: ${{ env.DB_MIGRATED }}
+        run: |
+          if pscale deploy-request create ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }}; then
+            echo "DR_OPENED=true" >> $GITHUB_ENV
+            echo "Deploy request successfully opened"
+          else
+            echo "Error: Deployment request failed"
+            exit 1
+          fi
+
+      - name: Get Deploy Requests
+        if: ${{ env.DR_OPENED }}
+        run: |
+          deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} | jq -r '.number')
+          echo "DEPLOY_REQUEST_NUMBER=$deploy_request_number" >> $GITHUB_ENV
+
+      - name: Create DR diff file
+        if: ${{ env.DR_OPENED }}
+        run: |
+          sleep 2
+          echo "Deploy request opened: https://app.planetscale.com/${{ secrets.PLANETSCALE_ORG_NAME }}/${{ secrets.PLANETSCALE_DATABASE_NAME }}/deploy-requests/${{ env.DEPLOY_REQUEST_NUMBER }}" >> migration-message.txt
+          echo "" >> migration-message.txt
+          echo "\`\`\`diff" >> migration-message.txt
+          pscale deploy-request diff ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.DEPLOY_REQUEST_NUMBER }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -r '.[].raw' >> migration-message.txt
+          echo "\`\`\`" >> migration-message.txt
+
+      - name: Add comment on github PR
+        uses: thollander/actions-comment-pull-request@v2
+        if: ${{ env.DR_OPENED }}
+        with:
+          filePath: migration-message.txt

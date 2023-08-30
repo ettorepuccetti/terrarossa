@@ -29,15 +29,13 @@ declare global {
        * @param {string} clubId clubId of the club to make the reservation for
        * @param {string} courtName name of the court to make the reservation for
        * @param {string} userMail email of the user to make the reservation for
-       * @param {string} userPassword password of the user to make the reservation for
        */
       addReservationToDB(
         startDate: Date,
         endDate: Date,
         clubId: string,
         courtName: string,
-        userMail: string,
-        userPassword: string
+        userMail: string
       ): void;
 
       waitForCalendarPageToLoad(): void;

@@ -1,4 +1,4 @@
-name: Cypress CI
+name: Cypress CI - e2e and component testing
 run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message || 'pull request'}}}
 on:
   push:

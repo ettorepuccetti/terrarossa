@@ -14,7 +14,8 @@ export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
     .input(ReservationInputSchema)
     .mutation(async ({ ctx, input }) => {
-      //collision check
+      const clubId = await getClubId(ctx, input.courtId);
+      //collision check [UI does NOT check for this]
       if (
         await collision(
           ctx.prisma,
@@ -28,14 +29,14 @@ export const reservationMutationRouter = createTRPCRouter({
         );
       }
 
-      // start date before end date
+      // start date before end date [UI already prevents this]
       if (input.startDateTime.getTime() > input.endDateTime.getTime()) {
         throw new TRPCClientError(
           "L'orario di inizio deve essere prima di quello di fine"
         );
       }
 
-      // start and end time must be `00` or `30`
+      // start and end time must be `00` or `30` [UI already prevents this]
       if (
         input.startDateTime.getMinutes() % 30 !== 0 ||
         input.endDateTime.getMinutes() % 30 !== 0
@@ -46,22 +47,35 @@ export const reservationMutationRouter = createTRPCRouter({
       }
 
       //checks for NON ADMIN user
-      if (!(await isUserAdminOfClub(ctx, input.courtId))) {
-        // reservation length
+      if (!isUserAdminOfClub(ctx, clubId)) {
+        // check limit of active reservations per users [UI does NOT check for this]
+        const activeReservationsForUser = await getUserActiveReservations(
+          ctx,
+          clubId
+        );
+        if (
+          activeReservationsForUser >=
+          reservationConstraints.maxActiveReservationsPerUser
+        ) {
+          throw new TRPCClientError(
+            `Hai raggiunto il numero massimo di prenotazioni attive (${reservationConstraints.maxActiveReservationsPerUser})`
+          );
+        }
+        // reservation length [UI already prevents this]
         if (!checkDuration(input.startDateTime, input.endDateTime)) {
           throw new TRPCClientError(
             "Error: Reservations needs to be at least 1 hour and not longer than 2 hours"
           );
         }
 
-        // reservation in the past
+        // reservation in the past [UI already prevents this]
         if (input.startDateTime.getTime() < Date.now()) {
           throw new TRPCClientError(
             "Error: Reservations cannot be in the past"
           );
         }
 
-        // name overwrite
+        // name overwrite [UI already prevents this]
         if (input.overwriteName) {
           throw new TRPCClientError(
             "Error: you are not authorized to overwrite the name of the reservation"
@@ -86,12 +100,13 @@ export const reservationMutationRouter = createTRPCRouter({
       const reservationToDelete = await ctx.prisma.reservation.findUnique({
         where: { id: input },
       });
-
       if (!reservationToDelete) {
         throw new Error("Reservation does not exist. Id: " + input.toString());
       }
 
-      if (!(await isUserAdminOfClub(ctx, reservationToDelete?.courtId))) {
+      const clubId = await getClubId(ctx, reservationToDelete.courtId);
+
+      if (!isUserAdminOfClub(ctx, clubId)) {
         // delete reservation of other users
         if (reservationToDelete?.userId !== ctx.session.user.id) {
           throw new TRPCClientError(
@@ -119,7 +134,7 @@ export const reservationMutationRouter = createTRPCRouter({
     }),
 });
 
-async function isUserAdminOfClub(ctx: CtxType, courtId: string) {
+async function getClubId(ctx: CtxType, courtId: string) {
   const clubIdFromCourt = (
     await ctx.prisma.court.findUnique({
       where: { id: courtId },
@@ -131,10 +146,38 @@ async function isUserAdminOfClub(ctx: CtxType, courtId: string) {
       "Error: Court has not clubId associated. CourtId: " + courtId
     );
   }
+  return clubIdFromCourt;
+}
+
+function isUserAdminOfClub(ctx: CtxType, clubId: string) {
   return (
     ctx.session.user.role === UserRoles.ADMIN &&
-    ctx.session.user.clubId === clubIdFromCourt
+    ctx.session.user.clubId === clubId
   );
+}
+
+async function getUserActiveReservations(ctx: CtxType, clubId: string) {
+  const activeReservationsForUser = await ctx.prisma.reservation.groupBy({
+    by: ["userId"],
+    where: {
+      userId: ctx.session.user.id,
+      endTime: {
+        gte: dayjs().toDate(),
+      },
+      //check that clubId is the same as the one of the court
+      court: {
+        clubId: clubId,
+      },
+    },
+    _count: {
+      userId: true,
+    },
+  });
+  console.log(
+    "Active reservations",
+    activeReservationsForUser[0]?._count.userId
+  );
+  return activeReservationsForUser[0]?._count.userId ?? 0;
 }
 
 function checkDuration(startDateTime: Date, endDateTime: Date) {
