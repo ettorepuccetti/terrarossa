@@ -1,0 +1,46 @@
+name: Vercel - production deployment on PR merge (possible DB migration)
+on:
+  pull_request:
+    types:
+      - closed
+  workflow_dispatch:
+env:
+  PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+  PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+jobs:
+  deploy-db:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    name: Deploy DB changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set DB branch name
+        run: echo "PSCALE_BRANCH_NAME=$(echo ${{ github.head_ref }} | tr -cd '[:alnum:]-'| tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      - name: Setup pscale
+        uses: planetscale/setup-pscale-action@v1
+      - name: Get Deploy Requests
+        if: github.event.pull_request.merged == true
+        run: |
+          deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -r '.number')
+          echo "DEPLOY_REQUEST_NUMBER=$deploy_request_number" >> $GITHUB_ENV
+      - name: Deploy schema migrations
+        if: ${{ env.DEPLOY_REQUEST_NUMBER }}
+        run: |
+          pscale deploy-request deploy ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.DEPLOY_REQUEST_NUMBER }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} --wait
+
+  deploy-code:
+    runs-on: ubuntu-latest
+    # I want to deploy on PR merge, after waiting for DB migration to finish. Even if no DB migration to deploy, dependency job correctly runs.
+    needs: deploy-db
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

@@ -170,6 +170,17 @@ However, I didn't find how to emulate the pointer type media query correctly.
 
 If any commit message in your push or the HEAD commit of your PR contains the strings `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]`, or `[actions skip]` workflows triggered on the push or pull_request events will be skipped.
 
+### Vercel manual deploy
+
+How to get secrets for vercel,
+from [this guide](https://vercel.com/guides/how-can-i-use-github-actions-with-vercel):
+
+- Retrieve your Vercel [Access Token](https://vercel.com/guides/how-do-i-use-a-vercel-api-access-token)
+- Install the [Vercel CLI](https://vercel.com/cli) and run `vercel login`
+- Inside your folder, run `vercel link` to create a new Vercel project
+- Inside the generated `.vercel` folder, save the `projectId` and `orgId` from the `project.json`
+- Inside GitHub, add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` as secrets
+
 ## Linting before commit
 
 install husky and pretty-quick:

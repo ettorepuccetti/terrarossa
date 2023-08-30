@@ -1,4 +1,4 @@
-name: Planetscale deploy request
+name: Planetscale - open deploy request
 run-name: ${{ github.head_ref}}
 on:
   pull_request:
@@ -54,7 +54,7 @@ jobs:
           cat migration-output.txt
           exit 0
 
-      - name: Check if a DR already exists and close it
+      - name: Close existing DR if any
         if: ${{ env.DB_MIGRATED }}
         run: |
           pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} 2> check_dr_stderr.txt
@@ -83,7 +83,7 @@ jobs:
           deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} | jq -r '.number')
           echo "DEPLOY_REQUEST_NUMBER=$deploy_request_number" >> $GITHUB_ENV
 
-      - name: DB migrated - create diff file
+      - name: Create DR diff file
         if: ${{ env.DR_OPENED }}
         run: |
           sleep 2
@@ -93,7 +93,7 @@ jobs:
           pscale deploy-request diff ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.DEPLOY_REQUEST_NUMBER }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -r '.[].raw' >> migration-message.txt
           echo "\`\`\`" >> migration-message.txt
 
-      - name: DB migrated - comment PR
+      - name: Add comment on github PR
         uses: thollander/actions-comment-pull-request@v2
         if: ${{ env.DR_OPENED }}
         with:
