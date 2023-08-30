@@ -64,6 +64,7 @@ Run db migration:
   - proxy the db connection to the new created branch on planetscale
   - run the migration (prisma db push)
   - comment on the PR the diff in schema changes (_very_ optional)
+  - check if the DR already exists and close it, in that case
   - open DR on planetscale (branch name of DB = branch name on GH)
 
 Deploy schema then code:

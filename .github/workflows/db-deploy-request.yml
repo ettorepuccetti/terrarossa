@@ -39,24 +39,39 @@ jobs:
           sleep 10
           npx prisma db push --skip-generate > migration-output.txt
           kill %1
-        env:
-          DATABASE_URL: "mysql://root@127.0.0.1:3309/${{secrets.PLANETSCALE_DATABASE_NAME}}"
-      - name: Open DR if migrations
-        run: |
           if grep -q "Your database is now in sync with your Prisma schema" migration-output.txt; then
             echo "DB_MIGRATED=true" >> $GITHUB_ENV
-            if pscale deploy-request create ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }}; then
-              echo "DR_OPENED=true" >> $GITHUB_ENV
-              echo "Deploy request successfully opened"
-            else
-              echo "Error: Deployment request failed"
-              exit 1
-            fi
+        env:
+          DATABASE_URL: "mysql://root@127.0.0.1:3309/${{secrets.PLANETSCALE_DATABASE_NAME}}"
+
+      - name: Migration not needed
+        if: ${{ !env.DB_MIGRATED }}
+        run: |
+          echo "Did not open a DR since no changes found"
+          echo "> 'prisma db push' output:\n"
+          cat migration-output.txt
+          exit 0
+
+      - name: Check if a DR already exists close it
+        if: ${{ env.DB_MIGRATED }}
+        run: |
+          pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} 2> check_dr_stderr.txt
+          if grep -q "error" check_dr_stderr.txt; then
+            echo "No DR found";
           else
-            echo "Did not open a DR since no changes found"
-            echo "> 'prisma db push' output:\n"
-            cat migration-output.txt
-            exit 0
+            echo "DR found, closing it before proceeding";
+            deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} | jq -r '.number')
+            pscale deploy-request close ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} $deploy_request_number --org ${{ secrets.PLANETSCALE_ORG_NAME }}
+
+      - name: Open DR if migrations
+        if: ${{ env.DB_MIGRATED }}
+        run: |
+          if pscale deploy-request create ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }}; then
+            echo "DR_OPENED=true" >> $GITHUB_ENV
+            echo "Deploy request successfully opened"
+          else
+            echo "Error: Deployment request failed"
+            exit 1
           fi
 
       - name: Get Deploy Requests
