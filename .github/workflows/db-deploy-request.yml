@@ -18,7 +18,8 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
       - name: install
-        run: npm install
+        # install only prisma
+        run: npm install prisma --no-save
       - name: Set DB branch name
         run: echo "PSCALE_BRANCH_NAME=$(echo ${{ github.head_ref }} | tr -cd '[:alnum:]-'| tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
       - name: Setup pscale
@@ -53,7 +54,7 @@ jobs:
           cat migration-output.txt
           exit 0
 
-      - name: Check if a DR already exists close it
+      - name: Check if a DR already exists and close it
         if: ${{ env.DB_MIGRATED }}
         run: |
           pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} 2> check_dr_stderr.txt
@@ -62,7 +63,8 @@ jobs:
           else
             echo "DR found, closing it before proceeding";
             deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} | jq -r '.number')
-            pscale deploy-request close ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} $deploy_request_number --org ${{ secrets.PLANETSCALE_ORG_NAME }}
+            pscale deploy-request close ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} $deploy_request_number --org ${{ secrets.PLANETSCALE_ORG_NAME }};
+          fi
 
       - name: Open DR if migrations
         if: ${{ env.DB_MIGRATED }}
