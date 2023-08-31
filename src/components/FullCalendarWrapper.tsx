@@ -96,6 +96,14 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       <HorizonalDatePicker
         calendarRef={calendarRef}
         clubImg={props.clubData?.imageSrc ?? defaultImg}
+        daysInThePastVisible={
+          props.clubData?.ClubPreferences?.daysInThePastVisible ??
+          reservationConstraints.daysInThePastVisible
+        }
+        daysInTheFutureVisible={
+          props.clubData?.ClubPreferences?.daysInFutureVisible ??
+          reservationConstraints.daysInTheFutureVisible
+        }
       />
       <Box padding={"0.5rem"}>
         <FullCalendar
