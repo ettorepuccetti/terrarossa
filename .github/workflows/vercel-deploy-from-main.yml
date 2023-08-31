@@ -11,20 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     # I want to skip deploy if the committer is Github
     steps:
-      - name: Expose git commit data
-        uses: rlespinasse/git-commit-data-action@v1.5.0
       - name: Check for github committer
         run: |
           echo "github.event.head_commit.committer: ${{ github.event.head_commit.committer.name}}"
-          echo "Get author info"
-          echo " - ${{ env.GIT_COMMIT_AUTHOR }}"
-          echo " - ${{ env.GIT_COMMIT_AUTHOR_NAME }}"
-          echo " - ${{ env.GIT_COMMIT_AUTHOR_EMAIL }}"
-          echo "Get committer info"
-          echo " - ${{ env.GIT_COMMIT_COMMITTER }}"
-          echo " - ${{ env.GIT_COMMIT_COMMITTER_NAME }}"
-          echo " - ${{ env.GIT_COMMIT_COMMITTER_EMAIL }}"
-          if [ "${{ env.GIT_COMMIT_COMMITTER_NAME }}" == "GitHub" ]; then
+          if [ "${{ github.event.head_commit.committer.name}}" == "GitHub" ]; then
             echo "Skipping deploy"
             exit 0
           fi
