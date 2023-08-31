@@ -73,11 +73,6 @@ Deploy schema then code:
   - merge the DR on Planetscale (and wait for it)
   - deploy to vercel
 
-What I need to do vercel side:
-
-- figure out how to deploy manually
-- create additional GH action when push on master (just for deploy, without schame change stuff)
-
 ## Privacy policy
 
 generated using https://www.freeprivacypolicy.com/free-terms-and-conditions-generator/
