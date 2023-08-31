@@ -4,7 +4,6 @@ import { Box, Typography } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
 import Image from "next/image";
 import { useState } from "react";
-import { reservationConstraints } from "~/utils/constants";
 import { capitaliseFirstChar } from "~/utils/utils";
 import { DayCard } from "./DayCard";
 require("dayjs/locale/it");
@@ -13,9 +12,13 @@ dayjs.locale("it");
 export const HorizonalDatePicker = ({
   calendarRef,
   clubImg,
+  daysInThePastVisible,
+  daysInTheFutureVisible,
 }: {
   calendarRef: RefObject<FullCalendar>;
   clubImg: string;
+  daysInThePastVisible: number;
+  daysInTheFutureVisible: number;
 }) => {
   const today = dayjs().set("hour", 0).set("minute", 0).set("second", 0);
   const [selectedDate, setSelectedDate] = useState<Dayjs>(today);
@@ -23,15 +26,10 @@ export const HorizonalDatePicker = ({
   // create an array of dates from today to today - daysInThePastVisible to today + daysInTheFutureVisible
   const dates: Dayjs[] = Array.from(
     {
-      length:
-        reservationConstraints.daysInThePastVisible +
-        reservationConstraints.daysInTheFutureVisible +
-        1,
+      length: daysInThePastVisible + daysInTheFutureVisible + 1,
     },
     (_, i) => {
-      return today
-        .subtract(reservationConstraints.daysInThePastVisible, "day")
-        .add(i, "day");
+      return today.subtract(daysInThePastVisible, "day").add(i, "day");
     }
   );
 
