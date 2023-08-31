@@ -2,6 +2,7 @@ name: Vercel - production deployment on push to main (no DB changes)
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
