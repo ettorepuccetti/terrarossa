@@ -181,6 +181,11 @@ from [this guide](https://vercel.com/guides/how-can-i-use-github-actions-with-ve
 - Inside the generated `.vercel` folder, save the `projectId` and `orgId` from the `project.json`
 - Inside GitHub, add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` as secrets
 
+### Get commit info (like committer)
+
+on push event:
+`github.event.head_commit.committer.name`
+
 ## Linting before commit
 
 install husky and pretty-quick:
