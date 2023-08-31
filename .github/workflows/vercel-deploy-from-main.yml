@@ -16,11 +16,15 @@ jobs:
           echo "github.event.head_commit.committer: ${{ github.event.head_commit.committer.name}}"
           if [ "${{ github.event.head_commit.committer.name}}" == "GitHub" ]; then
             echo "Skipping deploy"
+            echo "SKIP_DEPLOY=true" >> $GITHUB_ENV
             exit 0
           fi
       - name: checkout
+        if: ${{ !env.SKIP_DEPLOY }}
         uses: actions/checkout@v3
       - name: Install Vercel CLI
+        if: ${{ !env.SKIP_DEPLOY }}
         run: npm install --global vercel@latest
       - name: Deploy to Vercel
+        if: ${{ !env.SKIP_DEPLOY }}
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
