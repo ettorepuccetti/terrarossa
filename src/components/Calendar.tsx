@@ -16,6 +16,7 @@ import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
 import Header from "./Header";
+import Spinner from "./Spinner";
 import SpinnerPartial from "./SpinnerPartial";
 
 export const ReservationInputSchema = z.object({
@@ -137,6 +138,19 @@ export default function Calendar() {
    * ---------- Rendering ---------------
    * -------------------------------------
    */
+
+  if (clubQuery.error) {
+    return (
+      <ErrorAlert
+        error={clubQuery.error}
+        onClose={() => void clubQuery.refetch()}
+      />
+    );
+  }
+
+  if (clubQuery.isLoading) {
+    return <Spinner isLoading={true} />;
+  }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>

@@ -23,7 +23,7 @@ type ReservationFromDb =
 type CourtFromDb = RouterOutput["court"]["getAllByClubId"][0];
 
 interface FullCalendarWrapperProps {
-  clubData: RouterOutput["club"]["getByClubId"] | undefined;
+  clubData: RouterOutput["club"]["getByClubId"];
   reservationData: ReservationFromDb[];
   courtsData: CourtFromDb[];
   onEventClick: (eventClickInfo: EventClickArg) => void;
@@ -96,12 +96,8 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       <HorizonalDatePicker
         calendarRef={calendarRef}
         clubImg={props.clubData?.imageSrc ?? defaultImg}
-        daysInThePastVisible={
-          props.clubData?.clubSettings.daysInThePastVisible ?? 0
-        }
-        daysInTheFutureVisible={
-          props.clubData?.clubSettings.daysInFutureVisible ?? 0
-        }
+        daysInThePastVisible={props.clubData.clubSettings.daysInThePastVisible}
+        daysInTheFutureVisible={props.clubData.clubSettings.daysInFutureVisible}
       />
       <Box padding={"0.5rem"}>
         <FullCalendar
