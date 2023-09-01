@@ -11,8 +11,6 @@ export const defaultImg =
 export const appNameInHeader = "Terrarossa";
 
 export const reservationConstraints = {
-  daysInThePastVisible: 2,
-  daysInTheFutureVisible: 7,
   hoursBeforeDeleting: 6,
   firstBookableHour: 8,
   firstBookableMinute: 0,

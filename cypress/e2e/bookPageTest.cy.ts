@@ -1,15 +1,21 @@
-import { type Club } from "@prisma/client";
+import { type Club, type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
 import { reservationConstraints } from "~/utils/constants";
 
-beforeEach("Initial clean up and retrieve clubId from clubName", () => {
-  function saveClubIdAndCleanReservations(clubName: string, aliasName: string) {
+beforeEach("Initial clean up and retrieve Clubs", () => {
+  function saveClubIdAndCleanReservations(
+    clubName: string,
+    clubIdAliasName: string,
+    clubAliasName: string,
+    clubSettingsAliasName: string
+  ) {
     cy.queryFilteredClubs(clubName).then(function (clubs: Club[]) {
       if (clubs[0] === undefined) {
         throw new Error("No clubs found");
       }
+      cy.wrap(clubs[0]).as(clubAliasName);
       cy.wrap(clubs[0].id)
-        .as(aliasName)
+        .as(clubIdAliasName)
         .then(() => {
           if (clubs[0] === undefined) {
             //already checked, but build fails otherwise
@@ -17,16 +23,30 @@ beforeEach("Initial clean up and retrieve clubId from clubName", () => {
           }
           cy.deleteAllReservationOfClub(clubs[0].id);
         });
+
+      cy.getClubSettings(clubs[0].clubSettingsId).then((clubSettings) => {
+        cy.wrap(clubSettings).as(clubSettingsAliasName);
+      });
     });
   }
-  saveClubIdAndCleanReservations("foro italico", "clubId");
-  saveClubIdAndCleanReservations("club prova", "clubIdCircoloProva");
+  saveClubIdAndCleanReservations(
+    "foro italico",
+    "clubIdForoItalico",
+    "foroItalico",
+    "clubSettingsForoItalico"
+  );
+  saveClubIdAndCleanReservations(
+    "club prova",
+    "clubIdCircoloProva",
+    "circoloProva",
+    "clubSettingsCircoloProva"
+  );
 });
 
 describe("Not logged user", () => {
   beforeEach("visit calendar page", function () {
     cy.visit(
-      `/prenota?clubId=${this.clubId as string}`
+      `/prenota?clubId=${this.clubIdForoItalico as string}`
     ).waitForCalendarPageToLoad();
   });
 
@@ -47,7 +67,10 @@ describe("Not logged user", () => {
   it("GIVEN user WHEN navigate calendar THEN can go in the past and future according to club settings", function () {
     //check first selectable day is visible
     const firstSelectableDay = dayjs()
-      .add(-reservationConstraints.daysInThePastVisible, "day")
+      .subtract(
+        (this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible,
+        "day"
+      )
       .date()
       .toString()
       .padStart(2, "0");
@@ -58,7 +81,10 @@ describe("Not logged user", () => {
 
     //check if the last selectable day is visible
     const lastSelectableDay = dayjs()
-      .add(reservationConstraints.daysInTheFutureVisible, "day")
+      .add(
+        (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible,
+        "day"
+      )
       .date()
       .toString()
       .padStart(2, "0");
@@ -81,7 +107,7 @@ describe("Logged user", () => {
     });
 
     cy.visit(
-      `/prenota?clubId=${this.clubId as string}`
+      `/prenota?clubId=${this.clubIdForoItalico as string}`
     ).waitForCalendarPageToLoad();
   });
 
@@ -141,7 +167,10 @@ describe("Logged user", () => {
   it("GIVEN club with max day in the past and future WHEN reserve in first and last visible day THEN reservation shown", function () {
     // create PAST reservation
     const firstVisibleStartDate = dayjs()
-      .subtract(reservationConstraints.daysInThePastVisible, "day")
+      .subtract(
+        (this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible,
+        "day"
+      )
       .hour(reservationConstraints.getFirstBookableHour())
       .minute(reservationConstraints.getFirstBookableMinute())
       .second(0)
@@ -150,15 +179,18 @@ describe("Logged user", () => {
     cy.addReservationToDB(
       firstVisibleStartDate.toDate(),
       firstVisibleStartDate.add(1, "hour").toDate(),
-      this.clubId as string,
+      this.clubIdForoItalico as string,
       "Pietrangeli",
       Cypress.env("AUTH0_USER") as string
     );
 
     // create FUTURE reservation
     const lastVisibleStartDate = dayjs()
-      .add(reservationConstraints.daysInTheFutureVisible, "day")
-      .hour(reservationConstraints.getLastBookableHour() - 1) // -1 because slotMaxTime is the closing time of the club
+      .add(
+        (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible,
+        "day"
+      )
+      .hour(reservationConstraints.getLastBookableHour())
       .minute(reservationConstraints.getLastBookableMinute())
       .second(0)
       .millisecond(0);
@@ -166,7 +198,7 @@ describe("Logged user", () => {
     cy.addReservationToDB(
       lastVisibleStartDate.toDate(),
       lastVisibleStartDate.add(1, "hour").toDate(),
-      this.clubId as string,
+      this.clubIdForoItalico as string,
       "Pietrangeli",
       Cypress.env("AUTH0_USER") as string
     );
@@ -174,10 +206,14 @@ describe("Logged user", () => {
     // CHECKS
     cy.reload().waitForCalendarPageToLoad();
 
-    cy.navigateDaysFromToday(-reservationConstraints.daysInThePastVisible);
+    cy.navigateDaysFromToday(
+      -(this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible
+    );
     cy.get('[data-test="calendar-event"]').should("be.visible");
 
-    cy.navigateDaysFromToday(reservationConstraints.daysInTheFutureVisible);
+    cy.navigateDaysFromToday(
+      (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible
+    );
     cy.get('[data-test="calendar-event"]').should("be.visible");
   });
 
@@ -233,7 +269,7 @@ describe("Logged user", () => {
     cy.addReservationToDB(
       startDate.toDate(),
       startDate.add(1, "hour").toDate(),
-      this.clubId as string,
+      this.clubIdForoItalico as string,
       "Pietrangeli",
       Cypress.env("AUTH0_USER") as string
     );
@@ -292,7 +328,7 @@ describe("Logged user", () => {
       cy.addReservationToDB(
         startDate.add(i, "hour").toDate(),
         startDate.add(i + 1, "hour").toDate(),
-        this.clubId as string,
+        this.clubIdForoItalico as string,
         i % 2 === 0 ? "Pietrangeli" : "Centrale",
         Cypress.env("AUTH0_USER") as string
       );

@@ -107,22 +107,20 @@ model Court {
 }
 
 model Club {
-  id                String           @id @unique @default(cuid())
-  name              String           @unique
-  courts            Court[]
-  imageSrc          String?
-  logoSrc           String?
-  Admin             User[]
-  //relation with ClubPreferences, defined here so I enforce each club to have a ClubPreferences
-  ClubPreferences   ClubPreferences? @relation(fields: [clubPreferencesId], references: [id])
-  clubPreferencesId String? //@unique
-
-  @@index([clubPreferencesId])
+  id             String       @id @unique @default(cuid())
+  name           String       @unique
+  courts         Court[]
+  imageSrc       String?
+  logoSrc        String?
+  Admin          User[]
+  clubSettings   ClubSettings @relation(fields: [clubSettingsId], references: [id])
+  clubSettingsId String       @unique
 }
 
-model ClubPreferences {
+model ClubSettings {
   id                   String   @id @unique @default(cuid())
-  clubs                Club[]
+  description          String?
+  club                 Club?
   openingTime          DateTime @default("1970-01-01T08:00:00.000Z")
   closingTime          DateTime @default("1970-01-01T22:00:00.000Z")
   daysInThePastVisible Int      @default(2)

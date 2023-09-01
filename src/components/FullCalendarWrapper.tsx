@@ -97,12 +97,10 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         calendarRef={calendarRef}
         clubImg={props.clubData?.imageSrc ?? defaultImg}
         daysInThePastVisible={
-          props.clubData?.ClubPreferences?.daysInThePastVisible ??
-          reservationConstraints.daysInThePastVisible
+          props.clubData?.clubSettings.daysInThePastVisible ?? 0
         }
         daysInTheFutureVisible={
-          props.clubData?.ClubPreferences?.daysInFutureVisible ??
-          reservationConstraints.daysInTheFutureVisible
+          props.clubData?.clubSettings.daysInFutureVisible ?? 0
         }
       />
       <Box padding={"0.5rem"}>

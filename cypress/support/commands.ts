@@ -156,3 +156,7 @@ Cypress.Commands.add(
     );
   }
 );
+
+Cypress.Commands.add("getClubSettings", (settingsId: string) => {
+  return cy.task("prisma:getClubSettings", settingsId);
+});

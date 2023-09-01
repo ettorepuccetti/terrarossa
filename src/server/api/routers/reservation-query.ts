@@ -5,7 +5,6 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { reservationConstraints } from "~/utils/constants";
 
 export const reservationQueryRouter = createTRPCRouter({
   getAllVisibleInCalendarByClubId: publicProcedure
@@ -14,15 +13,22 @@ export const reservationQueryRouter = createTRPCRouter({
       if (typeof input.clubId !== "string") {
         throw new Error(`Server: invalid clubId`);
       }
+      const clubSettings = await ctx.prisma.clubSettings.findFirstOrThrow({
+        where: {
+          club: {
+            id: input.clubId,
+          },
+        },
+      });
       const fromDate = dayjs()
-        .subtract(reservationConstraints.daysInThePastVisible, "day")
-        .set("hour", 0)
+        .subtract(clubSettings.daysInThePastVisible, "day")
+        .set("hour", 0) //TODO: use the opening time of the club
         .set("minute", 0)
         .set("second", 0)
         .set("millisecond", 0);
       const toDate = dayjs()
-        .add(reservationConstraints.daysInTheFutureVisible + 1, "day")
-        .set("hour", 0)
+        .add(clubSettings.daysInFutureVisible + 1, "day") // +1 because hour is 00:00 (so the last day wouldn't be visible)
+        .set("hour", 0) //TODO: use the closing time of the club
         .set("minute", 0)
         .set("second", 0)
         .set("millisecond", 0);

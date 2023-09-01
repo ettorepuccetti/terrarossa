@@ -3,14 +3,7 @@ const prisma = new PrismaClient();
 async function main() {
   const foroItalico = await prisma.club.upsert({
     where: { name: "Foro Italico" },
-    update: {
-      ClubPreferences: {
-        create: {
-          daysInFutureVisible: 4,
-          daysInThePastVisible: 3,
-        },
-      },
-    },
+    update: {},
     create: {
       name: "Foro Italico",
       logoSrc:
@@ -37,7 +30,7 @@ async function main() {
           },
         ],
       },
-      ClubPreferences: {
+      clubSettings: {
         create: {
           daysInFutureVisible: 4,
           daysInThePastVisible: 3,
@@ -51,6 +44,12 @@ async function main() {
     update: {},
     create: {
       name: "Club Prova",
+      clubSettings: {
+        create: {
+          daysInFutureVisible: 7,
+          daysInThePastVisible: 2,
+        },
+      },
       courts: {
         create: [
           {

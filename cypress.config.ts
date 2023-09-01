@@ -53,13 +53,11 @@ export default defineConfig({
           });
         },
         async "prisma:getUserIdFromUsername"(username: string) {
-          const user = await prisma.user.findUnique({
+          return await prisma.user.findUniqueOrThrow({
             where: {
               email: username,
             },
           });
-          if (!user) throw new Error("User not found");
-          return user.id;
         },
         async "prisma:makeReservation"({
           startTime,
@@ -91,6 +89,13 @@ export default defineConfig({
                   },
                 },
               },
+            },
+          });
+        },
+        async "prisma:getClubSettings"(clubSettingsId: string) {
+          return await prisma.clubSettings.findUniqueOrThrow({
+            where: {
+              id: clubSettingsId,
             },
           });
         },

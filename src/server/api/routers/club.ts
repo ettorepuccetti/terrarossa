@@ -18,7 +18,7 @@ export const clubRouter = createTRPCRouter({
           id: input.clubId,
         },
         include: {
-          ClubPreferences: true,
+          clubSettings: true,
         },
       });
     }),

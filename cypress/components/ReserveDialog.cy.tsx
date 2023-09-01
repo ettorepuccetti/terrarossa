@@ -86,7 +86,7 @@ describe("<Reservation Dialog />", () => {
   it("GIVEN logged user WHEN reservation start time is in the past THEN show warning and cannot press button", () => {
     // fixed time of a PAST date.
     const startDate = dayjs()
-      .add(-1, "day")
+      .subtract(1, "day")
       .hour(13)
       .minute(0)
       .second(0)
