@@ -25,7 +25,7 @@ type CourtFromDb = RouterOutput["court"]["getAllByClubId"][0];
 interface FullCalendarWrapperProps {
   clubData: RouterOutput["club"]["getByClubId"];
   reservationData: ReservationFromDb[];
-  courtsData: CourtFromDb[];
+  courtData: CourtFromDb[];
   onEventClick: (eventClickInfo: EventClickArg) => void;
   onDateClick: (dateClickInfo: DateClickArg) => void;
 }
@@ -38,7 +38,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       id: reservation.id.toString(),
       title: reservation.overwriteName
         ? reservation.overwriteName
-        : reservation.user?.name || "[deleted user]", //user.name can be null or user can be null
+        : reservation.user?.name || "[deleted user]", //user.name can be null or user can be null TODO: move this logic to backend
       start: reservation.startTime,
       end: reservation.endTime,
       resourceId: reservation.courtId,
@@ -95,7 +95,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     <Box width={"100%"} display={"flex"} flexDirection={"column"}>
       <HorizonalDatePicker
         calendarRef={calendarRef}
-        clubImg={props.clubData?.imageSrc ?? defaultImg}
+        clubImg={props.clubData.imageSrc ?? defaultImg}
         daysInThePastVisible={props.clubData.clubSettings.daysInThePastVisible}
         daysInTheFutureVisible={props.clubData.clubSettings.daysInFutureVisible}
       />
@@ -109,7 +109,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
           height="auto"
           headerToolbar={false}
           events={props.reservationData.map(reservationToEvent)}
-          resources={props.courtsData.map(courtToResource)}
+          resources={props.courtData.map(courtToResource)}
           eventClick={(eventClickInfo) => props.onEventClick(eventClickInfo)}
           dateClick={(info) => {
             props.onDateClick(info);

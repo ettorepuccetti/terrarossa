@@ -315,8 +315,6 @@ describe("Logged user", () => {
   });
 
   it("GIVEN logged user WHEN exceed max active reservations THEN show warning and cannot reserve", function () {
-    const maxActiveReservationsPerUser =
-      reservationConstraints.maxActiveReservationsPerUser;
     const startDate = dayjs()
       .add(2, "days")
       .hour(reservationConstraints.firstBookableHour)
@@ -324,7 +322,11 @@ describe("Logged user", () => {
       .second(0)
       .millisecond(0);
     // reach the max number of reservations
-    for (let i = 0; i < maxActiveReservationsPerUser; i++) {
+    for (
+      let i = 0;
+      i < reservationConstraints.maxActiveReservationsPerUser;
+      i++
+    ) {
       cy.addReservationToDB(
         startDate.add(i, "hour").toDate(),
         startDate.add(i + 1, "hour").toDate(),
@@ -369,8 +371,20 @@ describe("Logged user", () => {
 
     //add reservation in different club and check that does not affect the count
     cy.addReservationToDB(
-      dayjs().add(1, "day").set("hour", 20).toDate(),
-      dayjs().add(1, "day").set("hour", 21).toDate(),
+      dayjs()
+        .add(1, "day")
+        .set("h", 20)
+        .set("m", 0)
+        .set("s", 0)
+        .set("ms", 0)
+        .toDate(),
+      dayjs()
+        .add(1, "day")
+        .set("h", 21)
+        .set("m", 0)
+        .set("s", 0)
+        .set("ms", 0)
+        .toDate(),
       this.clubIdCircoloProva as string,
       "campo prova",
       Cypress.env("AUTH0_USER") as string

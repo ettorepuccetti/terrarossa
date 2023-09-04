@@ -139,22 +139,22 @@ export default function Calendar() {
    * -------------------------------------
    */
 
-  if (clubQuery.error) {
+  if (clubQuery.error || courtQuery.error) {
     return (
       <ErrorAlert
-        error={clubQuery.error}
+        error={clubQuery.error ?? courtQuery.error}
         onClose={() => void clubQuery.refetch()}
       />
     );
   }
 
-  if (clubQuery.isLoading) {
+  if (clubQuery.isLoading || courtQuery.isLoading) {
     return <Spinner isLoading={true} />;
   }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {reservationAdd.error !== null && (
+      {reservationAdd.error && (
         <ErrorAlert
           error={reservationAdd.error}
           onClose={() => {
@@ -164,7 +164,7 @@ export default function Calendar() {
         />
       )}
 
-      {reservationDelete.error !== null && (
+      {reservationDelete.error && (
         <ErrorAlert
           error={reservationDelete.error}
           onClose={() => {
@@ -176,22 +176,20 @@ export default function Calendar() {
 
       <SpinnerPartial
         open={
-          clubQuery.isLoading ||
           reservationQuery.isLoading ||
           reservationQuery.isRefetching ||
-          courtQuery.isLoading ||
           reservationAdd.isLoading ||
           reservationDelete.isLoading
         }
       >
         <Header
-          headerName={clubQuery.data?.name}
-          logoSrc={clubQuery.data?.logoSrc}
+          headerName={clubQuery.data.name}
+          logoSrc={clubQuery.data.logoSrc}
         />
         <FullCalendarWrapper
           clubData={clubQuery.data}
+          courtData={courtQuery.data}
           reservationData={reservationQuery.data ?? []}
-          courtsData={courtQuery.data ?? []}
           onDateClick={openReservationDialog}
           onEventClick={openEventDialog}
         />

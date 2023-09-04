@@ -87,6 +87,7 @@ model Reservation {
   courtId       String
   userId        String?
   overwriteName String?
+  createdAt     DateTime @default(now())
 
   @@index([courtId])
   @@index([userId])
