@@ -119,13 +119,15 @@ model Club {
 }
 
 model ClubSettings {
-  id                   String   @id @unique @default(cuid())
+  id                   String  @id @unique @default(cuid())
   description          String?
   club                 Club?
-  openingTime          DateTime @default("1970-01-01T08:00:00.000Z")
-  closingTime          DateTime @default("1970-01-01T22:00:00.000Z")
-  daysInThePastVisible Int      @default(2)
-  daysInFutureVisible  Int      @default(7)
+  firstBookableHour    Int     @default(8)
+  firstBookableMinute  Int     @default(0)
+  lastBookableHour     Int     @default(22)
+  lastBookableMinute   Int     @default(0)
+  daysInThePastVisible Int     @default(2)
+  daysInFutureVisible  Int     @default(7)
 }
 
 enum BeginTime {

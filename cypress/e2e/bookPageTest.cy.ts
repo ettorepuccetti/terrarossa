@@ -1,6 +1,7 @@
 import { type Club, type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
 import { reservationConstraints } from "~/utils/constants";
+import { formatTimeString } from "~/utils/utils";
 
 beforeEach("Initial clean up and retrieve Clubs", () => {
   function saveClubIdAndCleanReservations(
@@ -146,7 +147,10 @@ describe("Logged user", () => {
     // check startTime of first bookable slot
     cy.get("[data-test='startTime']").should(
       "have.value",
-      reservationConstraints.getClubOpeningTime()
+      formatTimeString(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
     );
 
     // click outside the dialog to close it
@@ -160,7 +164,10 @@ describe("Logged user", () => {
     // check endTime of last bookable slot
     cy.get("[data-test='endTime']").should(
       "have.value",
-      reservationConstraints.getClubClosingTime()
+      formatTimeString(
+        (this.clubSettingsForoItalico as ClubSettings).lastBookableHour + 1, //TODO: wet code
+        (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+      )
     );
   });
 
@@ -171,8 +178,10 @@ describe("Logged user", () => {
         (this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible,
         "day"
       )
-      .hour(reservationConstraints.getFirstBookableHour())
-      .minute(reservationConstraints.getFirstBookableMinute())
+      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+      .minute(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
       .second(0)
       .millisecond(0);
 
@@ -190,8 +199,8 @@ describe("Logged user", () => {
         (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible,
         "day"
       )
-      .hour(reservationConstraints.getLastBookableHour())
-      .minute(reservationConstraints.getLastBookableMinute())
+      .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
+      .minute((this.clubSettingsForoItalico as ClubSettings).lastBookableMinute)
       .second(0)
       .millisecond(0);
 
@@ -317,8 +326,10 @@ describe("Logged user", () => {
   it("GIVEN logged user WHEN exceed max active reservations THEN show warning and cannot reserve", function () {
     const startDate = dayjs()
       .add(2, "days")
-      .hour(reservationConstraints.firstBookableHour)
-      .minute(reservationConstraints.firstBookableMinute)
+      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+      .minute(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
       .second(0)
       .millisecond(0);
     // reach the max number of reservations

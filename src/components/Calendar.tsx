@@ -10,7 +10,6 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { reservationConstraints } from "~/utils/constants";
 import { isSelectableSlot } from "~/utils/utils";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
@@ -90,14 +89,17 @@ export default function Calendar() {
     console.log("selected date: ", selectInfo.dateStr);
     console.log("resouce: ", selectInfo.resource?.title);
 
-    if (selectInfo.resource === undefined) {
+    if (!selectInfo.resource) {
       throw new Error("No court selected");
+    }
+    if (!clubQuery.data) {
+      throw new Error("No club settings found"); // should never happen since I use this function only when clubQuery.data is defined
     }
     if (
       !isSelectableSlot(
         selectInfo.date,
-        reservationConstraints.getLastBookableHour(),
-        reservationConstraints.getLastBookableMinute()
+        clubQuery.data.clubSettings.lastBookableHour,
+        clubQuery.data.clubSettings.lastBookableMinute
       )
     ) {
       console.log("last slot is not selectable");

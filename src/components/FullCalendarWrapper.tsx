@@ -14,7 +14,8 @@ import { Avatar, Box } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useRef, type RefObject } from "react";
 import { type AppRouter } from "~/server/api/root";
-import { defaultImg, reservationConstraints } from "~/utils/constants";
+import { defaultImg } from "~/utils/constants";
+import { formatTimeString } from "~/utils/utils";
 import { HorizonalDatePicker } from "./HorizontalDatePicker";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
@@ -115,8 +116,14 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
             props.onDateClick(info);
           }}
           selectable={false}
-          slotMinTime={reservationConstraints.getClubOpeningTime()}
-          slotMaxTime={reservationConstraints.getClubClosingTime()}
+          slotMinTime={formatTimeString(
+            props.clubData.clubSettings.firstBookableHour,
+            props.clubData.clubSettings.firstBookableMinute
+          )}
+          slotMaxTime={formatTimeString(
+            props.clubData.clubSettings.lastBookableHour + 1,
+            props.clubData.clubSettings.lastBookableMinute
+          )}
           selectLongPressDelay={0}
           slotLabelFormat={{
             hour: "numeric",
