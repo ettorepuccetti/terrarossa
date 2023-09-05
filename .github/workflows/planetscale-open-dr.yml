@@ -54,19 +54,23 @@ jobs:
           cat migration-output.txt
           exit 0
 
-      - name: Close existing DR if any
+      - name: Check for already open DR
         if: ${{ env.DB_MIGRATED }}
         run: |
           pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} 2> check_dr_stderr.txt
           if grep -q "error" check_dr_stderr.txt; then
             echo "Not found any DR to close";
-          else
-            echo "DR found, closing it before proceeding";
-            deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} | jq -r '.number')
-            pscale deploy-request close ${{ secrets.PLANETSCALE_DATABASE_NAME }} $deploy_request_number --org ${{ secrets.PLANETSCALE_ORG_NAME }};
+            echo "DR_ALREADY_EXISTS=true" >> $GITHUB_ENV;
           fi
 
-      - name: Open DR if migrations
+      - name: close already existing DR
+        if: ${{ env.DR_ALREADY_EXISTS }}
+        run: |
+          echo "DR found, closing it before proceeding";
+          deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} | jq -r '.number')
+          pscale deploy-request close ${{ secrets.PLANETSCALE_DATABASE_NAME }} $deploy_request_number --org ${{ secrets.PLANETSCALE_ORG_NAME }};
+
+      - name: Open new DR
         if: ${{ env.DB_MIGRATED }}
         run: |
           if pscale deploy-request create ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }}; then
