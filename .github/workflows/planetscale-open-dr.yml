@@ -25,7 +25,7 @@ jobs:
       - name: Setup pscale
         uses: planetscale/setup-pscale-action@v1
       - name: Create a branch
-        uses: planetscale/create-branch-action@v4
+        uses: planetscale/create-branch-action@v3
         id: create_branch
         with:
           org_name: ${{ secrets.PLANETSCALE_ORG_NAME }}

@@ -21,7 +21,7 @@ model Example {
   updatedAt DateTime @updatedAt
 }
 
-// Necessary for Next auth
+// Start of NextAuth models
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -76,7 +76,7 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// --- end of Next auth models
+// --- End of NextAuth models
 
 model Reservation {
   id            String   @id @unique @default(cuid())
