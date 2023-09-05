@@ -59,7 +59,9 @@ jobs:
         run: |
           pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} 2> check_dr_stderr.txt  || true 
           if grep -q "error" check_dr_stderr.txt; then
-            echo "DR_ALREADY_EXISTS=true" >> $GITHUB_ENV;
+            echo "No DR found"
+          else
+            echo "DR_ALREADY_EXISTS=true" >> $GITHUB_ENV
           fi
 
       - name: close already existing DR
