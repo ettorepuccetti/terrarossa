@@ -120,7 +120,7 @@ model Club {
 
 model ClubSettings {
   id                   String  @id @unique @default(cuid())
-  description          String?
+  description          String? @unique
   club                 Club?
   firstBookableHour    Int     @default(8)
   firstBookableMinute  Int     @default(0)

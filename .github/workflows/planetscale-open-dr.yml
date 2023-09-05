@@ -52,15 +52,14 @@ jobs:
           echo "Did not open a DR since no changes found"
           echo "> 'prisma db push' output:\n"
           cat migration-output.txt
-          exit 0
 
       - name: Check for already open DR
         if: ${{ env.DB_MIGRATED }}
+        # || true to avoid failing the job if the DR does not exist (redirect to stderr is not enough to prevent failure exit)
         run: |
-          pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} 2> check_dr_stderr.txt
+          pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} -f json --org ${{ secrets.PLANETSCALE_ORG_NAME }} 2> check_dr_stderr.txt  || true 
           if grep -q "error" check_dr_stderr.txt; then
             echo "DR_ALREADY_EXISTS=true" >> $GITHUB_ENV;
-            exit 0
           fi
 
       - name: close already existing DR
