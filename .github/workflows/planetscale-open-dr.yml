@@ -38,7 +38,7 @@ jobs:
         run: |
           pscale connect ${{secrets.PLANETSCALE_DATABASE_NAME}} ${{ env.PSCALE_BRANCH_NAME }} --port 3309 --org ${{ secrets.PLANETSCALE_ORG_NAME }} &
           sleep 10
-          npx prisma db push --skip-generate > migration-output.txt
+          npx prisma db push --skip-generate --accept-data-loss > migration-output.txt
           kill %1
           if grep -q "Your database is now in sync with your Prisma schema" migration-output.txt; then
             echo "DB_MIGRATED=true" >> $GITHUB_ENV;
