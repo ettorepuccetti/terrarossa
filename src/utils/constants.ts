@@ -12,5 +12,4 @@ export const appNameInHeader = "Terrarossa";
 
 export const reservationConstraints = {
   hoursBeforeDeleting: 6,
-  maxActiveReservationsPerUser: 4,
 };

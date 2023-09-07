@@ -1,6 +1,5 @@
 import { type Club, type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
-import { reservationConstraints } from "~/utils/constants";
 import { formatTimeString } from "~/utils/utils";
 
 beforeEach("Initial clean up and retrieve Clubs", () => {
@@ -335,7 +334,7 @@ describe("Logged user", () => {
     // reach the max number of reservations
     for (
       let i = 0;
-      i < reservationConstraints.maxActiveReservationsPerUser;
+      i < (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser;
       i++
     ) {
       cy.addReservationToDB(
@@ -352,7 +351,7 @@ describe("Logged user", () => {
     cy.navigateDaysFromToday(2);
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      reservationConstraints.maxActiveReservationsPerUser
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
     );
 
     // try to add another reservation, fairly far from the others.
@@ -362,13 +361,15 @@ describe("Logged user", () => {
     //Error expected
     cy.get("[data-test='error-alert']").should(
       "have.text",
-      `Hai raggiunto il numero massimo di prenotazioni attive (${reservationConstraints.maxActiveReservationsPerUser})`
+      `Hai raggiunto il numero massimo di prenotazioni attive (${
+        (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+      })`
     );
     // Number of reservations should not change
     cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      reservationConstraints.maxActiveReservationsPerUser
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
     );
 
     // delete one reservation and try again
@@ -377,7 +378,7 @@ describe("Logged user", () => {
     cy.get("[data-test='confirm-button']").click();
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      reservationConstraints.maxActiveReservationsPerUser - 1
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser - 1
     );
 
     //add reservation in different club and check that does not affect the count
@@ -407,7 +408,7 @@ describe("Logged user", () => {
     cy.get("[data-test='error-alert']").should("not.exist");
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      reservationConstraints.maxActiveReservationsPerUser
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
     );
   });
 });

@@ -1,8 +1,10 @@
 import { type Prisma, type PrismaClient } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
 import dayjs from "dayjs";
-import { z } from "zod";
-import { ReservationInputSchema } from "~/components/Calendar";
+import {
+  ReservationDeleteInputSchema,
+  ReservationInputSchema,
+} from "~/components/Calendar";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import {
   UserRoles,
@@ -14,7 +16,8 @@ export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
     .input(ReservationInputSchema)
     .mutation(async ({ ctx, input }) => {
-      const clubId = await getClubId(ctx, input.courtId);
+      const clubSettings = await getClubSettings(ctx, input.clubId);
+
       //collision check [UI does NOT check for this]
       if (
         await collision(
@@ -47,18 +50,15 @@ export const reservationMutationRouter = createTRPCRouter({
       }
 
       //checks for NON ADMIN user
-      if (!isUserAdminOfClub(ctx, clubId)) {
+      if (!isUserAdminOfClub(ctx, input.clubId)) {
         // check limit of active reservations per users [UI does NOT check for this]
         const activeReservationsForUser = await getUserActiveReservations(
           ctx,
-          clubId
+          input.clubId
         );
-        if (
-          activeReservationsForUser >=
-          reservationConstraints.maxActiveReservationsPerUser
-        ) {
+        if (activeReservationsForUser >= clubSettings.maxReservationPerUser) {
           throw new TRPCClientError(
-            `Hai raggiunto il numero massimo di prenotazioni attive (${reservationConstraints.maxActiveReservationsPerUser})`
+            `Hai raggiunto il numero massimo di prenotazioni attive (${clubSettings.maxReservationPerUser})`
           );
         }
         // reservation length [UI already prevents this]
@@ -95,20 +95,19 @@ export const reservationMutationRouter = createTRPCRouter({
     }),
 
   deleteOne: protectedProcedure
-    .input(z.string())
+    .input(ReservationDeleteInputSchema)
     .mutation(async ({ ctx, input }) => {
-      const reservationToDelete = await ctx.prisma.reservation.findUnique({
-        where: { id: input },
-      });
-      if (!reservationToDelete) {
-        throw new Error("Reservation does not exist. Id: " + input.toString());
-      }
+      const reservationToDelete =
+        await ctx.prisma.reservation.findUniqueOrThrow({
+          where: { id: input.reservationId },
+        });
 
-      const clubId = await getClubId(ctx, reservationToDelete.courtId);
-
-      if (!isUserAdminOfClub(ctx, clubId)) {
+      //checks for NON ADMIN user
+      // TODO: check that user is admin of the club for which the reservation is made.
+      // Possible exploit: admin of club A can delete reservation of club B
+      if (!isUserAdminOfClub(ctx, input.clubId)) {
         // delete reservation of other users
-        if (reservationToDelete?.userId !== ctx.session.user.id) {
+        if (reservationToDelete.userId !== ctx.session.user.id) {
           throw new TRPCClientError(
             "You are not authorized to delete this reservation"
           );
@@ -116,7 +115,7 @@ export const reservationMutationRouter = createTRPCRouter({
 
         // reservation deleting timewindow
         if (
-          dayjs(reservationToDelete?.startTime)
+          dayjs(reservationToDelete.startTime)
             .add(reservationConstraints.hoursBeforeDeleting, "hour")
             .isBefore(Date.now())
         ) {
@@ -128,25 +127,20 @@ export const reservationMutationRouter = createTRPCRouter({
 
       return ctx.prisma.reservation.delete({
         where: {
-          id: input,
+          id: input.reservationId,
         },
       });
     }),
 });
 
-async function getClubId(ctx: CtxType, courtId: string) {
-  const clubIdFromCourt = (
-    await ctx.prisma.court.findUnique({
-      where: { id: courtId },
-    })
-  )?.clubId;
-
-  if (!clubIdFromCourt) {
-    throw new Error(
-      "Error: Court has not clubId associated. CourtId: " + courtId
-    );
-  }
-  return clubIdFromCourt;
+async function getClubSettings(ctx: CtxType, clubId: string) {
+  return await ctx.prisma.clubSettings.findFirstOrThrow({
+    where: {
+      club: {
+        id: clubId,
+      },
+    },
+  });
 }
 
 function isUserAdminOfClub(ctx: CtxType, clubId: string) {

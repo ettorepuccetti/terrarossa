@@ -15,12 +15,6 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 // Start of NextAuth models
 model Account {
   id                String  @id @default(cuid())
@@ -64,6 +58,7 @@ model User {
   clubId        String?
   Reservation   Reservation[]
   createdAt     DateTime      @default(now())
+  updatedAt     DateTime?     @updatedAt
 
   @@index([clubId])
 }
@@ -88,6 +83,7 @@ model Reservation {
   userId        String?
   overwriteName String?
   createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([courtId])
   @@index([userId])
@@ -116,18 +112,23 @@ model Club {
   Admin          User[]
   clubSettings   ClubSettings @relation(fields: [clubSettingsId], references: [id])
   clubSettingsId String       @unique
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime?    @updatedAt
 }
 
 model ClubSettings {
-  id                   String  @id @unique @default(cuid())
-  description          String? 
-  club                 Club?
-  firstBookableHour    Int     @default(8)
-  firstBookableMinute  Int     @default(0)
-  lastBookableHour     Int     @default(22)
-  lastBookableMinute   Int     @default(0)
-  daysInThePastVisible Int     @default(2)
-  daysInFutureVisible  Int     @default(7)
+  id                    String    @id @unique @default(cuid())
+  description           String?
+  club                  Club?
+  firstBookableHour     Int       @default(8)
+  firstBookableMinute   Int       @default(0)
+  lastBookableHour      Int       @default(22)
+  lastBookableMinute    Int       @default(0)
+  daysInThePastVisible  Int       @default(2)
+  daysInFutureVisible   Int       @default(7)
+  maxReservationPerUser Int       @default(5)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime? @updatedAt
 }
 
 enum BeginTime {

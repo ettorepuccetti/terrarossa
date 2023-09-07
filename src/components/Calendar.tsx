@@ -23,6 +23,12 @@ export const ReservationInputSchema = z.object({
   endDateTime: z.date(),
   courtId: z.string(),
   overwriteName: z.string().optional(),
+  clubId: z.string(),
+});
+
+export const ReservationDeleteInputSchema = z.object({
+  reservationId: z.string(),
+  clubId: z.string(),
 });
 
 export const ClubIdInputSchema = z.object({
@@ -33,7 +39,7 @@ export default function Calendar() {
   const { data: sessionData } = useSession();
   const [clubId, setClubId] = useState<string | undefined>(undefined);
 
-  //get the club name from the router when is available
+  //get the club id from the router when is available
   const router = useRouter();
   useEffect(() => {
     if (router.isReady) {
@@ -49,24 +55,18 @@ export default function Calendar() {
 
   const clubQuery = api.club.getByClubId.useQuery(
     { clubId: clubId },
-    { enabled: clubId !== undefined }
+    { refetchOnWindowFocus: false, enabled: clubId !== undefined }
   );
 
   const courtQuery = api.court.getAllByClubId.useQuery(
     { clubId: clubId },
-    {
-      refetchOnWindowFocus: false,
-      enabled: clubId !== undefined,
-    }
+    { refetchOnWindowFocus: false, enabled: clubId !== undefined }
   );
 
   const reservationQuery =
     api.reservationQuery.getAllVisibleInCalendarByClubId.useQuery(
       { clubId: clubId },
-      {
-        refetchOnWindowFocus: false,
-        enabled: clubId !== undefined,
-      }
+      { refetchOnWindowFocus: false, enabled: clubId !== undefined }
     );
 
   const reservationAdd = api.reservationMutation.insertOne.useMutation({
@@ -112,24 +112,30 @@ export default function Calendar() {
     setEventDetails(eventClickInfo.event);
   };
 
-  const addEvent = (endDate: Date, overwrittenName?: string) => {
+  const addEvent = (endDate: Date, overwrittenName: string | undefined) => {
     setDateClick(undefined);
-
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
+    }
+    if (!clubId) {
+      throw new Error("ClubId not found");
     }
     reservationAdd.mutate({
       courtId: dateClick.resource.id,
       startDateTime: dateClick.date,
       endDateTime: endDate,
       overwriteName: overwrittenName,
+      clubId: clubId,
     });
   };
 
   function deleteEvent(eventId: string): void {
+    if (!clubId) {
+      throw new Error("ClubId not found");
+    }
     setEventDetails(undefined);
     console.log("delete Event: ", eventId);
-    reservationDelete.mutate(eventId);
+    reservationDelete.mutate({ reservationId: eventId, clubId: clubId });
   }
 
   const [eventDetails, setEventDetails] = useState<EventImpl>();
@@ -150,7 +156,7 @@ export default function Calendar() {
     );
   }
 
-  if (clubQuery.isLoading || courtQuery.isLoading) {
+  if (clubQuery.isLoading || courtQuery.isLoading || !clubId) {
     return <Spinner isLoading={true} />;
   }
 
@@ -202,7 +208,7 @@ export default function Calendar() {
         startDate={dateClick?.date}
         resource={dateClick?.resource?.title}
         onDialogClose={() => setDateClick(undefined)}
-        onConfirm={(endDate, overwrittenName?) =>
+        onConfirm={(endDate: Date, overwrittenName: string | undefined) =>
           addEvent(endDate, overwrittenName)
         }
         clubId={clubId}

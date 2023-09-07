@@ -22,7 +22,7 @@ interface DialogProps {
   onDialogClose: () => void;
   sessionData: Session | null;
   onReservationDelete: (id: string) => void;
-  clubId: string | undefined;
+  clubId: string;
 }
 
 export default function EventDetailDialog(props: DialogProps) {

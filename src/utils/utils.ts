@@ -27,12 +27,11 @@ export function formatTimeString(hour: number, minute: number): string {
  */
 export function isAdminOfTheClub(
   sessionData: Session | null | undefined,
-  clubId: string | undefined
+  clubId: string
 ): boolean {
   return (
     sessionData !== undefined &&
     sessionData !== null &&
-    clubId !== undefined &&
     sessionData.user.role === UserRoles.ADMIN &&
     sessionData.user.clubId === clubId
   );

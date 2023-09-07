@@ -8,9 +8,9 @@ import {
   Typography,
 } from "@mui/material";
 import { DateField, TimeField, TimePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import { signIn, useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { isAdminOfTheClub } from "~/utils/utils";
 import DialogLayout from "./DialogLayout";
 
@@ -18,20 +18,26 @@ export interface ReserveDialogProps {
   open: boolean;
   startDate: Date | undefined;
   resource: string | undefined;
-  onConfirm: (endDate: Date, overwrittenName?: string) => void;
+  onConfirm: (endDate: Date, overwrittenName: string | undefined) => void;
   onDialogClose: () => void;
-  clubId: string | undefined;
+  clubId: string;
 }
 
 export default function ReserveDialog(props: ReserveDialogProps) {
-  const { open, startDate, resource } = props;
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const { open, resource } = props;
+  const startDate = useMemo(() => dayjs(props.startDate), [props.startDate]);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
   const { data: sessionData } = useSession();
+  const [endDateError, setEndDateError] = useState<string | undefined>(
+    undefined
+  );
 
   // to set endDate to startDate + 1 hour, when component is mounted
   useEffect(() => {
-    setEndDate((dayjs(startDate).add(1, "hour") as unknown as Date) ?? null);
+    setEndDate(
+      startDate.add(1, "hours").set("second", 0).set("millisecond", 0)
+    );
   }, [startDate]);
 
   const onConfirmButton = () => {
@@ -43,27 +49,16 @@ export default function ReserveDialog(props: ReserveDialogProps) {
     console.log("startDate in calendar: ", startDate);
     console.log("endDate from dialog: ", endDate);
 
-    // clean seconds and milliseconds from endDate - issue with dayJS
-    const cleanedEndDate = dayjs(endDate).toDate();
-    cleanedEndDate.setMilliseconds(0);
-    cleanedEndDate.setSeconds(0);
-
     props.onConfirm(
-      cleanedEndDate,
+      endDate.toDate(),
       //manage overwriteName limitation about controlled component
       overwriteName !== "" ? overwriteName : undefined
     );
-    setEndDate(null);
     setOverwriteName("");
   };
 
-  const [endDateError, setEndDateError] = useState<string | undefined>(
-    undefined
-  );
-
   const canBook =
-    isAdminOfTheClub(sessionData, props.clubId) ||
-    dayjs(startDate).isAfter(dayjs());
+    isAdminOfTheClub(sessionData, props.clubId) || startDate.isAfter(dayjs());
 
   return (
     <>
@@ -71,7 +66,6 @@ export default function ReserveDialog(props: ReserveDialogProps) {
         data-test="reserve-dialog"
         open={open}
         onClose={() => {
-          setEndDate(null);
           setOverwriteName("");
           props.onDialogClose();
         }}
@@ -103,7 +97,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
               {/* date */}
               <DateField
                 inputProps={{ "data-test": "date" }}
-                value={dayjs(startDate)}
+                value={startDate}
                 readOnly={true}
                 label={"Data"}
                 format="DD/MM/YYYY"
@@ -131,15 +125,15 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                 }}
                 value={endDate}
                 label={"Orario di fine"}
-                onChange={(dayJsDate) => setEndDate(dayJsDate)} // value is DayJS object
+                onChange={(dayJsDate) => setEndDate(dayJsDate)}
                 ampm={false}
                 minutesStep={30}
                 skipDisabled={true}
-                minTime={dayjs(startDate).add(1, "hours") as unknown as Date}
+                minTime={startDate.add(1, "hours")}
                 maxTime={
                   isAdminOfTheClub(sessionData, props.clubId)
                     ? undefined
-                    : (dayjs(startDate).add(2, "hours") as unknown as Date)
+                    : startDate.add(2, "hours")
                 }
                 disabled={!canBook}
                 autoFocus
