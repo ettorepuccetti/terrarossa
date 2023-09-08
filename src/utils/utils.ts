@@ -10,12 +10,19 @@ export const capitaliseFirstChar = (s: string) => {
  * Format a time string in the format HH:MM given the hour and minute as numbers
  * @param {number} hour
  * @param {number} minute
+ * @param {number} paddingHour number of digits to pad the hour with
  * @returns a time in the format HH:MM
  * @example 08:00
  */
-export function formatTimeString(hour: number, minute: number): string {
+export function formatTimeString(
+  hour: number,
+  minute: number,
+  paddingHour = 2
+): string {
   return (
-    hour.toString().padStart(2, "0") + ":" + minute.toString().padStart(2, "0")
+    hour.toString().padStart(paddingHour, "0") +
+    ":" +
+    minute.toString().padStart(2, "0")
   );
 }
 

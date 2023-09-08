@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-import { type ClubSettings, type Club } from "@prisma/client";
+import { type Club, type ClubSettings } from "@prisma/client";
 import "./commands";
 
 declare global {
@@ -52,6 +52,8 @@ declare global {
       ): void;
 
       getClubSettings(clubId: string): Chainable<ClubSettings>;
+
+      logout(): void;
     }
   }
 }

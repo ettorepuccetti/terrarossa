@@ -8,10 +8,10 @@ import {
   Typography,
 } from "@mui/material";
 import { DateField, TimeField } from "@mui/x-date-pickers";
+import { type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import React from "react";
-import { reservationConstraints } from "~/utils/constants";
 import { isAdminOfTheClub } from "~/utils/utils";
 import ConfirmationDialog from "./ConfirmationDialog";
 import DialogLayout from "./DialogLayout";
@@ -23,10 +23,11 @@ interface DialogProps {
   sessionData: Session | null;
   onReservationDelete: (id: string) => void;
   clubId: string;
+  clubSettings: ClubSettings;
 }
 
 export default function EventDetailDialog(props: DialogProps) {
-  const { open, eventDetails, sessionData, clubId } = props;
+  const { open, eventDetails, sessionData, clubId, clubSettings } = props;
   const [confirmationOpen, setConfirmationOpen] = React.useState(false);
 
   if (!eventDetails) {
@@ -40,7 +41,7 @@ export default function EventDetailDialog(props: DialogProps) {
 
   const tooLateToCancel =
     dayjs(eventDetails.start).isBefore(
-      dayjs().add(reservationConstraints.hoursBeforeDeleting, "hour")
+      dayjs().add(clubSettings.hoursBeforeCancel, "hour")
     ) && !isAdminOfTheClub(sessionData, clubId);
 
   return (

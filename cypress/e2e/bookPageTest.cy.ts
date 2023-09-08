@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { formatTimeString } from "~/utils/utils";
 
 beforeEach("Initial clean up and retrieve Clubs", () => {
-  function saveClubIdAndCleanReservations(
+  function saveClubInfoAndCleanReservations(
     clubName: string,
     clubIdAliasName: string,
     clubAliasName: string,
@@ -29,13 +29,13 @@ beforeEach("Initial clean up and retrieve Clubs", () => {
       });
     });
   }
-  saveClubIdAndCleanReservations(
+  saveClubInfoAndCleanReservations(
     "foro italico",
     "clubIdForoItalico",
     "foroItalico",
     "clubSettingsForoItalico"
   );
-  saveClubIdAndCleanReservations(
+  saveClubInfoAndCleanReservations(
     "club prova",
     "clubIdCircoloProva",
     "circoloProva",
@@ -43,28 +43,23 @@ beforeEach("Initial clean up and retrieve Clubs", () => {
   );
 });
 
-describe("Not logged user", () => {
-  beforeEach("visit calendar page", function () {
+describe("Calendar navigation", () => {
+  beforeEach("login, retrieve username, visit calendar page", function () {
+    cy.loginToAuth0(
+      Cypress.env("AUTH0_USER") as string,
+      Cypress.env("AUTH0_PW") as string
+    );
+
+    cy.getUsername().then((username) => {
+      cy.wrap(username).should("be.a", "string").as("username");
+    });
+
     cy.visit(
       `/prenota?clubId=${this.clubIdForoItalico as string}`
     ).waitForCalendarPageToLoad();
   });
 
-  it("GIVEN not logged in user WHEN click on available slot THEN show login button", function () {
-    // select a random slot
-    cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
-    ).click();
-
-    // I should see the login button and nothing else
-    cy.get("button")
-      .filter("[data-test='login']")
-      .should("contain", "Effettua il login");
-
-    cy.get("[data-test='startTime']").should("not.exist");
-  });
-
-  it("GIVEN user WHEN navigate calendar THEN can go in the past and future according to club settings", function () {
+  it("GIVEN club with max day in the past and future WHEN navigate calendar THEN cannot go beyond those limits", function () {
     //check first selectable day is visible
     const firstSelectableDay = dayjs()
       .subtract(
@@ -92,82 +87,6 @@ describe("Not logged user", () => {
     cy.get("[data-test='day-card']")
       .last()
       .should("contain", lastSelectableDay);
-  });
-});
-
-describe("Logged user", () => {
-  beforeEach("login with mail/pwd and retrieve username", function () {
-    cy.loginToAuth0(
-      Cypress.env("AUTH0_USER") as string,
-      Cypress.env("AUTH0_PW") as string
-    );
-
-    cy.getUsername().then((username) => {
-      cy.wrap(username).should("be.a", "string").as("username");
-    });
-
-    cy.visit(
-      `/prenota?clubId=${this.clubIdForoItalico as string}`
-    ).waitForCalendarPageToLoad();
-  });
-
-  it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
-    cy.navigateDaysFromToday(2);
-
-    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
-
-    // save startTime
-    cy.get("[data-test='startTime']").invoke("val").as("startTime");
-
-    // save endTime
-    cy.get("[data-test='endTime']")
-      .wait(100) //wait for the rerender
-      .invoke("val")
-      .as("endTime");
-
-    // reserve and close the dialog
-    cy.get("[data-test='reserve-button']").click();
-
-    // check on the reservation card if username, startTime and endTime are correct
-    // need to wrap the assertion in a then() because startTime and endTime are set in this scope
-    cy.get('[data-test="calendar-event"]').then(function ($element) {
-      cy.wrap($element)
-        .should("contain", this.username)
-        .should("contain", this.startTime)
-        .should("contain", this.endTime);
-    });
-  });
-
-  it("GIVEN club with reservation time constrains WHEN select first and (second)last time slot THEN constrains respected", function () {
-    cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-child(1) > .fc-timegrid-slot"
-    ).click(); // click on first slot
-
-    // check startTime of first bookable slot
-    cy.get("[data-test='startTime']").should(
-      "have.value",
-      formatTimeString(
-        (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
-        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
-      )
-    );
-
-    // click outside the dialog to close it
-    cy.get(".MuiDialog-container").click(5, 5);
-
-    // select the last slot clickable
-    cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot"
-    ).click();
-
-    // check endTime of last bookable slot
-    cy.get("[data-test='endTime']").should(
-      "have.value",
-      formatTimeString(
-        (this.clubSettingsForoItalico as ClubSettings).lastBookableHour + 1, //TODO: wet code
-        (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
-      )
-    );
   });
 
   it("GIVEN club with max day in the past and future WHEN reserve in first and last visible day THEN reservation shown", function () {
@@ -225,13 +144,109 @@ describe("Logged user", () => {
     cy.get('[data-test="calendar-event"]').should("be.visible");
   });
 
-  it("GIVEN club with max reservation time WHEN click on very last slot THEN no reservation dialog showed", function () {
+  it("GIVEN club with reservation first and last hour WHEN select first and second last slot THEN constrains respected", function () {
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :nth-child(1) > .fc-timegrid-slot"
+    ).click(); // click on first slot
+
+    // check startTime of first bookable slot
+    cy.get("[data-test='startTime']").should(
+      "have.value",
+      formatTimeString(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
+    );
+
+    // click outside the dialog to close it
+    cy.get(".MuiDialog-container").click(5, 5);
+
+    // select the last slot clickable
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot"
+    ).click();
+
+    // check endTime of last bookable slot
+    cy.get("[data-test='endTime']").should(
+      "have.value",
+      formatTimeString(
+        (this.clubSettingsForoItalico as ClubSettings).lastBookableHour + 1, //TODO: implicit assumption
+        (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+      )
+    );
+  });
+
+  it("GIVEN club WHEN click on very last slot THEN no reservation dialog showed", function () {
     // click on the last slot
     cy.get(
       ".fc-timegrid-slots > table > tbody > :last-child > .fc-timegrid-slot"
     ).click();
 
     cy.get("[data-test='event-detail-dialog']").should("not.exist");
+  });
+});
+
+describe("New Reservation", () => {
+  beforeEach("login, retrieve username, visit calendar page", function () {
+    cy.loginToAuth0(
+      Cypress.env("AUTH0_USER") as string,
+      Cypress.env("AUTH0_PW") as string
+    );
+
+    cy.getUsername().then((username) => {
+      cy.wrap(username).should("be.a", "string").as("username");
+    });
+
+    cy.visit(
+      `/prenota?clubId=${this.clubIdForoItalico as string}`
+    ).waitForCalendarPageToLoad();
+  });
+
+  it("GIVEN not logged in user WHEN click on available slot THEN show login button", function () {
+    cy.logout();
+
+    cy.visit(
+      `/prenota?clubId=${this.clubIdForoItalico as string}`
+    ).waitForCalendarPageToLoad();
+
+    // select a random slot
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
+    ).click();
+
+    // I should see the login button and nothing else
+    cy.get("button")
+      .filter("[data-test='login']")
+      .should("contain", "Effettua il login");
+
+    cy.get("[data-test='startTime']").should("not.exist");
+  });
+
+  it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
+    cy.navigateDaysFromToday(2);
+
+    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
+
+    // save startTime
+    cy.get("[data-test='startTime']").invoke("val").as("startTime");
+
+    // save endTime
+    cy.get("[data-test='endTime']")
+      .wait(100) //wait for the rerender
+      .invoke("val")
+      .as("endTime");
+
+    // reserve and close the dialog
+    cy.get("[data-test='reserve-button']").click();
+
+    // check on the reservation card if username, startTime and endTime are correct
+    // need to wrap the assertion in a then() because startTime and endTime are set in this scope
+    cy.get('[data-test="calendar-event"]').then(function ($element) {
+      cy.wrap($element)
+        .should("contain", this.username)
+        .should("contain", this.startTime)
+        .should("contain", this.endTime);
+    });
   });
 
   it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", function () {

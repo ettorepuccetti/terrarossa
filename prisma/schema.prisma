@@ -129,6 +129,7 @@ model ClubSettings {
   maxReservationPerUser Int       @default(5)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime? @updatedAt
+  hoursBeforeCancel     Int       @default(4)
 }
 
 enum BeginTime {

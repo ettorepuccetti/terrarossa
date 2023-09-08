@@ -1,7 +1,8 @@
 import dayjs from "dayjs";
 
 export {};
-function loginToAuth0(username: string, password: string) {
+
+Cypress.Commands.add("loginToAuth0", (username: string, password: string) => {
   const log = Cypress.log({
     displayName: "AUTH0 LOGIN",
     message: [`🔐 Authenticating | ${username}`],
@@ -29,7 +30,6 @@ function loginToAuth0(username: string, password: string) {
             .click();
         }
       );
-
       // Ensure Auth0 has redirected us back to the RWA.
       cy.url().should("equal", "http://localhost:3000/");
     },
@@ -46,9 +46,7 @@ function loginToAuth0(username: string, password: string) {
 
   log.snapshot("after");
   log.end();
-}
-
-Cypress.Commands.add("loginToAuth0", loginToAuth0);
+});
 
 Cypress.Commands.add("queryClubs", () => {
   return cy.task("prisma:queryClubs");
@@ -159,4 +157,20 @@ Cypress.Commands.add(
 
 Cypress.Commands.add("getClubSettings", (settingsId: string) => {
   return cy.task("prisma:getClubSettings", settingsId);
+});
+
+Cypress.Commands.add("logout", () => {
+  cy.session(
+    "auth0-logout",
+    () => {
+      cy.visit("/api/auth/signout/");
+      cy.get("#submitButton").click();
+      cy.url().should("equal", "http://localhost:3000/");
+    },
+    {
+      validate: () => {
+        cy.request("/api/auth/session").its("body").should("be.empty");
+      },
+    }
+  );
 });

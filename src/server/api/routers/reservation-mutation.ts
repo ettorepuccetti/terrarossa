@@ -6,11 +6,7 @@ import {
   ReservationInputSchema,
 } from "~/components/Calendar";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import {
-  UserRoles,
-  reservationConstraints,
-  type UserRole,
-} from "~/utils/constants";
+import { UserRoles, type UserRole } from "~/utils/constants";
 
 export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
@@ -97,6 +93,7 @@ export const reservationMutationRouter = createTRPCRouter({
   deleteOne: protectedProcedure
     .input(ReservationDeleteInputSchema)
     .mutation(async ({ ctx, input }) => {
+      const clubSettings = await getClubSettings(ctx, input.clubId);
       const reservationToDelete =
         await ctx.prisma.reservation.findUniqueOrThrow({
           where: { id: input.reservationId },
@@ -116,11 +113,11 @@ export const reservationMutationRouter = createTRPCRouter({
         // reservation deleting timewindow
         if (
           dayjs(reservationToDelete.startTime)
-            .add(reservationConstraints.hoursBeforeDeleting, "hour")
+            .add(clubSettings.hoursBeforeCancel, "hour")
             .isBefore(Date.now())
         ) {
           throw new TRPCClientError(
-            `Error: Reservations cannot be deleted ${reservationConstraints.hoursBeforeDeleting} hours before the start time`
+            `Error: Reservations cannot be deleted ${clubSettings.hoursBeforeCancel} hours before the start time`
           );
         }
       }

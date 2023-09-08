@@ -147,16 +147,20 @@ export default function Calendar() {
    * -------------------------------------
    */
 
-  if (clubQuery.error || courtQuery.error) {
+  if (clubQuery.error || courtQuery.error || reservationQuery.error) {
     return (
       <ErrorAlert
-        error={clubQuery.error ?? courtQuery.error}
-        onClose={() => void clubQuery.refetch()}
+        error={clubQuery.error ?? courtQuery.error ?? reservationQuery.error}
+        onClose={() => {
+          clubQuery.error && void clubQuery.refetch();
+          courtQuery.error && void courtQuery.refetch();
+          reservationQuery.error && void reservationQuery.refetch();
+        }}
       />
     );
   }
 
-  if (clubQuery.isLoading || courtQuery.isLoading || !clubId) {
+  if (clubQuery.isLoading || !clubId) {
     return <Spinner isLoading={true} />;
   }
 
@@ -196,8 +200,8 @@ export default function Calendar() {
         />
         <FullCalendarWrapper
           clubData={clubQuery.data}
-          courtData={courtQuery.data}
-          reservationData={reservationQuery.data ?? []}
+          courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
+          reservationData={reservationQuery.data ?? []} //same
           onDateClick={openReservationDialog}
           onEventClick={openEventDialog}
         />
@@ -221,6 +225,7 @@ export default function Calendar() {
         sessionData={sessionData}
         onReservationDelete={(id) => deleteEvent(id)}
         clubId={clubId}
+        clubSettings={clubQuery.data.clubSettings}
       />
     </LocalizationProvider>
   );
