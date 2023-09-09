@@ -109,7 +109,10 @@ export default function Calendar() {
   };
 
   const openEventDialog = (eventClickInfo: EventClickArg) => {
-    setEventDetails(eventClickInfo.event);
+    eventClickInfo.jsEvent.preventDefault();
+    if (eventClickInfo.event.extendedProps.userId === sessionData?.user.id) {
+      setEventDetails(eventClickInfo.event);
+    }
   };
 
   const addEvent = (endDate: Date, overwrittenName: string | undefined) => {

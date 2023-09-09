@@ -54,13 +54,14 @@ export default function EventDetailDialog(props: DialogProps) {
         <DialogLayout title="Prenotazione">
           {/* Court name */}
           <DialogActions>
-            <Typography gutterBottom>
+            <Typography gutterBottom data-test="court-name">
               {eventDetails.getResources()[0]?.title}
             </Typography>
           </DialogActions>
 
           {/* date (day) */}
           <DateField
+            data-test="date"
             color="info"
             value={dayjs(eventDetails.start)}
             readOnly={true}
@@ -73,6 +74,7 @@ export default function EventDetailDialog(props: DialogProps) {
           <Box display={"flex"} gap={1}>
             {/* time start */}
             <TimeField
+              data-test="startTime"
               color="info"
               value={eventDetails.start}
               label={"Orario di inizio"}
@@ -81,6 +83,7 @@ export default function EventDetailDialog(props: DialogProps) {
             />
             {/* time end */}
             <TimeField
+              data-test="endTime"
               color="info"
               value={eventDetails.end}
               label={"Orario di fine"}

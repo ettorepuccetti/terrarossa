@@ -92,9 +92,9 @@ to avoid missing env variables, in package.json use:
 }
 ```
 
-flaky VSCode type error in .tsx file, how to temp solve:
+flaky VSCode type error in .tsx file, how to solve:
 
-in tsconfig.json add:
+in `cypress/tsconfig.json` add:
 
 ```
 "module": "NodeNext",
@@ -104,6 +104,14 @@ in tsconfig.json add:
     "paths": {
       "~/*": ["./src/*"]
     },
+```
+
+then, for solving import type from `@FullCalendar/core`, add:
+
+```
+"module": "esnext",
+"moduleResolution": "node",
+"allowSyntheticDefaultImports": true,
 ```
 
 ### Missing linting in cypress files

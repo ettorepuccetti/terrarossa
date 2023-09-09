@@ -2,7 +2,7 @@ import { type Club, type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
 import { formatTimeString } from "~/utils/utils";
 
-beforeEach("Initial clean up and retrieve Clubs", () => {
+beforeEach("Initial clean up and retrieve Clubs", function () {
   function saveClubInfoAndCleanReservations(
     clubName: string,
     clubIdAliasName: string,
@@ -41,10 +41,9 @@ beforeEach("Initial clean up and retrieve Clubs", () => {
     "circoloProva",
     "clubSettingsCircoloProva"
   );
-});
 
-describe("Calendar navigation", () => {
-  beforeEach("login, retrieve username, visit calendar page", function () {
+  // so I can use previous aliases
+  cy.then(() => {
     cy.loginToAuth0(
       Cypress.env("AUTH0_USER") as string,
       Cypress.env("AUTH0_PW") as string
@@ -58,7 +57,9 @@ describe("Calendar navigation", () => {
       `/prenota?clubId=${this.clubIdForoItalico as string}`
     ).waitForCalendarPageToLoad();
   });
+});
 
+describe("Calendar navigation", () => {
   it("GIVEN club with max day in the past and future WHEN navigate calendar THEN cannot go beyond those limits", function () {
     //check first selectable day is visible
     const firstSelectableDay = dayjs()
@@ -189,21 +190,6 @@ describe("Calendar navigation", () => {
 });
 
 describe("New Reservation", () => {
-  beforeEach("login, retrieve username, visit calendar page", function () {
-    cy.loginToAuth0(
-      Cypress.env("AUTH0_USER") as string,
-      Cypress.env("AUTH0_PW") as string
-    );
-
-    cy.getUsername().then((username) => {
-      cy.wrap(username).should("be.a", "string").as("username");
-    });
-
-    cy.visit(
-      `/prenota?clubId=${this.clubIdForoItalico as string}`
-    ).waitForCalendarPageToLoad();
-  });
-
   it("GIVEN not logged in user WHEN click on available slot THEN show login button", function () {
     cy.logout();
 
@@ -414,5 +400,57 @@ describe("New Reservation", () => {
       "have.length",
       (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
     );
+  });
+});
+
+describe("Reservation detail", () => {
+  it("GIVEN logged user WHEN click on his reservation THEN show details dialog", function () {
+    const dayInAdvance = 2;
+    const startDate = dayjs()
+      .add(dayInAdvance, "days")
+      .hour(12)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+    cy.addReservationToDB(
+      startDate.toDate(),
+      startDate.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      "Pietrangeli",
+      Cypress.env("AUTH0_USER") as string
+    );
+    cy.reload().waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(dayInAdvance);
+    // check that the reservation is visible
+    cy.get("[data-test='calendar-event']").should("have.length", 1);
+    // click on the reservation
+    cy.get("[data-test='calendar-event']").click();
+    // check that the dialog is visible
+    cy.get("[data-test='event-detail-dialog']").should("be.visible");
+  });
+
+  it.only("GIVEN logged user WHEN click on other's reservation THEN not show detail dialog", function () {
+    const dayInAdvance = 2;
+    const startDate = dayjs()
+      .add(dayInAdvance, "days")
+      .hour(12)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+    cy.addReservationToDB(
+      startDate.toDate(),
+      startDate.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      "Pietrangeli",
+      "admin@terrarossa.app"
+    );
+    cy.reload().waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(dayInAdvance);
+    // check that the reservation is visible
+    cy.get("[data-test='calendar-event']").should("have.length", 1);
+    // click on the reservation
+    cy.get("[data-test='calendar-event']").click();
+    // check that the dialog is visible
+    cy.get("[data-test='event-detail-dialog']").should("not.exist");
   });
 });
