@@ -46,41 +46,57 @@ describe("<FullCalendarWrapper />", () => {
     });
   });
   it("GIVEN club with reservation first and last hour WHEN select first and second last slot THEN constrains respected", function () {
-    const stub = cy.stub();
-    cy.on("window:alert", stub);
+    const testBody = (closingMinute: number, lastSlotLabelSelector: string) => {
+      cy.log("CLUB LAST BOOKABLE SLOT (minutes)", closingMinute);
 
-    cy.mount(
-      <FullCalendarWrapper
-        clubData={this.clubData as ClubData}
-        courtData={this.courtData as CourtData}
-        onDateClick={() => alert("date click")}
-        onEventClick={() => null}
-        reservationData={[]}
-      />
-    );
+      const clubData = this.clubData as ClubData;
 
-    // check time of the first slot
-    cy.get(
-      ":nth-child(1) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion"
-    ).should(
-      "have.text",
-      formatTimeString(
-        (this.clubData as ClubData).clubSettings.firstBookableHour,
-        (this.clubData as ClubData).clubSettings.firstBookableMinute,
-        1
-      )
-    );
+      cy.mount(
+        <FullCalendarWrapper
+          clubData={{
+            ...clubData,
+            clubSettings: {
+              ...clubData.clubSettings,
+              lastBookableMinute: closingMinute,
+            },
+          }}
+          courtData={this.courtData as CourtData}
+          onDateClick={() => alert("date click")}
+          onEventClick={() => null}
+          reservationData={[]}
+        />
+      );
 
-    // check time of the second last slot (containing the last bookable hour)
-    cy.get(
+      // check time of the first slot
+      cy.get(
+        ":nth-child(1) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion"
+      ).should(
+        "have.text",
+        formatTimeString(
+          (this.clubData as ClubData).clubSettings.firstBookableHour,
+          (this.clubData as ClubData).clubSettings.firstBookableMinute,
+          1
+        )
+      );
+
+      // check time of the second last slot (containing the last bookable hour)
+      cy.get(lastSlotLabelSelector).should(
+        "have.text",
+        formatTimeString(
+          (this.clubData as ClubData).clubSettings.lastBookableHour,
+          (this.clubData as ClubData).clubSettings.lastBookableMinute,
+          1
+        )
+      );
+    };
+    // repeat test for different closing minutes
+    testBody(
+      0,
       ":nth-last-child(2) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion"
-    ).should(
-      "have.text",
-      formatTimeString(
-        (this.clubData as ClubData).clubSettings.lastBookableHour,
-        (this.clubData as ClubData).clubSettings.lastBookableMinute,
-        1
-      )
+    );
+    testBody(
+      30,
+      ":nth-last-child(3) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion"
     );
   });
 });

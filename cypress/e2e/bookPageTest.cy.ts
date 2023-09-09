@@ -161,22 +161,24 @@ describe("Calendar navigation", () => {
     // click outside the dialog to close it
     cy.get(".MuiDialog-container").click(5, 5);
 
-    // select the last slot clickable
+    // select the last slot bookable
     cy.get(
       ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot"
     ).click();
 
     // check endTime of last bookable slot
-    cy.get("[data-test='endTime']").should(
-      "have.value",
-      formatTimeString(
-        (this.clubSettingsForoItalico as ClubSettings).lastBookableHour + 1, //TODO: implicit assumption
-        (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+    cy.get("[data-test='endTime']")
+      .should(
+        "have.value",
+        formatTimeString(
+          (this.clubSettingsForoItalico as ClubSettings).lastBookableHour + 1, //TODO: implicit assumption
+          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+        )
       )
-    );
+      .and("have.attr", "aria-invalid", "false");
   });
 
-  it("GIVEN club WHEN click on very last slot THEN no reservation dialog showed", function () {
+  it("GIVEN club with reservation last hour WHEN click on very last slot THEN no reservation dialog showed", function () {
     // click on the last slot
     cy.get(
       ".fc-timegrid-slots > table > tbody > :last-child > .fc-timegrid-slot"
@@ -264,20 +266,6 @@ describe("New Reservation", () => {
 
     // try to reserve by clicking confirm button
     cy.get("[data-test='reserve-button']").should("be.disabled");
-
-    //TODO: force call the API and check the error message
-    // cy.get("[data-test='error-alert']")
-    //   .should("be.visible")
-    //   .and(
-    //     "have.text",
-    //     "L'orario di inizio e di fine deve essere un multiplo di 30 minuti"
-    //   );
-
-    // // close the error dialog
-    // cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
-
-    // // check that no reservation has been added
-    // cy.get("[data-test='calendar-event']").should("not.exist");
   });
 
   it("GIVEN logged user WHEN reserve with a clash THEN show error banner and reservation not added", function () {
@@ -328,12 +316,13 @@ describe("New Reservation", () => {
     // insert endTime longer than 2 hours
     cy.get("[data-test='endTime']").type("14:00");
 
-    // try to reserve by clicking confirm button
+    // check reserve button is disabled
     cy.get("[data-test='reserve-button']").should("be.disabled");
 
+    // check error message
     cy.get(".MuiFormHelperText-root").should(
       "have.text",
-      "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+      "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
     );
   });
 

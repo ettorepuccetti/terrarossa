@@ -216,6 +216,7 @@ export default function Calendar() {
           addEvent(endDate, overwrittenName)
         }
         clubId={clubId}
+        clubSettings={clubQuery.data.clubSettings}
       />
 
       <EventDetailDialog
