@@ -1,4 +1,4 @@
-import { type ClubSettings } from "@prisma/client";
+import { type Club, type ClubSettings, type Court } from "@prisma/client";
 import { UserRoles } from "~/utils/constants";
 
 export const session = {
@@ -25,3 +25,32 @@ export const clubSettings: ClubSettings = {
   createdAt: new Date(),
   updatedAt: new Date(),
 };
+
+export const club: Club = {
+  id: "1",
+  name: "Club 1",
+  clubSettingsId: "1",
+  createdAt: new Date(),
+  imageSrc: null,
+  logoSrc: null,
+  updatedAt: null,
+};
+
+export const courts: Court[] = [
+  {
+    clubId: club.id,
+    id: "1",
+    name: "Campo 1",
+    beginTime: "BOTH",
+    indoor: true,
+    surface: "CLAY",
+  },
+  {
+    clubId: club.id,
+    id: "2",
+    name: "Campo 2",
+    beginTime: "BOTH",
+    indoor: true,
+    surface: "CLAY",
+  },
+];

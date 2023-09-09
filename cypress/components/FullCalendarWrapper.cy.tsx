@@ -1,4 +1,5 @@
 import { type inferRouterOutputs } from "@trpc/server";
+import { club, clubSettings, courts } from "../support/constants";
 import FullCalendarWrapper from "~/components/FullCalendarWrapper";
 import { type AppRouter } from "~/server/api/root";
 import { formatTimeString } from "~/utils/utils";
@@ -9,42 +10,16 @@ type CourtData = RouterOutput["court"]["getAllByClubId"];
 
 describe("<FullCalendarWrapper />", () => {
   beforeEach("build club, clubSetting and court objects", () => {
-    cy.queryFilteredClubs("foro italico").then((club) => {
-      if (!club[0]) {
-        throw new Error("Club not found");
-      }
-      cy.getClubSettings(club[0].clubSettingsId).then((clubSettings) => {
-        if (!clubSettings || !club[0]) {
-          throw new Error("Club settings not found");
-        }
-        const courtData: CourtData = [
-          {
-            clubId: club[0].id,
-            id: "1",
-            name: "Campo 1",
-            beginTime: "BOTH",
-            indoor: true,
-            surface: "CLAY",
-          },
-          {
-            clubId: club[0].id,
-            id: "2",
-            name: "Campo 2",
-            beginTime: "BOTH",
-            indoor: true,
-            surface: "CLAY",
-          },
-        ];
-        const clubData: ClubData = {
-          ...club[0],
-          clubSettings: clubSettings,
-        };
+    const clubData: ClubData = {
+      ...club,
+      clubSettings: clubSettings,
+    };
+    const courtData: CourtData = courts;
 
-        cy.wrap(clubData).as("clubData");
-        cy.wrap(courtData).as("courtData");
-      });
-    });
+    cy.wrap(clubData).as("clubData");
+    cy.wrap(courtData).as("courtData");
   });
+
   it("GIVEN club with reservation first and last hour WHEN select first and second last slot THEN constrains respected", function () {
     const testBody = (closingMinute: number, lastSlotLabelSelector: string) => {
       cy.log("CLUB LAST BOOKABLE SLOT (minutes)", closingMinute);
