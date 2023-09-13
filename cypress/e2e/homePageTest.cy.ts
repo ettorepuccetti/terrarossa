@@ -26,8 +26,8 @@ describe("homepage", () => {
     cy.url().should("contain", Cypress.env("AUTH0_ISSUER") as string);
 
     cy.loginToAuth0(
-      Cypress.env("AUTH0_USER") as string,
-      Cypress.env("AUTH0_PW") as string
+      Cypress.env("USER1_MAIL") as string,
+      Cypress.env("USER1_PWD") as string
     );
 
     cy.visit("/");

@@ -9,7 +9,7 @@ import { SessionProvider } from "next-auth/react";
 import ReserveDialog from "~/components/ReserveDialog";
 import lightTheme from "~/styles/lightTheme";
 import createEmotionCache from "~/utils/createEmotionCache";
-import { clubSettings, session } from "../support/constants";
+import { clubSettings, session } from "./constants";
 dayjs.extend(duration);
 
 const mountComponent = (

@@ -1,5 +1,11 @@
 import { type Club, type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
+import {
+  allEnglandClubName,
+  centerCourtName,
+  foroItalicoName,
+  pietrangeliCourtName,
+} from "~/utils/constants";
 import { formatTimeString } from "~/utils/utils";
 
 beforeEach("Initial clean up and retrieve Clubs", function () {
@@ -30,23 +36,23 @@ beforeEach("Initial clean up and retrieve Clubs", function () {
     });
   }
   saveClubInfoAndCleanReservations(
-    "foro italico",
+    foroItalicoName,
     "clubIdForoItalico",
     "foroItalico",
     "clubSettingsForoItalico"
   );
   saveClubInfoAndCleanReservations(
-    "club prova",
-    "clubIdCircoloProva",
-    "circoloProva",
-    "clubSettingsCircoloProva"
+    allEnglandClubName,
+    "clubIdAllEngland",
+    "allEngland",
+    "clubSettingsAllEngland"
   );
 
   // so I can use previous aliases
   cy.then(() => {
     cy.loginToAuth0(
-      Cypress.env("AUTH0_USER") as string,
-      Cypress.env("AUTH0_PW") as string
+      Cypress.env("USER1_MAIL") as string,
+      Cypress.env("USER1_PWD") as string
     );
 
     cy.getUsername().then((username) => {
@@ -90,7 +96,7 @@ describe("Calendar navigation", () => {
       .should("contain", lastSelectableDay);
   });
 
-  it("GIVEN club with max day in the past and future WHEN reserve in first and last visible day THEN reservation shown", function () {
+  it("GIVEN club with max day in the past and future WHEN reserve on first and last visible day THEN reservation shown", function () {
     // create PAST reservation
     const firstVisibleStartDate = dayjs()
       .subtract(
@@ -108,8 +114,8 @@ describe("Calendar navigation", () => {
       firstVisibleStartDate.toDate(),
       firstVisibleStartDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
-      "Pietrangeli",
-      Cypress.env("AUTH0_USER") as string
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
     );
 
     // create FUTURE reservation
@@ -127,8 +133,8 @@ describe("Calendar navigation", () => {
       lastVisibleStartDate.toDate(),
       lastVisibleStartDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
-      "Pietrangeli",
-      Cypress.env("AUTH0_USER") as string
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
     );
 
     // CHECKS
@@ -213,7 +219,7 @@ describe("New Reservation", () => {
   it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
     cy.navigateDaysFromToday(2);
 
-    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
     // save startTime
     cy.get("[data-test='startTime']").invoke("val").as("startTime");
@@ -240,7 +246,7 @@ describe("New Reservation", () => {
   it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", function () {
     cy.navigateDaysFromToday(2);
 
-    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
     // insert wrong endTime
     cy.get("[data-test='endTime']").type("12:15");
@@ -267,15 +273,15 @@ describe("New Reservation", () => {
       startDate.toDate(),
       startDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
-      "Pietrangeli",
-      Cypress.env("AUTH0_USER") as string
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
     );
 
     cy.reload().waitForCalendarPageToLoad();
 
     cy.navigateDaysFromToday(1);
 
-    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
     cy.get("[data-test='endTime']").type("12:30");
 
@@ -297,7 +303,7 @@ describe("New Reservation", () => {
   it("GIVEN logged user WHEN reservation is longer than 2 hours THEN show error and cannot press button", function () {
     cy.navigateDaysFromToday(2);
 
-    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
     // insert endTime longer than 2 hours
     cy.get("[data-test='endTime']").type("14:00");
@@ -331,8 +337,8 @@ describe("New Reservation", () => {
         startDate.add(i, "hour").toDate(),
         startDate.add(i + 1, "hour").toDate(),
         this.clubIdForoItalico as string,
-        i % 2 === 0 ? "Pietrangeli" : "Centrale",
-        Cypress.env("AUTH0_USER") as string
+        i % 2 === 0 ? pietrangeliCourtName : "Centrale",
+        Cypress.env("USER1_MAIL") as string
       );
     }
     // check that all reservation have been added
@@ -345,7 +351,7 @@ describe("New Reservation", () => {
     );
 
     // try to add another reservation, fairly far from the others.
-    cy.clickOnCalendarSlot("Pietrangeli", 20, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 20, 0);
     cy.get("[data-test='reserve-button']").click();
 
     //Error expected
@@ -387,13 +393,13 @@ describe("New Reservation", () => {
         .set("s", 0)
         .set("ms", 0)
         .toDate(),
-      this.clubIdCircoloProva as string,
-      "campo prova",
-      Cypress.env("AUTH0_USER") as string
+      this.clubIdAllEngland as string,
+      centerCourtName,
+      Cypress.env("USER1_MAIL") as string
     );
 
     // try again, succeed this time
-    cy.clickOnCalendarSlot("Pietrangeli", 20, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 20, 0);
     cy.get("[data-test='reserve-button']").click();
     cy.get("[data-test='error-alert']").should("not.exist");
     cy.get("[data-test='calendar-event']").should(
@@ -416,8 +422,8 @@ describe("Reservation detail", () => {
       startDate.toDate(),
       startDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
-      "Pietrangeli",
-      Cypress.env("AUTH0_USER") as string
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
     );
     cy.reload().waitForCalendarPageToLoad();
     cy.navigateDaysFromToday(dayInAdvance);
@@ -429,7 +435,7 @@ describe("Reservation detail", () => {
     cy.get("[data-test='event-detail-dialog']").should("be.visible");
   });
 
-  it.only("GIVEN logged user WHEN click on other's reservation THEN not show detail dialog", function () {
+  it("GIVEN logged user WHEN click on other's reservation THEN not show detail dialog", function () {
     const dayInAdvance = 2;
     const startDate = dayjs()
       .add(dayInAdvance, "days")
@@ -441,8 +447,8 @@ describe("Reservation detail", () => {
       startDate.toDate(),
       startDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
-      "Pietrangeli",
-      "admin@terrarossa.app"
+      pietrangeliCourtName,
+      Cypress.env("USER2_MAIL") as string
     );
     cy.reload().waitForCalendarPageToLoad();
     cy.navigateDaysFromToday(dayInAdvance);
