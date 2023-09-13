@@ -516,7 +516,7 @@ describe("Reservation detail", () => {
     cy.get("[data-test='calendar-event']").should("not.exist");
   });
 
-  it.only("GIVEN logged user WHEN select own reservation after canDelete time limit THEN show warning and cannot delete", function () {
+  it("GIVEN logged user WHEN select own reservation after canDelete time limit THEN show warning and cannot delete", function () {
     let firstStartDateNotDeletable = dayjs()
       .add(
         (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel,
