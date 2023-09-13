@@ -94,9 +94,9 @@ export default function EventDetailDialog(props: DialogProps) {
 
           {/* alert message */}
           {canDelete && tooLateToCancel && (
-            <Alert severity="warning">
-              Non puoi cancellare una prenotazione meno di 6 ore prima del suo
-              inizio
+            <Alert data-test="alert" severity="warning">
+              Non puoi cancellare una prenotazione meno di{" "}
+              {clubSettings.hoursBeforeCancel} ore prima del suo inizio
             </Alert>
           )}
 

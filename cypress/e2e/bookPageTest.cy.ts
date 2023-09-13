@@ -459,4 +459,118 @@ describe("Reservation detail", () => {
     // check that the dialog is visible
     cy.get("[data-test='event-detail-dialog']").should("not.exist");
   });
+
+  it("GIVEN logged user WHEN select own reservation before canDelete time limit THEN can delete", function () {
+    let startDateSafeToDelete = dayjs()
+      .millisecond(0)
+      .second(0)
+      .minute(0)
+      .add(
+        (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel + 1, // add 1 hour to be sure being after the hoursBeforeCancel time limit
+        "hour"
+      );
+
+    const clubClosingTimeToday = dayjs()
+      .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
+      .minute((this.clubSettingsForoItalico as ClubSettings).lastBookableMinute)
+      .second(0)
+      .millisecond(0);
+    const clubOpeningTimeTomorrow = dayjs()
+      .add(1, "day")
+      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+      .minute(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
+      .second(0)
+      .millisecond(0);
+
+    // if the reservation to create falls in the closing time window
+    // start it from the opening time of the next day
+    if (
+      startDateSafeToDelete.isAfter(clubClosingTimeToday) &&
+      startDateSafeToDelete.isBefore(clubOpeningTimeTomorrow)
+    ) {
+      startDateSafeToDelete = dayjs()
+        .add(1, "day")
+        .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+        .minute(
+          (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+        )
+        .second(0)
+        .millisecond(0);
+    }
+
+    cy.addReservationToDB(
+      startDateSafeToDelete.toDate(),
+      startDateSafeToDelete.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
+    );
+    cy.reload().waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(startDateSafeToDelete.day() - dayjs().day());
+
+    cy.get("[data-test='calendar-event']").click();
+    cy.get("[data-test='delete-button']").click();
+    cy.get("[data-test='confirm-button']").click();
+    cy.get("[data-test='calendar-event']").should("not.exist");
+  });
+
+  it.only("GIVEN logged user WHEN select own reservation after canDelete time limit THEN show warning and cannot delete", function () {
+    let firstStartDateNotDeletable = dayjs()
+      .add(
+        (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel,
+        "hour"
+      )
+      .millisecond(0)
+      .second(0)
+      .minute(0);
+
+    const clubClosingTimeToday = dayjs()
+      .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
+      .minute((this.clubSettingsForoItalico as ClubSettings).lastBookableMinute)
+      .second(0)
+      .millisecond(0);
+    const clubOpeningTimeTomorrow = dayjs()
+      .add(1, "day")
+      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+      .minute(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
+      .second(0)
+      .millisecond(0);
+    // if the reservation to create falls in the closing time window
+    // start it from the last bookable time of today
+    if (
+      firstStartDateNotDeletable.isAfter(clubClosingTimeToday) &&
+      firstStartDateNotDeletable.isBefore(clubOpeningTimeTomorrow)
+    ) {
+      firstStartDateNotDeletable = dayjs()
+        .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
+        .minute(
+          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+        )
+        .second(0)
+        .millisecond(0);
+    }
+
+    cy.addReservationToDB(
+      firstStartDateNotDeletable.toDate(),
+      firstStartDateNotDeletable.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
+    );
+    cy.reload().waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(firstStartDateNotDeletable.day() - dayjs().day());
+
+    cy.get("[data-test=calendar-event]").click();
+    cy.get("[data-test=delete-button]").should("be.disabled");
+    cy.get("[data-test=alert").should(
+      "have.text",
+      `Non puoi cancellare una prenotazione meno di ${
+        (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel
+      } ore prima del suo inizio`
+    );
+  });
 });
