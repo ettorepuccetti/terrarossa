@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const prisma = new PrismaClient();
+
 export default defineConfig({
   projectId: "y4edyf",
   e2e: {
@@ -28,73 +30,7 @@ export default defineConfig({
           return launchOptions;
         }
       });
-      const prisma = new PrismaClient();
-      on("task", {
-        "prisma:queryClubs"() {
-          return prisma.club.findMany();
-        },
-        "prisma:queryFilteredClubs"(filter: string) {
-          return prisma.club.findMany({
-            where: {
-              name: {
-                contains: filter,
-              },
-            },
-          });
-        },
-        "prisma:deleteAllReservationOfClub"(clubId: string) {
-          if (!clubId) throw new Error("clubId is undefined");
-          return prisma.reservation.deleteMany({
-            where: {
-              court: {
-                clubId: clubId,
-              },
-            },
-          });
-        },
-        async "prisma:getUserIdFromUsername"(username: string) {
-          const user = await prisma.user.findUnique({
-            where: {
-              email: username,
-            },
-          });
-          if (!user) throw new Error("User not found");
-          return user.id;
-        },
-        async "prisma:makeReservation"({
-          startTime,
-          endTime,
-          clubId,
-          courtName,
-          userMail,
-        }: {
-          startTime: Date;
-          endTime: Date;
-          clubId: string;
-          courtName: string;
-          userMail: string;
-        }) {
-          return await prisma.reservation.create({
-            data: {
-              startTime: startTime,
-              endTime: endTime,
-              user: {
-                connect: {
-                  email: userMail,
-                },
-              },
-              court: {
-                connect: {
-                  name_clubId: {
-                    clubId: clubId,
-                    name: courtName,
-                  },
-                },
-              },
-            },
-          });
-        },
-      });
+      tasks(on);
       return config;
     },
   },
@@ -105,5 +41,83 @@ export default defineConfig({
       framework: "next",
       bundler: "webpack",
     },
+    setupNodeEvents(on, config) {
+      tasks(on);
+      return config;
+    },
   },
 });
+
+function tasks(on: Cypress.PluginEvents) {
+  on("task", {
+    "prisma:queryClubs"() {
+      return prisma.club.findMany();
+    },
+    "prisma:queryFilteredClubs"(filter: string) {
+      return prisma.club.findMany({
+        where: {
+          name: {
+            contains: filter,
+          },
+        },
+      });
+    },
+    "prisma:deleteAllReservationOfClub"(clubId: string) {
+      if (!clubId) throw new Error("clubId is undefined");
+      return prisma.reservation.deleteMany({
+        where: {
+          court: {
+            clubId: clubId,
+          },
+        },
+      });
+    },
+    async "prisma:getUserIdFromUsername"(username: string) {
+      return await prisma.user.findUniqueOrThrow({
+        where: {
+          email: username,
+        },
+      });
+    },
+    async "prisma:makeReservation"({
+      startTime,
+      endTime,
+      clubId,
+      courtName,
+      userMail,
+    }: {
+      startTime: Date;
+      endTime: Date;
+      clubId: string;
+      courtName: string;
+      userMail: string;
+    }) {
+      return await prisma.reservation.create({
+        data: {
+          startTime: startTime,
+          endTime: endTime,
+          user: {
+            connect: {
+              email: userMail,
+            },
+          },
+          court: {
+            connect: {
+              name_clubId: {
+                clubId: clubId,
+                name: courtName,
+              },
+            },
+          },
+        },
+      });
+    },
+    async "prisma:getClubSettings"(clubSettingsId: string) {
+      return await prisma.clubSettings.findUniqueOrThrow({
+        where: {
+          id: clubSettingsId,
+        },
+      });
+    },
+  });
+}

@@ -7,8 +7,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { DateField, TimeField, TimePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
+import {
+  DateField,
+  TimeField,
+  TimePicker,
+  type TimeValidationError,
+} from "@mui/x-date-pickers";
+import { type ClubSettings } from "@prisma/client";
+import dayjs, { type Dayjs } from "dayjs";
 import { signIn, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { isAdminOfTheClub } from "~/utils/utils";
@@ -18,21 +24,34 @@ export interface ReserveDialogProps {
   open: boolean;
   startDate: Date | undefined;
   resource: string | undefined;
-  onConfirm: (endDate: Date, overwrittenName?: string) => void;
+  onConfirm: (endDate: Date, overwrittenName: string | undefined) => void;
   onDialogClose: () => void;
-  clubId: string | undefined;
+  clubId: string;
+  clubSettings: ClubSettings;
 }
 
 export default function ReserveDialog(props: ReserveDialogProps) {
-  const { open, startDate, resource } = props;
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const { open, resource } = props;
+  const startDate = dayjs(props.startDate);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
   const { data: sessionData } = useSession();
+  const [endDateError, setEndDateError] = useState<string | undefined>(
+    undefined
+  );
 
   // to set endDate to startDate + 1 hour, when component is mounted
   useEffect(() => {
-    setEndDate((dayjs(startDate).add(1, "hour") as unknown as Date) ?? null);
-  }, [startDate]);
+    if (!props.startDate) {
+      return;
+    }
+    setEndDate(
+      dayjs(props.startDate)
+        .add(1, "hours")
+        .set("second", 0)
+        .set("millisecond", 0)
+    );
+  }, [props.startDate]);
 
   const onConfirmButton = () => {
     if (!endDate) {
@@ -43,27 +62,63 @@ export default function ReserveDialog(props: ReserveDialogProps) {
     console.log("startDate in calendar: ", startDate);
     console.log("endDate from dialog: ", endDate);
 
-    // clean seconds and milliseconds from endDate - issue with dayJS
-    const cleanedEndDate = dayjs(endDate).toDate();
-    cleanedEndDate.setMilliseconds(0);
-    cleanedEndDate.setSeconds(0);
-
     props.onConfirm(
-      cleanedEndDate,
+      endDate.toDate(),
       //manage overwriteName limitation about controlled component
       overwriteName !== "" ? overwriteName : undefined
     );
-    setEndDate(null);
     setOverwriteName("");
+    setEndDate(null);
   };
 
-  const [endDateError, setEndDateError] = useState<string | undefined>(
-    undefined
-  );
-
   const canBook =
-    isAdminOfTheClub(sessionData, props.clubId) ||
-    dayjs(startDate).isAfter(dayjs());
+    isAdminOfTheClub(sessionData, props.clubId) || startDate.isAfter(dayjs());
+
+  const maxTime = () => {
+    // default case
+    const maxTime = startDate.add(2, "hours");
+
+    // manage case in which endTime would be after club closing time, apply also for ADMIN
+    const clubClosingTime = dayjs(startDate)
+      .hour(props.clubSettings.lastBookableHour + 1) // TODO: +1 implicit assumption
+      .minute(props.clubSettings.lastBookableMinute)
+      .second(0)
+      .millisecond(0);
+    if (maxTime.isAfter(clubClosingTime)) {
+      return clubClosingTime;
+    }
+
+    // manage ADMIN case, free to book as much as he wants
+    if (isAdminOfTheClub(sessionData, props.clubId)) {
+      return undefined;
+    }
+
+    // manage case in which endTime would be the next day (so end time before start time)
+    // TODO: useless because club closing time should be before midnight
+    if (maxTime.day() !== startDate.day()) {
+      return startDate.endOf("day");
+    }
+
+    return maxTime;
+  };
+
+  const setEndDateErrorText = (error: TimeValidationError) => {
+    if (!error) {
+      setEndDateError(undefined);
+      return;
+    }
+    if (error === "minutesStep" || error === "minTime") {
+      setEndDateError("Prenota 1 ora, 1 ora e mezzo o 2 ore");
+      return;
+    }
+    if (error === "maxTime") {
+      setEndDateError(
+        "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
+      );
+      return;
+    }
+    setEndDateError(error.toString());
+  };
 
   return (
     <>
@@ -71,8 +126,8 @@ export default function ReserveDialog(props: ReserveDialogProps) {
         data-test="reserve-dialog"
         open={open}
         onClose={() => {
-          setEndDate(null);
           setOverwriteName("");
+          setEndDate(null);
           props.onDialogClose();
         }}
       >
@@ -103,7 +158,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
               {/* date */}
               <DateField
                 inputProps={{ "data-test": "date" }}
-                value={dayjs(startDate)}
+                value={startDate}
                 readOnly={true}
                 label={"Data"}
                 format="DD/MM/YYYY"
@@ -131,24 +186,16 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                 }}
                 value={endDate}
                 label={"Orario di fine"}
-                onChange={(dayJsDate) => setEndDate(dayJsDate)} // value is DayJS object
+                onChange={(dayJsDate) => setEndDate(dayJsDate)}
                 ampm={false}
                 minutesStep={30}
                 skipDisabled={true}
-                minTime={dayjs(startDate).add(1, "hours") as unknown as Date}
-                maxTime={
-                  isAdminOfTheClub(sessionData, props.clubId)
-                    ? undefined
-                    : (dayjs(startDate).add(2, "hours") as unknown as Date)
-                }
+                minTime={startDate.add(1, "hours")}
+                maxTime={maxTime()}
                 disabled={!canBook}
                 autoFocus
                 sx={{ width: "100%" }}
-                onError={(error) => {
-                  setEndDateError(
-                    error ? "Prenota 1 ora, 1 ora e mezzo o 2 ore" : undefined
-                  );
-                }}
+                onError={setEndDateErrorText}
               />
 
               {!canBook && (

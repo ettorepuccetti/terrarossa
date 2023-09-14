@@ -1,15 +1,29 @@
-import { type Club } from "@prisma/client";
+import { type Club, type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
-import { reservationConstraints } from "~/utils/constants";
+import {
+  allEnglandClubName,
+  centerCourtName,
+  court1AllEngName,
+  court1ForoName,
+  foroItalicoName,
+  pietrangeliCourtName,
+} from "~/utils/constants";
+import { formatTimeString } from "~/utils/utils";
 
-beforeEach("Initial clean up and retrieve clubId from clubName", () => {
-  function saveClubIdAndCleanReservations(clubName: string, aliasName: string) {
+beforeEach("Initial clean up and retrieve Clubs", function () {
+  function saveClubInfoAndCleanReservations(
+    clubName: string,
+    clubIdAliasName: string,
+    clubAliasName: string,
+    clubSettingsAliasName: string
+  ) {
     cy.queryFilteredClubs(clubName).then(function (clubs: Club[]) {
       if (clubs[0] === undefined) {
         throw new Error("No clubs found");
       }
+      cy.wrap(clubs[0]).as(clubAliasName);
       cy.wrap(clubs[0].id)
-        .as(aliasName)
+        .as(clubIdAliasName)
         .then(() => {
           if (clubs[0] === undefined) {
             //already checked, but build fails otherwise
@@ -17,20 +31,210 @@ beforeEach("Initial clean up and retrieve clubId from clubName", () => {
           }
           cy.deleteAllReservationOfClub(clubs[0].id);
         });
+
+      cy.getClubSettings(clubs[0].clubSettingsId).then((clubSettings) => {
+        cy.wrap(clubSettings).as(clubSettingsAliasName);
+      });
     });
   }
-  saveClubIdAndCleanReservations("foro italico", "clubId");
-  saveClubIdAndCleanReservations("club prova", "clubIdCircoloProva");
-});
+  saveClubInfoAndCleanReservations(
+    foroItalicoName,
+    "clubIdForoItalico",
+    "foroItalico",
+    "clubSettingsForoItalico"
+  );
+  saveClubInfoAndCleanReservations(
+    allEnglandClubName,
+    "clubIdAllEngland",
+    "allEngland",
+    "clubSettingsAllEngland"
+  );
 
-describe("Not logged user", () => {
-  beforeEach("visit calendar page", function () {
+  // so I can use previous aliases
+  cy.then(() => {
+    cy.loginToAuth0(
+      Cypress.env("USER1_MAIL") as string,
+      Cypress.env("USER1_PWD") as string
+    );
+
+    cy.getUsername().then((username) => {
+      cy.wrap(username).should("be.a", "string").as("username");
+    });
+
     cy.visit(
-      `/prenota?clubId=${this.clubId as string}`
+      `/prenota?clubId=${this.clubIdForoItalico as string}`
     ).waitForCalendarPageToLoad();
   });
+});
 
+describe("Calendar navigation", () => {
+  it("GIVEN club with max day in the past and future WHEN navigate calendar THEN cannot go beyond those limits", function () {
+    //check first selectable day is visible
+    const firstSelectableDay = dayjs()
+      .subtract(
+        (this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible,
+        "day"
+      )
+      .date()
+      .toString()
+      .padStart(2, "0");
+
+    cy.get("[data-test='day-card']")
+      .first()
+      .should("contain", firstSelectableDay);
+
+    //check if the last selectable day is visible
+    const lastSelectableDay = dayjs()
+      .add(
+        (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible,
+        "day"
+      )
+      .date()
+      .toString()
+      .padStart(2, "0");
+
+    cy.get("[data-test='day-card']")
+      .last()
+      .should("contain", lastSelectableDay);
+  });
+
+  it("GIVEN club with max day in the past and future WHEN reserve on first and last visible day THEN reservation shown", function () {
+    // create PAST reservation
+    const firstVisibleStartDate = dayjs()
+      .subtract(
+        (this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible,
+        "day"
+      )
+      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+      .minute(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
+      .second(0)
+      .millisecond(0);
+
+    cy.addReservationToDB(
+      firstVisibleStartDate.toDate(),
+      firstVisibleStartDate.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
+    );
+
+    // create FUTURE reservation
+    const lastVisibleStartDate = dayjs()
+      .add(
+        (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible,
+        "day"
+      )
+      .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
+      .minute((this.clubSettingsForoItalico as ClubSettings).lastBookableMinute)
+      .second(0)
+      .millisecond(0);
+
+    cy.addReservationToDB(
+      lastVisibleStartDate.toDate(),
+      lastVisibleStartDate.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
+    );
+
+    // CHECKS
+    cy.reload().waitForCalendarPageToLoad();
+
+    cy.navigateDaysFromToday(
+      -(this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible
+    );
+    cy.get('[data-test="calendar-event"]').should("be.visible");
+
+    cy.navigateDaysFromToday(
+      (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible
+    );
+    cy.get('[data-test="calendar-event"]').should("be.visible");
+  });
+
+  it("GIVEN club with reservation first and last hour WHEN select first and second last slot THEN constrains respected", function () {
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :nth-child(1) > .fc-timegrid-slot"
+    ).click(); // click on first slot
+
+    // check startTime of first bookable slot
+    cy.get("[data-test='startTime']").should(
+      "have.value",
+      formatTimeString(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
+    );
+
+    // click outside the dialog to close it
+    cy.get(".MuiDialog-container").click(5, 5);
+
+    // select the last slot bookable
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot"
+    ).click();
+
+    // check endTime of last bookable slot
+    cy.get("[data-test='endTime']")
+      .should(
+        "have.value",
+        formatTimeString(
+          (this.clubSettingsForoItalico as ClubSettings).lastBookableHour + 1, //TODO: implicit assumption
+          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+        )
+      )
+      .and("have.attr", "aria-invalid", "false");
+  });
+
+  it("GIVEN club with reservation last hour WHEN click on very last slot THEN no reservation dialog showed", function () {
+    // click on the last slot
+    cy.get(
+      ".fc-timegrid-slots > table > tbody > :last-child > .fc-timegrid-slot"
+    ).click();
+
+    cy.get("[data-test='event-detail-dialog']").should("not.exist");
+  });
+
+  it("GIVEN two club with a court with same name WHEN get all reservation of one club THEN show only reservation of one club", function () {
+    const startDate = dayjs()
+      .add(1, "day")
+      .hour(12)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+
+    cy.addReservationToDB(
+      startDate.toDate(),
+      startDate.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      court1ForoName,
+      Cypress.env("USER1_MAIL") as string
+    );
+
+    cy.addReservationToDB(
+      startDate.toDate(),
+      startDate.add(1, "hour").toDate(),
+      this.clubIdAllEngland as string,
+      court1AllEngName,
+      Cypress.env("USER1_MAIL") as string
+    );
+
+    cy.reload().waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(1);
+
+    cy.get("[data-test='calendar-event']").should("have.length", 1);
+  });
+});
+
+describe("New Reservation", () => {
   it("GIVEN not logged in user WHEN click on available slot THEN show login button", function () {
+    cy.logout();
+
+    cy.visit(
+      `/prenota?clubId=${this.clubIdForoItalico as string}`
+    ).waitForCalendarPageToLoad();
+
     // select a random slot
     cy.get(
       ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
@@ -44,51 +248,10 @@ describe("Not logged user", () => {
     cy.get("[data-test='startTime']").should("not.exist");
   });
 
-  it("GIVEN user WHEN navigate calendar THEN can go in the past and future according to club settings", function () {
-    //check first selectable day is visible
-    const firstSelectableDay = dayjs()
-      .add(-reservationConstraints.daysInThePastVisible, "day")
-      .date()
-      .toString()
-      .padStart(2, "0");
-
-    cy.get("[data-test='day-card']")
-      .first()
-      .should("contain", firstSelectableDay);
-
-    //check if the last selectable day is visible
-    const lastSelectableDay = dayjs()
-      .add(reservationConstraints.daysInTheFutureVisible, "day")
-      .date()
-      .toString()
-      .padStart(2, "0");
-
-    cy.get("[data-test='day-card']")
-      .last()
-      .should("contain", lastSelectableDay);
-  });
-});
-
-describe("Logged user", () => {
-  beforeEach("login with mail/pwd and retrieve username", function () {
-    cy.loginToAuth0(
-      Cypress.env("AUTH0_USER") as string,
-      Cypress.env("AUTH0_PW") as string
-    );
-
-    cy.getUsername().then((username) => {
-      cy.wrap(username).should("be.a", "string").as("username");
-    });
-
-    cy.visit(
-      `/prenota?clubId=${this.clubId as string}`
-    ).waitForCalendarPageToLoad();
-  });
-
   it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
     cy.navigateDaysFromToday(2);
 
-    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
     // save startTime
     cy.get("[data-test='startTime']").invoke("val").as("startTime");
@@ -112,88 +275,10 @@ describe("Logged user", () => {
     });
   });
 
-  it("GIVEN club with reservation time constrains WHEN select first and (second)last time slot THEN constrains respected", function () {
-    cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-child(1) > .fc-timegrid-slot"
-    ).click(); // click on first slot
-
-    // check startTime of first bookable slot
-    cy.get("[data-test='startTime']").should(
-      "have.value",
-      reservationConstraints.getClubOpeningTime()
-    );
-
-    // click outside the dialog to close it
-    cy.get(".MuiDialog-container").click(5, 5);
-
-    // select the last slot clickable
-    cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot"
-    ).click();
-
-    // check endTime of last bookable slot
-    cy.get("[data-test='endTime']").should(
-      "have.value",
-      reservationConstraints.getClubClosingTime()
-    );
-  });
-
-  it("GIVEN club with max day in the past and future WHEN reserve in first and last visible day THEN reservation shown", function () {
-    // create PAST reservation
-    const firstVisibleStartDate = dayjs()
-      .subtract(reservationConstraints.daysInThePastVisible, "day")
-      .hour(reservationConstraints.getFirstBookableHour())
-      .minute(reservationConstraints.getFirstBookableMinute())
-      .second(0)
-      .millisecond(0);
-
-    cy.addReservationToDB(
-      firstVisibleStartDate.toDate(),
-      firstVisibleStartDate.add(1, "hour").toDate(),
-      this.clubId as string,
-      "Pietrangeli",
-      Cypress.env("AUTH0_USER") as string
-    );
-
-    // create FUTURE reservation
-    const lastVisibleStartDate = dayjs()
-      .add(reservationConstraints.daysInTheFutureVisible, "day")
-      .hour(reservationConstraints.getLastBookableHour() - 1) // -1 because slotMaxTime is the closing time of the club
-      .minute(reservationConstraints.getLastBookableMinute())
-      .second(0)
-      .millisecond(0);
-
-    cy.addReservationToDB(
-      lastVisibleStartDate.toDate(),
-      lastVisibleStartDate.add(1, "hour").toDate(),
-      this.clubId as string,
-      "Pietrangeli",
-      Cypress.env("AUTH0_USER") as string
-    );
-
-    // CHECKS
-    cy.reload().waitForCalendarPageToLoad();
-
-    cy.navigateDaysFromToday(-reservationConstraints.daysInThePastVisible);
-    cy.get('[data-test="calendar-event"]').should("be.visible");
-
-    cy.navigateDaysFromToday(reservationConstraints.daysInTheFutureVisible);
-    cy.get('[data-test="calendar-event"]').should("be.visible");
-  });
-
-  it("GIVEN club with max reservation time WHEN click on very last slot THEN no reservation dialog showed", function () {
-    // click on the last slot
-    cy.get(
-      ".fc-timegrid-slots > table > tbody > :last-child > .fc-timegrid-slot"
-    ).click();
-
-    cy.get("[data-test='event-detail-dialog']").should("not.exist");
-  });
-
   it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", function () {
     cy.navigateDaysFromToday(2);
 
-    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
     // insert wrong endTime
     cy.get("[data-test='endTime']").type("12:15");
@@ -205,20 +290,6 @@ describe("Logged user", () => {
 
     // try to reserve by clicking confirm button
     cy.get("[data-test='reserve-button']").should("be.disabled");
-
-    //TODO: force call the API and check the error message
-    // cy.get("[data-test='error-alert']")
-    //   .should("be.visible")
-    //   .and(
-    //     "have.text",
-    //     "L'orario di inizio e di fine deve essere un multiplo di 30 minuti"
-    //   );
-
-    // // close the error dialog
-    // cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
-
-    // // check that no reservation has been added
-    // cy.get("[data-test='calendar-event']").should("not.exist");
   });
 
   it("GIVEN logged user WHEN reserve with a clash THEN show error banner and reservation not added", function () {
@@ -233,16 +304,16 @@ describe("Logged user", () => {
     cy.addReservationToDB(
       startDate.toDate(),
       startDate.add(1, "hour").toDate(),
-      this.clubId as string,
-      "Pietrangeli",
-      Cypress.env("AUTH0_USER") as string
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
     );
 
     cy.reload().waitForCalendarPageToLoad();
 
     cy.navigateDaysFromToday(1);
 
-    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
     cy.get("[data-test='endTime']").type("12:30");
 
@@ -264,37 +335,42 @@ describe("Logged user", () => {
   it("GIVEN logged user WHEN reservation is longer than 2 hours THEN show error and cannot press button", function () {
     cy.navigateDaysFromToday(2);
 
-    cy.clickOnCalendarSlot("Pietrangeli", 11, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
     // insert endTime longer than 2 hours
     cy.get("[data-test='endTime']").type("14:00");
 
-    // try to reserve by clicking confirm button
+    // check reserve button is disabled
     cy.get("[data-test='reserve-button']").should("be.disabled");
 
+    // check error message
     cy.get(".MuiFormHelperText-root").should(
       "have.text",
-      "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+      "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
     );
   });
 
   it("GIVEN logged user WHEN exceed max active reservations THEN show warning and cannot reserve", function () {
-    const maxActiveReservationsPerUser =
-      reservationConstraints.maxActiveReservationsPerUser;
     const startDate = dayjs()
       .add(2, "days")
-      .hour(reservationConstraints.firstBookableHour)
-      .minute(reservationConstraints.firstBookableMinute)
+      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+      .minute(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
       .second(0)
       .millisecond(0);
     // reach the max number of reservations
-    for (let i = 0; i < maxActiveReservationsPerUser; i++) {
+    for (
+      let i = 0;
+      i < (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser;
+      i++
+    ) {
       cy.addReservationToDB(
         startDate.add(i, "hour").toDate(),
         startDate.add(i + 1, "hour").toDate(),
-        this.clubId as string,
-        i % 2 === 0 ? "Pietrangeli" : "Centrale",
-        Cypress.env("AUTH0_USER") as string
+        this.clubIdForoItalico as string,
+        i % 2 === 0 ? pietrangeliCourtName : "Centrale",
+        Cypress.env("USER1_MAIL") as string
       );
     }
     // check that all reservation have been added
@@ -303,23 +379,25 @@ describe("Logged user", () => {
     cy.navigateDaysFromToday(2);
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      reservationConstraints.maxActiveReservationsPerUser
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
     );
 
     // try to add another reservation, fairly far from the others.
-    cy.clickOnCalendarSlot("Pietrangeli", 20, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 20, 0);
     cy.get("[data-test='reserve-button']").click();
 
     //Error expected
     cy.get("[data-test='error-alert']").should(
       "have.text",
-      `Hai raggiunto il numero massimo di prenotazioni attive (${reservationConstraints.maxActiveReservationsPerUser})`
+      `Hai raggiunto il numero massimo di prenotazioni attive (${
+        (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+      })`
     );
     // Number of reservations should not change
     cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      reservationConstraints.maxActiveReservationsPerUser
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
     );
 
     // delete one reservation and try again
@@ -328,25 +406,203 @@ describe("Logged user", () => {
     cy.get("[data-test='confirm-button']").click();
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      reservationConstraints.maxActiveReservationsPerUser - 1
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser - 1
     );
 
     //add reservation in different club and check that does not affect the count
     cy.addReservationToDB(
-      dayjs().add(1, "day").set("hour", 20).toDate(),
-      dayjs().add(1, "day").set("hour", 21).toDate(),
-      this.clubIdCircoloProva as string,
-      "campo prova",
-      Cypress.env("AUTH0_USER") as string
+      dayjs()
+        .add(1, "day")
+        .set("h", 20)
+        .set("m", 0)
+        .set("s", 0)
+        .set("ms", 0)
+        .toDate(),
+      dayjs()
+        .add(1, "day")
+        .set("h", 21)
+        .set("m", 0)
+        .set("s", 0)
+        .set("ms", 0)
+        .toDate(),
+      this.clubIdAllEngland as string,
+      centerCourtName,
+      Cypress.env("USER1_MAIL") as string
     );
 
     // try again, succeed this time
-    cy.clickOnCalendarSlot("Pietrangeli", 20, 0);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 20, 0);
     cy.get("[data-test='reserve-button']").click();
     cy.get("[data-test='error-alert']").should("not.exist");
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      reservationConstraints.maxActiveReservationsPerUser
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+    );
+  });
+});
+
+describe("Reservation details", () => {
+  it("GIVEN logged user WHEN click on his reservation THEN show details dialog", function () {
+    const dayInAdvance = 2;
+    const startDate = dayjs()
+      .add(dayInAdvance, "days")
+      .hour(12)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+    cy.addReservationToDB(
+      startDate.toDate(),
+      startDate.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
+    );
+    cy.reload().waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(dayInAdvance);
+    // check that the reservation is visible
+    cy.get("[data-test='calendar-event']").should("have.length", 1);
+    // click on the reservation
+    cy.get("[data-test='calendar-event']").click();
+    // check that the dialog is visible
+    cy.get("[data-test='event-detail-dialog']").should("be.visible");
+  });
+
+  it("GIVEN logged user WHEN click on other's reservation THEN not show detail dialog", function () {
+    const dayInAdvance = 2;
+    const startDate = dayjs()
+      .add(dayInAdvance, "days")
+      .hour(12)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+    cy.addReservationToDB(
+      startDate.toDate(),
+      startDate.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("USER2_MAIL") as string
+    );
+    cy.reload().waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(dayInAdvance);
+    // check that the reservation is visible
+    cy.get("[data-test='calendar-event']").should("have.length", 1);
+    // click on the reservation
+    cy.get("[data-test='calendar-event']").click();
+    // check that the dialog is visible
+    cy.get("[data-test='event-detail-dialog']").should("not.exist");
+  });
+
+  it("GIVEN logged user WHEN select own reservation before canDelete time limit THEN can delete", function () {
+    let startDateSafeToDelete = dayjs()
+      .millisecond(0)
+      .second(0)
+      .minute(0)
+      .add(
+        (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel + 1, // add 1 hour to be sure being after the hoursBeforeCancel time limit
+        "hour"
+      );
+
+    const clubClosingTimeToday = dayjs()
+      .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
+      .minute((this.clubSettingsForoItalico as ClubSettings).lastBookableMinute)
+      .second(0)
+      .millisecond(0);
+    const clubOpeningTimeTomorrow = dayjs()
+      .add(1, "day")
+      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+      .minute(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
+      .second(0)
+      .millisecond(0);
+
+    // if the reservation to create falls in the closing time window
+    // start it from the opening time of the next day
+    if (
+      startDateSafeToDelete.isAfter(clubClosingTimeToday) &&
+      startDateSafeToDelete.isBefore(clubOpeningTimeTomorrow)
+    ) {
+      startDateSafeToDelete = dayjs()
+        .add(1, "day")
+        .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+        .minute(
+          (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+        )
+        .second(0)
+        .millisecond(0);
+    }
+
+    cy.addReservationToDB(
+      startDateSafeToDelete.toDate(),
+      startDateSafeToDelete.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
+    );
+    cy.reload().waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(startDateSafeToDelete.day() - dayjs().day());
+
+    cy.get("[data-test='calendar-event']").click();
+    cy.get("[data-test='delete-button']").click();
+    cy.get("[data-test='confirm-button']").click();
+    cy.get("[data-test='calendar-event']").should("not.exist");
+  });
+
+  it("GIVEN logged user WHEN select own reservation after canDelete time limit THEN show warning and cannot delete", function () {
+    let firstStartDateNotDeletable = dayjs()
+      .add(
+        (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel,
+        "hour"
+      )
+      .millisecond(0)
+      .second(0)
+      .minute(0);
+
+    const clubClosingTimeToday = dayjs()
+      .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
+      .minute((this.clubSettingsForoItalico as ClubSettings).lastBookableMinute)
+      .second(0)
+      .millisecond(0);
+    const clubOpeningTimeTomorrow = dayjs()
+      .add(1, "day")
+      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+      .minute(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
+      .second(0)
+      .millisecond(0);
+    // if the reservation to create falls in the closing time window
+    // start it from the last bookable time of today
+    if (
+      firstStartDateNotDeletable.isAfter(clubClosingTimeToday) &&
+      firstStartDateNotDeletable.isBefore(clubOpeningTimeTomorrow)
+    ) {
+      firstStartDateNotDeletable = dayjs()
+        .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
+        .minute(
+          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+        )
+        .second(0)
+        .millisecond(0);
+    }
+
+    cy.addReservationToDB(
+      firstStartDateNotDeletable.toDate(),
+      firstStartDateNotDeletable.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("USER1_MAIL") as string
+    );
+    cy.reload().waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(firstStartDateNotDeletable.day() - dayjs().day());
+
+    cy.get("[data-test=calendar-event]").click();
+    cy.get("[data-test=delete-button]").should("be.disabled");
+    cy.get("[data-test=alert").should(
+      "have.text",
+      `Non puoi cancellare una prenotazione meno di ${
+        (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel
+      } ore prima del suo inizio`
     );
   });
 });

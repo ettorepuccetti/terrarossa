@@ -1,18 +1,21 @@
 import { PrismaClient } from "@prisma/client";
+import {
+  allEnglandClubName,
+  centerCourtName,
+  centralCourtName,
+  court1AllEngName,
+  court1ForoName,
+  foroItalicoName,
+  pietrangeliCourtName,
+} from "../src/utils/constants";
+
 const prisma = new PrismaClient();
 async function main() {
   const foroItalico = await prisma.club.upsert({
-    where: { name: "Foro Italico" },
-    update: {
-      ClubPreferences: {
-        create: {
-          daysInFutureVisible: 4,
-          daysInThePastVisible: 3,
-        },
-      },
-    },
+    where: { name: foroItalicoName },
+    update: {},
     create: {
-      name: "Foro Italico",
+      name: foroItalicoName,
       logoSrc:
         "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/bnl-logo.png",
       imageSrc:
@@ -20,24 +23,24 @@ async function main() {
       courts: {
         create: [
           {
-            name: "Centrale",
+            name: centralCourtName,
             surface: "Clay",
             indoor: false,
           },
           {
-            name: "Pietrangeli",
+            name: pietrangeliCourtName,
             surface: "Clay",
             indoor: false,
           },
           {
-            name: "Campo 1",
+            name: court1ForoName,
             surface: "Clay",
             indoor: false,
             beginTime: "HOUR",
           },
         ],
       },
-      ClubPreferences: {
+      clubSettings: {
         create: {
           daysInFutureVisible: 4,
           daysInThePastVisible: 3,
@@ -46,16 +49,31 @@ async function main() {
     },
   });
 
-  const clubProva = await prisma.club.upsert({
-    where: { name: "Club Prova" },
+  const allEnglandClub = await prisma.club.upsert({
+    where: { name: allEnglandClubName },
     update: {},
     create: {
-      name: "Club Prova",
+      name: allEnglandClubName,
+      imageSrc:
+        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/wimbledon-image.jpg",
+      logoSrc:
+        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/wimbledon-logo.png",
+      clubSettings: {
+        create: {
+          daysInFutureVisible: 7,
+          daysInThePastVisible: 2,
+        },
+      },
       courts: {
         create: [
           {
-            name: "campo prova",
-            surface: "Clay",
+            name: centerCourtName,
+            surface: "Grass",
+            indoor: true,
+          },
+          {
+            name: court1AllEngName,
+            surface: "Grass",
             indoor: false,
           },
         ],
@@ -63,9 +81,48 @@ async function main() {
     },
   });
 
+  const adminForoItalico = await prisma.user.upsert({
+    where: { email: process.env.CYPRESS_ADMIN_FORO_MAIL },
+    update: {},
+    create: {
+      email: process.env.CYPRESS_ADMIN_FORO_MAIL,
+      name: "admin-foro",
+      role: "ADMIN",
+      clubId: foroItalico.id,
+      accounts: {
+        create: {
+          type: "oauth",
+          provider: "auth0",
+          providerAccountId: "auth0|649eaa3b9391b8386a3519c8",
+          scope: "openid profile email",
+        },
+      },
+    },
+  });
+
+  const user2 = await prisma.user.upsert({
+    where: { email: process.env.CYPRESS_USER2_MAIL },
+    update: {},
+    create: {
+      email: process.env.CYPRESS_USER2_MAIL,
+      name: "user2",
+      role: "USER",
+      accounts: {
+        create: {
+          type: "oauth",
+          provider: "auth0",
+          providerAccountId: "auth0|64fdd616155c5381cdc2f9ec",
+          scope: "openid profile email",
+        },
+      },
+    },
+  });
+
   console.log("Seeding database...");
+  console.log(allEnglandClub);
   console.log(foroItalico);
-  console.log(clubProva);
+  console.log(adminForoItalico);
+  console.log(user2);
 }
 
 main()

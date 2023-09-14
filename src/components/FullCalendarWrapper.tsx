@@ -14,7 +14,8 @@ import { Avatar, Box } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useRef, type RefObject } from "react";
 import { type AppRouter } from "~/server/api/root";
-import { defaultImg, reservationConstraints } from "~/utils/constants";
+import { defaultImg } from "~/utils/constants";
+import { formatTimeString } from "~/utils/utils";
 import { HorizonalDatePicker } from "./HorizontalDatePicker";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
@@ -23,9 +24,9 @@ type ReservationFromDb =
 type CourtFromDb = RouterOutput["court"]["getAllByClubId"][0];
 
 interface FullCalendarWrapperProps {
-  clubData: RouterOutput["club"]["getByClubId"] | undefined;
+  clubData: RouterOutput["club"]["getByClubId"];
   reservationData: ReservationFromDb[];
-  courtsData: CourtFromDb[];
+  courtData: CourtFromDb[];
   onEventClick: (eventClickInfo: EventClickArg) => void;
   onDateClick: (dateClickInfo: DateClickArg) => void;
 }
@@ -38,7 +39,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       id: reservation.id.toString(),
       title: reservation.overwriteName
         ? reservation.overwriteName
-        : reservation.user?.name || "[deleted user]", //user.name can be null or user can be null
+        : reservation.user?.name || "[deleted user]", //user.name can be null or user can be null TODO: move this logic to backend
       start: reservation.startTime,
       end: reservation.endTime,
       resourceId: reservation.courtId,
@@ -95,15 +96,9 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     <Box width={"100%"} display={"flex"} flexDirection={"column"}>
       <HorizonalDatePicker
         calendarRef={calendarRef}
-        clubImg={props.clubData?.imageSrc ?? defaultImg}
-        daysInThePastVisible={
-          props.clubData?.ClubPreferences?.daysInThePastVisible ??
-          reservationConstraints.daysInThePastVisible
-        }
-        daysInTheFutureVisible={
-          props.clubData?.ClubPreferences?.daysInFutureVisible ??
-          reservationConstraints.daysInTheFutureVisible
-        }
+        clubImg={props.clubData.imageSrc ?? defaultImg}
+        daysInThePastVisible={props.clubData.clubSettings.daysInThePastVisible}
+        daysInTheFutureVisible={props.clubData.clubSettings.daysInFutureVisible}
       />
       <Box padding={"0.5rem"}>
         <FullCalendar
@@ -115,14 +110,20 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
           height="auto"
           headerToolbar={false}
           events={props.reservationData.map(reservationToEvent)}
-          resources={props.courtsData.map(courtToResource)}
+          resources={props.courtData.map(courtToResource)}
           eventClick={(eventClickInfo) => props.onEventClick(eventClickInfo)}
           dateClick={(info) => {
             props.onDateClick(info);
           }}
           selectable={false}
-          slotMinTime={reservationConstraints.getClubOpeningTime()}
-          slotMaxTime={reservationConstraints.getClubClosingTime()}
+          slotMinTime={formatTimeString(
+            props.clubData.clubSettings.firstBookableHour,
+            props.clubData.clubSettings.firstBookableMinute
+          )}
+          slotMaxTime={formatTimeString(
+            props.clubData.clubSettings.lastBookableHour + 1,
+            props.clubData.clubSettings.lastBookableMinute
+          )}
           selectLongPressDelay={0}
           slotLabelFormat={{
             hour: "numeric",

@@ -15,13 +15,7 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// Necessary for Next auth
+// Start of NextAuth models
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -64,6 +58,7 @@ model User {
   clubId        String?
   Reservation   Reservation[]
   createdAt     DateTime      @default(now())
+  updatedAt     DateTime?     @updatedAt
 
   @@index([clubId])
 }
@@ -76,7 +71,7 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// --- end of Next auth models
+// --- End of NextAuth models
 
 model Reservation {
   id            String   @id @unique @default(cuid())
@@ -87,6 +82,8 @@ model Reservation {
   courtId       String
   userId        String?
   overwriteName String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([courtId])
   @@index([userId])
@@ -107,26 +104,32 @@ model Court {
 }
 
 model Club {
-  id                String           @id @unique @default(cuid())
-  name              String           @unique
-  courts            Court[]
-  imageSrc          String?
-  logoSrc           String?
-  Admin             User[]
-  //relation with ClubPreferences, defined here so I enforce each club to have a ClubPreferences
-  ClubPreferences   ClubPreferences? @relation(fields: [clubPreferencesId], references: [id])
-  clubPreferencesId String? //@unique
-
-  @@index([clubPreferencesId])
+  id             String       @id @unique @default(cuid())
+  name           String       @unique
+  courts         Court[]
+  imageSrc       String?
+  logoSrc        String?
+  Admin          User[]
+  clubSettings   ClubSettings @relation(fields: [clubSettingsId], references: [id])
+  clubSettingsId String       @unique
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime?    @updatedAt
 }
 
-model ClubPreferences {
-  id                   String   @id @unique @default(cuid())
-  clubs                Club[]
-  openingTime          DateTime @default("1970-01-01T08:00:00.000Z")
-  closingTime          DateTime @default("1970-01-01T22:00:00.000Z")
-  daysInThePastVisible Int      @default(2)
-  daysInFutureVisible  Int      @default(7)
+model ClubSettings {
+  id                    String    @id @unique @default(cuid())
+  description           String?
+  club                  Club?
+  firstBookableHour     Int       @default(8)
+  firstBookableMinute   Int       @default(0)
+  lastBookableHour      Int       @default(22)
+  lastBookableMinute    Int       @default(0)
+  daysInThePastVisible  Int       @default(2)
+  daysInFutureVisible   Int       @default(7)
+  maxReservationPerUser Int       @default(5)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime? @updatedAt
+  hoursBeforeCancel     Int       @default(4)
 }
 
 enum BeginTime {

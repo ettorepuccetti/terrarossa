@@ -10,12 +10,12 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { reservationConstraints } from "~/utils/constants";
 import { isSelectableSlot } from "~/utils/utils";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
 import Header from "./Header";
+import Spinner from "./Spinner";
 import SpinnerPartial from "./SpinnerPartial";
 
 export const ReservationInputSchema = z.object({
@@ -23,6 +23,12 @@ export const ReservationInputSchema = z.object({
   endDateTime: z.date(),
   courtId: z.string(),
   overwriteName: z.string().optional(),
+  clubId: z.string(),
+});
+
+export const ReservationDeleteInputSchema = z.object({
+  reservationId: z.string(),
+  clubId: z.string(),
 });
 
 export const ClubIdInputSchema = z.object({
@@ -33,7 +39,7 @@ export default function Calendar() {
   const { data: sessionData } = useSession();
   const [clubId, setClubId] = useState<string | undefined>(undefined);
 
-  //get the club name from the router when is available
+  //get the club id from the router when is available
   const router = useRouter();
   useEffect(() => {
     if (router.isReady) {
@@ -49,24 +55,18 @@ export default function Calendar() {
 
   const clubQuery = api.club.getByClubId.useQuery(
     { clubId: clubId },
-    { enabled: clubId !== undefined }
+    { refetchOnWindowFocus: false, enabled: clubId !== undefined }
   );
 
   const courtQuery = api.court.getAllByClubId.useQuery(
     { clubId: clubId },
-    {
-      refetchOnWindowFocus: false,
-      enabled: clubId !== undefined,
-    }
+    { refetchOnWindowFocus: false, enabled: clubId !== undefined }
   );
 
   const reservationQuery =
     api.reservationQuery.getAllVisibleInCalendarByClubId.useQuery(
       { clubId: clubId },
-      {
-        refetchOnWindowFocus: false,
-        enabled: clubId !== undefined,
-      }
+      { refetchOnWindowFocus: false, enabled: clubId !== undefined }
     );
 
   const reservationAdd = api.reservationMutation.insertOne.useMutation({
@@ -89,14 +89,17 @@ export default function Calendar() {
     console.log("selected date: ", selectInfo.dateStr);
     console.log("resouce: ", selectInfo.resource?.title);
 
-    if (selectInfo.resource === undefined) {
+    if (!selectInfo.resource) {
       throw new Error("No court selected");
+    }
+    if (!clubQuery.data) {
+      throw new Error("No club settings found"); // should never happen since I use this function only when clubQuery.data is defined
     }
     if (
       !isSelectableSlot(
         selectInfo.date,
-        reservationConstraints.getLastBookableHour(),
-        reservationConstraints.getLastBookableMinute()
+        clubQuery.data.clubSettings.lastBookableHour,
+        clubQuery.data.clubSettings.lastBookableMinute
       )
     ) {
       console.log("last slot is not selectable");
@@ -106,27 +109,36 @@ export default function Calendar() {
   };
 
   const openEventDialog = (eventClickInfo: EventClickArg) => {
-    setEventDetails(eventClickInfo.event);
+    eventClickInfo.jsEvent.preventDefault();
+    if (eventClickInfo.event.extendedProps.userId === sessionData?.user.id) {
+      setEventDetails(eventClickInfo.event);
+    }
   };
 
-  const addEvent = (endDate: Date, overwrittenName?: string) => {
+  const addEvent = (endDate: Date, overwrittenName: string | undefined) => {
     setDateClick(undefined);
-
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
+    }
+    if (!clubId) {
+      throw new Error("ClubId not found");
     }
     reservationAdd.mutate({
       courtId: dateClick.resource.id,
       startDateTime: dateClick.date,
       endDateTime: endDate,
       overwriteName: overwrittenName,
+      clubId: clubId,
     });
   };
 
   function deleteEvent(eventId: string): void {
+    if (!clubId) {
+      throw new Error("ClubId not found");
+    }
     setEventDetails(undefined);
     console.log("delete Event: ", eventId);
-    reservationDelete.mutate(eventId);
+    reservationDelete.mutate({ reservationId: eventId, clubId: clubId });
   }
 
   const [eventDetails, setEventDetails] = useState<EventImpl>();
@@ -138,9 +150,26 @@ export default function Calendar() {
    * -------------------------------------
    */
 
+  if (clubQuery.error || courtQuery.error || reservationQuery.error) {
+    return (
+      <ErrorAlert
+        error={clubQuery.error ?? courtQuery.error ?? reservationQuery.error}
+        onClose={() => {
+          clubQuery.error && void clubQuery.refetch();
+          courtQuery.error && void courtQuery.refetch();
+          reservationQuery.error && void reservationQuery.refetch();
+        }}
+      />
+    );
+  }
+
+  if (clubQuery.isLoading || !clubId) {
+    return <Spinner isLoading={true} />;
+  }
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {reservationAdd.error !== null && (
+      {reservationAdd.error && (
         <ErrorAlert
           error={reservationAdd.error}
           onClose={() => {
@@ -150,7 +179,7 @@ export default function Calendar() {
         />
       )}
 
-      {reservationDelete.error !== null && (
+      {reservationDelete.error && (
         <ErrorAlert
           error={reservationDelete.error}
           onClose={() => {
@@ -162,22 +191,20 @@ export default function Calendar() {
 
       <SpinnerPartial
         open={
-          clubQuery.isLoading ||
           reservationQuery.isLoading ||
           reservationQuery.isRefetching ||
-          courtQuery.isLoading ||
           reservationAdd.isLoading ||
           reservationDelete.isLoading
         }
       >
         <Header
-          headerName={clubQuery.data?.name}
-          logoSrc={clubQuery.data?.logoSrc}
+          headerName={clubQuery.data.name}
+          logoSrc={clubQuery.data.logoSrc}
         />
         <FullCalendarWrapper
           clubData={clubQuery.data}
-          reservationData={reservationQuery.data ?? []}
-          courtsData={courtQuery.data ?? []}
+          courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
+          reservationData={reservationQuery.data ?? []} //same
           onDateClick={openReservationDialog}
           onEventClick={openEventDialog}
         />
@@ -188,10 +215,11 @@ export default function Calendar() {
         startDate={dateClick?.date}
         resource={dateClick?.resource?.title}
         onDialogClose={() => setDateClick(undefined)}
-        onConfirm={(endDate, overwrittenName?) =>
+        onConfirm={(endDate: Date, overwrittenName: string | undefined) =>
           addEvent(endDate, overwrittenName)
         }
         clubId={clubId}
+        clubSettings={clubQuery.data.clubSettings}
       />
 
       <EventDetailDialog
@@ -201,6 +229,7 @@ export default function Calendar() {
         sessionData={sessionData}
         onReservationDelete={(id) => deleteEvent(id)}
         clubId={clubId}
+        clubSettings={clubQuery.data.clubSettings}
       />
     </LocalizationProvider>
   );

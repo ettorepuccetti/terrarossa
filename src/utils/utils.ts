@@ -7,6 +7,26 @@ export const capitaliseFirstChar = (s: string) => {
 };
 
 /**
+ * Format a time string in the format HH:MM given the hour and minute as numbers
+ * @param {number} hour
+ * @param {number} minute
+ * @param {number} paddingHour number of digits to pad the hour with
+ * @returns a time in the format HH:MM
+ * @example 08:00
+ */
+export function formatTimeString(
+  hour: number,
+  minute: number,
+  paddingHour = 2
+): string {
+  return (
+    hour.toString().padStart(paddingHour, "0") +
+    ":" +
+    minute.toString().padStart(2, "0")
+  );
+}
+
+/**
  * Check if the logged user is admin of the club
  * @param sessionData session of the logged user
  * @param clubId id of the club to check
@@ -14,12 +34,11 @@ export const capitaliseFirstChar = (s: string) => {
  */
 export function isAdminOfTheClub(
   sessionData: Session | null | undefined,
-  clubId: string | undefined
+  clubId: string
 ): boolean {
   return (
     sessionData !== undefined &&
     sessionData !== null &&
-    clubId !== undefined &&
     sessionData.user.role === UserRoles.ADMIN &&
     sessionData.user.clubId === clubId
   );

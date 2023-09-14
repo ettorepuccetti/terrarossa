@@ -1,3 +1,4 @@
+import { TRPCClientError } from "@trpc/client";
 import { ClubIdInputSchema } from "~/components/Calendar";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
@@ -13,13 +14,20 @@ export const clubRouter = createTRPCRouter({
         //clubId come from the router, so it can also be an array of strings, or undefined
         throw new Error(`Server: invalid clubId`);
       }
-      return await ctx.prisma.club.findUnique({
-        where: {
-          id: input.clubId,
-        },
-        include: {
-          ClubPreferences: true,
-        },
-      });
+      return await ctx.prisma.club
+        .findUniqueOrThrow({
+          where: {
+            id: input.clubId,
+          },
+          include: {
+            clubSettings: true,
+          },
+        })
+        .catch((_error: Error) => {
+          throw new TRPCClientError(
+            "Si è verificato un errore, per favore riprova",
+            { cause: _error }
+          );
+        });
     }),
 });
