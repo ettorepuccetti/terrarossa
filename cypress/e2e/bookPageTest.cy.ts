@@ -441,7 +441,7 @@ describe("New Reservation", () => {
   });
 });
 
-describe("Reservation detail", () => {
+describe("Reservation details", () => {
   it("GIVEN logged user WHEN click on his reservation THEN show details dialog", function () {
     const dayInAdvance = 2;
     const startDate = dayjs()
