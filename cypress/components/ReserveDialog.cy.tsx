@@ -8,15 +8,22 @@ import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import ReserveDialog from "~/components/ReserveDialog";
 import lightTheme from "~/styles/lightTheme";
+import { UserRoles } from "~/utils/constants";
 import createEmotionCache from "~/utils/createEmotionCache";
 import { clubSettings, session } from "./constants";
 dayjs.extend(duration);
 
-const mountComponent = (
-  startDate: Dayjs | undefined,
-  session: Session | null | undefined,
-  clubSettingsInput: ClubSettings = clubSettings
-) => {
+const mountComponent = ({
+  startDate,
+  session,
+  clubId = "my_club_Id",
+  clubSettings: clubSettingsInput = clubSettings,
+}: {
+  startDate: Dayjs | undefined;
+  session: Session | null | undefined;
+  clubId?: string;
+  clubSettings?: ClubSettings;
+}) => {
   cy.mount(
     <CacheProvider value={createEmotionCache()}>
       <ThemeProvider theme={lightTheme}>
@@ -24,7 +31,7 @@ const mountComponent = (
           <SessionProvider session={session}>
             <ReserveDialog
               open={true}
-              clubId="clubId"
+              clubId={clubId}
               startDate={startDate?.toDate()}
               resource={"Campo 1"}
               onConfirm={(endDate) => console.log("end date :", endDate)}
@@ -38,9 +45,9 @@ const mountComponent = (
   );
 };
 
-describe("<Reservation Dialog />", () => {
+describe("USER", () => {
   it("GIVEN I am not logged in WHEN dialog THEN show login button", () => {
-    mountComponent(undefined, undefined);
+    mountComponent({ startDate: undefined, session: undefined });
     cy.get("h2").should("contain", "Prenota");
     cy.get(".MuiButtonBase-root").should("contain", "Effettua il login");
   });
@@ -54,7 +61,7 @@ describe("<Reservation Dialog />", () => {
       .second(0)
       .millisecond(0);
 
-    mountComponent(startDate, session);
+    mountComponent({ startDate, session });
 
     cy.get("h2").should("contain", "Prenota");
 
@@ -95,7 +102,7 @@ describe("<Reservation Dialog />", () => {
       .second(0)
       .millisecond(0);
 
-    mountComponent(startDate, session);
+    mountComponent({ startDate, session });
 
     // endTime is disabled
     cy.get("input")
@@ -121,7 +128,7 @@ describe("<Reservation Dialog />", () => {
       .second(0)
       .millisecond(0);
 
-    mountComponent(startDate, session);
+    mountComponent({ startDate, session });
 
     //try to reserve for 2h30min, not allowed
     cy.get("input").filter("[data-test='endTime']").type("15:30");
@@ -161,14 +168,14 @@ describe("<Reservation Dialog />", () => {
       let endDate = startDate.add(1, "hour").format("HH:mm");
 
       //enter last allowed endTime: LAST BOOKABLE HOUR + 1h = 21:30
-      mountComponent(startDate, session, customClubSettings);
+      mountComponent({ startDate, session, clubSettings: customClubSettings });
       cy.get("input").filter("[data-test='endTime']").type(endDate);
       cy.get("[data-test='endTime']")
         .should("have.value", endDate)
         .and("have.attr", "aria-invalid", "false");
 
       //enter invalid hour, after closing time: LAST BOOKABLE HOUR + 1.5h = 22:00
-      mountComponent(startDate, session, customClubSettings);
+      mountComponent({ startDate, session, clubSettings: customClubSettings });
       endDate = startDate
         .add(dayjs.duration({ hours: 1, minutes: 30 }))
         .format("HH:mm");
@@ -183,7 +190,7 @@ describe("<Reservation Dialog />", () => {
       );
 
       //enter invalid hour, after closing time: LAST BOOKABLE HOUR + 2h = 22:30
-      mountComponent(startDate, session, customClubSettings);
+      mountComponent({ startDate, session, clubSettings: customClubSettings });
       endDate = startDate
         .add(dayjs.duration({ hours: 2, minutes: 0 }))
         .format("HH:mm");
@@ -200,5 +207,31 @@ describe("<Reservation Dialog />", () => {
     // repeat test for all possible club closing minutes
     testBody(30);
     testBody(0);
+  });
+
+  describe("ADMIN", () => {
+    it.only("GIVEN admin WHEN reserve THEN can book more than 2 hours", () => {
+      const clubId = "my_club_Id";
+      const adminSession: Session = {
+        ...session,
+        user: {
+          ...session.user,
+          role: UserRoles.ADMIN,
+          clubId: clubId,
+        },
+      };
+      mountComponent({
+        startDate: dayjs().hour(13).minute(0),
+        session: adminSession,
+        clubId: clubId,
+      });
+      cy.get("[data-test='endTime']").type("18:00");
+      cy.get("[data-test='endTime']").should(
+        "have.attr",
+        "aria-invalid",
+        "false"
+      );
+      cy.get("[data-test='reserve-button']").should("be.enabled");
+    });
   });
 });

@@ -1,12 +1,12 @@
 import { type Club, type ClubSettings, type Court } from "@prisma/client";
+import { type Session } from "next-auth";
 import { UserRoles } from "~/utils/constants";
 
-export const session = {
+export const session: Session = {
   expires: "2022-10-20T11:00:00.000Z",
   user: {
     id: "test",
     name: "test",
-    email: "",
     role: UserRoles.USER,
   },
 };
