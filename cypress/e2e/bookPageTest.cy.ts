@@ -3,6 +3,8 @@ import dayjs from "dayjs";
 import {
   allEnglandClubName,
   centerCourtName,
+  court1AllEngName,
+  court1ForoName,
   foroItalicoName,
   pietrangeliCourtName,
 } from "~/utils/constants";
@@ -192,6 +194,36 @@ describe("Calendar navigation", () => {
     ).click();
 
     cy.get("[data-test='event-detail-dialog']").should("not.exist");
+  });
+
+  it("GIVEN two club with a court with same name WHEN get all reservation of one club THEN show only reservation of one club", function () {
+    const startDate = dayjs()
+      .add(1, "day")
+      .hour(12)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+
+    cy.addReservationToDB(
+      startDate.toDate(),
+      startDate.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      court1ForoName,
+      Cypress.env("USER1_MAIL") as string
+    );
+
+    cy.addReservationToDB(
+      startDate.toDate(),
+      startDate.add(1, "hour").toDate(),
+      this.clubIdAllEngland as string,
+      court1AllEngName,
+      Cypress.env("USER1_MAIL") as string
+    );
+
+    cy.reload().waitForCalendarPageToLoad();
+    cy.navigateDaysFromToday(1);
+
+    cy.get("[data-test='calendar-event']").should("have.length", 1);
   });
 });
 

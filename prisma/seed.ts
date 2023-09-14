@@ -3,8 +3,8 @@ import {
   allEnglandClubName,
   centerCourtName,
   centralCourtName,
-  court1Name,
-  court2Name,
+  court1AllEngName,
+  court1ForoName,
   foroItalicoName,
   pietrangeliCourtName,
 } from "../src/utils/constants";
@@ -33,7 +33,7 @@ async function main() {
             indoor: false,
           },
           {
-            name: court1Name,
+            name: court1ForoName,
             surface: "Clay",
             indoor: false,
             beginTime: "HOUR",
@@ -72,7 +72,7 @@ async function main() {
             indoor: true,
           },
           {
-            name: court2Name,
+            name: court1AllEngName,
             surface: "Grass",
             indoor: false,
           },

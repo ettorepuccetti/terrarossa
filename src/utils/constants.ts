@@ -16,8 +16,8 @@ export const appNameInHeader = "Terrarossa";
 export const foroItalicoName = "Foro Italico";
 export const centralCourtName = "Centrale";
 export const pietrangeliCourtName = "Pietrangeli";
-export const court1Name = "Campo 1";
+export const court1ForoName = "Court 1";
 
 export const allEnglandClubName = "All England Club";
 export const centerCourtName = "Center Court";
-export const court2Name = "Court 2";
+export const court1AllEngName = "Court 1";
