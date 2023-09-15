@@ -146,7 +146,7 @@ describe("USER", () => {
     );
 
     // reserve button is disabled
-    cy.get("[data-test='reserve-button']").should("be.disabled");
+    cy.get("[data-test=reserveButton]").should("be.disabled");
   });
 
   it("GIVEN logged user WHEN reservation end time is after club closing time THEN show error and cannot press button", () => {
@@ -209,8 +209,30 @@ describe("USER", () => {
     testBody(0);
   });
 
+  it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", () => {
+    const startDate = dayjs().add(1, "day").hour(13).minute(0);
+
+    mountComponent({ startDate, session });
+
+    //try to enter duration 1h:12m
+    const endDate = startDate
+      .add(dayjs.duration({ hours: 1, minutes: 12 }))
+      .format("HH:mm");
+    cy.get("input").filter("[data-test='endTime']").type(endDate);
+
+    // check end time after edit
+    cy.get("[data-test='endTime']")
+      .should("have.value", endDate)
+      .and("have.attr", "aria-invalid", "true");
+    // check error message
+    cy.get(".MuiFormHelperText-root").should(
+      "have.text",
+      "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+    );
+  });
+
   describe("ADMIN", () => {
-    it.only("GIVEN admin WHEN reserve THEN can book more than 2 hours", () => {
+    it("GIVEN admin WHEN reserve THEN can book more than 2 hours", () => {
       const clubId = "my_club_Id";
       const adminSession: Session = {
         ...session,
@@ -231,7 +253,7 @@ describe("USER", () => {
         "aria-invalid",
         "false"
       );
-      cy.get("[data-test='reserve-button']").should("be.enabled");
+      cy.get("[data-test=reserveButton]").should("be.enabled");
     });
   });
 });

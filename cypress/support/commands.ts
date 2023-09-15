@@ -14,7 +14,7 @@ Cypress.Commands.add("loginToAuth0", (username: string, password: string) => {
 
   const args = { username, password };
   cy.session(
-    `auth0-${username}`,
+    `${username}`,
     () => {
       cy.visit("/api/auth/signin/auth0");
       cy.get("button").click();

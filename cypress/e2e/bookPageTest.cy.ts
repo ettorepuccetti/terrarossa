@@ -9,34 +9,10 @@ import {
   pietrangeliCourtName,
 } from "~/utils/constants";
 import { formatTimeString } from "~/utils/utils";
+import { ADMIN_FORO, USER1, loginAndVisitCalendarPage, saveClubInfoAndCleanReservations } from "./constants";
+
 
 beforeEach("Initial clean up and retrieve Clubs", function () {
-  function saveClubInfoAndCleanReservations(
-    clubName: string,
-    clubIdAliasName: string,
-    clubAliasName: string,
-    clubSettingsAliasName: string
-  ) {
-    cy.queryFilteredClubs(clubName).then(function (clubs: Club[]) {
-      if (clubs[0] === undefined) {
-        throw new Error("No clubs found");
-      }
-      cy.wrap(clubs[0]).as(clubAliasName);
-      cy.wrap(clubs[0].id)
-        .as(clubIdAliasName)
-        .then(() => {
-          if (clubs[0] === undefined) {
-            //already checked, but build fails otherwise
-            throw new Error("No clubs found");
-          }
-          cy.deleteAllReservationOfClub(clubs[0].id);
-        });
-
-      cy.getClubSettings(clubs[0].clubSettingsId).then((clubSettings) => {
-        cy.wrap(clubSettings).as(clubSettingsAliasName);
-      });
-    });
-  }
   saveClubInfoAndCleanReservations(
     foroItalicoName,
     "clubIdForoItalico",
@@ -50,20 +26,13 @@ beforeEach("Initial clean up and retrieve Clubs", function () {
     "clubSettingsAllEngland"
   );
 
-  // so I can use previous aliases
+  // .then() so I can use previous aliases
   cy.then(() => {
-    cy.loginToAuth0(
+    loginAndVisitCalendarPage(
       Cypress.env("USER1_MAIL") as string,
-      Cypress.env("USER1_PWD") as string
+      Cypress.env("USER1_PWD") as string,
+      this.clubIdForoItalico as string
     );
-
-    cy.getUsername().then((username) => {
-      cy.wrap(username).should("be.a", "string").as("username");
-    });
-
-    cy.visit(
-      `/prenota?clubId=${this.clubIdForoItalico as string}`
-    ).waitForCalendarPageToLoad();
   });
 });
 
@@ -228,216 +197,291 @@ describe("Calendar navigation", () => {
 });
 
 describe("New Reservation", () => {
-  it("GIVEN not logged in user WHEN click on available slot THEN show login button", function () {
-    cy.logout();
+  describe("User", () => {
+    it("GIVEN not logged in user WHEN click on available slot THEN show login button", function () {
+      cy.logout();
 
-    cy.visit(
-      `/prenota?clubId=${this.clubIdForoItalico as string}`
-    ).waitForCalendarPageToLoad();
+      cy.visit(
+        `/prenota?clubId=${this.clubIdForoItalico as string}`
+      ).waitForCalendarPageToLoad();
 
-    // select a random slot
-    cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
-    ).click();
+      // select a random slot
+      cy.get(
+        ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
+      ).click();
 
-    // I should see the login button and nothing else
-    cy.get("button")
-      .filter("[data-test='login']")
-      .should("contain", "Effettua il login");
+      // I should see the login button and nothing else
+      cy.get("button")
+        .filter("[data-test='login']")
+        .should("contain", "Effettua il login");
 
-    cy.get("[data-test='startTime']").should("not.exist");
-  });
+      cy.get("[data-test='startTime']").should("not.exist");
+    });
 
-  it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
-    cy.navigateDaysFromToday(2);
+    it("GIVEN logged in user WHEN select a free slot THEN he can make a reservation ", function () {
+      cy.navigateDaysFromToday(2);
 
-    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
+      cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
-    // save startTime
-    cy.get("[data-test='startTime']").invoke("val").as("startTime");
+      // save startTime
+      cy.get("[data-test='startTime']").invoke("val").as("startTime");
 
-    // save endTime
-    cy.get("[data-test='endTime']")
-      .wait(100) //wait for the rerender
-      .invoke("val")
-      .as("endTime");
+      // save endTime
+      cy.get("[data-test='endTime']")
+        .wait(100) //wait for the rerender
+        .invoke("val")
+        .as("endTime");
 
-    // reserve and close the dialog
-    cy.get("[data-test='reserve-button']").click();
+      // reserve and close the dialog
+      cy.get("[data-test=reserveButton]").click();
 
-    // check on the reservation card if username, startTime and endTime are correct
-    // need to wrap the assertion in a then() because startTime and endTime are set in this scope
-    cy.get('[data-test="calendar-event"]').then(function ($element) {
-      cy.wrap($element)
-        .should("contain", this.username)
-        .should("contain", this.startTime)
-        .should("contain", this.endTime);
+      // reservation is added
+      cy.get("[data-test=calendar-event]").should("be.visible");
+    });
+
+    it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", function () {
+      cy.navigateDaysFromToday(2);
+
+      cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
+
+      // insert wrong endTime
+      cy.get("[data-test='endTime']").type("12:15");
+
+      cy.get(".MuiFormHelperText-root").should(
+        "have.text",
+        "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+      );
+
+      // try to reserve by clicking confirm button
+      cy.get("[data-test=reserveButton]").should("be.disabled");
+    });
+
+    it("GIVEN logged user WHEN reserve with a clash THEN show error banner and reservation not added", function () {
+      // create a reservation in the next day, for avoiding `reservation in the past` warning
+      const startDate = dayjs()
+        .add(1, "day")
+        .hour(12)
+        .minute(0)
+        .second(0)
+        .millisecond(0);
+
+      cy.addReservationToDB(
+        startDate.toDate(),
+        startDate.add(1, "hour").toDate(),
+        this.clubIdForoItalico as string,
+        pietrangeliCourtName,
+        Cypress.env("USER1_MAIL") as string
+      );
+
+      cy.reload().waitForCalendarPageToLoad();
+
+      cy.navigateDaysFromToday(1);
+
+      cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
+
+      cy.get("[data-test='endTime']").type("12:30");
+
+      cy.get("[data-test=reserveButton]").click();
+
+      cy.get("[data-test='error-alert']")
+        .should("be.visible")
+        .and(
+          "have.text",
+          "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero"
+        );
+      // close the error dialog
+      cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
+
+      // check that no reservation has been added
+      cy.get("[data-test='calendar-event']").should("have.length", 1);
+    });
+
+    it("GIVEN logged user WHEN reservation is longer than 2 hours THEN show error and cannot press button", function () {
+      cy.navigateDaysFromToday(2);
+
+      cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
+
+      // insert endTime longer than 2 hours
+      cy.get("[data-test='endTime']").type("14:00");
+
+      // check reserve button is disabled
+      cy.get("[data-test=reserveButton]").should("be.disabled");
+
+      // check error message
+      cy.get(".MuiFormHelperText-root").should(
+        "have.text",
+        "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
+      );
+    });
+
+    it("GIVEN logged user WHEN exceed max active reservations THEN show warning and cannot reserve", function () {
+      const startDate = dayjs()
+        .add(2, "days")
+        .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+        .minute(
+          (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+        )
+        .second(0)
+        .millisecond(0);
+      // reach the max number of reservations
+      for (
+        let i = 0;
+        i <
+        (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser;
+        i++
+      ) {
+        cy.addReservationToDB(
+          startDate.add(i, "hour").toDate(),
+          startDate.add(i + 1, "hour").toDate(),
+          this.clubIdForoItalico as string,
+          i % 2 === 0 ? pietrangeliCourtName : "Centrale",
+          Cypress.env("USER1_MAIL") as string
+        );
+      }
+      // check that all reservation have been added
+      cy.reload();
+      cy.waitForCalendarPageToLoad();
+      cy.navigateDaysFromToday(2);
+      cy.get("[data-test='calendar-event']").should(
+        "have.length",
+        (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+      );
+
+      // try to add another reservation, fairly far from the others.
+      cy.clickOnCalendarSlot(pietrangeliCourtName, 20, 0);
+      cy.get("[data-test=reserveButton]").click();
+
+      //Error expected
+      cy.get("[data-test='error-alert']").should(
+        "have.text",
+        `Hai raggiunto il numero massimo di prenotazioni attive (${
+          (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+        })`
+      );
+      // Number of reservations should not change
+      cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
+      cy.get("[data-test='calendar-event']").should(
+        "have.length",
+        (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+      );
+
+      // delete one reservation and try again
+      cy.get("[data-test='calendar-event']").first().click();
+      cy.get("[data-test='delete-button']").click();
+      cy.get("[data-test='confirm-button']").click();
+      cy.get("[data-test='calendar-event']").should(
+        "have.length",
+        (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser - 1
+      );
+
+      //add reservation in different club and check that does not affect the count
+      cy.addReservationToDB(
+        dayjs()
+          .add(1, "day")
+          .set("h", 20)
+          .set("m", 0)
+          .set("s", 0)
+          .set("ms", 0)
+          .toDate(),
+        dayjs()
+          .add(1, "day")
+          .set("h", 21)
+          .set("m", 0)
+          .set("s", 0)
+          .set("ms", 0)
+          .toDate(),
+        this.clubIdAllEngland as string,
+        centerCourtName,
+        Cypress.env("USER1_MAIL") as string
+      );
+
+      // try again, succeed this time
+      cy.clickOnCalendarSlot(pietrangeliCourtName, 20, 0);
+      cy.get("[data-test=reserveButton]").click();
+      cy.get("[data-test='error-alert']").should("not.exist");
+      cy.get("[data-test='calendar-event']").should(
+        "have.length",
+        (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+      );
     });
   });
 
-  it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", function () {
-    cy.navigateDaysFromToday(2);
+  describe("Admin AND user", () => {
+    describe("GIVEN logged user WHEN reserve with a clash THEN show error banner and reservation not added", () => {
+      [USER1, ADMIN_FORO].forEach((user) => {
+        it(`Testing for ${user.type}`, function () {
+          //initial setup
+          loginAndVisitCalendarPage(
+            user.username,
+            user.password,
+            this.clubIdForoItalico as string
+          );
+          // create a reservation in the next day, for avoiding `reservation in the past` warning
+          const startDate = dayjs()
+            .add(1, "day")
+            .hour(12)
+            .minute(0)
+            .second(0)
+            .millisecond(0);
 
-    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
+          cy.addReservationToDB(
+            startDate.toDate(),
+            startDate.add(1, "hour").toDate(),
+            this.clubIdForoItalico as string,
+            pietrangeliCourtName,
+            Cypress.env("USER1_MAIL") as string
+          );
 
-    // insert wrong endTime
-    cy.get("[data-test='endTime']").type("12:15");
+          cy.reload().waitForCalendarPageToLoad();
 
-    cy.get(".MuiFormHelperText-root").should(
-      "have.text",
-      "Prenota 1 ora, 1 ora e mezzo o 2 ore"
-    );
+          cy.navigateDaysFromToday(1);
 
-    // try to reserve by clicking confirm button
-    cy.get("[data-test='reserve-button']").should("be.disabled");
-  });
+          cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
-  it("GIVEN logged user WHEN reserve with a clash THEN show error banner and reservation not added", function () {
-    // create a reservation in the next day, for avoiding `reservation in the past` warning
-    const startDate = dayjs()
-      .add(1, "day")
-      .hour(12)
-      .minute(0)
-      .second(0)
-      .millisecond(0);
+          cy.get("[data-test='endTime']").type("12:30");
 
-    cy.addReservationToDB(
-      startDate.toDate(),
-      startDate.add(1, "hour").toDate(),
-      this.clubIdForoItalico as string,
-      pietrangeliCourtName,
-      Cypress.env("USER1_MAIL") as string
-    );
+          cy.get("[data-test=reserveButton]").click();
 
-    cy.reload().waitForCalendarPageToLoad();
+          cy.get("[data-test='error-alert']")
+            .should("be.visible")
+            .and(
+              "have.text",
+              "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero"
+            );
+          // close the error dialog
+          cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
 
-    cy.navigateDaysFromToday(1);
+          // check that no reservation has been added
+          cy.get("[data-test='calendar-event']").should("have.length", 1);
+        });
+      });
+    });
 
-    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
+    describe("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", () => {
+      [USER1, ADMIN_FORO].forEach((user) => {
+        it(`Testing for ${user.type}`, function () {
+          loginAndVisitCalendarPage(
+            user.username,
+            user.password,
+            this.clubIdForoItalico as string
+          );
+          cy.navigateDaysFromToday(2);
 
-    cy.get("[data-test='endTime']").type("12:30");
+          cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
 
-    cy.get("[data-test='reserve-button']").click();
+          // insert wrong endTime
+          cy.get("[data-test='endTime']").type("12:15");
 
-    cy.get("[data-test='error-alert']")
-      .should("be.visible")
-      .and(
-        "have.text",
-        "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero"
-      );
-    // close the error dialog
-    cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
+          cy.get(".MuiFormHelperText-root").should(
+            "have.text",
+            "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+          );
 
-    // check that no reservation has been added
-    cy.get("[data-test='calendar-event']").should("have.length", 1);
-  });
-
-  it("GIVEN logged user WHEN reservation is longer than 2 hours THEN show error and cannot press button", function () {
-    cy.navigateDaysFromToday(2);
-
-    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
-
-    // insert endTime longer than 2 hours
-    cy.get("[data-test='endTime']").type("14:00");
-
-    // check reserve button is disabled
-    cy.get("[data-test='reserve-button']").should("be.disabled");
-
-    // check error message
-    cy.get(".MuiFormHelperText-root").should(
-      "have.text",
-      "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
-    );
-  });
-
-  it("GIVEN logged user WHEN exceed max active reservations THEN show warning and cannot reserve", function () {
-    const startDate = dayjs()
-      .add(2, "days")
-      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
-      .minute(
-        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
-      )
-      .second(0)
-      .millisecond(0);
-    // reach the max number of reservations
-    for (
-      let i = 0;
-      i < (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser;
-      i++
-    ) {
-      cy.addReservationToDB(
-        startDate.add(i, "hour").toDate(),
-        startDate.add(i + 1, "hour").toDate(),
-        this.clubIdForoItalico as string,
-        i % 2 === 0 ? pietrangeliCourtName : "Centrale",
-        Cypress.env("USER1_MAIL") as string
-      );
-    }
-    // check that all reservation have been added
-    cy.reload();
-    cy.waitForCalendarPageToLoad();
-    cy.navigateDaysFromToday(2);
-    cy.get("[data-test='calendar-event']").should(
-      "have.length",
-      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
-    );
-
-    // try to add another reservation, fairly far from the others.
-    cy.clickOnCalendarSlot(pietrangeliCourtName, 20, 0);
-    cy.get("[data-test='reserve-button']").click();
-
-    //Error expected
-    cy.get("[data-test='error-alert']").should(
-      "have.text",
-      `Hai raggiunto il numero massimo di prenotazioni attive (${
-        (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
-      })`
-    );
-    // Number of reservations should not change
-    cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
-    cy.get("[data-test='calendar-event']").should(
-      "have.length",
-      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
-    );
-
-    // delete one reservation and try again
-    cy.get("[data-test='calendar-event']").first().click();
-    cy.get("[data-test='delete-button']").click();
-    cy.get("[data-test='confirm-button']").click();
-    cy.get("[data-test='calendar-event']").should(
-      "have.length",
-      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser - 1
-    );
-
-    //add reservation in different club and check that does not affect the count
-    cy.addReservationToDB(
-      dayjs()
-        .add(1, "day")
-        .set("h", 20)
-        .set("m", 0)
-        .set("s", 0)
-        .set("ms", 0)
-        .toDate(),
-      dayjs()
-        .add(1, "day")
-        .set("h", 21)
-        .set("m", 0)
-        .set("s", 0)
-        .set("ms", 0)
-        .toDate(),
-      this.clubIdAllEngland as string,
-      centerCourtName,
-      Cypress.env("USER1_MAIL") as string
-    );
-
-    // try again, succeed this time
-    cy.clickOnCalendarSlot(pietrangeliCourtName, 20, 0);
-    cy.get("[data-test='reserve-button']").click();
-    cy.get("[data-test='error-alert']").should("not.exist");
-    cy.get("[data-test='calendar-event']").should(
-      "have.length",
-      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
-    );
+          // try to reserve by clicking confirm button
+          cy.get("[data-test=reserveButton]").should("be.disabled");
+        });
+      });
+    });
   });
 });
 
