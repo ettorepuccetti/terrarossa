@@ -14,7 +14,6 @@ export const DayCard = (props: {
         display: "flex",
         flexDirection: "column",
         borderTop: 0,
-        minWidth: 50,
         borderRadius: 3,
         cursor: "pointer",
       }}
@@ -24,36 +23,51 @@ export const DayCard = (props: {
       }}
       data-test="day-card"
     >
-      {/* upper part of the card, contain day of the week, red background */}
-      <Box
-        display={"flex"}
-        justifyContent={"center"}
-        sx={{
-          backgroundColor: "#F1564E",
-          color: "white",
-          borderRadius: 3,
-          borderBottomLeftRadius: 0,
-          borderBottomRightRadius: 0,
-        }}
-      >
-        {props.day.format("ddd").toUpperCase()}
-      </Box>
+      {/* Calendar day rounded square */}
+      <Box display={"flex"} flexDirection={"column"} width={50} height={50}>
+        {/* upper part of the card, contain day of the week, red background */}
+        <Box
+          display={"flex"}
+          justifyContent={"center"}
+          alignContent={"center"}
+          flexBasis={"33%"}
+          flexShrink={0}
+          sx={{
+            backgroundColor: "#F1564E",
+            color: "white",
+            borderRadius: 3,
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+            overflow: "hidden",
+            fontSize: 12,
+            fontWeight: 500,
+          }}
+        >
+          {props.day.format("ddd").toUpperCase()}
+        </Box>
 
-      {/* lower part of the card, contain day of the month, white background */}
-      <Box
-        display={"flex"}
-        justifyContent={"center"}
-        sx={{
-          borderRadius: 3,
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
-          boxShadow: 3,
-          backgroundColor: props.day.isSame(today, "day") ? "#FFFAE3" : "white",
-        }}
-      >
-        <Typography fontSize={18}>{props.day.format("DD")}</Typography>
+        {/* lower part of the card, contain day of the month, white or yellow background */}
+        <Box
+          display={"flex"}
+          justifyContent={"center"}
+          alignItems={"center"}
+          flexGrow={1}
+          sx={{
+            borderRadius: 3,
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0,
+            boxShadow: 3,
+            overflow: "hidden",
+            backgroundColor: props.day.isSame(today, "day")
+              ? "#FFFAE3"
+              : "white",
+          }}
+        >
+          <Typography fontSize={26} fontWeight={300}>
+            {props.day.format("DD")}
+          </Typography>
+        </Box>
       </Box>
-
       {/* dot indicating the selected date */}
       {props.day.isSame(props.selected, "day") && (
         <Box

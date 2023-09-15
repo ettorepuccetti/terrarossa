@@ -109,7 +109,7 @@ model Club {
   courts         Court[]
   imageSrc       String?
   logoSrc        String?
-  Admin          User[]
+  Admin          User[] //TODO: remove
   clubSettings   ClubSettings @relation(fields: [clubSettingsId], references: [id])
   clubSettingsId String       @unique
   createdAt      DateTime     @default(now())

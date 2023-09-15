@@ -20,16 +20,26 @@ How can
 
 altrimenti connettersi direttamente con `DATABASE_URL` in `.env`
 
-### Prisma seed
+### Prisma
+
+#### Seed
 
 ```
 npx prisma db seed
 ```
 
-### Prisma studio
+#### Prisma studio
 
 ```
 npx prisma studio
+```
+
+#### Reset
+
+to reset the database (delete all data!!):
+
+```
+npx prisma db push --force-reset
 ```
 
 ### Docker

@@ -87,7 +87,7 @@ export const HorizonalDatePicker = ({
         </Box>
       </Box>
       {/* Selected date extended */}
-      <Typography variant={"h6"} textAlign={"center"}>
+      <Typography variant={"h6"} textAlign={"center"} fontWeight={300}>
         {capitaliseFirstChar(selectedDate.format("dddd DD MMMM YYYY"))}
       </Typography>
     </Box>
