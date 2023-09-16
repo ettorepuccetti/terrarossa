@@ -8,7 +8,7 @@ import {
   saveClubInfoAndCleanReservations,
 } from "./constants";
 
-beforeEach("Initial clean up and retrieve Clubs", function () {
+beforeEach("Retrieve clubs, delete reservations and login", function () {
   saveClubInfoAndCleanReservations(
     foroItalicoName,
     "clubIdForoItalico",
@@ -39,6 +39,21 @@ describe("New reservation", () => {
     cy.get("[data-test=endTime")
       .should("have.value", "15:00")
       .and("have.attr", "aria-invalid", "false");
+    cy.get("[data-test=reserveButton]").click();
+    cy.get("[data-test=calendar-event]").should("be.visible");
+  });
+
+  it("GIVEN admin WHEN override reservation name THEN new name is visible", function () {
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
+    cy.get("[data-test=overwriteName").type("John Doe");
+    cy.get("[data-test=reserveButton]").click();
+    cy.get("[data-test=calendar-event]").should("contain.text", "John Doe");
+  });
+
+  it("GIVEN admin WHEN reserve in the past THEN can make reservation", function () {
+    cy.navigateDaysFromToday(-1);
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
+    cy.get("[data-test=past-warning").should("not.exist");
     cy.get("[data-test=reserveButton]").click();
     cy.get("[data-test=calendar-event]").should("be.visible");
   });

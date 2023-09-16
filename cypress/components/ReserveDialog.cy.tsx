@@ -1,16 +1,10 @@
-import { CacheProvider, ThemeProvider } from "@emotion/react";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { type ClubSettings } from "@prisma/client";
 import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
 import ReserveDialog from "~/components/ReserveDialog";
-import lightTheme from "~/styles/lightTheme";
 import { UserRoles } from "~/utils/constants";
-import createEmotionCache from "~/utils/createEmotionCache";
-import { clubSettings, session } from "./constants";
+import { clubSettings, mountWithContexts, session } from "./constants";
 dayjs.extend(duration);
 
 const mountComponent = ({
@@ -20,28 +14,21 @@ const mountComponent = ({
   clubSettings: clubSettingsInput = clubSettings,
 }: {
   startDate: Dayjs | undefined;
-  session: Session | null | undefined;
+  session: Session | undefined;
   clubId?: string;
   clubSettings?: ClubSettings;
 }) => {
-  cy.mount(
-    <CacheProvider value={createEmotionCache()}>
-      <ThemeProvider theme={lightTheme}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <SessionProvider session={session}>
-            <ReserveDialog
-              open={true}
-              clubId={clubId}
-              startDate={startDate?.toDate()}
-              resource={"Campo 1"}
-              onConfirm={(endDate) => console.log("end date :", endDate)}
-              onDialogClose={() => null}
-              clubSettings={clubSettingsInput}
-            />
-          </SessionProvider>
-        </LocalizationProvider>
-      </ThemeProvider>
-    </CacheProvider>
+  mountWithContexts(
+    <ReserveDialog
+      open={true}
+      clubId={clubId}
+      startDate={startDate?.toDate()}
+      resource={"Campo 1"}
+      onConfirm={(endDate) => console.log("end date :", endDate)}
+      onDialogClose={() => null}
+      clubSettings={clubSettingsInput}
+    />,
+    session
   );
 };
 
@@ -110,7 +97,7 @@ describe("USER", () => {
       .should("have.attr", "disabled");
 
     // show warning
-    cy.get(".MuiBox-root > .MuiPaper-root").should(
+    cy.get("[data-test=past-warning]").should(
       "contain",
       "Non puoi prenotare una data nel passato"
     );

@@ -143,6 +143,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
               {/* overwrite name, only if admin mode */}
               {isAdminOfTheClub(sessionData, props.clubId) && (
                 <TextField
+                  data-test="overwriteName"
                   variant="outlined"
                   placeholder="Nome"
                   label="Nome prenotazione"
@@ -200,7 +201,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
 
               {!canBook && (
                 <Box display={"flex"}>
-                  <Alert severity={"warning"}>
+                  <Alert data-test="past-warning" severity={"warning"}>
                     Non puoi prenotare una data nel passato
                   </Alert>
                 </Box>
