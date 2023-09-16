@@ -37,8 +37,7 @@ export function isAdminOfTheClub(
   clubId: string
 ): boolean {
   return (
-    sessionData !== undefined &&
-    sessionData !== null &&
+    !!sessionData &&
     sessionData.user.role === UserRoles.ADMIN &&
     sessionData.user.clubId === clubId
   );

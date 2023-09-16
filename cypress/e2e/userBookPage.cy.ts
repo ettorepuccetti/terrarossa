@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import {
   allEnglandClubName,
   centerCourtName,
+  centralCourtName,
   court1AllEngName,
   court1ForoName,
   foroItalicoName,
@@ -313,7 +314,7 @@ describe("New Reservation", () => {
         startDate.add(i, "hour").toDate(),
         startDate.add(i + 1, "hour").toDate(),
         this.clubIdForoItalico as string,
-        i % 2 === 0 ? pietrangeliCourtName : "Centrale",
+        i % 2 === 0 ? pietrangeliCourtName : centralCourtName,
         Cypress.env("USER1_MAIL") as string
       );
     }

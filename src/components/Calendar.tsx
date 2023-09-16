@@ -10,7 +10,7 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { isSelectableSlot } from "~/utils/utils";
+import { isAdminOfTheClub, isSelectableSlot } from "~/utils/utils";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
@@ -109,8 +109,16 @@ export default function Calendar() {
   };
 
   const openEventDialog = (eventClickInfo: EventClickArg) => {
+    if (!clubId) {
+      throw new Error("ClubId not found");
+    }
     eventClickInfo.jsEvent.preventDefault();
-    if (eventClickInfo.event.extendedProps.userId === sessionData?.user.id) {
+
+    //open eventDetail dialog only for the user who made the reservation or for the admin
+    if (
+      eventClickInfo.event.extendedProps.userId === sessionData?.user.id ||
+      isAdminOfTheClub(sessionData, clubId)
+    ) {
       setEventDetails(eventClickInfo.event);
     }
   };
