@@ -173,7 +173,7 @@ describe("Existing reservation", () => {
     });
   });
 
-  describe.only("GIVEN logged user WHEN select own reservation before the time limit THEN can delete", () => {
+  describe("GIVEN logged user WHEN select own reservation before the time limit THEN can delete", () => {
     [USER1, ADMIN_FORO].forEach((user) => {
       it(`Testing for ${user.type}`, function () {
         //initial setup
