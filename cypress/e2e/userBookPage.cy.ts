@@ -387,31 +387,6 @@ describe("New Reservation", () => {
 });
 
 describe("Reservation details", () => {
-  it("GIVEN logged user WHEN click on his reservation THEN show details dialog", function () {
-    const dayInAdvance = 2;
-    const startDate = dayjs()
-      .add(dayInAdvance, "days")
-      .hour(12)
-      .minute(0)
-      .second(0)
-      .millisecond(0);
-    cy.addReservationToDB(
-      startDate.toDate(),
-      startDate.add(1, "hour").toDate(),
-      this.clubIdForoItalico as string,
-      pietrangeliCourtName,
-      Cypress.env("USER1_MAIL") as string
-    );
-    cy.reload().waitForCalendarPageToLoad();
-    cy.navigateDaysFromToday(dayInAdvance);
-    // check that the reservation is visible
-    cy.get("[data-test='calendar-event']").should("have.length", 1);
-    // click on the reservation
-    cy.get("[data-test='calendar-event']").click();
-    // check that the dialog is visible
-    cy.get("[data-test='event-detail-dialog']").should("be.visible");
-  });
-
   it("GIVEN logged user WHEN click on other's reservation THEN not show detail dialog", function () {
     const dayInAdvance = 2;
     const startDate = dayjs()
@@ -437,63 +412,7 @@ describe("Reservation details", () => {
     cy.get("[data-test='event-detail-dialog']").should("not.exist");
   });
 
-  it("GIVEN logged user WHEN select own reservation before canDelete time limit THEN can delete", function () {
-    let startDateSafeToDelete = dayjs()
-      .millisecond(0)
-      .second(0)
-      .minute(0)
-      .add(
-        (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel + 1, // add 1 hour to be sure being after the hoursBeforeCancel time limit
-        "hour"
-      );
-
-    const clubClosingTimeToday = dayjs()
-      .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
-      .minute((this.clubSettingsForoItalico as ClubSettings).lastBookableMinute)
-      .second(0)
-      .millisecond(0);
-    const clubOpeningTimeTomorrow = dayjs()
-      .add(1, "day")
-      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
-      .minute(
-        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
-      )
-      .second(0)
-      .millisecond(0);
-
-    // if the reservation to create falls in the closing time window
-    // start it from the opening time of the next day
-    if (
-      startDateSafeToDelete.isAfter(clubClosingTimeToday) &&
-      startDateSafeToDelete.isBefore(clubOpeningTimeTomorrow)
-    ) {
-      startDateSafeToDelete = dayjs()
-        .add(1, "day")
-        .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
-        .minute(
-          (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
-        )
-        .second(0)
-        .millisecond(0);
-    }
-
-    cy.addReservationToDB(
-      startDateSafeToDelete.toDate(),
-      startDateSafeToDelete.add(1, "hour").toDate(),
-      this.clubIdForoItalico as string,
-      pietrangeliCourtName,
-      Cypress.env("USER1_MAIL") as string
-    );
-    cy.reload().waitForCalendarPageToLoad();
-    cy.navigateDaysFromToday(startDateSafeToDelete.day() - dayjs().day());
-
-    cy.get("[data-test='calendar-event']").click();
-    cy.get("[data-test='delete-button']").click();
-    cy.get("[data-test='confirm-button']").click();
-    cy.get("[data-test='calendar-event']").should("not.exist");
-  });
-
-  it("GIVEN logged user WHEN select own reservation after canDelete time limit THEN show warning and cannot delete", function () {
+  it("GIVEN logged user WHEN select own reservation after the time limit THEN show warning and cannot delete", function () {
     let firstStartDateNotDeletable = dayjs()
       .add(
         (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel,

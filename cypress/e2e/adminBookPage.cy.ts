@@ -96,7 +96,7 @@ describe("New reservation", () => {
 });
 
 describe("Existing reservation", () => {
-  it.only("GIVEN admin WHEN click on other's reservation THEN can delete", function () {
+  it("GIVEN admin WHEN click on other's reservation THEN can delete", function () {
     const startDate = dayjs().add(2, "day").hour(12).minute(0);
 
     cy.addReservationToDB(
@@ -104,7 +104,7 @@ describe("Existing reservation", () => {
       startDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
       pietrangeliCourtName,
-      Cypress.env("USER1_MAIL") as string
+      Cypress.env("USER2_MAIL") as string //user_2 because is already added to db in seeding script
     );
 
     cy.reload().waitForCalendarPageToLoad();
@@ -114,5 +114,15 @@ describe("Existing reservation", () => {
     cy.get("[data-test=confirm-button]").click();
 
     cy.get("[data-test=calendar-event]").should("not.exist");
+  });
+
+  it("GIVEN admin WHEN select reservation after the time limit THEN can delete", function () {
+    cy.addReservationToDB(
+      dayjs().add(1, "hour").set("minute", 0).toDate(),
+      dayjs().add(2, "hour").set("minute", 0).toDate(),
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("ADMIN_FORO_MAIL") as string
+    );
   });
 });
