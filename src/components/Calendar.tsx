@@ -3,7 +3,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
-import { api } from "~/utils/api";
 
 import { type EventClickArg } from "@fullcalendar/core";
 import { type EventImpl } from "@fullcalendar/core/internal";
@@ -17,6 +16,7 @@ import FullCalendarWrapper from "./FullCalendarWrapper";
 import Header from "./Header";
 import Spinner from "./Spinner";
 import SpinnerPartial from "./SpinnerPartial";
+import { api } from "~/utils/api";
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -25,6 +25,13 @@ export const ReservationInputSchema = z.object({
   overwriteName: z.string().optional(),
   clubId: z.string(),
 });
+
+export const RecurrentReservationInputSchema = z
+  .object({
+    startDate: z.date(),
+    endDate: z.date(),
+  })
+  .and(ReservationInputSchema);
 
 export const ReservationDeleteInputSchema = z.object({
   reservationId: z.string(),

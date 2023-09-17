@@ -2,6 +2,7 @@ import { type Prisma, type PrismaClient } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
 import dayjs from "dayjs";
 import {
+  RecurrentReservationInputSchema,
   ReservationDeleteInputSchema,
   ReservationInputSchema,
 } from "~/components/Calendar";
@@ -87,6 +88,55 @@ export const reservationMutationRouter = createTRPCRouter({
           userId: ctx.session.user.id,
           overwriteName: input.overwriteName,
         },
+      });
+    }),
+
+  insertRecurrent: protectedProcedure
+    .input(RecurrentReservationInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      // check for privileges [UI already prevents this]
+      if (!isUserAdminOfClub(ctx, input.clubId)) {
+        throw new TRPCClientError(
+          "Error: Only admins can create recurrent reservations"
+        );
+      }
+      //add to reservations array a reservation for each week from input.startDate to input.endDate
+      const reservations = [];
+      for (
+        let date = dayjs(input.startDate);
+        date.isBefore(input.endDate);
+        date = date.add(1, "week")
+      ) {
+        const reservationInput = {
+          courtId: input.courtId,
+          startTime: date.toDate(),
+          endTime: date
+            .hour(input.endDateTime.getHours())
+            .minute(input.endDateTime.getMinutes())
+            .toDate(),
+          userId: ctx.session.user.id,
+          overwriteName: input.overwriteName,
+        };
+
+        //check for collision [UI does NOT check for this]
+        if (
+          await collision(
+            ctx.prisma,
+            reservationInput.startTime,
+            reservationInput.endTime,
+            reservationInput.courtId
+          )
+        ) {
+          throw new TRPCClientError(
+            "Errore nella creazione della prenotazione ricorrente.\
+            Confiltto in data " + date.format("DD/MM/YYYY")
+          );
+        }
+        reservations.push(reservationInput);
+      }
+
+      return ctx.prisma.reservation.createMany({
+        data: reservations,
       });
     }),
 
