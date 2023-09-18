@@ -100,11 +100,18 @@ export const reservationMutationRouter = createTRPCRouter({
           "Error: Only admins can create recurrent reservations"
         );
       }
+      // create the recurrent reservation at which the reservations will refer to
+      const recurrentDbEntity = await ctx.prisma.recurrentReservation.create({
+        data: {
+          endDate: input.recurrentEndDate,
+          startDate: input.startDateTime,
+        },
+      });
       //add to reservations array a reservation for each week from input.startDate to input.endDate
       const reservations = [];
       for (
-        let date = dayjs(input.startDate);
-        date.isBefore(input.endDate);
+        let date = dayjs(input.startDateTime);
+        date.isBefore(input.recurrentEndDate);
         date = date.add(1, "week")
       ) {
         const reservationInput = {
@@ -116,6 +123,7 @@ export const reservationMutationRouter = createTRPCRouter({
             .toDate(),
           userId: ctx.session.user.id,
           overwriteName: input.overwriteName,
+          recurrentReservationId: recurrentDbEntity.id,
         };
 
         //check for collision [UI does NOT check for this]
@@ -135,7 +143,7 @@ export const reservationMutationRouter = createTRPCRouter({
         reservations.push(reservationInput);
       }
 
-      return ctx.prisma.reservation.createMany({
+      await ctx.prisma.reservation.createMany({
         data: reservations,
       });
     }),

@@ -9,6 +9,7 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { api } from "~/utils/api";
 import { isAdminOfTheClub, isSelectableSlot } from "~/utils/utils";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
@@ -16,7 +17,6 @@ import FullCalendarWrapper from "./FullCalendarWrapper";
 import Header from "./Header";
 import Spinner from "./Spinner";
 import SpinnerPartial from "./SpinnerPartial";
-import { api } from "~/utils/api";
 
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
@@ -28,8 +28,7 @@ export const ReservationInputSchema = z.object({
 
 export const RecurrentReservationInputSchema = z
   .object({
-    startDate: z.date(),
-    endDate: z.date(),
+    recurrentEndDate: z.date(),
   })
   .and(ReservationInputSchema);
 
@@ -82,6 +81,13 @@ export default function Calendar() {
     },
   });
 
+  const currentReservationAdd =
+    api.reservationMutation.insertRecurrent.useMutation({
+      async onSuccess() {
+        await reservationQuery.refetch();
+      },
+    });
+
   const reservationDelete = api.reservationMutation.deleteOne.useMutation({
     async onSuccess() {
       await reservationQuery.refetch();
@@ -130,13 +136,28 @@ export default function Calendar() {
     }
   };
 
-  const addEvent = (endDate: Date, overwrittenName: string | undefined) => {
+  const addEvent = (
+    endDate: Date,
+    overwrittenName: string | undefined,
+    recurrentEndDate: Date | undefined
+  ) => {
     setDateClick(undefined);
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
     }
     if (!clubId) {
       throw new Error("ClubId not found");
+    }
+    if (recurrentEndDate) {
+      currentReservationAdd.mutate({
+        clubId: clubId,
+        courtId: dateClick.resource.id,
+        startDateTime: dateClick.date,
+        endDateTime: endDate,
+        overwriteName: overwrittenName,
+        recurrentEndDate: recurrentEndDate,
+      });
+      return;
     }
     reservationAdd.mutate({
       courtId: dateClick.resource.id,
@@ -230,9 +251,11 @@ export default function Calendar() {
         startDate={dateClick?.date}
         resource={dateClick?.resource?.title}
         onDialogClose={() => setDateClick(undefined)}
-        onConfirm={(endDate: Date, overwrittenName: string | undefined) =>
-          addEvent(endDate, overwrittenName)
-        }
+        onConfirm={(
+          endDate: Date,
+          overwrittenName: string | undefined,
+          recurrentEndDate: Date | undefined
+        ) => addEvent(endDate, overwrittenName, recurrentEndDate)}
         clubId={clubId}
         clubSettings={clubQuery.data.clubSettings}
       />

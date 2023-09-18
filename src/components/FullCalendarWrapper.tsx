@@ -47,6 +47,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       extendedProps: {
         userId: reservation.user?.id,
         userImg: reservation.user?.image,
+        recurrentId: reservation.recurrentReservationId,
       },
     };
   };

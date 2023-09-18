@@ -10,7 +10,7 @@ const Prenota: NextPage = () => {
         <title>Prenota</title>
         <meta name="description" content="" />
       </Head>
-      <Container maxWidth={"md"} sx={{ padding: 0 }}>
+      <Container maxWidth={"lg"} sx={{ padding: 0 }}>
         <Calendar />
       </Container>
     </>
