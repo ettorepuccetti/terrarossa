@@ -39,6 +39,7 @@ const mountComponent = (startDate: Date, endDate: Date) => {
               eventDetails={eventDetails}
               onDialogClose={() => undefined}
               onReservationDelete={() => undefined}
+              onRecurrentReservationDelete={() => undefined}
               open={true}
               sessionData={session}
             />
