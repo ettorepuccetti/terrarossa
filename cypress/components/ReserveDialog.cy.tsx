@@ -252,7 +252,7 @@ describe("USER", () => {
       );
       cy.get("[data-test=reserveButton]").should("be.enabled");
     });
-    it("GIVEN admin WHEN enable recurrent reervation toggle THEN show recurrent end date", () => {
+    it("GIVEN admin WHEN enable recurrent reervation toggle THEN show recurrent end date box", () => {
       cy.get("[data-test=recurrent-switch]").click();
       cy.get("[data-test=recurrent-end-date]").should("be.visible");
     });
