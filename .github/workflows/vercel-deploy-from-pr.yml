@@ -26,7 +26,7 @@ jobs:
           deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -r '.number')
           echo "DEPLOY_REQUEST_NUMBER=$deploy_request_number" >> $GITHUB_ENV
       - name: Get Deploy Request number from the only open DR (on workflow_dispatch)
-        if: false
+        if: github.event_name == 'workflow_dispatch'
         run: |
           deploy_request_number=$(pscale deploy-request list ${{ secrets.PLANETSCALE_DATABASE_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -c '.[] | select( .state | contains("open"))' | jq -r .'number')
           echo "DEPLOY_REQUEST_NUMBER=$deploy_request_number" >> $GITHUB_ENV
