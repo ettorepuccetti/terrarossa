@@ -63,10 +63,6 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     container:
       image: cypress/browsers:latest
-    strategy:
-      fail-fast: false
-      matrix:
-        containers: [1, 2, 3]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -84,8 +80,6 @@ jobs:
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           browser: chrome
-          record: true
-          parallel: true
           group: "UI - Chrome"
           config-file: cypress.config.ts
 
@@ -101,10 +95,6 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     container:
       image: cypress/browsers:latest
-    strategy:
-      fail-fast: false
-      matrix:
-        containers: [1, 2, 3]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -123,8 +113,6 @@ jobs:
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           browser: chrome
-          record: true
-          parallel: true
           group: "UI - Chrome - Mobile"
           config-file: cypress.config.ts
 
