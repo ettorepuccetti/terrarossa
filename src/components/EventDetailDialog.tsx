@@ -23,7 +23,7 @@ interface DialogProps {
   onDialogClose: () => void;
   sessionData: Session | null;
   onReservationDelete: (id: string) => void;
-  onRecurrentReservationDelete: (id: string, futureOnly: boolean) => void;
+  onRecurrentReservationDelete: (recurrentId: string) => void;
   clubId: string;
   clubSettings: ClubSettings;
 }
@@ -124,15 +124,7 @@ export default function EventDetailDialog(props: DialogProps) {
               }}
               onCancelRecurrent={() => {
                 props.onRecurrentReservationDelete(
-                  eventDetails.extendedProps.recurrentId as string,
-                  false
-                );
-                setConfirmationOpen(false);
-              }}
-              OnCancelFutures={() => {
-                props.onRecurrentReservationDelete(
-                  eventDetails.extendedProps.recurrentId as string,
-                  true
+                  eventDetails.extendedProps.recurrentId as string
                 );
                 setConfirmationOpen(false);
               }}

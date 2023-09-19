@@ -253,59 +253,61 @@ describe("USER", () => {
       cy.get("[data-test=reserveButton]").should("be.enabled");
     });
 
-    it("GIVEN admin WHEN enable recurrent reervation toggle THEN show recurrent end date", () => {
-      cy.get("[data-test=recurrent-switch]").click();
-      cy.get("[data-test=recurrent-end-date]").should("be.visible");
-    });
+    describe("RECURRENT RESERVATION", () => {
+      it("GIVEN admin WHEN enable recurrent reervation toggle THEN show recurrent end date", () => {
+        cy.get("[data-test=recurrent-switch]").click();
+        cy.get("[data-test=recurrent-end-date]").should("be.visible");
+      });
 
-    it("GIVEN admin WHEN enable recurrent switch but not set end date THEN button disabled", () => {
-      cy.get("[data-test=recurrent-switch]").click();
-      cy.get("[data-test=reserveButton]").should("be.disabled");
-    });
+      it("GIVEN admin WHEN enable recurrent switch but not set end date THEN button disabled", () => {
+        cy.get("[data-test=recurrent-switch]").click();
+        cy.get("[data-test=reserveButton]").should("be.disabled");
+      });
 
-    it("GIVEN admin WHEN enable recurrent switch and set end date THEN button enabled", () => {
-      cy.get("[data-test=recurrent-switch]").click();
-      cy.get("[data-test=recurrent-end-date]").type(
-        dayjs().add(1, "week").format("DD/MM/YYYY")
-      );
-      cy.get("[data-test=reserveButton]").should("be.enabled");
-    });
+      it("GIVEN admin WHEN enable recurrent switch and set end date THEN button enabled", () => {
+        cy.get("[data-test=recurrent-switch]").click();
+        cy.get("[data-test=recurrent-end-date]").type(
+          dayjs().add(1, "week").format("DD/MM/YYYY")
+        );
+        cy.get("[data-test=reserveButton]").should("be.enabled");
+      });
 
-    it("GIVEN admin WHEN set recurrent end date not same week day THEN show error and button disabled", () => {
-      cy.get("[data-test=recurrent-switch]").click();
-      cy.get("[data-test=recurrent-end-date]").type(
-        dayjs().add(8, "day").format("DD/MM/YYYY")
-      );
-      cy.get("[data-test=reserveButton]").should("be.disabled");
-      cy.get("[data-test=recurrent-end-date]").should(
-        "have.attr",
-        "aria-invalid",
-        "true"
-      );
-      cy.get(".MuiFormHelperText-root").should(
-        "have.text",
-        "La data deve essere lo stesso giorno della settimana della prenotazione"
-      );
-      cy.get("[data-test=reserveButton]").should("be.disabled");
-    });
+      it("GIVEN admin WHEN set recurrent end date not same week day THEN show error and button disabled", () => {
+        cy.get("[data-test=recurrent-switch]").click();
+        cy.get("[data-test=recurrent-end-date]").type(
+          dayjs().add(8, "day").format("DD/MM/YYYY")
+        );
+        cy.get("[data-test=reserveButton]").should("be.disabled");
+        cy.get("[data-test=recurrent-end-date]").should(
+          "have.attr",
+          "aria-invalid",
+          "true"
+        );
+        cy.get(".MuiFormHelperText-root").should(
+          "have.text",
+          "La data deve essere lo stesso giorno della settimana della prenotazione"
+        );
+        cy.get("[data-test=reserveButton]").should("be.disabled");
+      });
 
-    it("GIVEN admin WHEN set recurrent end date next year THEN show error and button disabled", () => {
-      cy.get("[data-test=recurrent-switch]").click();
-      const dayOfTheWeek = dayjs().day();
-      cy.get("[data-test=recurrent-end-date]").type(
-        dayjs().add(1, "year").month(0).day(dayOfTheWeek).format("DD/MM/YYYY")
-      );
-      cy.get("[data-test=reserveButton]").should("be.disabled");
-      cy.get("[data-test=recurrent-end-date]").should(
-        "have.attr",
-        "aria-invalid",
-        "true"
-      );
-      cy.get(".MuiFormHelperText-root").should(
-        "have.text",
-        "La data di fine validità deve essere entro la fine dell'anno"
-      );
-      cy.get("[data-test=reserveButton]").should("be.disabled");
+      it("GIVEN admin WHEN set recurrent end date next year THEN show error and button disabled", () => {
+        cy.get("[data-test=recurrent-switch]").click();
+        const dayOfTheWeek = dayjs().day();
+        cy.get("[data-test=recurrent-end-date]").type(
+          dayjs().add(1, "year").month(0).day(dayOfTheWeek).format("DD/MM/YYYY")
+        );
+        cy.get("[data-test=reserveButton]").should("be.disabled");
+        cy.get("[data-test=recurrent-end-date]").should(
+          "have.attr",
+          "aria-invalid",
+          "true"
+        );
+        cy.get(".MuiFormHelperText-root").should(
+          "have.text",
+          "La data di fine validità deve essere entro la fine dell'anno"
+        );
+        cy.get("[data-test=reserveButton]").should("be.disabled");
+      });
     });
   });
 });

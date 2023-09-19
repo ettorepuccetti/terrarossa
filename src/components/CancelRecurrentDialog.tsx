@@ -16,7 +16,6 @@ interface CancelRecurrentDialogProps {
   onDialogClose: () => void;
   onCancelSingle: () => void;
   onCancelRecurrent: () => void;
-  OnCancelFutures: () => void;
 }
 
 export default function CancelRecurrentDialog(
@@ -31,10 +30,6 @@ export default function CancelRecurrentDialog(
     }
     if (value === "recurrent") {
       props.onCancelRecurrent();
-      return;
-    }
-    if (value === "futures") {
-      props.OnCancelFutures();
       return;
     }
   };
@@ -61,13 +56,6 @@ export default function CancelRecurrentDialog(
               value="recurrent"
               control={<Radio color="info" />}
               label="Tutte le prenotazioni di questa ora fissa"
-              componentsProps={{ typography: { color: "MenuText" } }}
-            />
-            <FormControlLabel
-              data-test="futures"
-              value="futures"
-              control={<Radio color="info" />}
-              label="Tutte le prenotazioni FUTURE di questa ora fissa"
               componentsProps={{ typography: { color: "MenuText" } }}
             />
           </RadioGroup>

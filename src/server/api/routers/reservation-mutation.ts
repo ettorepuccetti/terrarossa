@@ -8,7 +8,7 @@ import {
   ReservationInputSchema,
 } from "~/components/Calendar";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { type UserRole, UserRoles } from "~/utils/constants";
+import { UserRoles, type UserRole } from "~/utils/constants";
 
 export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
@@ -197,19 +197,13 @@ export const reservationMutationRouter = createTRPCRouter({
           "Error: Only admins can delete recurrent reservations"
         );
       }
-      if (input.futureOnly) {
-        // delete all reservations that refer to the recurrent reservation
-        return ctx.prisma.reservation.deleteMany({
-          //delete all reservations that refer to the recurrent reservation and are in the future
-          where: {
-            recurrentReservationId: input.reservationId,
-            startTime: {
-              gte: Date.now(),
-            },
-          },
-        });
-      } else {
-      }
+      // delete all reservations that refer to the recurrent reservation
+      return ctx.prisma.recurrentReservation.delete({
+        //delete all reservations that refer to the recurrent reservation and are in the future
+        where: {
+          id: input.recurrentReservationId,
+        },
+      });
     }),
 });
 

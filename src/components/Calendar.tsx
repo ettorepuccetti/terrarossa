@@ -37,11 +37,10 @@ export const ReservationDeleteInputSchema = z.object({
   clubId: z.string(),
 });
 
-export const RecurrentReservationDeleteInputSchema = z
-  .object({
-    futureOnly: z.boolean(),
-  })
-  .and(ReservationDeleteInputSchema);
+export const RecurrentReservationDeleteInputSchema = z.object({
+  recurrentReservationId: z.string(),
+  clubId: z.string(),
+});
 
 export const ClubIdInputSchema = z.object({
   clubId: z.union([z.string(), z.string().array(), z.undefined()]), //router param can also be undefined or array of strings
@@ -99,6 +98,13 @@ export default function Calendar() {
       await reservationQuery.refetch();
     },
   });
+
+  const recurrentReservationDelete =
+    api.reservationMutation.deleteRecurrent.useMutation({
+      async onSuccess() {
+        await reservationQuery.refetch();
+      },
+    });
 
   /**
    * ---------- end of trpc procedures ----------------
@@ -183,17 +189,16 @@ export default function Calendar() {
     reservationDelete.mutate({ reservationId: eventId, clubId: clubId });
   }
 
-  function deleteRecurrentEvent(eventId: string, futureOnly: boolean): void {
+  function deleteRecurrentEvent(recurrentReservationId: string): void {
     if (!clubId) {
       throw new Error("ClubId not found");
     }
     setEventDetails(undefined);
-    console.log(
-      "delete recurrent event: ",
-      eventId,
-      ", future only:",
-      futureOnly
-    );
+    console.log("delete recurrent event: ", recurrentReservationId);
+    recurrentReservationDelete.mutate({
+      recurrentReservationId: recurrentReservationId,
+      clubId: clubId,
+    });
   }
 
   const [eventDetails, setEventDetails] = useState<EventImpl>();
@@ -285,9 +290,7 @@ export default function Calendar() {
         onDialogClose={() => setEventDetails(undefined)}
         sessionData={sessionData}
         onReservationDelete={(id) => deleteEvent(id)}
-        onRecurrentReservationDelete={(id, futureOnly) =>
-          deleteRecurrentEvent(id, futureOnly)
-        }
+        onRecurrentReservationDelete={(id) => deleteRecurrentEvent(id)}
         clubId={clubId}
         clubSettings={clubQuery.data.clubSettings}
       />
