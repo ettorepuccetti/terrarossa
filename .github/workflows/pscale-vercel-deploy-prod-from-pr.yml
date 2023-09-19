@@ -20,15 +20,14 @@ jobs:
         run: echo "PSCALE_BRANCH_NAME=$(echo ${{ github.head_ref }} | tr -cd '[:alnum:]-'| tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
       - name: Setup pscale
         uses: planetscale/setup-pscale-action@v1
-      - name: Get Deploy Requests number from branch name (on merge)
-        if: github.event.pull_request.merged == true
-        run: |
-          deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -r '.number')
-          echo "DEPLOY_REQUEST_NUMBER=$deploy_request_number" >> $GITHUB_ENV
-      - name: Get Deploy Request number from the only open DR (on workflow_dispatch)
+      - name: Get branch name from the only on opened DR (on workflow_dispatch)
         if: github.event_name == 'workflow_dispatch'
         run: |
-          deploy_request_number=$(pscale deploy-request list ${{ secrets.PLANETSCALE_DATABASE_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -c '.[] | select( .state | contains("open"))' | jq -r .'number')
+          branch_name=$(pscale deploy-request list ${{ secrets.PLANETSCALE_DATABASE_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -c '.[] | select( .state | contains("open"))' | jq -r .'branch')
+          echo "PSCALE_BRANCH_NAME=$branch_name" >> $GITHUB_ENV
+      - name: Get Deploy Requests number from branch name
+        run: |
+          deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -r '.number')
           echo "DEPLOY_REQUEST_NUMBER=$deploy_request_number" >> $GITHUB_ENV
       - name: Deploy schema migrations
         if: ${{ env.DEPLOY_REQUEST_NUMBER }}
