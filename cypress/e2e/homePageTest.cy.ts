@@ -6,7 +6,7 @@ describe("Homepage", () => {
     cy.clearCookies();
     cy.clearAllSessionStorage();
 
-    cy.visit("http://localhost:3000");
+    cy.visit("/");
   });
 
   it("GIVEN not logged in user WHEN login from drawer THEN show logout and username in drawer", () => {
