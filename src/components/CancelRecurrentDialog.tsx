@@ -36,7 +36,10 @@ export default function CancelRecurrentDialog(
   return (
     <Dialog open={props.open} onClose={() => props.onDialogClose()}>
       <DialogLayout title="Cancellazione">
-        <Alert severity="error">Cosa vuoi cancellare? </Alert>
+        <Alert severity="error">
+          Questa prenotazione fa parte di un{"'"}ora fissa. Cosa vuoi
+          cancellare?
+        </Alert>
         <FormControl>
           <RadioGroup
             name="controlled-radio-buttons-group"
