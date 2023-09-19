@@ -137,8 +137,8 @@ export const reservationMutationRouter = createTRPCRouter({
           )
         ) {
           throw new TRPCClientError(
-            "Errore nella creazione della prenotazione ricorrente.\
-            Confiltto in data " + date.format("DD/MM/YYYY")
+            "Errore nella creazione della prenotazione ricorrente. Confiltto in data " +
+              date.format("DD/MM/YYYY")
           );
         }
         reservations.push(reservationInput);

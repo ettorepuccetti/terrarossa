@@ -30,7 +30,6 @@ export default function CancelRecurrentDialog(
     }
     if (value === "recurrent") {
       props.onCancelRecurrent();
-      return;
     }
   };
 
