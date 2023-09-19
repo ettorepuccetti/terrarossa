@@ -1,7 +1,6 @@
 import { type EventImpl } from "@fullcalendar/core/internal";
 import {
   Alert,
-  Box,
   Button,
   Dialog,
   DialogActions,
@@ -52,6 +51,8 @@ export default function EventDetailDialog(props: DialogProps) {
         data-test="event-detail-dialog"
         open={open}
         onClose={() => props.onDialogClose()}
+        fullWidth
+        maxWidth="xs"
       >
         <DialogLayout title="Prenotazione">
           {/* Court name */}
@@ -72,27 +73,26 @@ export default function EventDetailDialog(props: DialogProps) {
             fullWidth
           />
 
-          {/* layout for the two TimeFields on the same row */}
-          <Box display={"flex"} gap={1}>
-            {/* time start */}
-            <TimeField
-              data-test="startTime"
-              color="info"
-              value={eventDetails.start}
-              label={"Orario di inizio"}
-              readOnly={true}
-              ampm={false}
-            />
-            {/* time end */}
-            <TimeField
-              data-test="endTime"
-              color="info"
-              value={eventDetails.end}
-              label={"Orario di fine"}
-              readOnly={true}
-              ampm={false}
-            />
-          </Box>
+          {/* time start */}
+          <TimeField
+            data-test="startTime"
+            color="info"
+            value={eventDetails.start}
+            label={"Orario di inizio"}
+            readOnly={true}
+            ampm={false}
+            fullWidth
+          />
+          {/* time end */}
+          <TimeField
+            data-test="endTime"
+            color="info"
+            value={eventDetails.end}
+            label={"Orario di fine"}
+            readOnly={true}
+            ampm={false}
+            fullWidth
+          />
 
           {/* alert message */}
           {canDelete && tooLateToCancel && (
