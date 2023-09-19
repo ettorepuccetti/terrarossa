@@ -1,8 +1,6 @@
 # Terrarossa
 
 [![Cypress CI](https://github.com/ettorepuccetti/terrarossa/actions/workflows/cypress-testing.yml/badge.svg)](https://github.com/ettorepuccetti/terrarossa/actions/workflows/cypress-testing.yml)
-[![CodeFactor](https://www.codefactor.io/repository/github/ettorepuccetti/terrarossa/badge)](https://www.codefactor.io/repository/github/ettorepuccetti/terrarossa)
-[![DeepScan grade](https://deepscan.io/api/teams/21832/projects/25210/branches/785235/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=21832&pid=25210&bid=785235)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ettorepuccetti_terrarossa&metric=bugs)](https://sonarcloud.io/summary/new_code?id=ettorepuccetti_terrarossa)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ettorepuccetti_terrarossa&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=ettorepuccetti_terrarossa)
 
