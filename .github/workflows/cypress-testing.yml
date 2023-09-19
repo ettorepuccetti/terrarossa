@@ -80,7 +80,6 @@ jobs:
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           browser: chrome
-          group: "UI - Chrome"
           config-file: cypress.config.ts
 
   ui-chrome-mobile-tests:
@@ -113,7 +112,6 @@ jobs:
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           browser: chrome
-          group: "UI - Chrome - Mobile"
           config-file: cypress.config.ts
 
   component-testing:
