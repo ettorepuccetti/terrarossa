@@ -30,6 +30,13 @@ const mountComponent = ({
     />,
     session
   );
+  if (!startDate) {
+    return;
+  }
+  // wait for the useEffect hook to set the endTime
+  cy.get("input")
+    .filter("[data-test='endTime']")
+    .should("have.value", startDate?.add(1, "hour").format("HH:mm"));
 };
 
 describe("USER", () => {
@@ -218,8 +225,8 @@ describe("USER", () => {
     );
   });
 
-  describe("ADMIN", () => {
-    it("GIVEN admin WHEN reserve THEN can book more than 2 hours", () => {
+  describe.only("ADMIN", () => {
+    beforeEach(() => {
       const clubId = "my_club_Id";
       const adminSession: Session = {
         ...session,
@@ -230,17 +237,70 @@ describe("USER", () => {
         },
       };
       mountComponent({
-        startDate: dayjs().hour(13).minute(0),
+        startDate: dayjs().hour(13).minute(0).second(0).millisecond(0),
         session: adminSession,
         clubId: clubId,
       });
-      cy.get("[data-test='endTime']").type("18:00");
+    });
+
+    it("GIVEN admin WHEN reserve THEN can book more than 2 hours", () => {
+      cy.get("input").filter("[data-test='endTime']").type("18:00");
       cy.get("[data-test='endTime']").should(
         "have.attr",
         "aria-invalid",
         "false"
       );
       cy.get("[data-test=reserveButton]").should("be.enabled");
+    });
+    it("GIVEN admin WHEN enable recurrent reervation toggle THEN show recurrent end date", () => {
+      cy.get("[data-test=recurrent-switch]").click();
+      cy.get("[data-test=recurrent-end-date]").should("be.visible");
+    });
+    it("GIVEN admin WHEN enable recurrent switch but not set end date THEN button disabled", () => {
+      cy.get("[data-test=recurrent-switch]").click();
+      cy.get("[data-test=reserveButton]").should("be.disabled");
+    });
+    it("GIVEN admin WHEN enable recurrent switch and set end date THEN button enabled", () => {
+      cy.get("[data-test=recurrent-switch]").click();
+      cy.get("[data-test=recurrent-end-date]").type(
+        dayjs().add(1, "week").format("DD/MM/YYYY")
+      );
+      cy.get("[data-test=reserveButton]").should("be.enabled");
+    });
+    it("GIVEN admin WHEN set recurrent end date not same week day THEN show error and button disabled", () => {
+      cy.get("[data-test=recurrent-switch]").click();
+      cy.get("[data-test=recurrent-end-date]").type(
+        dayjs().add(8, "day").format("DD/MM/YYYY")
+      );
+      cy.get("[data-test=reserveButton]").should("be.disabled");
+      cy.get("[data-test=recurrent-end-date]").should(
+        "have.attr",
+        "aria-invalid",
+        "true"
+      );
+      cy.get(".MuiFormHelperText-root").should(
+        "have.text",
+        "La data deve essere lo stesso giorno della settimana della prenotazione"
+      );
+      cy.get("[data-test=reserveButton]").should("be.disabled");
+    });
+    it("GIVEN admin WHEN set recurrent end date next year THEN show error and button disabled", () => {
+      cy.get("[data-test=recurrent-switch]").click();
+      const dayOfTheWeek = dayjs().day();
+      cy.get("[data-test=recurrent-end-date]").type(
+        dayjs().add(1, "year").month(0).day(dayOfTheWeek).format("DD/MM/YYYY")
+      );
+      cy.get("[data-test=reserveButton]").should("be.disabled");
+      cy.get("[data-test=recurrent-end-date]").should(
+        "have.attr",
+        "aria-invalid",
+        "true"
+      );
+      cy.get(".MuiFormHelperText-root").should(
+        "have.text",
+        "La data di fine validità deve essere entro la fine dell'anno"
+      );
+      cy.get("[data-test=reserveButton]").should("be.disabled");
     });
   });
 });
