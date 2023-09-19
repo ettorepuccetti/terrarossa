@@ -1,4 +1,10 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# lint
 npx pretty-quick --staged
+
+# remove `.only` from tests under `/cypress`
+# note that '' after `sed -i` is required only for macOS
+# it also add to staged files all the files that match the find pattern (I cannot make it happen only for the files that were changed)
+find ./cypress -type f \( -name "*.cy.ts" -o -name "*.cy.tsx" \) -exec sed -i '' 's/\.only(/(/g' {} + -print | xargs git add

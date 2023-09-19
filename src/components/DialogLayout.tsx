@@ -16,7 +16,6 @@ export default function DialogLayout({
         gap={1.5}
         alignItems={"center"}
         color={useTheme().palette.secondary.main}
-        maxWidth={300}
       >
         {children}
       </Box>

@@ -1,7 +1,6 @@
 import { type EventImpl } from "@fullcalendar/core/internal";
 import {
   Alert,
-  Box,
   Button,
   Dialog,
   DialogActions,
@@ -13,6 +12,7 @@ import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import React from "react";
 import { isAdminOfTheClub } from "~/utils/utils";
+import CancelRecurrentDialog from "./CancelRecurrentDialog";
 import ConfirmationDialog from "./ConfirmationDialog";
 import DialogLayout from "./DialogLayout";
 
@@ -22,6 +22,7 @@ interface DialogProps {
   onDialogClose: () => void;
   sessionData: Session | null;
   onReservationDelete: (id: string) => void;
+  onRecurrentReservationDelete: (recurrentId: string) => void;
   clubId: string;
   clubSettings: ClubSettings;
 }
@@ -50,6 +51,8 @@ export default function EventDetailDialog(props: DialogProps) {
         data-test="event-detail-dialog"
         open={open}
         onClose={() => props.onDialogClose()}
+        fullWidth
+        maxWidth="xs"
       >
         <DialogLayout title="Prenotazione">
           {/* Court name */}
@@ -70,27 +73,26 @@ export default function EventDetailDialog(props: DialogProps) {
             fullWidth
           />
 
-          {/* layout for the two TimeFields on the same row */}
-          <Box display={"flex"} gap={1}>
-            {/* time start */}
-            <TimeField
-              data-test="startTime"
-              color="info"
-              value={eventDetails.start}
-              label={"Orario di inizio"}
-              readOnly={true}
-              ampm={false}
-            />
-            {/* time end */}
-            <TimeField
-              data-test="endTime"
-              color="info"
-              value={eventDetails.end}
-              label={"Orario di fine"}
-              readOnly={true}
-              ampm={false}
-            />
-          </Box>
+          {/* time start */}
+          <TimeField
+            data-test="startTime"
+            color="info"
+            value={eventDetails.start}
+            label={"Orario di inizio"}
+            readOnly={true}
+            ampm={false}
+            fullWidth
+          />
+          {/* time end */}
+          <TimeField
+            data-test="endTime"
+            color="info"
+            value={eventDetails.end}
+            label={"Orario di fine"}
+            readOnly={true}
+            ampm={false}
+            fullWidth
+          />
 
           {/* alert message */}
           {canDelete && tooLateToCancel && (
@@ -112,16 +114,35 @@ export default function EventDetailDialog(props: DialogProps) {
             </Button>
           )}
 
-          <ConfirmationDialog
-            open={confirmationOpen}
-            title={"Cancellazione"}
-            message={"Sei sicuro di voler cancellare la prenotazione?"}
-            onDialogClose={() => setConfirmationOpen(false)}
-            onConfirm={() => {
-              props.onReservationDelete(eventDetails.id);
-              setConfirmationOpen(false);
-            }}
-          />
+          {eventDetails.extendedProps.recurrentId && (
+            <CancelRecurrentDialog
+              open={confirmationOpen}
+              onDialogClose={() => setConfirmationOpen(false)}
+              onCancelSingle={() => {
+                props.onReservationDelete(eventDetails.id);
+                setConfirmationOpen(false);
+              }}
+              onCancelRecurrent={() => {
+                props.onRecurrentReservationDelete(
+                  eventDetails.extendedProps.recurrentId as string
+                );
+                setConfirmationOpen(false);
+              }}
+            />
+          )}
+
+          {!eventDetails.extendedProps.recurrentId && (
+            <ConfirmationDialog
+              open={confirmationOpen}
+              title={"Cancellazione"}
+              message={"Sei sicuro di voler cancellare la prenotazione?"}
+              onDialogClose={() => setConfirmationOpen(false)}
+              onConfirm={() => {
+                props.onReservationDelete(eventDetails.id);
+                setConfirmationOpen(false);
+              }}
+            />
+          )}
         </DialogLayout>
       </Dialog>
     </>

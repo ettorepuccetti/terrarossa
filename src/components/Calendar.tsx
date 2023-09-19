@@ -3,13 +3,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
-import { api } from "~/utils/api";
 
 import { type EventClickArg } from "@fullcalendar/core";
 import { type EventImpl } from "@fullcalendar/core/internal";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { api } from "~/utils/api";
 import { isAdminOfTheClub, isSelectableSlot } from "~/utils/utils";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
@@ -26,8 +26,19 @@ export const ReservationInputSchema = z.object({
   clubId: z.string(),
 });
 
+export const RecurrentReservationInputSchema = z
+  .object({
+    recurrentEndDate: z.date(),
+  })
+  .and(ReservationInputSchema);
+
 export const ReservationDeleteInputSchema = z.object({
   reservationId: z.string(),
+  clubId: z.string(),
+});
+
+export const RecurrentReservationDeleteInputSchema = z.object({
+  recurrentReservationId: z.string(),
   clubId: z.string(),
 });
 
@@ -75,11 +86,25 @@ export default function Calendar() {
     },
   });
 
+  const currentReservationAdd =
+    api.reservationMutation.insertRecurrent.useMutation({
+      async onSuccess() {
+        await reservationQuery.refetch();
+      },
+    });
+
   const reservationDelete = api.reservationMutation.deleteOne.useMutation({
     async onSuccess() {
       await reservationQuery.refetch();
     },
   });
+
+  const recurrentReservationDelete =
+    api.reservationMutation.deleteRecurrent.useMutation({
+      async onSuccess() {
+        await reservationQuery.refetch();
+      },
+    });
 
   /**
    * ---------- end of trpc procedures ----------------
@@ -123,13 +148,28 @@ export default function Calendar() {
     }
   };
 
-  const addEvent = (endDate: Date, overwrittenName: string | undefined) => {
+  const addEvent = (
+    endDate: Date,
+    overwrittenName: string | undefined,
+    recurrentEndDate: Date | undefined
+  ) => {
     setDateClick(undefined);
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
     }
     if (!clubId) {
       throw new Error("ClubId not found");
+    }
+    if (recurrentEndDate) {
+      currentReservationAdd.mutate({
+        clubId: clubId,
+        courtId: dateClick.resource.id,
+        startDateTime: dateClick.date,
+        endDateTime: endDate,
+        overwriteName: overwrittenName,
+        recurrentEndDate: recurrentEndDate,
+      });
+      return;
     }
     reservationAdd.mutate({
       courtId: dateClick.resource.id,
@@ -145,8 +185,20 @@ export default function Calendar() {
       throw new Error("ClubId not found");
     }
     setEventDetails(undefined);
-    console.log("delete Event: ", eventId);
+    console.log("delete event: ", eventId);
     reservationDelete.mutate({ reservationId: eventId, clubId: clubId });
+  }
+
+  function deleteRecurrentEvent(recurrentReservationId: string): void {
+    if (!clubId) {
+      throw new Error("ClubId not found");
+    }
+    setEventDetails(undefined);
+    console.log("delete recurrent event: ", recurrentReservationId);
+    recurrentReservationDelete.mutate({
+      recurrentReservationId: recurrentReservationId,
+      clubId: clubId,
+    });
   }
 
   const [eventDetails, setEventDetails] = useState<EventImpl>();
@@ -212,7 +264,7 @@ export default function Calendar() {
         <FullCalendarWrapper
           clubData={clubQuery.data}
           courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
-          reservationData={reservationQuery.data ?? []} //same
+          reservationData={reservationQuery.data ?? []} //same as above
           onDateClick={openReservationDialog}
           onEventClick={openEventDialog}
         />
@@ -223,9 +275,11 @@ export default function Calendar() {
         startDate={dateClick?.date}
         resource={dateClick?.resource?.title}
         onDialogClose={() => setDateClick(undefined)}
-        onConfirm={(endDate: Date, overwrittenName: string | undefined) =>
-          addEvent(endDate, overwrittenName)
-        }
+        onConfirm={(
+          endDate: Date,
+          overwrittenName: string | undefined,
+          recurrentEndDate: Date | undefined
+        ) => addEvent(endDate, overwrittenName, recurrentEndDate)}
         clubId={clubId}
         clubSettings={clubQuery.data.clubSettings}
       />
@@ -236,6 +290,7 @@ export default function Calendar() {
         onDialogClose={() => setEventDetails(undefined)}
         sessionData={sessionData}
         onReservationDelete={(id) => deleteEvent(id)}
+        onRecurrentReservationDelete={(id) => deleteRecurrentEvent(id)}
         clubId={clubId}
         clubSettings={clubQuery.data.clubSettings}
       />

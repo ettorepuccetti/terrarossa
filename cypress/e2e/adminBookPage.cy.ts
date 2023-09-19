@@ -93,6 +93,18 @@ describe("New reservation", () => {
     cy.get("[data-test=reserveButton]").click();
     cy.get("[data-test=calendar-event]").should("be.visible");
   });
+
+  it("GIVEN admin WHEN make recurrent reservation THEN reservations are created", function () {
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
+    cy.get("[data-test=recurrent-switch]").click();
+    cy.get("[data-test=recurrent-end-date]").type(
+      dayjs().add(2, "week").format("DD/MM/YYYY")
+    );
+    cy.get("[data-test=reserveButton]").click();
+    cy.get("[data-test=calendar-event]").should("be.visible");
+    cy.navigateDaysFromToday(7);
+    cy.get("[data-test=calendar-event]").should("be.visible");
+  });
 });
 
 describe("Existing reservation", () => {
@@ -124,5 +136,50 @@ describe("Existing reservation", () => {
       pietrangeliCourtName,
       Cypress.env("ADMIN_FORO_MAIL") as string
     );
+  });
+
+  it("GIVEN admin WHEN cancel recurrent reservation series THEN all reservations are deleted", function () {
+    // create recurrent reservation
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
+    cy.get("[data-test=recurrent-switch]").click();
+    cy.get("[data-test=recurrent-end-date]").type(
+      dayjs().add(1, "week").format("DD/MM/YYYY")
+    );
+    cy.get("[data-test=reserveButton]").click();
+
+    // delete recurrent reservation
+    cy.get("[data-test=calendar-event]").click();
+    cy.get("[data-test=delete-button]").click();
+    cy.get("[data-test=recurrent]").click();
+    cy.get("[data-test=confirm-button]").click();
+
+    // check that all reservations have been deleted
+    cy.get("[data-test=calendar-event]").should("not.exist");
+    cy.navigateDaysFromToday(7);
+    cy.get("[data-test=calendar-event]").should("not.exist");
+  });
+
+  it("GIVEN admin WHEN cancel single occurrence of recurrent reservation THEN only single reservation deleted", function () {
+    // create recurrent reservation
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
+    cy.get("[data-test=recurrent-switch]").click();
+    cy.get("[data-test=recurrent-end-date]").type(
+      dayjs().add(1, "week").format("DD/MM/YYYY")
+    );
+    cy.get("[data-test=reserveButton]").click();
+
+    // delete recurrent reservation (from another occurrence)
+    cy.navigateDaysFromToday(7);
+    cy.get("[data-test=calendar-event]").click();
+    cy.get("[data-test=delete-button]").click();
+    cy.get("[data-test=single]").click();
+    cy.get("[data-test=confirm-button]").click();
+
+    // check that only that reservation has been deleted
+    cy.get("[data-test=calendar-event]").should("not.exist");
+
+    // check that other reservations are still there
+    cy.navigateDaysFromToday(0);
+    cy.get("[data-test=calendar-event]").should("exist");
   });
 });

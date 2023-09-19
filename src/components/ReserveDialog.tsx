@@ -4,13 +4,16 @@ import {
   Button,
   Dialog,
   DialogActions,
+  Switch,
   TextField,
   Typography,
 } from "@mui/material";
 import {
   DateField,
+  DatePicker,
   TimeField,
   TimePicker,
+  type DateValidationError,
   type TimeValidationError,
 } from "@mui/x-date-pickers";
 import { type ClubSettings } from "@prisma/client";
@@ -24,7 +27,11 @@ export interface ReserveDialogProps {
   open: boolean;
   startDate: Date | undefined;
   resource: string | undefined;
-  onConfirm: (endDate: Date, overwrittenName: string | undefined) => void;
+  onConfirm: (
+    endDate: Date,
+    overwrittenName: string | undefined,
+    recurrentEndDate: Date | undefined
+  ) => void;
   onDialogClose: () => void;
   clubId: string;
   clubSettings: ClubSettings;
@@ -35,10 +42,15 @@ export default function ReserveDialog(props: ReserveDialogProps) {
   const startDate = dayjs(props.startDate);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
+  const [recurrentEndDate, setRecurrentEndDate] = useState<Dayjs | null>(null);
+  const [recurrentView, setRecurrentView] = useState<boolean>(false);
   const { data: sessionData } = useSession();
   const [endDateError, setEndDateError] = useState<string | undefined>(
     undefined
   );
+  const [recurrentEndDateError, setRecurrentEndDateError] = useState<
+    string | undefined
+  >(undefined);
 
   // to set endDate to startDate + 1 hour, when component is mounted
   useEffect(() => {
@@ -65,10 +77,13 @@ export default function ReserveDialog(props: ReserveDialogProps) {
     props.onConfirm(
       endDate.toDate(),
       //manage overwriteName limitation about controlled component
-      overwriteName !== "" ? overwriteName : undefined
+      overwriteName !== "" ? overwriteName : undefined,
+      recurrentEndDate?.hour(23).minute(59).toDate()
     );
     setOverwriteName("");
     setEndDate(null);
+    setRecurrentView(false);
+    setRecurrentEndDate(null);
   };
 
   const canBook =
@@ -78,7 +93,8 @@ export default function ReserveDialog(props: ReserveDialogProps) {
     // default case
     const maxTime = startDate.add(2, "hours");
 
-    // manage case in which endTime would be after club closing time, apply also for ADMIN
+    // manage case in which endTime would be after club closing time
+    // apply also for ADMIN
     const clubClosingTime = dayjs(startDate)
       .hour(props.clubSettings.lastBookableHour + 1) // TODO: +1 implicit assumption
       .minute(props.clubSettings.lastBookableMinute)
@@ -120,6 +136,36 @@ export default function ReserveDialog(props: ReserveDialogProps) {
     setEndDateError(error.toString());
   };
 
+  const setRecurrentEndDateErrorText = (error: DateValidationError) => {
+    if (!error) {
+      setRecurrentEndDateError(undefined);
+      return;
+    }
+    if (error === "minDate") {
+      setRecurrentEndDateError(
+        "La data di fine validità deve essere successiva alla data di inizio"
+      );
+      return;
+    }
+    if (error === "maxDate") {
+      setRecurrentEndDateError(
+        "La data di fine validità deve essere entro la fine dell'anno"
+      );
+      return;
+    }
+    if (error === "shouldDisableDate") {
+      setRecurrentEndDateError(
+        "La data deve essere lo stesso giorno della settimana della prenotazione"
+      );
+      return;
+    }
+    if (error === "invalidDate") {
+      setRecurrentEndDateError("Data non valida");
+      return;
+    }
+    setRecurrentEndDateError(error.toString());
+  };
+
   return (
     <>
       <Dialog
@@ -128,8 +174,12 @@ export default function ReserveDialog(props: ReserveDialogProps) {
         onClose={() => {
           setOverwriteName("");
           setEndDate(null);
+          setRecurrentView(false);
+          setRecurrentEndDate(null);
           props.onDialogClose();
         }}
+        fullWidth
+        maxWidth="xs"
       >
         <DialogLayout title="Prenota">
           {/* if not login only show login button with no other fields */}
@@ -155,13 +205,12 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                   color="info"
                 />
               )}
-
               {/* date */}
               <DateField
                 inputProps={{ "data-test": "date" }}
                 value={startDate}
                 readOnly={true}
-                label={"Data"}
+                label={recurrentView ? "Data di inizio" : "Data"}
                 format="DD/MM/YYYY"
                 size="small"
                 fullWidth
@@ -199,6 +248,46 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                 onError={setEndDateErrorText}
               />
 
+              {/* swticher for recurrent reservation */}
+              {isAdminOfTheClub(sessionData, props.clubId) && (
+                <Box display={"flex"} gap={0.5} alignItems={"center"}>
+                  <Switch
+                    data-test="recurrent-switch"
+                    checked={recurrentView}
+                    onChange={() => {
+                      setRecurrentView(!recurrentView);
+                    }}
+                    color="info"
+                  />
+                  <Typography color={recurrentView ? "info" : "GrayText"}>
+                    Ora fissa
+                  </Typography>
+                </Box>
+              )}
+              {/* recurrent reservation end date */}
+              {recurrentView && (
+                <DatePicker
+                  slotProps={{
+                    textField: {
+                      inputProps: { "data-test": "recurrent-end-date" },
+                      color: "info",
+                      helperText: recurrentEndDateError,
+                    },
+                  }}
+                  value={recurrentEndDate}
+                  label={"Data di fine validità"}
+                  onChange={(dayJsDate) => setRecurrentEndDate(dayJsDate)}
+                  minDate={startDate}
+                  maxDate={startDate.endOf("year")}
+                  shouldDisableDate={(dayJsDate) =>
+                    dayJsDate.day() !== startDate.day()
+                  }
+                  onError={setRecurrentEndDateErrorText}
+                  views={["day"]}
+                  format="DD/MM/YYYY"
+                  sx={{ width: "100%" }}
+                />
+              )}
               {!canBook && (
                 <Box display={"flex"}>
                   <Alert data-test="past-warning" severity={"warning"}>
@@ -209,7 +298,13 @@ export default function ReserveDialog(props: ReserveDialogProps) {
 
               <Button
                 onClick={() => onConfirmButton()}
-                disabled={!endDate || !canBook || !!endDateError}
+                disabled={
+                  !endDate ||
+                  !canBook ||
+                  !!endDateError ||
+                  !!recurrentEndDateError ||
+                  (recurrentView && !recurrentEndDate)
+                }
                 color="info"
                 data-test="reserveButton"
               >

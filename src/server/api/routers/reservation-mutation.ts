@@ -2,6 +2,8 @@ import { type Prisma, type PrismaClient } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
 import dayjs from "dayjs";
 import {
+  RecurrentReservationDeleteInputSchema,
+  RecurrentReservationInputSchema,
   ReservationDeleteInputSchema,
   ReservationInputSchema,
 } from "~/components/Calendar";
@@ -90,6 +92,63 @@ export const reservationMutationRouter = createTRPCRouter({
       });
     }),
 
+  insertRecurrent: protectedProcedure
+    .input(RecurrentReservationInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      // check for privileges [UI already prevents this]
+      if (!isUserAdminOfClub(ctx, input.clubId)) {
+        throw new TRPCClientError(
+          "Error: Only admins can create recurrent reservations"
+        );
+      }
+      // create the recurrent reservation at which the reservations will refer to
+      const recurrentDbEntity = await ctx.prisma.recurrentReservation.create({
+        data: {
+          endDate: input.recurrentEndDate,
+          startDate: input.startDateTime,
+        },
+      });
+      //add to reservations array a reservation for each week from input.startDate to input.endDate
+      const reservations = [];
+      for (
+        let date = dayjs(input.startDateTime);
+        date.isBefore(input.recurrentEndDate);
+        date = date.add(1, "week")
+      ) {
+        const reservationInput = {
+          courtId: input.courtId,
+          startTime: date.toDate(),
+          endTime: date
+            .hour(input.endDateTime.getHours())
+            .minute(input.endDateTime.getMinutes())
+            .toDate(),
+          userId: ctx.session.user.id,
+          overwriteName: input.overwriteName,
+          recurrentReservationId: recurrentDbEntity.id,
+        };
+
+        //check for collision [UI does NOT check for this]
+        if (
+          await collision(
+            ctx.prisma,
+            reservationInput.startTime,
+            reservationInput.endTime,
+            reservationInput.courtId
+          )
+        ) {
+          throw new TRPCClientError(
+            "Errore nella creazione della prenotazione ricorrente. Confiltto in data " +
+              date.format("DD/MM/YYYY")
+          );
+        }
+        reservations.push(reservationInput);
+      }
+
+      await ctx.prisma.reservation.createMany({
+        data: reservations,
+      });
+    }),
+
   deleteOne: protectedProcedure
     .input(ReservationDeleteInputSchema)
     .mutation(async ({ ctx, input }) => {
@@ -125,6 +184,24 @@ export const reservationMutationRouter = createTRPCRouter({
       return ctx.prisma.reservation.delete({
         where: {
           id: input.reservationId,
+        },
+      });
+    }),
+
+  deleteRecurrent: protectedProcedure
+    .input(RecurrentReservationDeleteInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      // check for privileges [UI already prevents this]
+      if (!isUserAdminOfClub(ctx, input.clubId)) {
+        throw new TRPCClientError(
+          "Error: Only admins can delete recurrent reservations"
+        );
+      }
+      // delete all reservations that refer to the recurrent reservation
+      return ctx.prisma.recurrentReservation.delete({
+        //delete all reservations that refer to the recurrent reservation and are in the future
+        where: {
+          id: input.recurrentReservationId,
         },
       });
     }),

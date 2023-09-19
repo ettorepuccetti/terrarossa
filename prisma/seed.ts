@@ -42,7 +42,7 @@ async function main() {
       },
       clubSettings: {
         create: {
-          daysInFutureVisible: 4,
+          daysInFutureVisible: 7,
           daysInThePastVisible: 3,
         },
       },
@@ -60,7 +60,7 @@ async function main() {
         "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/wimbledon-logo.png",
       clubSettings: {
         create: {
-          daysInFutureVisible: 7,
+          daysInFutureVisible: 5,
           daysInThePastVisible: 2,
         },
       },

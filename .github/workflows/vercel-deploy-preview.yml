@@ -1,8 +1,7 @@
 name: Vercel - preview deployment on push to feature branch
 on:
-  push:
-    branches-ignore:
-      - main
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
