@@ -259,7 +259,7 @@ export default function Calendar() {
         <FullCalendarWrapper
           clubData={clubQuery.data}
           courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
-          reservationData={reservationQuery.data ?? []} //same
+          reservationData={reservationQuery.data ?? []} //same as above
           onDateClick={openReservationDialog}
           onEventClick={openEventDialog}
         />
