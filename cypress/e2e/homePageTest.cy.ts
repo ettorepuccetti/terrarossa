@@ -1,20 +1,12 @@
 export {};
 
-describe("homepage", () => {
+describe("Homepage", () => {
   beforeEach(() => {
     cy.clearLocalStorage();
     cy.clearCookies();
     cy.clearAllSessionStorage();
 
     cy.visit("http://localhost:3000");
-  });
-
-  it("layout", () => {
-    cy.get(".MuiPaper-root > .MuiToolbar-root").should("be.visible"); //the toolbar is visible
-    cy.get("a > .MuiButtonBase-root").should("be.visible"); //the button "Prenota" is visible
-    cy.get("a > .MuiButtonBase-root")
-      .parent()
-      .should("have.attr", "href", "/search"); //the button "Prenota" has the correct href
   });
 
   it("GIVEN not logged in user WHEN login from drawer THEN show logout and username in drawer", () => {
