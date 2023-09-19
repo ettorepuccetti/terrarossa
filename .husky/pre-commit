@@ -5,4 +5,5 @@
 npx pretty-quick --staged
 
 # remove `.only` from tests under `/cypress`
+# note that '' after `sed -i` is required only for macOS
 find ./cypress -type f \( -name "*.cy.ts" -o -name "*.cy.tsx" \) -exec sed -i '' 's/\.only(/(/g' {} +
