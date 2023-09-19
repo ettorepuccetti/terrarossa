@@ -21,7 +21,6 @@ jobs:
       - name: Setup pscale
         uses: planetscale/setup-pscale-action@v1
       - name: Get Deploy Requests
-        if: github.event.pull_request.merged == true
         run: |
           deploy_request_number=$(pscale deploy-request show ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} -f json | jq -r '.number')
           echo "DEPLOY_REQUEST_NUMBER=$deploy_request_number" >> $GITHUB_ENV
