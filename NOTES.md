@@ -177,6 +177,25 @@ Cypress.automation("remote:debugger:protocol", {
 
 However, I didn't find how to emulate the pointer type media query correctly.
 
+### Re-enable parallelization on Cloud
+
+at job level (before `steps`):
+
+```
+strategy:
+  fail-fast: false
+  matrix:
+    containers: [1, 2, 3]
+```
+
+under option of `cypress-io/github-action@v5`:
+
+```
+record: true
+parallel: true
+group: "UI - Chrome [ - mobile]"
+```
+
 ## Github Actions
 
 ### Skip pull request and push workflows
