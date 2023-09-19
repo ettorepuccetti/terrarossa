@@ -9,7 +9,7 @@ env:
   PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-  DEPLOY_SUCCESS_STATUS: "complete"
+  DEPLOY_SUCCESS_STATUS: "complete_pending_revert"
 jobs:
   deploy-db:
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
