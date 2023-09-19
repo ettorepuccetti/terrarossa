@@ -1,4 +1,4 @@
-name: Vercel - production deployment on PR merge (possible DB migration)
+name: Pscale + Vercel - merge DR and production deployment on PR merge
 on:
   pull_request:
     types:
