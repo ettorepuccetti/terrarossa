@@ -5,4 +5,4 @@
 npx pretty-quick --staged
 
 # remove `.only` from tests under `/cypress`
-find /cypress -type f \(-name "*.cy.ts" -o -name "*.cy.tsx"\)  -exec sed -i 's/\.only(/(/g' {} +
+#find ./cypress -type f \( -name "*.cy.ts" -o -name "*.cy.tsx" \) -exec sed -i 's/\.only(/(/g' {} +

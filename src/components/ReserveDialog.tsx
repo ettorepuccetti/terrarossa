@@ -155,7 +155,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
     }
     if (error === "shouldDisableDate") {
       setRecurrentEndDateError(
-        "Il giorno della settimana di fine validità deve essere lo stesso della prenotazione"
+        "La data deve essere lo stesso giorno della settimana della prenotazione"
       );
       return;
     }
@@ -252,6 +252,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
               {isAdminOfTheClub(sessionData, props.clubId) && (
                 <Box display={"flex"} gap={0.5} alignItems={"center"}>
                   <Switch
+                    data-test="recurrent-switch"
                     checked={recurrentView}
                     onChange={() => {
                       setRecurrentView(!recurrentView);
@@ -268,7 +269,7 @@ export default function ReserveDialog(props: ReserveDialogProps) {
                 <DatePicker
                   slotProps={{
                     textField: {
-                      // error: !!recurrentEndDateError || !recurrentEndDate,
+                      inputProps: { "data-test": "recurrent-end-date" },
                       color: "info",
                       helperText: recurrentEndDateError,
                     },

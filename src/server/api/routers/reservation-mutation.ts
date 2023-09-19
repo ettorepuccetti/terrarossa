@@ -2,12 +2,13 @@ import { type Prisma, type PrismaClient } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
 import dayjs from "dayjs";
 import {
+  RecurrentReservationDeleteInputSchema,
   RecurrentReservationInputSchema,
   ReservationDeleteInputSchema,
   ReservationInputSchema,
 } from "~/components/Calendar";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { UserRoles, type UserRole } from "~/utils/constants";
+import { type UserRole, UserRoles } from "~/utils/constants";
 
 export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
@@ -185,6 +186,30 @@ export const reservationMutationRouter = createTRPCRouter({
           id: input.reservationId,
         },
       });
+    }),
+
+  deleteRecurrent: protectedProcedure
+    .input(RecurrentReservationDeleteInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      // check for privileges [UI already prevents this]
+      if (!isUserAdminOfClub(ctx, input.clubId)) {
+        throw new TRPCClientError(
+          "Error: Only admins can delete recurrent reservations"
+        );
+      }
+      if (input.futureOnly) {
+        // delete all reservations that refer to the recurrent reservation
+        return ctx.prisma.reservation.deleteMany({
+          //delete all reservations that refer to the recurrent reservation and are in the future
+          where: {
+            recurrentReservationId: input.reservationId,
+            startTime: {
+              gte: Date.now(),
+            },
+          },
+        });
+      } else {
+      }
     }),
 });
 

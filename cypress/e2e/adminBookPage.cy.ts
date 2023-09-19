@@ -125,4 +125,16 @@ describe("Existing reservation", () => {
       Cypress.env("ADMIN_FORO_MAIL") as string
     );
   });
+
+  it("GIVEN admin WHEN make recurrent reservation THEN reservations are created", function () {
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
+    cy.get("[data-test=recurrent-switch]").click();
+    cy.get("[data-test=recurrent-end-date]").type(
+      dayjs().add(2, "week").format("DD/MM/YYYY")
+    );
+    cy.get("[data-test=reserveButton]").click();
+    cy.get("[data-test=calendar-event]").should("be.visible");
+    cy.navigateDaysFromToday(7);
+    cy.get("[data-test=calendar-event]").should("be.visible");
+  });
 });

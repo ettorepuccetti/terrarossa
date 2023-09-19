@@ -37,6 +37,12 @@ export const ReservationDeleteInputSchema = z.object({
   clubId: z.string(),
 });
 
+export const RecurrentReservationDeleteInputSchema = z
+  .object({
+    futureOnly: z.boolean(),
+  })
+  .and(ReservationDeleteInputSchema);
+
 export const ClubIdInputSchema = z.object({
   clubId: z.union([z.string(), z.string().array(), z.undefined()]), //router param can also be undefined or array of strings
 });
@@ -173,8 +179,21 @@ export default function Calendar() {
       throw new Error("ClubId not found");
     }
     setEventDetails(undefined);
-    console.log("delete Event: ", eventId);
+    console.log("delete event: ", eventId);
     reservationDelete.mutate({ reservationId: eventId, clubId: clubId });
+  }
+
+  function deleteRecurrentEvent(eventId: string, futureOnly: boolean): void {
+    if (!clubId) {
+      throw new Error("ClubId not found");
+    }
+    setEventDetails(undefined);
+    console.log(
+      "delete recurrent event: ",
+      eventId,
+      ", future only:",
+      futureOnly
+    );
   }
 
   const [eventDetails, setEventDetails] = useState<EventImpl>();
@@ -266,6 +285,9 @@ export default function Calendar() {
         onDialogClose={() => setEventDetails(undefined)}
         sessionData={sessionData}
         onReservationDelete={(id) => deleteEvent(id)}
+        onRecurrentReservationDelete={(id, futureOnly) =>
+          deleteRecurrentEvent(id, futureOnly)
+        }
         clubId={clubId}
         clubSettings={clubQuery.data.clubSettings}
       />
