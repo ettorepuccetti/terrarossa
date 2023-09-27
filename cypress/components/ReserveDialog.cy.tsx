@@ -149,6 +149,25 @@ describe("USER", () => {
     cy.get("[data-test=reserveButton]").should("be.enabled");
   });
 
+  it("GIVEN logged user WHEN clear end date and insert valid endDate (no typing) THEN button enabled", () => {
+    const startDate = dayjs()
+      .add(1, "day")
+      .hour(13)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+
+    mountComponent({ startDate, session });
+
+    cy.get("input").filter("[data-test='endTime']").clear();
+    cy.get("[data-test=reserveButton]").should("be.disabled");
+
+    cy.get("[data-testid=ClockIcon]").click();
+    cy.get('[aria-label="14 hours"]').click();
+    cy.get('[aria-label="0 minutes"]').click();
+    cy.get("[data-test=reserveButton]").should("be.enabled");
+  });
+
   it("GIVEN logged user WHEN reservation is longer than 2 hours THEN show error and cannot press button", () => {
     // fixed time of a future date. TIME: 13:00
     const startDate = dayjs()
