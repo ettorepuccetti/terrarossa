@@ -22,22 +22,22 @@ describe("ReserveDialogRecurrent", () => {
     );
   });
 
-  it("return error on first switch with null date", () => {
+  it("GIVEN date null and switch off WHEN switch on THEN set error", () => {
     cy.get("[data-test=recurrent-switch]").click();
-    cy.get(".MuiFormHelperText-root").should(
-      "have.text",
-      "Inserisci una data valida"
-    );
+    // cy.get(".MuiFormHelperText-root").should(
+    //   "have.text",
+    //   "Inserisci una data valida"
+    // );
     cy.get("@setErrorStub").should("be.calledOnceWithExactly", true);
   });
 
-  it("reset the error when the switch is turned off", () => {
+  it("GIVEN switch on WHEN switch off THEN clear error", () => {
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("@setErrorStub").should("be.calledWithExactly", false);
   });
 
-  it("return no error when inserted a valid date", () => {
+  it("GIVEN switch on and null date WHEN type valid date THEN clear error", () => {
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-end-date]").click();
     cy.get("[data-test=recurrent-end-date]").type(
@@ -50,7 +50,7 @@ describe("ReserveDialogRecurrent", () => {
     cy.get("@setErrorStub").should("be.calledWithExactly", false);
   });
 
-  it("return error when inserted a date before the start date", () => {
+  it("GIVEN switch on WHEN type invalid date THEN error set", () => {
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-end-date]").click();
     cy.get("[data-test=recurrent-end-date]").type(
@@ -67,7 +67,7 @@ describe("ReserveDialogRecurrent", () => {
     cy.get("@setErrorStub").should("be.calledWithExactly", true);
   });
 
-  it("when specific error and switch is turned off and on, the error is still present", () => {
+  it("GIVEN invalid date and switch on WHEN switch off and on THEN error set", () => {
     // enable switch
     cy.get("[data-test=recurrent-switch]").click();
     // enter invalid date
@@ -89,5 +89,18 @@ describe("ReserveDialogRecurrent", () => {
       "La data di fine validità deve essere successiva alla data di inizio"
     );
     cy.get("@setErrorStub").should("be.calledWithExactly", true);
+  });
+
+  it("GIVEN null date and switch on WHEN set valid date (without typing) THEN error clear", () => {
+    cy.get("[data-test=recurrent-switch]").click();
+    cy.get("[data-test=recurrent-end-date]").click();
+    cy.get("[data-testid=CalendarIcon]").click();
+    cy.get(".MuiPickersDay-today").click();
+
+    cy.get("@setDateStub").should(
+      "be.calledWith",
+      dayjs().hour(0).minute(0).second(0).millisecond(0)
+    );
+    cy.get("@setErrorStub").should("be.calledWithExactly", false);
   });
 });

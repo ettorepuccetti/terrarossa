@@ -307,6 +307,16 @@ describe("USER", () => {
         );
         cy.get("[data-test=reserveButton]").should("be.disabled");
       });
+
+      it("GIVEN admin WHEN set valid recurrent end date (without typing) THEN button enabled", () => {
+        cy.get("[data-test=recurrent-switch]").click();
+        cy.get("[data-test=reserveButton]").should("be.disabled");
+
+        cy.get("[data-test=recurrent-end-date]").click();
+        cy.get("[data-testid=CalendarIcon]").click();
+        cy.get(".MuiPickersDay-today").click();
+        cy.get("[data-test=reserveButton]").should("be.enabled");
+      });
     });
   });
 });
