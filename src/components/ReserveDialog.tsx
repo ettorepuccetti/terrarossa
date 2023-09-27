@@ -16,7 +16,7 @@ import { useMemo, useState } from "react";
 import { isAdminOfTheClub } from "~/utils/utils";
 import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
-import ReserveDialogLoginButton from "./ReserveDialogLogin";
+import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
 
 export interface ReserveDialogProps {

@@ -24,10 +24,6 @@ describe("ReserveDialogRecurrent", () => {
 
   it("GIVEN date null and switch off WHEN switch on THEN set error", () => {
     cy.get("[data-test=recurrent-switch]").click();
-    // cy.get(".MuiFormHelperText-root").should(
-    //   "have.text",
-    //   "Inserisci una data valida"
-    // );
     cy.get("@setErrorStub").should("be.calledOnceWithExactly", true);
   });
 
