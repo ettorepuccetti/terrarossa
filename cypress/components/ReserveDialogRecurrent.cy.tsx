@@ -103,4 +103,23 @@ describe("ReserveDialogRecurrent", () => {
     );
     cy.get("@setErrorStub").should("be.calledWithExactly", false);
   });
+
+  it("GIVEN switch on and valid date WHEN clear date THEN error set", () => {
+    cy.get("[data-test=recurrent-switch]").click();
+    cy.get("[data-test=recurrent-end-date]").click();
+    cy.get("[data-test=recurrent-end-date]").type(
+      dayjs().add(1, "week").format("DD/MM/YYYY")
+    );
+
+    //clear the three fields of the date
+    cy.get("[data-test=recurrent-end-date]")
+      .clear()
+      .type("{leftarrow}")
+      .clear()
+      .type("{leftarrow}")
+      .clear();
+
+    cy.get("@setDateStub").should("be.calledWithExactly", null);
+    cy.get("@setErrorStub").should("be.calledWithExactly", true);
+  });
 });

@@ -13,32 +13,8 @@ export default function ReserveDialogRecurrent(props: {
   recurrentEndDate: Dayjs | null;
 }) {
   const [recurrentView, setRecurrentView] = useState<boolean>(false);
-  const [errorText, setErrorText] = useState<string | null>(
-    "Inserisci una data valida"
-  );
+  const [errorText, setErrorText] = useState<string | null>(null);
   const { data: sessionData } = useSession();
-
-  function manageErrorTextAndState(
-    error: DateValidationError,
-    switchValue?: boolean
-  ) {
-    // invoked by switchButton change
-    if (switchValue != undefined) {
-      if (switchValue == true) {
-        //send the error, if present
-        props.recurrentDateErrorEventHandler(errorText != null);
-      }
-
-      if (switchValue == false) {
-        //clear the error, but not the error text
-        props.recurrentDateErrorEventHandler(false);
-      }
-    } else {
-      // invoked by error on date change, error could be null if the data became valid
-      setErrorText(mapErrorToText(error));
-      props.recurrentDateErrorEventHandler(error != null);
-    }
-  }
 
   return (
     <>
@@ -50,7 +26,10 @@ export default function ReserveDialogRecurrent(props: {
             checked={recurrentView}
             onChange={() => {
               setRecurrentView(!recurrentView);
-              manageErrorTextAndState(null, !recurrentView);
+              props.recurrentDateErrorEventHandler(
+                !recurrentView &&
+                  (errorText != null || props.recurrentEndDate == null)
+              );
             }}
             color="info"
           />
@@ -74,14 +53,21 @@ export default function ReserveDialogRecurrent(props: {
           label={"Data di fine validità"}
           onChange={(dayJsDate) => {
             props.recurrentDateEventHandler(dayJsDate);
+            if ((props.recurrentEndDate == null) != (dayJsDate == null)) {
+              // date changed from null to not null or viceversa
+              props.recurrentDateErrorEventHandler(dayJsDate == null);
+            }
           }}
           minDate={props.startDate}
           maxDate={props.startDate.endOf("year")}
           shouldDisableDate={(dayJsDate) =>
             dayJsDate.day() !== props.startDate.day()
           }
-          onError={(error) => {
-            manageErrorTextAndState(error);
+          onError={(error, value) => {
+            props.recurrentDateErrorEventHandler(
+              error != null || value == null
+            );
+            setErrorText(mapErrorToText(error));
           }}
           views={["day"]}
           format="DD/MM/YYYY"

@@ -309,6 +309,7 @@ describe("USER", () => {
       });
 
       it("GIVEN admin WHEN set valid recurrent end date (without typing) THEN button enabled", () => {
+        cy.viewport(500, 800);
         cy.get("[data-test=recurrent-switch]").click();
         cy.get("[data-test=reserveButton]").should("be.disabled");
 
