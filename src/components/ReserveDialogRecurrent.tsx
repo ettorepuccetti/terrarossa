@@ -40,33 +40,6 @@ export default function ReserveDialogRecurrent(props: {
     }
   }
 
-  function mapErrorToText(error: DateValidationError): string | null {
-    let returnString;
-    if (!error) {
-      return null;
-    }
-    switch (error) {
-      case "minDate":
-        returnString =
-          "La data di fine validità deve essere successiva alla data di inizio";
-        break;
-      case "maxDate":
-        returnString =
-          "La data di fine validità deve essere entro la fine dell'anno";
-        break;
-      case "shouldDisableDate":
-        returnString =
-          "La data deve essere lo stesso giorno della settimana della prenotazione";
-        break;
-      case "invalidDate":
-        returnString = "Data non valida";
-        break;
-      default:
-        returnString = error.toString();
-    }
-    return returnString;
-  }
-
   return (
     <>
       {/* swticher for recurrent reservation */}
@@ -117,4 +90,22 @@ export default function ReserveDialogRecurrent(props: {
       )}
     </>
   );
+}
+
+function mapErrorToText(error: DateValidationError): string | null {
+  if (!error) {
+    return null;
+  }
+  switch (error) {
+    case "minDate":
+      return "La data di fine validità deve essere successiva alla data di inizio";
+    case "maxDate":
+      return "La data di fine validità deve essere entro la fine dell'anno";
+    case "shouldDisableDate":
+      return "La data deve essere lo stesso giorno della settimana della prenotazione";
+    case "invalidDate":
+      return "Data non valida";
+    default:
+      return error.toString();
+  }
 }

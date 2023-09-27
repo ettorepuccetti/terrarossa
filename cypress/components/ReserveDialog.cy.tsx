@@ -207,7 +207,7 @@ describe("USER", () => {
     testBody(0);
   });
 
-  it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", () => {
+  it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error cannot press button", () => {
     const startDate = dayjs().add(1, "day").hour(13).minute(0);
 
     mountComponent({ startDate, session });
@@ -227,6 +227,8 @@ describe("USER", () => {
       "have.text",
       "Prenota 1 ora, 1 ora e mezzo o 2 ore"
     );
+    // check button disabled
+    cy.get("[data-test=reserveButton]").should("be.disabled");
   });
 
   describe("ADMIN", () => {

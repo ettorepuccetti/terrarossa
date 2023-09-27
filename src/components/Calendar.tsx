@@ -275,11 +275,7 @@ export default function Calendar() {
         startDate={dateClick?.date}
         resource={dateClick?.resource?.title}
         onDialogClose={() => setDateClick(undefined)}
-        onConfirm={(
-          endDate: Date,
-          overwrittenName: string | undefined,
-          recurrentEndDate: Date | undefined
-        ) => addEvent(endDate, overwrittenName, recurrentEndDate)}
+        onConfirm={addEvent}
         clubId={clubId}
         clubSettings={clubQuery.data.clubSettings}
       />
