@@ -53,8 +53,8 @@ export default function ReserveDialogRecurrent(props: {
           label={"Data di fine validità"}
           onChange={(dayJsDate) => {
             props.recurrentDateEventHandler(dayJsDate);
+            // date changed from null to not null or viceversa
             if ((props.recurrentEndDate == null) != (dayJsDate == null)) {
-              // date changed from null to not null or viceversa
               props.recurrentDateErrorEventHandler(dayJsDate == null);
             }
           }}

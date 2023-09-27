@@ -40,7 +40,13 @@ export default function ReserveDialogEndDate(props: {
       }}
       value={props.endDate}
       label={"Orario di fine"}
-      onChange={(dayJsDate) => props.endDateEventHandler(dayJsDate)}
+      onChange={(dayJsDate) => {
+        props.endDateEventHandler(dayJsDate);
+        // date changed from null to not null or viceversa
+        if ((props.endDate == null) != (dayJsDate == null)) {
+          props.endDateErrorEventHandler(dayJsDate == null);
+        }
+      }}
       ampm={false}
       minutesStep={30}
       skipDisabled={true}
@@ -54,9 +60,9 @@ export default function ReserveDialogEndDate(props: {
       disabled={props.disabled}
       autoFocus
       sx={{ width: "100%" }}
-      onError={(error) => {
+      onError={(error, value) => {
         setEndDateErrorText(mapEndDateErrorText(error));
-        props.endDateErrorEventHandler(error != null);
+        props.endDateErrorEventHandler(error != null || value == null);
       }}
     />
   );

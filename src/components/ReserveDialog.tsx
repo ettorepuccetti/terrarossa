@@ -157,7 +157,6 @@ export default function ReserveDialog(props: ReserveDialogProps) {
               <Button
                 onClick={() => onConfirmButton()}
                 disabled={
-                  !endDate ||
                   !startDateIsFuture(sessionData, props.clubId, startDate) ||
                   endDateError ||
                   recurrentEndDateError
