@@ -3,8 +3,12 @@ import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
 import ReserveDialog from "~/components/ReserveDialog";
-import { UserRoles } from "~/utils/constants";
-import { clubSettings, mountWithContexts, session } from "./constants";
+import {
+  clubSettings,
+  getAdminSession,
+  mountWithContexts,
+  session,
+} from "./constants";
 dayjs.extend(duration);
 
 const mountComponent = ({
@@ -228,14 +232,7 @@ describe("USER", () => {
   describe("ADMIN", () => {
     beforeEach(() => {
       const clubId = "my_club_Id";
-      const adminSession: Session = {
-        ...session,
-        user: {
-          ...session.user,
-          role: UserRoles.ADMIN,
-          clubId: clubId,
-        },
-      };
+      const adminSession = getAdminSession(clubId);
       mountComponent({
         startDate: dayjs().hour(13).minute(0).second(0).millisecond(0),
         session: adminSession,

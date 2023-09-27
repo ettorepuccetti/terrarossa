@@ -65,6 +65,17 @@ export const courts: Court[] = [
   },
 ];
 
+export function getAdminSession(clubId: string): Session {
+  return {
+    ...session,
+    user: {
+      ...session.user,
+      role: UserRoles.ADMIN,
+      clubId: clubId,
+    },
+  };
+}
+
 export const mountWithContexts = (
   children: React.ReactNode,
   session?: Session
@@ -82,6 +93,7 @@ export const mountWithContexts = (
   );
 };
 
+// ------- END OF FILE -------
 // try to mock NextRouter (not succeed) - see:
 // https://github.com/cypress-io/cypress/discussions/22715
 // https://github.com/mike-plummer/nextjs-cypress-ct-example/blob/main/cypress/support/component.js
