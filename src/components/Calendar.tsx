@@ -229,22 +229,24 @@ export default function Calendar() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {(reservationAdd.error || recurrentReservationAdd.error) && (
+      {/* error handling */}
+      {(reservationAdd.error ||
+        recurrentReservationAdd.error ||
+        reservationDelete.error ||
+        recurrentReservationDelete.isError) && (
         <ErrorAlert
-          error={reservationAdd.error ?? recurrentReservationAdd.error}
+          error={
+            reservationAdd.error ??
+            recurrentReservationAdd.error ??
+            reservationDelete.error ??
+            recurrentReservationDelete.error
+          }
           onClose={() => {
             reservationAdd.error && reservationAdd.reset();
             recurrentReservationAdd.error && recurrentReservationAdd.reset();
-            void reservationQuery.refetch();
-          }}
-        />
-      )}
-
-      {reservationDelete.error && (
-        <ErrorAlert
-          error={reservationDelete.error}
-          onClose={() => {
-            reservationDelete.reset();
+            reservationDelete.error && reservationDelete.reset();
+            recurrentReservationDelete.error &&
+              recurrentReservationDelete.reset();
             void reservationQuery.refetch();
           }}
         />
@@ -255,7 +257,9 @@ export default function Calendar() {
           reservationQuery.isLoading ||
           reservationQuery.isRefetching ||
           reservationAdd.isLoading ||
-          reservationDelete.isLoading
+          reservationDelete.isLoading ||
+          recurrentReservationAdd.isLoading ||
+          recurrentReservationDelete.isLoading
         }
       >
         <Header
