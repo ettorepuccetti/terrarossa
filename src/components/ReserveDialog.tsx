@@ -13,6 +13,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
+import { useStore } from "~/hooks/UseStore";
 import { isAdminOfTheClub } from "~/utils/utils";
 import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
@@ -20,22 +21,22 @@ import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
 
 export interface ReserveDialogProps {
-  open: boolean;
-  startDate: Date | undefined;
-  resource: string | undefined;
   onConfirm: (
     endDate: Date,
     overwrittenName: string | undefined,
     recurrentEndDate: Date | undefined
   ) => void;
-  onDialogClose: () => void;
   clubId: string;
   clubSettings: ClubSettings;
 }
 
 export default function ReserveDialog(props: ReserveDialogProps) {
-  const { open, resource } = props;
-  const startDate = useMemo(() => dayjs(props.startDate), [props.startDate]);
+  const dateClick = useStore((state) => state.dateClick);
+  const setDateClick = useStore((state) => state.setDateClick);
+
+  const startDate = useMemo(() => dayjs(dateClick?.date), [dateClick?.date]);
+  const resource = dateClick?.resource?.title;
+
   const { data: sessionData } = useSession();
 
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
@@ -69,12 +70,12 @@ export default function ReserveDialog(props: ReserveDialogProps) {
     <>
       <Dialog
         data-test="reserve-dialog"
-        open={open}
+        open={dateClick !== null}
         onClose={() => {
           setOverwriteName("");
           setEndDate(null);
           setRecurrentEndDate(null);
-          props.onDialogClose();
+          setDateClick(null);
         }}
         fullWidth
         maxWidth="xs"

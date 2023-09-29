@@ -18,7 +18,7 @@ import DialogLayout from "./DialogLayout";
 
 interface DialogProps {
   open: boolean;
-  eventDetails: EventImpl | undefined;
+  eventDetails: EventImpl | null;
   onDialogClose: () => void;
   sessionData: Session | null;
   onReservationDelete: (id: string) => void;

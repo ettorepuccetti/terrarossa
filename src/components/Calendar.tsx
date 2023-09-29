@@ -5,10 +5,10 @@ import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
 
 import { type EventClickArg } from "@fullcalendar/core";
-import { type EventImpl } from "@fullcalendar/core/internal";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { useStore } from "~/hooks/UseStore";
 import { api } from "~/utils/api";
 import { isAdminOfTheClub, isSelectableSlot } from "~/utils/utils";
 import ErrorAlert from "./ErrorAlert";
@@ -110,6 +110,11 @@ export default function Calendar() {
    * ---------- end of trpc procedures ----------------
    */
 
+  const dateClick = useStore((state) => state.dateClick);
+  const setDateClick = useStore((state) => state.setDateClick);
+  const eventDetails = useStore((state) => state.eventDetails);
+  const setEventDetails = useStore((state) => state.setEventDetails);
+
   const openReservationDialog = (selectInfo: DateClickArg) => {
     console.log("selected date: ", selectInfo.dateStr);
     console.log("resouce: ", selectInfo.resource?.title);
@@ -153,7 +158,7 @@ export default function Calendar() {
     overwrittenName: string | undefined,
     recurrentEndDate: Date | undefined
   ) => {
-    setDateClick(undefined);
+    setDateClick(null);
     if (dateClick?.resource === undefined || dateClick?.date === undefined) {
       throw new Error("No court or date selected");
     }
@@ -184,7 +189,7 @@ export default function Calendar() {
     if (!clubId) {
       throw new Error("ClubId not found");
     }
-    setEventDetails(undefined);
+    setEventDetails(null);
     console.log("delete event: ", eventId);
     reservationDelete.mutate({ reservationId: eventId, clubId: clubId });
   }
@@ -193,16 +198,13 @@ export default function Calendar() {
     if (!clubId) {
       throw new Error("ClubId not found");
     }
-    setEventDetails(undefined);
+    setEventDetails(null);
     console.log("delete recurrent event: ", recurrentReservationId);
     recurrentReservationDelete.mutate({
       recurrentReservationId: recurrentReservationId,
       clubId: clubId,
     });
   }
-
-  const [eventDetails, setEventDetails] = useState<EventImpl>();
-  const [dateClick, setDateClick] = useState<DateClickArg>();
 
   /**
    * -------------------------------------
@@ -276,10 +278,6 @@ export default function Calendar() {
       </SpinnerPartial>
 
       <ReserveDialog
-        open={dateClick !== undefined}
-        startDate={dateClick?.date}
-        resource={dateClick?.resource?.title}
-        onDialogClose={() => setDateClick(undefined)}
         onConfirm={addEvent}
         clubId={clubId}
         clubSettings={clubQuery.data.clubSettings}
@@ -288,7 +286,7 @@ export default function Calendar() {
       <EventDetailDialog
         open={eventDetails !== undefined}
         eventDetails={eventDetails}
-        onDialogClose={() => setEventDetails(undefined)}
+        onDialogClose={() => setEventDetails(null)}
         sessionData={sessionData}
         onReservationDelete={(id) => deleteEvent(id)}
         onRecurrentReservationDelete={(id) => deleteRecurrentEvent(id)}
