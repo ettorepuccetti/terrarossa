@@ -86,7 +86,7 @@ export default function Calendar() {
     },
   });
 
-  const currentReservationAdd =
+  const recurrentReservationAdd =
     api.reservationMutation.insertRecurrent.useMutation({
       async onSuccess() {
         await reservationQuery.refetch();
@@ -161,7 +161,7 @@ export default function Calendar() {
       throw new Error("ClubId not found");
     }
     if (recurrentEndDate) {
-      currentReservationAdd.mutate({
+      recurrentReservationAdd.mutate({
         clubId: clubId,
         courtId: dateClick.resource.id,
         startDateTime: dateClick.date,
@@ -229,21 +229,24 @@ export default function Calendar() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {reservationAdd.error && (
+      {/* error handling */}
+      {(reservationAdd.error ||
+        recurrentReservationAdd.error ||
+        reservationDelete.error ||
+        recurrentReservationDelete.isError) && (
         <ErrorAlert
-          error={reservationAdd.error}
+          error={
+            reservationAdd.error ??
+            recurrentReservationAdd.error ??
+            reservationDelete.error ??
+            recurrentReservationDelete.error
+          }
           onClose={() => {
-            reservationAdd.reset();
-            void reservationQuery.refetch();
-          }}
-        />
-      )}
-
-      {reservationDelete.error && (
-        <ErrorAlert
-          error={reservationDelete.error}
-          onClose={() => {
-            reservationDelete.reset();
+            reservationAdd.error && reservationAdd.reset();
+            recurrentReservationAdd.error && recurrentReservationAdd.reset();
+            reservationDelete.error && reservationDelete.reset();
+            recurrentReservationDelete.error &&
+              recurrentReservationDelete.reset();
             void reservationQuery.refetch();
           }}
         />
@@ -254,7 +257,9 @@ export default function Calendar() {
           reservationQuery.isLoading ||
           reservationQuery.isRefetching ||
           reservationAdd.isLoading ||
-          reservationDelete.isLoading
+          reservationDelete.isLoading ||
+          recurrentReservationAdd.isLoading ||
+          recurrentReservationDelete.isLoading
         }
       >
         <Header
@@ -275,11 +280,7 @@ export default function Calendar() {
         startDate={dateClick?.date}
         resource={dateClick?.resource?.title}
         onDialogClose={() => setDateClick(undefined)}
-        onConfirm={(
-          endDate: Date,
-          overwrittenName: string | undefined,
-          recurrentEndDate: Date | undefined
-        ) => addEvent(endDate, overwrittenName, recurrentEndDate)}
+        onConfirm={addEvent}
         clubId={clubId}
         clubSettings={clubQuery.data.clubSettings}
       />

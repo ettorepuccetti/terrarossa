@@ -105,6 +105,49 @@ describe("New reservation", () => {
     cy.navigateDaysFromToday(7);
     cy.get("[data-test=calendar-event]").should("be.visible");
   });
+
+  it("GIVEN admin WHEN make recurrent reservation AND there is a conflict THEN error is shown", function () {
+    //create reservation that will conflict with the recurrent one
+    const conflictStartDate = dayjs()
+      .add(1, "week")
+      .hour(12)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+
+    cy.addReservationToDB(
+      conflictStartDate.toDate(),
+      conflictStartDate.add(1, "hour").toDate(),
+      this.clubIdForoItalico as string,
+      pietrangeliCourtName,
+      Cypress.env("ADMIN_FORO_MAIL") as string
+    );
+
+    // create recurrent reservation
+    cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
+    cy.get("[data-test=recurrent-switch]").click();
+    cy.get("[data-test=recurrent-end-date]").type(
+      dayjs().add(2, "week").format("DD/MM/YYYY")
+    );
+    cy.get("[data-test=reserveButton]").click();
+
+    // check that error is shown
+    cy.get("[data-test=error-alert]").should("be.visible");
+    cy.get("[data-test=error-alert]").should(
+      "contain.text",
+      "Errore nella creazione della prenotazione ricorrente. Conflitto in data " +
+        conflictStartDate.format("DD/MM/YYYY")
+    );
+    cy.get("[data-testid=CloseIcon]").click();
+
+    cy.reload().waitForCalendarPageToLoad();
+    // check that recurrent reservation has not been created
+    cy.get("[calendar-event]").should("not.exist");
+
+    //check that the conflicting reservation is still there
+    cy.navigateDaysFromToday(7);
+    cy.get("[data-test=calendar-event]").should("have.length", 1);
+  });
 });
 
 describe("Existing reservation", () => {

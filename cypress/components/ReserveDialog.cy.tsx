@@ -3,8 +3,12 @@ import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
 import ReserveDialog from "~/components/ReserveDialog";
-import { UserRoles } from "~/utils/constants";
-import { clubSettings, mountWithContexts, session } from "./constants";
+import {
+  clubSettings,
+  getAdminSession,
+  mountWithContexts,
+  session,
+} from "./constants";
 dayjs.extend(duration);
 
 const mountComponent = ({
@@ -113,6 +117,57 @@ describe("USER", () => {
     cy.get("button").contains("Prenota").should("have.attr", "disabled");
   });
 
+  it("GIVEN logged user WHEN clear end date THEN button disabled", () => {
+    const startDate = dayjs()
+      .add(1, "day")
+      .hour(13)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+
+    mountComponent({ startDate, session });
+
+    cy.get("[data-test=reserveButton]").should("be.enabled");
+    cy.get("input").filter("[data-test='endTime']").clear();
+    cy.get("[data-test=reserveButton]").should("be.disabled");
+  });
+
+  it("GIVEN logged user and cleared end date WHEN insert valid endDate THEN button enabled", () => {
+    const startDate = dayjs()
+      .add(1, "day")
+      .hour(13)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+
+    mountComponent({ startDate, session });
+
+    cy.get("input").filter("[data-test='endTime']").clear();
+    cy.get("[data-test=reserveButton]").should("be.disabled");
+
+    cy.get("input").filter("[data-test='endTime']").type("14:00");
+    cy.get("[data-test=reserveButton]").should("be.enabled");
+  });
+
+  it("GIVEN logged user WHEN clear end date and insert valid endDate (no typing) THEN button enabled", () => {
+    const startDate = dayjs()
+      .add(1, "day")
+      .hour(13)
+      .minute(0)
+      .second(0)
+      .millisecond(0);
+
+    mountComponent({ startDate, session });
+
+    cy.get("input").filter("[data-test='endTime']").clear();
+    cy.get("[data-test=reserveButton]").should("be.disabled");
+
+    cy.get("[data-testid=ClockIcon]").click();
+    cy.get('[aria-label="14 hours"]').click();
+    cy.get('[aria-label="0 minutes"]').click();
+    cy.get("[data-test=reserveButton]").should("be.enabled");
+  });
+
   it("GIVEN logged user WHEN reservation is longer than 2 hours THEN show error and cannot press button", () => {
     // fixed time of a future date. TIME: 13:00
     const startDate = dayjs()
@@ -203,7 +258,7 @@ describe("USER", () => {
     testBody(0);
   });
 
-  it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error and reservation not added", () => {
+  it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error cannot press button", () => {
     const startDate = dayjs().add(1, "day").hour(13).minute(0);
 
     mountComponent({ startDate, session });
@@ -223,19 +278,14 @@ describe("USER", () => {
       "have.text",
       "Prenota 1 ora, 1 ora e mezzo o 2 ore"
     );
+    // check button disabled
+    cy.get("[data-test=reserveButton]").should("be.disabled");
   });
 
   describe("ADMIN", () => {
     beforeEach(() => {
       const clubId = "my_club_Id";
-      const adminSession: Session = {
-        ...session,
-        user: {
-          ...session.user,
-          role: UserRoles.ADMIN,
-          clubId: clubId,
-        },
-      };
+      const adminSession = getAdminSession(clubId);
       mountComponent({
         startDate: dayjs().hour(13).minute(0).second(0).millisecond(0),
         session: adminSession,
@@ -307,6 +357,17 @@ describe("USER", () => {
           "La data di fine validità deve essere entro la fine dell'anno"
         );
         cy.get("[data-test=reserveButton]").should("be.disabled");
+      });
+
+      it("GIVEN admin WHEN set valid recurrent end date (without typing) THEN button enabled", () => {
+        cy.viewport(500, 800);
+        cy.get("[data-test=recurrent-switch]").click();
+        cy.get("[data-test=reserveButton]").should("be.disabled");
+
+        cy.get("[data-test=recurrent-end-date]").click();
+        cy.get("[data-testid=CalendarIcon]").click();
+        cy.get(".MuiPickersDay-today").click();
+        cy.get("[data-test=reserveButton]").should("be.enabled");
       });
     });
   });
