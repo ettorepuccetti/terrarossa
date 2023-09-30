@@ -12,7 +12,9 @@ import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import ScrollGrid from "@fullcalendar/scrollgrid";
 import { Box } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
+import { useSession } from "next-auth/react";
 import { useRef, type RefObject } from "react";
+import { useStore } from "~/hooks/UseStore";
 import { type AppRouter } from "~/server/api/root";
 import { defaultImg } from "~/utils/constants";
 import {
@@ -20,11 +22,9 @@ import {
   isAdminOfTheClub,
   isSelectableSlot,
 } from "~/utils/utils";
+import { useClubQuery } from "./Calendar";
 import CalendarEventCard from "./CalendarEventCard";
 import { HorizonalDatePicker } from "./HorizontalDatePicker";
-import { useClubQuery } from "./Calendar";
-import { useStore } from "~/hooks/UseStore";
-import { useSession } from "next-auth/react";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type ReservationFromDb =
@@ -72,12 +72,13 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   const setEventDetails = useStore((state) => state.setEventDetails);
 
   const openReservationDialog = (selectInfo: DateClickArg) => {
-    console.log("selected date: ", selectInfo.dateStr);
-    console.log("resouce: ", selectInfo.resource?.title);
+    console.log(
+      "selected date: ",
+      selectInfo.dateStr,
+      "resource: ",
+      selectInfo.resource?.id
+    );
 
-    if (!selectInfo.resource) {
-      throw new Error("No court selected");
-    }
     if (!clubQuery.data) {
       throw new Error("No club settings found"); // should never happen since I use this function only when clubQuery.data is defined
     }
@@ -88,7 +89,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         clubQuery.data.clubSettings.lastBookableMinute
       )
     ) {
-      console.log("last slot is not selectable");
+      console.log("last slot is not selectable", "date: ", selectInfo.date);
       return;
     }
     setDateClick(selectInfo);

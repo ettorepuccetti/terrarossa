@@ -57,7 +57,11 @@ export const useClubQuery = (clubId: string | undefined) => {
 export const useCourtQuery = (clubId: string | undefined) =>
   api.court.getAllByClubId.useQuery(
     { clubId: clubId },
-    { refetchOnWindowFocus: false, enabled: clubId !== undefined }
+    {
+      refetchOnWindowFocus: false,
+      enabled: clubId !== undefined,
+      staleTime: Infinity,
+    }
   );
 
 export const useReservationQuery = (clubId: string | undefined) =>
@@ -72,6 +76,9 @@ export const useReservationAdd = (clubId: string | undefined) => {
     async onSuccess() {
       await reservationQuery.refetch();
     },
+    async onError() {
+      await reservationQuery.refetch();
+    },
   });
 };
 
@@ -79,6 +86,9 @@ export const useRecurrentReservationAdd = (clubId: string | undefined) => {
   const reservationQuery = useReservationQuery(clubId);
   return api.reservationMutation.insertRecurrent.useMutation({
     async onSuccess() {
+      await reservationQuery.refetch();
+    },
+    async onError() {
       await reservationQuery.refetch();
     },
   });
@@ -90,6 +100,9 @@ export const useReservationDelete = (clubId: string | undefined) => {
     async onSuccess() {
       await reservationQuery.refetch();
     },
+    async onError() {
+      await reservationQuery.refetch();
+    },
   });
 };
 
@@ -97,6 +110,9 @@ export const useRecurrentReservationDelete = (clubId: string | undefined) => {
   const reservationQuery = useReservationQuery(clubId);
   return api.reservationMutation.deleteRecurrent.useMutation({
     async onSuccess() {
+      await reservationQuery.refetch();
+    },
+    async onError() {
       await reservationQuery.refetch();
     },
   });
@@ -124,7 +140,6 @@ export default function Calendar() {
   const clubQuery = useClubQuery(clubId);
   const courtQuery = useCourtQuery(clubId);
   const reservationQuery = useReservationQuery(clubId);
-  const reservationAdd = useReservationAdd(clubId);
   const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
   const reservationDelete = useReservationDelete(clubId);
   const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
@@ -183,20 +198,10 @@ export default function Calendar() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       {/* error handling */}
-      {(reservationAdd.error ||
-        recurrentReservationAdd.error ||
-        reservationDelete.error ||
-        recurrentReservationDelete.isError) && (
+      {(reservationDelete.error || recurrentReservationDelete.isError) && (
         <ErrorAlert
-          error={
-            reservationAdd.error ??
-            recurrentReservationAdd.error ??
-            reservationDelete.error ??
-            recurrentReservationDelete.error
-          }
+          error={reservationDelete.error ?? recurrentReservationDelete.error}
           onClose={() => {
-            reservationAdd.error && reservationAdd.reset();
-            recurrentReservationAdd.error && recurrentReservationAdd.reset();
             reservationDelete.error && reservationDelete.reset();
             recurrentReservationDelete.error &&
               recurrentReservationDelete.reset();
@@ -208,10 +213,7 @@ export default function Calendar() {
       <SpinnerPartial
         open={
           reservationQuery.isLoading ||
-          reservationQuery.isRefetching ||
-          reservationAdd.isLoading ||
           reservationDelete.isLoading ||
-          recurrentReservationAdd.isLoading ||
           recurrentReservationDelete.isLoading
         }
       >

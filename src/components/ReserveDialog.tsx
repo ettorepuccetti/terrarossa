@@ -25,6 +25,7 @@ import ErrorAlert from "./ErrorAlert";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
+import Spinner from "./Spinner";
 
 export interface ReserveDialogProps {
   clubSettings: ClubSettings;
@@ -99,6 +100,7 @@ export default function ReserveDialog() {
     setRecurrentEndDate(null);
   };
 
+  // error handling
   if (reservationAdd.error || recurrentReservationAdd.error) {
     return (
       <ErrorAlert
@@ -106,10 +108,14 @@ export default function ReserveDialog() {
         onClose={() => {
           reservationAdd.error && reservationAdd.reset();
           recurrentReservationAdd.error && recurrentReservationAdd.reset();
-          void reservationQuery.refetch();
         }}
       />
     );
+  }
+
+  // loading handling
+  if (reservationAdd.isLoading || recurrentReservationAdd.isLoading) {
+    return <Spinner isLoading={true} />;
   }
 
   return (
