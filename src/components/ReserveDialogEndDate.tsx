@@ -5,12 +5,12 @@ import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { isAdminOfTheClub } from "~/utils/utils";
+import { useClubQuery } from "./Calendar";
 
 export default function ReserveDialogEndDate(props: {
   endDate: Dayjs | null;
   startDate: Dayjs;
   clubId: string;
-  clubSettings: ClubSettings;
   disabled: boolean;
   endDateEventHandler: (dayJsDate: Dayjs | null) => void;
   endDateErrorEventHandler: (error: boolean) => void;
@@ -18,6 +18,8 @@ export default function ReserveDialogEndDate(props: {
   const { startDate, endDateEventHandler } = props; // for using them inside useEffect
   const { data: sessionData } = useSession();
   const [endDateErrorText, setEndDateErrorText] = useState<string | null>(null);
+
+  const clubQuery = useClubQuery(props.clubId);
 
   // to set endDate to startDate + 1 hour, when component is mounted
   useEffect(() => {
@@ -55,7 +57,7 @@ export default function ReserveDialogEndDate(props: {
         props.startDate,
         sessionData,
         props.clubId,
-        props.clubSettings
+        clubQuery.data?.clubSettings
       )}
       disabled={props.disabled}
       autoFocus
@@ -72,8 +74,13 @@ const maxTime = (
   startDate: Dayjs,
   sessionData: Session | null,
   clubId: string,
-  clubSettings: ClubSettings
+  clubSettings?: ClubSettings
 ) => {
+  if (!clubSettings) {
+    console.error("clubSettings not found");
+    return startDate;
+  }
+
   // default case
   const maxTime = startDate.add(2, "hours");
 

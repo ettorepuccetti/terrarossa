@@ -10,13 +10,21 @@ import FullCalendar from "@fullcalendar/react";
 import { type ResourceInput } from "@fullcalendar/resource";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import ScrollGrid from "@fullcalendar/scrollgrid";
-import { Avatar, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useRef, type RefObject } from "react";
 import { type AppRouter } from "~/server/api/root";
 import { defaultImg } from "~/utils/constants";
-import { formatTimeString } from "~/utils/utils";
+import {
+  formatTimeString,
+  isAdminOfTheClub,
+  isSelectableSlot,
+} from "~/utils/utils";
+import CalendarEventCard from "./CalendarEventCard";
 import { HorizonalDatePicker } from "./HorizontalDatePicker";
+import { useClubQuery } from "./Calendar";
+import { useStore } from "~/hooks/UseStore";
+import { useSession } from "next-auth/react";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type ReservationFromDb =
@@ -27,8 +35,6 @@ interface FullCalendarWrapperProps {
   clubData: RouterOutput["club"]["getByClubId"];
   reservationData: ReservationFromDb[];
   courtData: CourtFromDb[];
-  onEventClick: (eventClickInfo: EventClickArg) => void;
-  onDateClick: (dateClickInfo: DateClickArg) => void;
 }
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
@@ -59,39 +65,48 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     };
   };
 
-  /**
-   * Render the calendar event containing the reservation
-   * @param eventInfo
-   * @returns
-   */
-  function renderEventContent(eventInfo: EventContentArg) {
-    return (
-      <Box
-        display={"flex"}
-        gap={1}
-        className={"fc-event-main"}
-        alignItems={"center"}
-        data-test="calendar-event"
-      >
-        {eventInfo.event.extendedProps.userImg && (
-          <Avatar
-            alt={eventInfo.event.title}
-            src={eventInfo.event.extendedProps.userImg as string}
-          />
-        )}
-        <Box maxHeight={"100%"} overflow={"hidden"}>
-          <Box className="fc-event-time">{eventInfo.timeText} </Box>
-          <Box
-            textOverflow={"ellipsis"}
-            className="fc-event-title"
-            lineHeight={"22px"}
-          >
-            {eventInfo.event.title}
-          </Box>
-        </Box>
-      </Box>
-    );
-  }
+  const clubId = useStore((state) => state.clubId);
+  const clubQuery = useClubQuery(clubId);
+  const { data: sessionData } = useSession();
+  const setDateClick = useStore((state) => state.setDateClick);
+  const setEventDetails = useStore((state) => state.setEventDetails);
+
+  const openReservationDialog = (selectInfo: DateClickArg) => {
+    console.log("selected date: ", selectInfo.dateStr);
+    console.log("resouce: ", selectInfo.resource?.title);
+
+    if (!selectInfo.resource) {
+      throw new Error("No court selected");
+    }
+    if (!clubQuery.data) {
+      throw new Error("No club settings found"); // should never happen since I use this function only when clubQuery.data is defined
+    }
+    if (
+      !isSelectableSlot(
+        selectInfo.date,
+        clubQuery.data.clubSettings.lastBookableHour,
+        clubQuery.data.clubSettings.lastBookableMinute
+      )
+    ) {
+      console.log("last slot is not selectable");
+      return;
+    }
+    setDateClick(selectInfo);
+  };
+
+  const openEventDialog = (eventClickInfo: EventClickArg) => {
+    if (!clubId) {
+      throw new Error("ClubId not found");
+    }
+    eventClickInfo.jsEvent.preventDefault();
+    //open eventDetail dialog only for the user who made the reservation or for the admin
+    if (
+      eventClickInfo.event.extendedProps.userId === sessionData?.user.id ||
+      isAdminOfTheClub(sessionData, clubId)
+    ) {
+      setEventDetails(eventClickInfo.event);
+    }
+  };
 
   return (
     <Box width={"100%"} display={"flex"} flexDirection={"column"}>
@@ -112,10 +127,8 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
           headerToolbar={false}
           events={props.reservationData.map(reservationToEvent)}
           resources={props.courtData.map(courtToResource)}
-          eventClick={(eventClickInfo) => props.onEventClick(eventClickInfo)}
-          dateClick={(info) => {
-            props.onDateClick(info);
-          }}
+          eventClick={openEventDialog}
+          dateClick={openReservationDialog}
           selectable={false}
           slotMinTime={formatTimeString(
             props.clubData.clubSettings.firstBookableHour,
@@ -137,7 +150,9 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
             hour12: false,
           }}
           allDaySlot={false}
-          eventContent={renderEventContent}
+          eventContent={(eventInfo: EventContentArg) => {
+            return <CalendarEventCard eventInfo={eventInfo} />;
+          }}
           titleFormat={{ month: "short", day: "numeric" }}
           locale={"it-it"}
           dayMinWidth={150}

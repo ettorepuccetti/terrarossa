@@ -15,27 +15,32 @@ import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { useStore } from "~/hooks/UseStore";
 import { isAdminOfTheClub } from "~/utils/utils";
+import {
+  useRecurrentReservationAdd,
+  useReservationAdd,
+  useReservationQuery,
+} from "./Calendar";
 import DialogLayout from "./DialogLayout";
+import ErrorAlert from "./ErrorAlert";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
 
 export interface ReserveDialogProps {
-  onConfirm: (
-    endDate: Date,
-    overwrittenName: string | undefined,
-    recurrentEndDate: Date | undefined
-  ) => void;
-  clubId: string;
   clubSettings: ClubSettings;
 }
 
-export default function ReserveDialog(props: ReserveDialogProps) {
+export default function ReserveDialog() {
   const dateClick = useStore((state) => state.dateClick);
+  const clubId = useStore((state) => state.getClubId());
   const setDateClick = useStore((state) => state.setDateClick);
 
+  const reservationAdd = useReservationAdd(clubId);
+  const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
+  const reservationQuery = useReservationQuery(clubId);
+
   const startDate = useMemo(() => dayjs(dateClick?.date), [dateClick?.date]);
-  const resource = dateClick?.resource?.title;
+  const resource = dateClick?.resource;
 
   const { data: sessionData } = useSession();
 
@@ -47,24 +52,65 @@ export default function ReserveDialog(props: ReserveDialogProps) {
     useState<boolean>(false);
 
   const onConfirmButton = () => {
-    if (!endDate) {
-      throw new Error(
-        "Non è stato possibile impostare la data di fine prenotazione. Per favore riprova."
-      );
+    if (!endDate || !startDate || !resource) {
+      throw new Error("Si è verificato un problema, per favore riprova.");
     }
-    console.log("startDate in calendar: ", startDate);
-    console.log("endDate from dialog: ", endDate);
 
-    props.onConfirm(
-      endDate.toDate(),
-      //manage overwriteName limitation about controlled component
-      overwriteName !== "" ? overwriteName : undefined,
-      recurrentEndDate?.hour(23).minute(59).toDate()
+    console.log(
+      "startDate: ",
+      startDate,
+      "endDate: ",
+      endDate,
+      "recurrentEndDate: ",
+      recurrentEndDate,
+      "overwriteName: ",
+      overwriteName,
+      "resource: ",
+      resource.id,
+      "resource title: ",
+      resource.title,
+      "clubId: ",
+      clubId
     );
+
+    const name = overwriteName !== "" ? overwriteName : undefined;
+    if (recurrentEndDate) {
+      recurrentReservationAdd.mutate({
+        clubId: clubId,
+        courtId: resource.id,
+        startDateTime: startDate.toDate(),
+        endDateTime: endDate.toDate(),
+        overwriteName: name,
+        recurrentEndDate: recurrentEndDate.hour(23).minute(59).toDate(), //TODO: fix that
+      });
+      return;
+    }
+    reservationAdd.mutate({
+      courtId: resource.id,
+      startDateTime: startDate.toDate(),
+      endDateTime: endDate.toDate(),
+      overwriteName: name,
+      clubId: clubId,
+    });
+
+    setDateClick(null);
     setOverwriteName("");
     setEndDate(null);
     setRecurrentEndDate(null);
   };
+
+  if (reservationAdd.error || recurrentReservationAdd.error) {
+    return (
+      <ErrorAlert
+        error={reservationAdd.error ?? recurrentReservationAdd.error}
+        onClose={() => {
+          reservationAdd.error && reservationAdd.reset();
+          recurrentReservationAdd.error && recurrentReservationAdd.reset();
+          void reservationQuery.refetch();
+        }}
+      />
+    );
+  }
 
   return (
     <>
@@ -72,10 +118,10 @@ export default function ReserveDialog(props: ReserveDialogProps) {
         data-test="reserve-dialog"
         open={dateClick !== null}
         onClose={() => {
+          setDateClick(null);
           setOverwriteName("");
           setEndDate(null);
           setRecurrentEndDate(null);
-          setDateClick(null);
         }}
         fullWidth
         maxWidth="xs"
@@ -86,11 +132,11 @@ export default function ReserveDialog(props: ReserveDialogProps) {
             <>
               {/* court name */}
               <DialogActions>
-                <Typography gutterBottom>{resource}</Typography>
+                <Typography gutterBottom>{resource?.title}</Typography>
               </DialogActions>
 
               {/* overwrite name, only if admin mode */}
-              {isAdminOfTheClub(sessionData, props.clubId) && (
+              {isAdminOfTheClub(sessionData, clubId) && (
                 <TextField
                   data-test="overwriteName"
                   variant="outlined"
@@ -130,24 +176,21 @@ export default function ReserveDialog(props: ReserveDialogProps) {
               <ReserveDialogEndDate
                 endDate={endDate}
                 startDate={startDate}
-                clubId={props.clubId}
-                clubSettings={props.clubSettings}
-                disabled={
-                  !startDateIsFuture(sessionData, props.clubId, startDate)
-                }
+                clubId={clubId}
+                disabled={!startDateIsFuture(sessionData, clubId, startDate)}
                 endDateEventHandler={setEndDate}
                 endDateErrorEventHandler={setEndDateError}
               />
               {/* recurrent reservation */}
               <ReserveDialogRecurrent
-                clubId={props.clubId}
+                clubId={clubId}
                 startDate={startDate}
                 recurrentDateEventHandler={setRecurrentEndDate}
                 recurrentDateErrorEventHandler={setRecurrentEndDateError}
                 recurrentEndDate={recurrentEndDate}
               />
               {/* start date in the past warning */}
-              {!startDateIsFuture(sessionData, props.clubId, startDate) && (
+              {!startDateIsFuture(sessionData, clubId, startDate) && (
                 <Box display={"flex"}>
                   <Alert data-test="past-warning" severity={"warning"}>
                     Non puoi prenotare una data nel passato
@@ -156,9 +199,9 @@ export default function ReserveDialog(props: ReserveDialogProps) {
               )}
 
               <Button
-                onClick={() => onConfirmButton()}
+                onClick={onConfirmButton}
                 disabled={
-                  !startDateIsFuture(sessionData, props.clubId, startDate) ||
+                  !startDateIsFuture(sessionData, clubId, startDate) ||
                   endDateError ||
                   recurrentEndDateError
                 }

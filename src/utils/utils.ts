@@ -8,9 +8,9 @@ export const capitaliseFirstChar = (s: string) => {
 
 /**
  * Format a time string in the format HH:MM given the hour and minute as numbers
- * @param {number} hour
- * @param {number} minute
- * @param {number} paddingHour number of digits to pad the hour with
+ * @param hour
+ * @param minute
+ * @param paddingHour number of digits to pad the hour with
  * @returns a time in the format HH:MM
  * @example 08:00
  */
