@@ -159,7 +159,7 @@ describe("Existing reservation", () => {
           startDate.add(1, "hour").toDate(),
           this.clubIdForoItalico as string,
           pietrangeliCourtName,
-          Cypress.env("USER1_MAIL") as string
+          user.username
         );
         cy.reload().waitForCalendarPageToLoad();
         cy.navigateDaysFromToday(dayInAdvance);
@@ -233,7 +233,7 @@ describe("Existing reservation", () => {
           startDateSafeToDelete.add(1, "hour").toDate(),
           this.clubIdForoItalico as string,
           pietrangeliCourtName,
-          Cypress.env("USER1_MAIL") as string
+          user.username
         );
         cy.reload().waitForCalendarPageToLoad();
         cy.navigateDaysFromToday(startDateSafeToDelete.day() - dayjs().day());
@@ -242,6 +242,48 @@ describe("Existing reservation", () => {
         cy.get("[data-test='delete-button']").click();
         cy.get("[data-test='confirm-button']").click();
         cy.get("[data-test='calendar-event']").should("not.exist");
+      });
+    });
+  });
+
+  describe("GIVEN logged user WHEN delete a reservation already deleted THEN show error banner", () => {
+    [USER1, ADMIN_FORO].forEach((user) => {
+      it(`testing for ${user.type}`, function () {
+        //initial setup
+        loginAndVisitCalendarPage(
+          user.username,
+          user.password,
+          this.clubIdForoItalico as string
+        );
+
+        const startDate = dayjs()
+          .add(1, "day")
+          .hour(12)
+          .minute(0)
+          .second(0)
+          .millisecond(0);
+
+        cy.addReservationToDB(
+          startDate.toDate(),
+          startDate.add(1, "hour").toDate(),
+          this.clubIdForoItalico as string,
+          pietrangeliCourtName,
+          user.username
+        );
+
+        cy.reload().waitForCalendarPageToLoad();
+        cy.navigateDaysFromToday(1);
+        cy.get("[data-test='calendar-event']").then(($event) => {
+          const eventId = $event.attr("data-id");
+          if (!eventId) throw new Error("Event id not found");
+          cy.deleteReservationFromDb(eventId);
+        });
+        cy.get("[data-test='calendar-event']").click();
+        cy.get("[data-test='delete-button']").click();
+        cy.get("[data-test='confirm-button']").click();
+        cy.get("[data-test='error-alert']")
+          .should("be.visible")
+          .and("have.text", "No Reservation found");
       });
     });
   });

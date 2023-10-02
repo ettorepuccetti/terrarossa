@@ -119,5 +119,12 @@ function tasks(on: Cypress.PluginEvents) {
         },
       });
     },
+    async "prisma:deleteReservationFromDb"(reservationId: string) {
+      return await prisma.reservation.delete({
+        where: {
+          id: reservationId,
+        },
+      });
+    },
   });
 }

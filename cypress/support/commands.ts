@@ -174,3 +174,7 @@ Cypress.Commands.add("logout", () => {
     }
   );
 });
+
+Cypress.Commands.add("deleteReservationFromDb", (reservationId: string) => {
+  cy.task("prisma:deleteReservationFromDb", reservationId);
+});
