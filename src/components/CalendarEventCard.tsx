@@ -18,6 +18,7 @@ export default function CalendarEventCard({
       className={"fc-event-main"}
       alignItems={"center"}
       data-test="calendar-event"
+      data-id={eventInfo.event.id}
     >
       {eventInfo.event.extendedProps.userImg && (
         <Avatar
