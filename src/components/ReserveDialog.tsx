@@ -15,11 +15,7 @@ import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { useStore } from "~/hooks/UseStore";
 import { isAdminOfTheClub } from "~/utils/utils";
-import {
-  useRecurrentReservationAdd,
-  useReservationAdd,
-  useReservationQuery,
-} from "./Calendar";
+import { useRecurrentReservationAdd, useReservationAdd } from "./Calendar";
 import DialogLayout from "./DialogLayout";
 import ErrorAlert from "./ErrorAlert";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
@@ -35,15 +31,12 @@ export default function ReserveDialog() {
   const dateClick = useStore((state) => state.dateClick);
   const clubId = useStore((state) => state.getClubId());
   const setDateClick = useStore((state) => state.setDateClick);
-
   const reservationAdd = useReservationAdd(clubId);
   const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
-  const reservationQuery = useReservationQuery(clubId);
+  const { data: sessionData } = useSession();
 
   const startDate = useMemo(() => dayjs(dateClick?.date), [dateClick?.date]);
   const resource = dateClick?.resource;
-
-  const { data: sessionData } = useSession();
 
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
   const [endDate, setEndDate] = useState<Dayjs | null>(null);

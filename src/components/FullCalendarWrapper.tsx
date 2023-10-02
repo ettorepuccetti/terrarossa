@@ -39,6 +39,11 @@ interface FullCalendarWrapperProps {
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
+  const clubId = useStore((state) => state.clubId);
+  const clubQuery = useClubQuery(clubId);
+  const { data: sessionData } = useSession();
+  const setDateClick = useStore((state) => state.setDateClick);
+  const setEventDetails = useStore((state) => state.setEventDetails);
 
   const reservationToEvent = (reservation: ReservationFromDb): EventInput => {
     return {
@@ -64,12 +69,6 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       title: court.name,
     };
   };
-
-  const clubId = useStore((state) => state.clubId);
-  const clubQuery = useClubQuery(clubId);
-  const { data: sessionData } = useSession();
-  const setDateClick = useStore((state) => state.setDateClick);
-  const setEventDetails = useStore((state) => state.setEventDetails);
 
   const openReservationDialog = (selectInfo: DateClickArg) => {
     console.log(

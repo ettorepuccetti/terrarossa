@@ -4,7 +4,6 @@ import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useStore } from "~/hooks/UseStore";
 import { api } from "~/utils/api";
@@ -119,7 +118,6 @@ export const useRecurrentReservationDelete = (clubId: string | undefined) => {
 };
 
 export default function Calendar() {
-  const { data: sessionData } = useSession();
   const clubId = useStore((state) => state.clubId);
   const setClubId = useStore((state) => state.setClubId);
 
@@ -140,37 +138,6 @@ export default function Calendar() {
   const clubQuery = useClubQuery(clubId);
   const courtQuery = useCourtQuery(clubId);
   const reservationQuery = useReservationQuery(clubId);
-  const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
-  const reservationDelete = useReservationDelete(clubId);
-  const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
-
-  /**
-   * ---------- end of trpc procedures ----------------
-   */
-
-  const eventDetails = useStore((state) => state.eventDetails);
-  const setEventDetails = useStore((state) => state.setEventDetails);
-
-  function deleteEvent(eventId: string): void {
-    if (!clubId) {
-      throw new Error("ClubId not found");
-    }
-    setEventDetails(null);
-    console.log("delete event: ", eventId);
-    reservationDelete.mutate({ reservationId: eventId, clubId: clubId });
-  }
-
-  function deleteRecurrentEvent(recurrentReservationId: string): void {
-    if (!clubId) {
-      throw new Error("ClubId not found");
-    }
-    setEventDetails(null);
-    console.log("delete recurrent event: ", recurrentReservationId);
-    recurrentReservationDelete.mutate({
-      recurrentReservationId: recurrentReservationId,
-      clubId: clubId,
-    });
-  }
 
   /**
    * -------------------------------------
@@ -197,26 +164,7 @@ export default function Calendar() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {/* error handling */}
-      {(reservationDelete.error || recurrentReservationDelete.isError) && (
-        <ErrorAlert
-          error={reservationDelete.error ?? recurrentReservationDelete.error}
-          onClose={() => {
-            reservationDelete.error && reservationDelete.reset();
-            recurrentReservationDelete.error &&
-              recurrentReservationDelete.reset();
-            void reservationQuery.refetch();
-          }}
-        />
-      )}
-
-      <SpinnerPartial
-        open={
-          reservationQuery.isLoading ||
-          reservationDelete.isLoading ||
-          recurrentReservationDelete.isLoading
-        }
-      >
+      <SpinnerPartial open={reservationQuery.isLoading}>
         <Header
           headerName={clubQuery.data.name}
           logoSrc={clubQuery.data.logoSrc}
@@ -229,17 +177,7 @@ export default function Calendar() {
       </SpinnerPartial>
 
       <ReserveDialog />
-
-      <EventDetailDialog
-        open={eventDetails !== undefined}
-        eventDetails={eventDetails}
-        onDialogClose={() => setEventDetails(null)}
-        sessionData={sessionData}
-        onReservationDelete={(id) => deleteEvent(id)}
-        onRecurrentReservationDelete={(id) => deleteRecurrentEvent(id)}
-        clubId={clubId}
-        clubSettings={clubQuery.data.clubSettings}
-      />
+      <EventDetailDialog />
     </LocalizationProvider>
   );
 }

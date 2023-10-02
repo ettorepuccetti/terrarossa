@@ -1,4 +1,3 @@
-import { type EventImpl } from "@fullcalendar/core/internal";
 import {
   Alert,
   Button,
@@ -7,50 +6,89 @@ import {
   Typography,
 } from "@mui/material";
 import { DateField, TimeField } from "@mui/x-date-pickers";
-import { type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
-import { type Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import React from "react";
+import { useStore } from "~/hooks/UseStore";
 import { isAdminOfTheClub } from "~/utils/utils";
+import {
+  useClubQuery,
+  useRecurrentReservationDelete,
+  useReservationDelete,
+} from "./Calendar";
 import CancelRecurrentDialog from "./CancelRecurrentDialog";
 import ConfirmationDialog from "./ConfirmationDialog";
 import DialogLayout from "./DialogLayout";
+import ErrorAlert from "./ErrorAlert";
+import Spinner from "./Spinner";
 
-interface DialogProps {
-  open: boolean;
-  eventDetails: EventImpl | null;
-  onDialogClose: () => void;
-  sessionData: Session | null;
-  onReservationDelete: (id: string) => void;
-  onRecurrentReservationDelete: (recurrentId: string) => void;
-  clubId: string;
-  clubSettings: ClubSettings;
-}
-
-export default function EventDetailDialog(props: DialogProps) {
-  const { open, eventDetails, sessionData, clubId, clubSettings } = props;
+export default function EventDetailDialog() {
+  const eventDetails = useStore((state) => state.eventDetails);
+  const setEventDetails = useStore((state) => state.setEventDetails);
+  const clubId = useStore((state) => state.getClubId());
+  const { data: sessionData } = useSession();
+  const reservationDelete = useReservationDelete(clubId);
+  const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
+  const clubQuery = useClubQuery(clubId);
+  const clubSettings = clubQuery.data?.clubSettings;
   const [confirmationOpen, setConfirmationOpen] = React.useState(false);
-
-  if (!eventDetails) {
-    return null;
-  }
 
   const canDelete =
     isAdminOfTheClub(sessionData, clubId) ||
     (sessionData?.user?.id &&
-      sessionData.user.id === props.eventDetails?.extendedProps?.userId);
+      sessionData.user.id === eventDetails?.extendedProps?.userId);
 
-  const tooLateToCancel =
-    dayjs(eventDetails.start).isBefore(
-      dayjs().add(clubSettings.hoursBeforeCancel, "hour")
-    ) && !isAdminOfTheClub(sessionData, clubId);
+  const tooLateToCancel = (startTime: Date | null) => {
+    if (!startTime || !clubSettings?.hoursBeforeCancel) {
+      throw new Error("Si è verificato un problema, per favore riprova.");
+    }
+    return (
+      dayjs(startTime).isBefore(
+        dayjs().add(clubSettings.hoursBeforeCancel, "hour")
+      ) && !isAdminOfTheClub(sessionData, clubId)
+    );
+  };
+
+  const deleteReservation = (reservationId: string) => {
+    reservationDelete.mutate({
+      reservationId: reservationId,
+      clubId: clubId,
+    });
+    console.log("delete event: ", reservationId);
+    setEventDetails(null);
+    setConfirmationOpen(false);
+  };
+
+  // error handling
+  if (reservationDelete.error || recurrentReservationDelete.error) {
+    return (
+      <ErrorAlert
+        error={reservationDelete.error ?? recurrentReservationDelete.error}
+        onClose={() => {
+          reservationDelete.error && reservationDelete.reset();
+          recurrentReservationDelete.error &&
+            recurrentReservationDelete.reset();
+        }}
+      />
+    );
+  }
+
+  // loading handling
+  if (reservationDelete.isLoading || recurrentReservationDelete.isLoading) {
+    return <Spinner isLoading={true} />;
+  }
+
+  // only for linting
+  if (!eventDetails) {
+    return null;
+  }
 
   return (
     <>
       <Dialog
         data-test="event-detail-dialog"
-        open={open}
-        onClose={() => props.onDialogClose()}
+        open={eventDetails !== null}
+        onClose={() => setEventDetails(null)}
         fullWidth
         maxWidth="xs"
       >
@@ -95,10 +133,10 @@ export default function EventDetailDialog(props: DialogProps) {
           />
 
           {/* alert message */}
-          {canDelete && tooLateToCancel && (
+          {canDelete && tooLateToCancel(eventDetails.start) && (
             <Alert data-test="alert" severity="warning">
               Non puoi cancellare una prenotazione meno di{" "}
-              {clubSettings.hoursBeforeCancel} ore prima del suo inizio
+              {clubSettings?.hoursBeforeCancel} ore prima del suo inizio
             </Alert>
           )}
 
@@ -107,40 +145,43 @@ export default function EventDetailDialog(props: DialogProps) {
             <Button
               onClick={() => setConfirmationOpen(true)}
               color={"error"}
-              disabled={tooLateToCancel}
+              disabled={tooLateToCancel(eventDetails.start)}
               data-test="delete-button"
             >
               Cancella
             </Button>
           )}
 
-          {eventDetails.extendedProps.recurrentId && (
+          {/* show recurrent confirmation dialog */}
+          {eventDetails?.extendedProps.recurrentId && (
             <CancelRecurrentDialog
               open={confirmationOpen}
               onDialogClose={() => setConfirmationOpen(false)}
-              onCancelSingle={() => {
-                props.onReservationDelete(eventDetails.id);
-                setConfirmationOpen(false);
-              }}
+              onCancelSingle={() => deleteReservation(eventDetails.id)}
               onCancelRecurrent={() => {
-                props.onRecurrentReservationDelete(
-                  eventDetails.extendedProps.recurrentId as string
+                recurrentReservationDelete.mutate({
+                  recurrentReservationId: eventDetails.extendedProps
+                    .recurrentId as string,
+                  clubId: clubId,
+                });
+                console.log(
+                  "delete recurrent event: ",
+                  eventDetails.extendedProps.recurrentId
                 );
+                setEventDetails(null);
                 setConfirmationOpen(false);
               }}
             />
           )}
 
-          {!eventDetails.extendedProps.recurrentId && (
+          {/* show confirmation dialog */}
+          {!eventDetails?.extendedProps.recurrentId && (
             <ConfirmationDialog
               open={confirmationOpen}
               title={"Cancellazione"}
               message={"Sei sicuro di voler cancellare la prenotazione?"}
               onDialogClose={() => setConfirmationOpen(false)}
-              onConfirm={() => {
-                props.onReservationDelete(eventDetails.id);
-                setConfirmationOpen(false);
-              }}
+              onConfirm={() => deleteReservation(eventDetails.id)}
             />
           )}
         </DialogLayout>
