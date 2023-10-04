@@ -5,7 +5,7 @@ import ReserveDialog from "~/components/ReserveDialog";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useRouter } from "next/router";
-import { useStore } from "~/hooks/UseStore";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { api } from "~/utils/api";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
@@ -118,8 +118,8 @@ export const useRecurrentReservationDelete = (clubId: string | undefined) => {
 };
 
 export default function Calendar() {
-  const clubId = useStore((state) => state.clubId);
-  const setClubId = useStore((state) => state.setClubId);
+  const clubId = useCalendarStoreContext((state) => state.clubId);
+  const setClubId = useCalendarStoreContext((state) => state.setClubId);
 
   //get the club id from the router when is available
   const router = useRouter();

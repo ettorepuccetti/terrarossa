@@ -9,7 +9,7 @@ import { DateField, TimeField } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
 import React from "react";
-import { useStore } from "~/hooks/UseStore";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 import {
   useClubQuery,
@@ -23,9 +23,11 @@ import ErrorAlert from "./ErrorAlert";
 import Spinner from "./Spinner";
 
 export default function EventDetailDialog() {
-  const eventDetails = useStore((state) => state.eventDetails);
-  const setEventDetails = useStore((state) => state.setEventDetails);
-  const clubId = useStore((state) => state.getClubId());
+  const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
+  const setEventDetails = useCalendarStoreContext(
+    (state) => state.setEventDetails
+  );
+  const clubId = useCalendarStoreContext((state) => state.getClubId());
   const { data: sessionData } = useSession();
   const reservationDelete = useReservationDelete(clubId);
   const recurrentReservationDelete = useRecurrentReservationDelete(clubId);

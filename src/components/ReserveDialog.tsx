@@ -13,7 +13,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
-import { useStore } from "~/hooks/UseStore";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 import { useRecurrentReservationAdd, useReservationAdd } from "./Calendar";
 import DialogLayout from "./DialogLayout";
@@ -28,9 +28,9 @@ export interface ReserveDialogProps {
 }
 
 export default function ReserveDialog() {
-  const dateClick = useStore((state) => state.dateClick);
-  const clubId = useStore((state) => state.getClubId());
-  const setDateClick = useStore((state) => state.setDateClick);
+  const dateClick = useCalendarStoreContext((state) => state.dateClick);
+  const clubId = useCalendarStoreContext((state) => state.getClubId());
+  const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
   const reservationAdd = useReservationAdd(clubId);
   const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
   const { data: sessionData } = useSession();

@@ -1,6 +1,7 @@
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppProps } from "next/app";
+import { CalendarStoreProvider } from "~/hooks/useCalendarStoreContext";
 
 import { api } from "~/utils/api";
 
@@ -34,8 +35,10 @@ const MyApp = (props: MyAppProps) => {
     <CacheProvider value={emotionCache}>
       <ThemeProvider theme={lightTheme}>
         <SessionProvider session={session}>
-          <CssBaseline />
-          <Component {...pageProps} />
+          <CalendarStoreProvider>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </CalendarStoreProvider>
         </SessionProvider>
       </ThemeProvider>
     </CacheProvider>

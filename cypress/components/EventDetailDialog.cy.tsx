@@ -7,10 +7,22 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { SessionProvider } from "next-auth/react";
 import EventDetailDialog from "~/components/EventDetailDialog";
+import {
+  CalendarStoreProvider,
+  useCalendarStoreContext,
+} from "~/hooks/useCalendarStoreContext";
 import lightTheme from "~/styles/lightTheme";
 import createEmotionCache from "~/utils/createEmotionCache";
-import { club, clubSettings, session } from "./constants";
+import { session } from "./constants";
+import { api } from "~/utils/api";
+
 dayjs.extend(duration);
+
+const EventDetailDialogWrapper = () => {
+  const useSetClubId = useCalendarStoreContext((store) => store.setClubId);
+  useSetClubId("1");
+  return <EventDetailDialog />;
+};
 
 const mountComponent = (startDate: Date, endDate: Date) => {
   const eventDetails: EventImpl = {
@@ -33,16 +45,9 @@ const mountComponent = (startDate: Date, endDate: Date) => {
       <ThemeProvider theme={lightTheme}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <SessionProvider session={session}>
-            <EventDetailDialog
-              clubId={club.id}
-              clubSettings={clubSettings}
-              eventDetails={eventDetails}
-              onDialogClose={() => undefined}
-              onReservationDelete={() => undefined}
-              onRecurrentReservationDelete={() => undefined}
-              open={true}
-              sessionData={session}
-            />
+            <CalendarStoreProvider>
+              <EventDetailDialogWrapper />
+            </CalendarStoreProvider>
           </SessionProvider>
         </LocalizationProvider>
       </ThemeProvider>

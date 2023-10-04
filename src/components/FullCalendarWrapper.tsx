@@ -14,7 +14,7 @@ import { Box } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useSession } from "next-auth/react";
 import { useRef, type RefObject } from "react";
-import { useStore } from "~/hooks/UseStore";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { type AppRouter } from "~/server/api/root";
 import { defaultImg } from "~/utils/constants";
 import {
@@ -39,11 +39,13 @@ interface FullCalendarWrapperProps {
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
-  const clubId = useStore((state) => state.clubId);
+  const clubId = useCalendarStoreContext((state) => state.clubId);
   const clubQuery = useClubQuery(clubId);
   const { data: sessionData } = useSession();
-  const setDateClick = useStore((state) => state.setDateClick);
-  const setEventDetails = useStore((state) => state.setEventDetails);
+  const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
+  const setEventDetails = useCalendarStoreContext(
+    (state) => state.setEventDetails
+  );
 
   const reservationToEvent = (reservation: ReservationFromDb): EventInput => {
     return {
