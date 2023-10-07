@@ -32,7 +32,6 @@ export default function EventDetailDialog() {
   const reservationDelete = useReservationDelete(clubId);
   const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
   const clubQuery = useClubQuery(clubId);
-  const clubSettings = clubQuery.data?.clubSettings;
   const [confirmationOpen, setConfirmationOpen] = React.useState(false);
 
   const canDelete =
@@ -40,14 +39,16 @@ export default function EventDetailDialog() {
     (sessionData?.user?.id &&
       sessionData.user.id === eventDetails?.extendedProps?.userId);
 
-  const tooLateToCancel = (startTime: Date | null) => {
-    if (!startTime || !clubSettings?.hoursBeforeCancel) {
+  const tooLateToCancel = (
+    startTime: Date | null,
+    hoursBeforeCancel: number
+  ) => {
+    if (!startTime) {
       throw new Error("Si è verificato un problema, per favore riprova.");
     }
     return (
-      dayjs(startTime).isBefore(
-        dayjs().add(clubSettings.hoursBeforeCancel, "hour")
-      ) && !isAdminOfTheClub(sessionData, clubId)
+      dayjs(startTime).isBefore(dayjs().add(hoursBeforeCancel, "hour")) &&
+      !isAdminOfTheClub(sessionData, clubId)
     );
   };
 
@@ -62,7 +63,11 @@ export default function EventDetailDialog() {
   };
 
   // error handling
-  if (reservationDelete.error || recurrentReservationDelete.error) {
+  if (
+    reservationDelete.error ||
+    recurrentReservationDelete.error ||
+    clubQuery.error
+  ) {
     return (
       <ErrorAlert
         error={reservationDelete.error ?? recurrentReservationDelete.error}
@@ -76,7 +81,11 @@ export default function EventDetailDialog() {
   }
 
   // loading handling
-  if (reservationDelete.isLoading || recurrentReservationDelete.isLoading) {
+  if (
+    reservationDelete.isLoading ||
+    recurrentReservationDelete.isLoading ||
+    clubQuery.isLoading
+  ) {
     return <Spinner isLoading={true} />;
   }
 
@@ -135,19 +144,27 @@ export default function EventDetailDialog() {
           />
 
           {/* alert message */}
-          {canDelete && tooLateToCancel(eventDetails.start) && (
-            <Alert data-test="alert" severity="warning">
-              Non puoi cancellare una prenotazione meno di{" "}
-              {clubSettings?.hoursBeforeCancel} ore prima del suo inizio
-            </Alert>
-          )}
+          {canDelete &&
+            tooLateToCancel(
+              eventDetails.start,
+              clubQuery.data.clubSettings.hoursBeforeCancel
+            ) && (
+              <Alert data-test="alert" severity="warning">
+                Non puoi cancellare una prenotazione meno di{" "}
+                {clubQuery.data.clubSettings.hoursBeforeCancel} ore prima del
+                suo inizio
+              </Alert>
+            )}
 
           {/* delete button */}
           {canDelete && (
             <Button
               onClick={() => setConfirmationOpen(true)}
               color={"error"}
-              disabled={tooLateToCancel(eventDetails.start)}
+              disabled={tooLateToCancel(
+                eventDetails.start,
+                clubQuery.data.clubSettings.hoursBeforeCancel
+              )}
               data-test="delete-button"
             >
               Cancella
