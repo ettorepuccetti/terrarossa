@@ -11,7 +11,7 @@ import { DateField, TimeField } from "@mui/x-date-pickers";
 import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 import {
@@ -27,26 +27,39 @@ import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
 import Spinner from "./Spinner";
 
 export default function ReserveDialog() {
-  const dateClick = useCalendarStoreContext((state) => state.dateClick);
-  const clubId = useCalendarStoreContext((state) => state.getClubId());
-  const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
-  const reservationAdd = useReservationAdd(clubId);
-  const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
-  const clubQuery = useClubQuery(clubId);
   const { data: sessionData } = useSession();
 
-  const startDate = useMemo(() => dayjs(dateClick?.date), [dateClick?.date]);
-  const resource = dateClick?.resource;
+  const startDate = useCalendarStoreContext((store) => store.getStartDate());
+  const clubId = useCalendarStoreContext((state) => state.getClubId());
+
+  const clubQuery = useClubQuery(clubId);
+  const reservationAdd = useReservationAdd(clubId);
+  const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
+
+  const dateClick = useCalendarStoreContext((state) => state.dateClick);
+  const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
+  const endDate = useCalendarStoreContext((store) => store.endDate);
+  const setEndDate = useCalendarStoreContext((store) => store.setEndDate);
 
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
-  const [endDateError, setEndDateError] = useState<boolean>(false);
+  const endDateError = useCalendarStoreContext((store) => store.endDateError);
+
   const [recurrentEndDate, setRecurrentEndDate] = useState<Dayjs | null>(null);
   const [recurrentEndDateError, setRecurrentEndDateError] =
     useState<boolean>(false);
 
+  const resource = dateClick?.resource;
+
   const onConfirmButton = () => {
     if (!endDate || !startDate || !resource) {
+      console.error(
+        "endDate",
+        endDate,
+        "startDate",
+        startDate,
+        "resource",
+        resource
+      );
       throw new Error("Si è verificato un problema, per favore riprova.");
     }
 
@@ -67,7 +80,7 @@ export default function ReserveDialog() {
       clubId
     );
     //todo: use a single api end point for both reservation and recurrent reservation
-    const name = overwriteName !== "" ? overwriteName : undefined;
+    const name = overwriteName !== "" ? overwriteName : undefined; //manage undefined of input for controlled component
     if (recurrentEndDate) {
       recurrentReservationAdd.mutate({
         clubId: clubId,
@@ -186,12 +199,6 @@ export default function ReserveDialog() {
               />
               {/* end time */}
               <ReserveDialogEndDate
-                endDate={endDate}
-                startDate={startDate}
-                clubId={clubId}
-                disabled={!startDateIsFuture(sessionData, clubId, startDate)}
-                endDateEventHandler={setEndDate}
-                endDateErrorEventHandler={setEndDateError}
                 clubSettings={clubQuery.data.clubSettings}
               />
               {/* recurrent reservation */}
@@ -233,7 +240,7 @@ export default function ReserveDialog() {
   );
 }
 
-const startDateIsFuture = (
+export const startDateIsFuture = (
   sessionData: Session | null,
   clubId: string,
   startDate: Dayjs

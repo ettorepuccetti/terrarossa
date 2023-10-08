@@ -3,31 +3,23 @@ import { type ClubSettings } from "@prisma/client";
 import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
+import { startDateIsFuture } from "./ReserveDialog";
 
 export default function ReserveDialogEndDate(props: {
-  endDate: Dayjs | null;
-  startDate: Dayjs;
-  clubId: string;
-  disabled: boolean;
-  endDateEventHandler: (dayJsDate: Dayjs | null) => void;
-  endDateErrorEventHandler: (error: boolean) => void;
   clubSettings: ClubSettings;
 }) {
-  const { startDate, endDateEventHandler, clubSettings } = props; // for using them inside useEffect
+  const clubId = useCalendarStoreContext((store) => store.getClubId());
+  const startDate = useCalendarStoreContext((store) => store.getStartDate());
+  const endDate = useCalendarStoreContext((store) => store.endDate);
+  const setEndDate = useCalendarStoreContext((store) => store.setEndDate);
+  const setEndDateError = useCalendarStoreContext(
+    (store) => store.setEndDateError
+  );
   const { data: sessionData } = useSession();
   const [endDateErrorText, setEndDateErrorText] = useState<string | null>(null);
-
-  // to set endDate to startDate + 1 hour, when component is mounted
-  useEffect(() => {
-    if (!startDate) {
-      return;
-    }
-    endDateEventHandler(
-      dayjs(startDate).add(1, "hours").set("second", 0).set("millisecond", 0)
-    );
-  }, [startDate, endDateEventHandler]);
 
   return (
     <TimePicker
@@ -38,32 +30,32 @@ export default function ReserveDialogEndDate(props: {
           helperText: endDateErrorText,
         },
       }}
-      value={props.endDate}
+      value={endDate}
       label={"Orario di fine"}
       onChange={(dayJsDate) => {
-        props.endDateEventHandler(dayJsDate);
+        setEndDate(dayJsDate);
         // date changed from null to not null or viceversa
-        if ((props.endDate == null) != (dayJsDate == null)) {
-          props.endDateErrorEventHandler(dayJsDate == null);
+        if ((endDate == null) != (dayJsDate == null)) {
+          setEndDateError(dayJsDate == null);
         }
       }}
       ampm={false}
       minutesStep={30}
       skipDisabled={true}
-      minTime={props.startDate.add(1, "hours")}
+      minTime={startDate.add(1, "hours")}
       maxTime={maxTime(
-        props.startDate,
+        startDate,
         sessionData,
-        props.clubId,
-        clubSettings.lastBookableHour,
-        clubSettings.lastBookableMinute
+        clubId,
+        props.clubSettings.lastBookableHour,
+        props.clubSettings.lastBookableMinute
       )}
-      disabled={props.disabled}
+      disabled={!startDateIsFuture(sessionData, clubId, startDate)}
       autoFocus
       sx={{ width: "100%" }}
       onError={(error) => {
         setEndDateErrorText(mapEndDateErrorText(error));
-        props.endDateErrorEventHandler(error != null);
+        setEndDateError(error != null);
       }}
     />
   );
