@@ -1,22 +1,19 @@
 import { type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
-import { type Session } from "next-auth";
 import ReserveDialogEndDate from "~/components/ReserveDialogEndDate";
-import { getAdminSession, mountWithContexts } from "./constants";
+import { mountWithContexts, session } from "./constants";
 
 describe("ReserveDialogEndDate", () => {
   beforeEach("Mount", () => {
-    const clubId = "1";
-    const adminSession: Session = getAdminSession(clubId);
-
     const setDateStub = cy.stub().as("setDateStub");
     const setErrorStub = cy.stub().as("setErrorStub");
 
-    const now = dayjs()
+    const startDate = dayjs()
       .set("hour", 12)
       .set("minute", 0)
       .second(0)
       .millisecond(0);
+
     mountWithContexts(
       <ReserveDialogEndDate
         disabled={false}
@@ -24,12 +21,12 @@ describe("ReserveDialogEndDate", () => {
           { lastBookableMinute: 0, lastBookableHour: 22 } as ClubSettings
         }
         clubId={"1"}
-        startDate={now}
+        startDate={startDate}
         endDateEventHandler={setDateStub}
         endDateErrorEventHandler={setErrorStub}
-        endDate={now.add(1, "hours")}
+        endDate={startDate.add(1, "hours")}
       />,
-      adminSession
+      session
     );
   });
 
