@@ -102,6 +102,7 @@ describe("USER", () => {
       //default duration is 1 hour
       .should("have.value", startDate.add(1, "hour").format("HH:mm"))
       //EDIT endTime
+      .should("be.visible")
       .type("14:30");
 
     // check end time after edit
@@ -168,7 +169,10 @@ describe("USER", () => {
     cy.get("input").filter("[data-test='endTime']").clear();
     cy.get("[data-test=reserveButton]").should("be.disabled");
 
-    cy.get("input").filter("[data-test='endTime']").type("14:00");
+    cy.get("input")
+      .filter("[data-test='endTime']")
+      .should("be.visible")
+      .type("14:00");
     cy.get("[data-test=reserveButton]").should("be.enabled");
   });
 
@@ -203,12 +207,14 @@ describe("USER", () => {
     mountComponent({ startDate, session });
 
     //try to reserve for 2h30min, not allowed
-    cy.get("input").filter("[data-test='endTime']").type("15:30");
+    cy.get("input")
+      .filter("[data-test='endTime']")
+      .should("be.visible")
+      .type("15:30");
 
     // check end time after edit and error status
     cy.get("input")
       .filter("[data-test='endTime']")
-      .filter(":focus")
       .should("have.value", startDate.hour(15).minute(30).format("HH:mm"))
       .should("have.attr", "aria-invalid", "true");
     // check error message
@@ -252,7 +258,10 @@ describe("USER", () => {
           overrideApiCall: response,
         });
 
-        cy.get("input").filter("[data-test='endTime']").type(endDate);
+        cy.get("input")
+          .filter("[data-test='endTime']")
+          .should("be.visible")
+          .type(endDate);
         cy.get("[data-test='endTime']")
           .should("have.value", endDate)
           .and("have.attr", "aria-invalid", "false");
@@ -311,7 +320,10 @@ describe("USER", () => {
     const endDate = startDate
       .add(dayjs.duration({ hours: 1, minutes: 12 }))
       .format("HH:mm");
-    cy.get("input").filter("[data-test='endTime']").type(endDate);
+    cy.get("input")
+      .filter("[data-test='endTime']")
+      .should("be.visible")
+      .type(endDate);
 
     // check end time after edit
     cy.get("[data-test='endTime']")
@@ -343,7 +355,10 @@ describe("USER", () => {
     });
 
     it("GIVEN admin WHEN reserve THEN can book more than 2 hours", () => {
-      cy.get("input").filter("[data-test='endTime']").type("18:00");
+      cy.get("input")
+        .filter("[data-test='endTime']")
+        .should("be.visible")
+        .type("18:00");
       cy.get("[data-test='endTime']").should(
         "have.attr",
         "aria-invalid",
@@ -365,17 +380,17 @@ describe("USER", () => {
 
       it("GIVEN admin WHEN enable recurrent switch and set end date THEN button enabled", () => {
         cy.get("[data-test=recurrent-switch]").click();
-        cy.get("[data-test=recurrent-end-date]").type(
-          dayjs().add(1, "week").format("DD/MM/YYYY")
-        );
+        cy.get("[data-test=recurrent-end-date]")
+          .should("be.visible")
+          .type(dayjs().add(1, "week").format("DD/MM/YYYY"));
         cy.get("[data-test=reserveButton]").should("be.enabled");
       });
 
       it("GIVEN admin WHEN set recurrent end date not same week day THEN show error and button disabled", () => {
         cy.get("[data-test=recurrent-switch]").click();
-        cy.get("[data-test=recurrent-end-date]").type(
-          dayjs().add(8, "day").format("DD/MM/YYYY")
-        );
+        cy.get("[data-test=recurrent-end-date]")
+          .should("be.visible")
+          .type(dayjs().add(8, "day").format("DD/MM/YYYY"));
         cy.get("[data-test=reserveButton]").should("be.disabled");
         cy.get("[data-test=recurrent-end-date]").should(
           "have.attr",
@@ -392,9 +407,15 @@ describe("USER", () => {
       it("GIVEN admin WHEN set recurrent end date next year THEN show error and button disabled", () => {
         cy.get("[data-test=recurrent-switch]").click();
         const dayOfTheWeek = dayjs().day();
-        cy.get("[data-test=recurrent-end-date]").type(
-          dayjs().add(1, "year").month(0).day(dayOfTheWeek).format("DD/MM/YYYY")
-        );
+        cy.get("[data-test=recurrent-end-date]")
+          .should("be.visible")
+          .type(
+            dayjs()
+              .add(1, "year")
+              .month(0)
+              .day(dayOfTheWeek)
+              .format("DD/MM/YYYY")
+          );
         cy.get("[data-test=reserveButton]").should("be.disabled");
         cy.get("[data-test=recurrent-end-date]").should(
           "have.attr",

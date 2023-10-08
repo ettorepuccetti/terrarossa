@@ -41,13 +41,19 @@ export default function ReserveDialog() {
   const endDate = useCalendarStoreContext((store) => store.endDate);
   const setEndDate = useCalendarStoreContext((store) => store.setEndDate);
 
-  const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
   const endDateError = useCalendarStoreContext((store) => store.endDateError);
 
-  const [recurrentEndDate, setRecurrentEndDate] = useState<Dayjs | null>(null);
-  const [recurrentEndDateError, setRecurrentEndDateError] =
-    useState<boolean>(false);
+  const recurrentEndDate = useCalendarStoreContext(
+    (state) => state.recurrentEndDate
+  );
+  const setRecurrentEndDate = useCalendarStoreContext(
+    (state) => state.setRecurrentEndDate
+  );
+  const recurrentEndDateError = useCalendarStoreContext(
+    (state) => state.recurringEndDateError
+  );
 
+  const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
   const resource = dateClick?.resource;
 
   const onConfirmButton = () => {
@@ -197,18 +203,15 @@ export default function ReserveDialog() {
                 fullWidth
                 color="info"
               />
+
               {/* end time */}
               <ReserveDialogEndDate
                 clubSettings={clubQuery.data.clubSettings}
               />
+
               {/* recurrent reservation */}
-              <ReserveDialogRecurrent
-                clubId={clubId}
-                startDate={startDate}
-                recurrentDateEventHandler={setRecurrentEndDate}
-                recurrentDateErrorEventHandler={setRecurrentEndDateError}
-                recurrentEndDate={recurrentEndDate}
-              />
+              <ReserveDialogRecurrent />
+
               {/* start date in the past warning */}
               {!startDateIsFuture(sessionData, clubId, startDate) && (
                 <Box display={"flex"}>

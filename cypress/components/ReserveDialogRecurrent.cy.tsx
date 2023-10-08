@@ -1,25 +1,46 @@
+import { type DateClickArg } from "@fullcalendar/interaction";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import ReserveDialogRecurrent from "~/components/ReserveDialogRecurrent";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { getAdminSession, mountWithContexts } from "./constants";
+
+function ReserveDialogRecurrentContext() {
+  // setting stubs
+  const setDateStub = cy.stub().as("setDateStub");
+  const setErrorStub = cy.stub().as("setErrorStub");
+  useCalendarStoreContext((store) => store.setSetRecurrentEndDate)(setDateStub);
+  useCalendarStoreContext((store) => store.setSetRecurringEndDateError)(
+    setErrorStub
+  );
+
+  //setting dateClick
+  const startDate = dayjs()
+    .set("hour", 12)
+    .set("minute", 0)
+    .second(0)
+    .millisecond(0);
+  const dateClick: DateClickArg = {
+    date: startDate.toDate(),
+    resource: {
+      id: "court1",
+      title: "Campo 1",
+    },
+  } as DateClickArg;
+  useCalendarStoreContext((store) => store.setDateClick)(dateClick);
+
+  //setting clubId
+  useCalendarStoreContext((state) => state.setClubId)("1");
+
+  return <ReserveDialogRecurrent />;
+}
 
 describe("ReserveDialogRecurrent", () => {
   beforeEach("Mount", () => {
     const clubId = "1";
     const adminSession: Session = getAdminSession(clubId);
 
-    const setDateStub = cy.stub().as("setDateStub");
-    const setErrorStub = cy.stub().as("setErrorStub");
-    mountWithContexts(
-      <ReserveDialogRecurrent
-        clubId={"1"}
-        startDate={dayjs()}
-        recurrentDateEventHandler={setDateStub}
-        recurrentDateErrorEventHandler={setErrorStub}
-        recurrentEndDate={null}
-      />,
-      adminSession
-    );
+    mountWithContexts(<ReserveDialogRecurrentContext />, adminSession);
   });
 
   it("GIVEN date null and switch off WHEN switch on THEN set error", () => {
