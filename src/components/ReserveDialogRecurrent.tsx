@@ -47,6 +47,7 @@ export default function ReserveDialogRecurrent(props: {
               inputProps: { "data-test": "recurrent-end-date" },
               color: "info",
               helperText: errorText,
+              // to enable red border on null date (but give problem in component testing): error: errorText != null || props.recurrentEndDate == null,
             },
           }}
           value={props.recurrentEndDate}
@@ -63,10 +64,8 @@ export default function ReserveDialogRecurrent(props: {
           shouldDisableDate={(dayJsDate) =>
             dayJsDate.day() !== props.startDate.day()
           }
-          onError={(error, value) => {
-            props.recurrentDateErrorEventHandler(
-              error != null || value == null
-            );
+          onError={(error) => {
+            props.recurrentDateErrorEventHandler(error != null);
             setErrorText(mapErrorToText(error));
           }}
           views={["day"]}

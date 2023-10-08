@@ -66,7 +66,7 @@ export default function ReserveDialog() {
       "clubId: ",
       clubId
     );
-
+    //todo: use a single api end point for both reservation and recurrent reservation
     const name = overwriteName !== "" ? overwriteName : undefined;
     if (recurrentEndDate) {
       recurrentReservationAdd.mutate({
@@ -77,15 +77,15 @@ export default function ReserveDialog() {
         overwriteName: name,
         recurrentEndDate: recurrentEndDate.hour(23).minute(59).toDate(), //TODO: fix that
       });
-      return;
+    } else {
+      reservationAdd.mutate({
+        courtId: resource.id,
+        startDateTime: startDate.toDate(),
+        endDateTime: endDate.toDate(),
+        overwriteName: name,
+        clubId: clubId,
+      });
     }
-    reservationAdd.mutate({
-      courtId: resource.id,
-      startDateTime: startDate.toDate(),
-      endDateTime: endDate.toDate(),
-      overwriteName: name,
-      clubId: clubId,
-    });
 
     setDateClick(null);
     setOverwriteName("");

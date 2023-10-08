@@ -1,13 +1,10 @@
 import { TimePicker, type TimeValidationError } from "@mui/x-date-pickers";
+import { type ClubSettings } from "@prisma/client";
 import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { isAdminOfTheClub } from "~/utils/utils";
-import { useClubQuery } from "./Calendar";
-import ErrorAlert from "./ErrorAlert";
-import Spinner from "./Spinner";
-import { type ClubSettings } from "@prisma/client";
 
 export default function ReserveDialogEndDate(props: {
   endDate: Dayjs | null;
@@ -64,9 +61,9 @@ export default function ReserveDialogEndDate(props: {
       disabled={props.disabled}
       autoFocus
       sx={{ width: "100%" }}
-      onError={(error, value) => {
+      onError={(error) => {
         setEndDateErrorText(mapEndDateErrorText(error));
-        props.endDateErrorEventHandler(error != null || value == null);
+        props.endDateErrorEventHandler(error != null);
       }}
     />
   );
