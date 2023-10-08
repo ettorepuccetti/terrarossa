@@ -1,6 +1,6 @@
 import { type EventImpl } from "@fullcalendar/core/internal";
 import { type DateClickArg } from "@fullcalendar/interaction";
-import { create, type StateCreator } from "zustand";
+import { type StateCreator } from "zustand";
 
 export interface IStore {
   dateClick: DateClickArg | null;
@@ -27,5 +27,3 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
     return clubId;
   },
 });
-
-export const useCalendarStore = create<IStore>()(calendarStoreCreator);

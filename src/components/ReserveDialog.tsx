@@ -8,7 +8,6 @@ import {
   Typography,
 } from "@mui/material";
 import { DateField, TimeField } from "@mui/x-date-pickers";
-import { type ClubSettings } from "@prisma/client";
 import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
@@ -22,10 +21,6 @@ import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
 import Spinner from "./Spinner";
-
-export interface ReserveDialogProps {
-  clubSettings: ClubSettings;
-}
 
 export default function ReserveDialog() {
   const dateClick = useCalendarStoreContext((state) => state.dateClick);

@@ -11,13 +11,11 @@ import { shallow } from "zustand/shallow";
 import { useStoreWithEqualityFn } from "zustand/traditional";
 import { calendarStoreCreator, type IStore } from "./UseCalendarStore";
 
-export const createCalandarStore = () => {
+const createCalandarStore = () => {
   return createStore<IStore>(calendarStoreCreator);
 };
 
-export const CalendarStoreContext = createContext<StoreApi<IStore>>(
-  null as never
-);
+const CalendarStoreContext = createContext<StoreApi<IStore>>(null as never);
 
 export type CalendarStoreProviderProps = PropsWithChildren<Partial<IStore>>;
 

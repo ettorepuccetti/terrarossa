@@ -1,11 +1,12 @@
 import { TimePicker, type TimeValidationError } from "@mui/x-date-pickers";
-import { type ClubSettings } from "@prisma/client";
 import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { isAdminOfTheClub } from "~/utils/utils";
 import { useClubQuery } from "./Calendar";
+import ErrorAlert from "./ErrorAlert";
+import Spinner from "./Spinner";
 
 export default function ReserveDialogEndDate(props: {
   endDate: Dayjs | null;
@@ -30,6 +31,23 @@ export default function ReserveDialogEndDate(props: {
       dayjs(startDate).add(1, "hours").set("second", 0).set("millisecond", 0)
     );
   }, [startDate, endDateEventHandler]);
+
+  // error handling
+  if (clubQuery.error) {
+    return (
+      <ErrorAlert
+        error={clubQuery.error}
+        onClose={() => {
+          void clubQuery.refetch();
+        }}
+      />
+    );
+  }
+
+  // loading handling
+  if (clubQuery.isLoading) {
+    return <Spinner isLoading={true} />;
+  }
 
   return (
     <TimePicker
@@ -57,7 +75,8 @@ export default function ReserveDialogEndDate(props: {
         props.startDate,
         sessionData,
         props.clubId,
-        clubQuery.data?.clubSettings
+        clubQuery.data?.clubSettings.lastBookableHour,
+        clubQuery.data?.clubSettings.lastBookableMinute
       )}
       disabled={props.disabled}
       autoFocus
@@ -74,21 +93,17 @@ const maxTime = (
   startDate: Dayjs,
   sessionData: Session | null,
   clubId: string,
-  clubSettings?: ClubSettings
+  lastBookableHour: number,
+  lastBookableMinute: number
 ) => {
-  if (!clubSettings) {
-    console.error("clubSettings not found");
-    return startDate;
-  }
-
   // default case
   const maxTime = startDate.add(2, "hours");
 
   // manage case in which endTime would be after club closing time
   // apply also for ADMIN
   const clubClosingTime = dayjs(startDate)
-    .hour(clubSettings.lastBookableHour + 1) // TODO: +1 implicit assumption
-    .minute(clubSettings.lastBookableMinute)
+    .hour(lastBookableHour + 1) // TODO: +1 implicit assumption
+    .minute(lastBookableMinute)
     .second(0)
     .millisecond(0);
   if (maxTime.isAfter(clubClosingTime)) {

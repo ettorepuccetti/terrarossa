@@ -103,7 +103,7 @@ function WrapperComponentForTesting({
   const [queryClient] = useState(
     () =>
       new QueryClient({
-        defaultOptions: { queries: { retry: true } },
+        defaultOptions: { queries: { retry: false } },
       })
   );
   const [trpcClient] = useState(() =>
@@ -159,6 +159,24 @@ export const mountWithContexts = (
     </WrapperComponentForTesting>
   );
 };
+
+export type ApiResponse<T> = {
+  result: {
+    data: {
+      json: T;
+    };
+  };
+};
+
+export function buildApiResponse<T>(payload: T): ApiResponse<T> {
+  return {
+    result: {
+      data: {
+        json: payload,
+      },
+    },
+  };
+}
 
 // ------- END OF FILE -------
 // try to mock NextRouter (not succeed) - see:

@@ -237,3 +237,30 @@ npm run prepare
 ```
 
 On each commit, husky will run pretty-quick, which will run prettier on all staged files.
+
+## Providing context to component in Cypress component testing
+
+General concept:
+https://blog.zenika.com/2022/10/07/a-few-ways-to-approach-cypress-component-testing-with-react-components/
+https://github.com/Ked57/cypress-ct-example-app
+
+Zustand:
+https://github.com/pmndrs/zustand/blob/main/docs/guides/testing.md
+
+React Query:
+https://tkdodo.eu/blog/testing-react-query
+
+## MSW (in case I want to mock the network for testing)
+
+https://github.com/maloguertin/msw-trpc
+
+How to use with cypress (when to initialize service worker)
+https://github.com/mswjs/msw/issues/1560
+https://www.capocaccia.dev/posts/cypressMsw
+
+libraries or example on top of msw:
+https://github.com/deshiknaves/cypress-msw-interceptor
+https://github.com/abrahamgr/msw-cypress
+
+discussion on trpc repo on how to mock calls:
+https://github.com/trpc/trpc/discussions/1879
