@@ -14,7 +14,11 @@ import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
-import { useRecurrentReservationAdd, useReservationAdd } from "./Calendar";
+import {
+  useClubQuery,
+  useRecurrentReservationAdd,
+  useReservationAdd,
+} from "./Calendar";
 import DialogLayout from "./DialogLayout";
 import ErrorAlert from "./ErrorAlert";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
@@ -28,6 +32,7 @@ export default function ReserveDialog() {
   const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
   const reservationAdd = useReservationAdd(clubId);
   const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
+  const clubQuery = useClubQuery(clubId);
   const { data: sessionData } = useSession();
 
   const startDate = useMemo(() => dayjs(dateClick?.date), [dateClick?.date]);
@@ -89,20 +94,33 @@ export default function ReserveDialog() {
   };
 
   // error handling
-  if (reservationAdd.error || recurrentReservationAdd.error) {
+  if (
+    reservationAdd.error ||
+    recurrentReservationAdd.error ||
+    clubQuery.error
+  ) {
     return (
       <ErrorAlert
-        error={reservationAdd.error ?? recurrentReservationAdd.error}
+        error={
+          reservationAdd.error ??
+          recurrentReservationAdd.error ??
+          clubQuery.error
+        }
         onClose={() => {
           reservationAdd.error && reservationAdd.reset();
           recurrentReservationAdd.error && recurrentReservationAdd.reset();
+          clubQuery.error && void clubQuery.refetch();
         }}
       />
     );
   }
 
   // loading handling
-  if (reservationAdd.isLoading || recurrentReservationAdd.isLoading) {
+  if (
+    reservationAdd.isLoading ||
+    recurrentReservationAdd.isLoading ||
+    clubQuery.isLoading
+  ) {
     return <Spinner isLoading={true} />;
   }
 
@@ -174,6 +192,7 @@ export default function ReserveDialog() {
                 disabled={!startDateIsFuture(sessionData, clubId, startDate)}
                 endDateEventHandler={setEndDate}
                 endDateErrorEventHandler={setEndDateError}
+                clubSettings={clubQuery.data.clubSettings}
               />
               {/* recurrent reservation */}
               <ReserveDialogRecurrent

@@ -7,6 +7,7 @@ import { isAdminOfTheClub } from "~/utils/utils";
 import { useClubQuery } from "./Calendar";
 import ErrorAlert from "./ErrorAlert";
 import Spinner from "./Spinner";
+import { type ClubSettings } from "@prisma/client";
 
 export default function ReserveDialogEndDate(props: {
   endDate: Dayjs | null;
@@ -15,12 +16,11 @@ export default function ReserveDialogEndDate(props: {
   disabled: boolean;
   endDateEventHandler: (dayJsDate: Dayjs | null) => void;
   endDateErrorEventHandler: (error: boolean) => void;
+  clubSettings: ClubSettings;
 }) {
-  const { startDate, endDateEventHandler } = props; // for using them inside useEffect
+  const { startDate, endDateEventHandler, clubSettings } = props; // for using them inside useEffect
   const { data: sessionData } = useSession();
   const [endDateErrorText, setEndDateErrorText] = useState<string | null>(null);
-
-  const clubQuery = useClubQuery(props.clubId);
 
   // to set endDate to startDate + 1 hour, when component is mounted
   useEffect(() => {
@@ -31,23 +31,6 @@ export default function ReserveDialogEndDate(props: {
       dayjs(startDate).add(1, "hours").set("second", 0).set("millisecond", 0)
     );
   }, [startDate, endDateEventHandler]);
-
-  // error handling
-  if (clubQuery.error) {
-    return (
-      <ErrorAlert
-        error={clubQuery.error}
-        onClose={() => {
-          void clubQuery.refetch();
-        }}
-      />
-    );
-  }
-
-  // loading handling
-  if (clubQuery.isLoading) {
-    return <Spinner isLoading={true} />;
-  }
 
   return (
     <TimePicker
@@ -75,8 +58,8 @@ export default function ReserveDialogEndDate(props: {
         props.startDate,
         sessionData,
         props.clubId,
-        clubQuery.data?.clubSettings.lastBookableHour,
-        clubQuery.data?.clubSettings.lastBookableMinute
+        clubSettings.lastBookableHour,
+        clubSettings.lastBookableMinute
       )}
       disabled={props.disabled}
       autoFocus
