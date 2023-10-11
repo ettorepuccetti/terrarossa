@@ -15,9 +15,13 @@ import {
   useReservationDelete,
 } from "./Calendar";
 import DialogLayout from "./DialogLayout";
+import ErrorAlert from "./ErrorAlert";
+import Spinner from "./Spinner";
 
 export default function CancelRecurrentDialog() {
-  const open = useCalendarStoreContext((state) => state.deleteConfirmationOpen);
+  const deleteOpen = useCalendarStoreContext(
+    (state) => state.deleteConfirmationOpen
+  );
   const setDeleteConfirmationOpen = useCalendarStoreContext(
     (state) => state.setDeleteConfirmationOpen
   );
@@ -67,8 +71,31 @@ export default function CancelRecurrentDialog() {
     setDeleteConfirmationOpen(false);
   };
 
+  // error handling
+  if (reservationDelete.error || recurrentReservationDelete.error) {
+    return (
+      <ErrorAlert
+        error={reservationDelete.error || recurrentReservationDelete.error}
+        onClose={() => {
+          reservationDelete.error && reservationDelete.reset();
+          recurrentReservationDelete.error &&
+            recurrentReservationDelete.reset();
+        }}
+      />
+    );
+  }
+
+  // loading handling
+  if (reservationDelete.isLoading || recurrentReservationDelete.isLoading) {
+    return <Spinner isLoading={true} />;
+  }
+
   return (
-    <Dialog open={open} onClose={() => setDeleteConfirmationOpen(false)}>
+    <Dialog
+      data-test="cancel-recurrent-dialog"
+      open={deleteOpen && !!eventDetails?.extendedProps.recurrentId}
+      onClose={() => setDeleteConfirmationOpen(false)}
+    >
       <DialogLayout title="Cancellazione">
         <Alert severity="error">
           Questa prenotazione fa parte di un{"'"}ora fissa. Cosa vuoi

@@ -22,7 +22,6 @@ import {
   isAdminOfTheClub,
   isSelectableSlot,
 } from "~/utils/utils";
-import { useClubQuery } from "./Calendar";
 import CalendarEventCard from "./CalendarEventCard";
 import { HorizonalDatePicker } from "./HorizontalDatePicker";
 
@@ -40,12 +39,11 @@ interface FullCalendarWrapperProps {
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
   const clubId = useCalendarStoreContext((state) => state.clubId);
-  const clubQuery = useClubQuery(clubId);
-  const { data: sessionData } = useSession();
   const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
   const setEventDetails = useCalendarStoreContext(
     (state) => state.setEventDetails
   );
+  const { data: sessionData } = useSession();
 
   const reservationToEvent = (reservation: ReservationFromDb): EventInput => {
     return {
@@ -80,14 +78,11 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       selectInfo.resource?.id
     );
 
-    if (!clubQuery.data) {
-      throw new Error("No club settings found"); // should never happen since I use this function only when clubQuery.data is defined
-    }
     if (
       !isSelectableSlot(
         selectInfo.date,
-        clubQuery.data.clubSettings.lastBookableHour,
-        clubQuery.data.clubSettings.lastBookableMinute
+        props.clubData.clubSettings.lastBookableHour,
+        props.clubData.clubSettings.lastBookableMinute
       )
     ) {
       console.log("last slot is not selectable", "date: ", selectInfo.date);

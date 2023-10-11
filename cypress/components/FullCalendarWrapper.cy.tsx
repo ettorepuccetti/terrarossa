@@ -18,6 +18,9 @@ describe("<FullCalendarWrapper />", () => {
 
     cy.wrap(clubData).as("clubData");
     cy.wrap(courtData).as("courtData");
+
+    // just to avoid error in console
+    cy.intercept("GET", "/api/auth/session", { body: {} });
   });
 
   describe("GIVEN club with reservation first and last hour WHEN select first and second last slot THEN constrains respected", () => {

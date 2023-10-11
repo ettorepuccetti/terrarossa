@@ -63,11 +63,13 @@ export const useCourtQuery = (clubId: string | undefined) =>
     }
   );
 
-export const useReservationQuery = (clubId: string | undefined) =>
-  api.reservationQuery.getAllVisibleInCalendarByClubId.useQuery(
+export const useReservationQuery = (clubId: string | undefined) => {
+  const query = api.reservationQuery.getAllVisibleInCalendarByClubId;
+  return query.useQuery(
     { clubId: clubId },
     { refetchOnWindowFocus: false, enabled: clubId !== undefined }
   );
+};
 
 export const useReservationAdd = (clubId: string | undefined) => {
   const reservationQuery = useReservationQuery(clubId);
@@ -129,22 +131,11 @@ export default function Calendar() {
     }
   }, [router.isReady, router.query.clubId, setClubId]);
 
-  /**
-   * -------------------------------------
-   *      ----- trpc procedures -----
-   * -------------------------------------
-   */
-
   const clubQuery = useClubQuery(clubId);
   const courtQuery = useCourtQuery(clubId);
   const reservationQuery = useReservationQuery(clubId);
 
-  /**
-   * -------------------------------------
-   * ---------- Rendering ---------------
-   * -------------------------------------
-   */
-
+  // error handling
   if (clubQuery.error || courtQuery.error || reservationQuery.error) {
     return (
       <ErrorAlert
@@ -158,17 +149,18 @@ export default function Calendar() {
     );
   }
 
+  // loading handling
   if (clubQuery.isLoading || !clubId) {
     return <Spinner isLoading={true} />;
   }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Header
+        headerName={clubQuery.data.name}
+        logoSrc={clubQuery.data.logoSrc}
+      />
       <SpinnerPartial open={reservationQuery.isLoading}>
-        <Header
-          headerName={clubQuery.data.name}
-          logoSrc={clubQuery.data.logoSrc}
-        />
         <FullCalendarWrapper
           clubData={clubQuery.data}
           courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page

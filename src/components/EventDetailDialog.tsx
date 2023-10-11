@@ -10,13 +10,9 @@ import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
-import {
-  useClubQuery,
-  useRecurrentReservationDelete,
-  useReservationDelete,
-} from "./Calendar";
+import { useClubQuery } from "./Calendar";
 import CancelRecurrentDialog from "./CancelRecurrentDialog";
-import ConfirmationDialog from "./ConfirmationDialog";
+import CancelSingleDialog from "./CancelSingleDialog";
 import DialogLayout from "./DialogLayout";
 import ErrorAlert from "./ErrorAlert";
 import Spinner from "./Spinner";
@@ -28,12 +24,7 @@ export default function EventDetailDialog() {
   );
   const clubId = useCalendarStoreContext((state) => state.getClubId());
   const { data: sessionData } = useSession();
-  const reservationDelete = useReservationDelete(clubId);
-  const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
   const clubQuery = useClubQuery(clubId);
-  const deleteConfirmationOpen = useCalendarStoreContext(
-    (state) => state.deleteConfirmationOpen
-  );
   const setDeleteConfirmationOpen = useCalendarStoreContext(
     (state) => state.setDeleteConfirmationOpen
   );
@@ -44,58 +35,30 @@ export default function EventDetailDialog() {
       sessionData.user.id === eventDetails?.extendedProps?.userId);
 
   const tooLateToCancel = (
-    startTime: Date | null,
+    startTime: Date | null | undefined,
     hoursBeforeCancel: number
   ) => {
-    if (!startTime) {
-      throw new Error("Si è verificato un problema, per favore riprova.");
-    }
     return (
       dayjs(startTime).isBefore(dayjs().add(hoursBeforeCancel, "hour")) &&
       !isAdminOfTheClub(sessionData, clubId)
     );
   };
 
-  const deleteReservation = (reservationId: string) => {
-    reservationDelete.mutate({
-      reservationId: reservationId,
-      clubId: clubId,
-    });
-    console.log("delete event: ", reservationId);
-    setEventDetails(null);
-    setDeleteConfirmationOpen(false);
-  };
-
   // error handling
-  if (
-    reservationDelete.error ||
-    recurrentReservationDelete.error ||
-    clubQuery.error
-  ) {
+  if (clubQuery.error) {
     return (
       <ErrorAlert
-        error={reservationDelete.error ?? recurrentReservationDelete.error}
+        error={clubQuery.error}
         onClose={() => {
-          reservationDelete.error && reservationDelete.reset();
-          recurrentReservationDelete.error &&
-            recurrentReservationDelete.reset();
+          void clubQuery.refetch();
         }}
       />
     );
   }
 
   // loading handling
-  if (
-    reservationDelete.isLoading ||
-    recurrentReservationDelete.isLoading ||
-    clubQuery.isLoading
-  ) {
+  if (clubQuery.isLoading) {
     return <Spinner isLoading={true} />;
-  }
-
-  // only for linting
-  if (!eventDetails) {
-    return null;
   }
 
   return (
@@ -111,7 +74,7 @@ export default function EventDetailDialog() {
           {/* Court name */}
           <DialogActions>
             <Typography gutterBottom data-test="court-name">
-              {eventDetails.getResources()[0]?.title}
+              {eventDetails?.getResources()[0]?.title}
             </Typography>
           </DialogActions>
 
@@ -119,7 +82,7 @@ export default function EventDetailDialog() {
           <DateField
             data-test="date"
             color="info"
-            value={dayjs(eventDetails.start)}
+            value={dayjs(eventDetails?.start)}
             readOnly={true}
             label={"Data"}
             format="DD/MM/YYYY"
@@ -130,7 +93,7 @@ export default function EventDetailDialog() {
           <TimeField
             data-test="startTime"
             color="info"
-            value={eventDetails.start}
+            value={eventDetails?.start}
             label={"Orario di inizio"}
             readOnly={true}
             ampm={false}
@@ -140,7 +103,7 @@ export default function EventDetailDialog() {
           <TimeField
             data-test="endTime"
             color="info"
-            value={eventDetails.end}
+            value={eventDetails?.end}
             label={"Orario di fine"}
             readOnly={true}
             ampm={false}
@@ -150,7 +113,7 @@ export default function EventDetailDialog() {
           {/* alert message */}
           {canDelete &&
             tooLateToCancel(
-              eventDetails.start,
+              eventDetails?.start,
               clubQuery.data.clubSettings.hoursBeforeCancel
             ) && (
               <Alert data-test="alert" severity="warning">
@@ -166,7 +129,7 @@ export default function EventDetailDialog() {
               onClick={() => setDeleteConfirmationOpen(true)}
               color={"error"}
               disabled={tooLateToCancel(
-                eventDetails.start,
+                eventDetails?.start,
                 clubQuery.data.clubSettings.hoursBeforeCancel
               )}
               data-test="delete-button"
@@ -176,18 +139,10 @@ export default function EventDetailDialog() {
           )}
 
           {/* show recurrent confirmation dialog */}
-          {eventDetails?.extendedProps.recurrentId && <CancelRecurrentDialog />}
+          <CancelRecurrentDialog />
 
           {/* show confirmation dialog */}
-          {!eventDetails?.extendedProps.recurrentId && (
-            <ConfirmationDialog
-              open={deleteConfirmationOpen}
-              title={"Cancellazione"}
-              message={"Sei sicuro di voler cancellare la prenotazione?"}
-              onDialogClose={() => setDeleteConfirmationOpen(false)}
-              onConfirm={() => deleteReservation(eventDetails.id)}
-            />
-          )}
+          <CancelSingleDialog />
         </DialogLayout>
       </Dialog>
     </>
