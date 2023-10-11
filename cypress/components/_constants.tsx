@@ -185,8 +185,8 @@ export function buildApiResponse<T>(payload: T): ApiResponse<T> {
 import {
   AppRouterContext,
   type AppRouterInstance,
-} from "next/dist/shared/lib/app-router-context";
-import { HeadManagerContext } from "next/dist/shared/lib/head-manager-context";
+} from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { HeadManagerContext } from "next/dist/shared/lib/head-manager-context.shared-runtime";
 import { CalendarStoreProvider } from "~/hooks/useCalendarStoreContext";
 
 const createRouter = (params: Partial<AppRouterInstance>) => ({
