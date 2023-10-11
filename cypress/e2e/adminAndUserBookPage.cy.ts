@@ -12,6 +12,9 @@ import {
   saveClubInfoAndCleanReservations,
 } from "./_constants";
 
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
+
 beforeEach("Retrieve clubs and delete reservations (no login)", function () {
   saveClubInfoAndCleanReservations(
     foroItalicoName,
@@ -210,6 +213,30 @@ describe("Existing reservation", () => {
           .second(0)
           .millisecond(0);
 
+        const clubOpeningTimeToday = dayjs()
+          .hour(
+            (this.clubSettingsForoItalico as ClubSettings).firstBookableHour
+          )
+          .minute(
+            (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+          )
+          .second(0)
+          .millisecond(0);
+
+        //if the reservation to create is before the opening time of the club (because we are after midnight)
+        //start it from the opening time
+        if (startDateSafeToDelete.isBefore(clubOpeningTimeToday)) {
+          startDateSafeToDelete = dayjs()
+            .hour(
+              (this.clubSettingsForoItalico as ClubSettings).firstBookableHour
+            )
+            .minute(
+              (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+            )
+            .second(0)
+            .millisecond(0);
+        }
+
         // if the reservation to create falls in the closing time window
         // start it from the opening time of the next day
         if (
@@ -228,9 +255,11 @@ describe("Existing reservation", () => {
             .millisecond(0);
         }
 
+        cy.log("startDate safe to delete: ", startDateSafeToDelete.toDate());
+
         cy.addReservationToDB(
           startDateSafeToDelete.toDate(),
-          startDateSafeToDelete.add(1, "hour").toDate(),
+          startDateSafeToDelete.add(dayjs.duration({ hours: 1 })).toDate(),
           this.clubIdForoItalico as string,
           pietrangeliCourtName,
           user.username
