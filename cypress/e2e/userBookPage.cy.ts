@@ -435,6 +435,27 @@ describe("Reservation details", () => {
       )
       .second(0)
       .millisecond(0);
+    const clubOpeningTimeToday = dayjs()
+      .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
+      .minute(
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+      )
+      .second(0)
+      .millisecond(0);
+
+    //if the reservation to create is before the opening time of the club (because we are after midnight)
+    //start it from the last bookable time of yesterday
+    if (firstStartDateNotDeletable.isBefore(clubOpeningTimeToday)) {
+      firstStartDateNotDeletable = dayjs()
+        .subtract(1, "day")
+        .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
+        .minute(
+          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+        )
+        .second(0)
+        .millisecond(0);
+    }
+
     // if the reservation to create falls in the closing time window
     // start it from the last bookable time of today
     if (
