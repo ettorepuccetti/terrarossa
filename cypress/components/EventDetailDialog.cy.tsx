@@ -33,7 +33,7 @@ it("check base EventDetailDialog", () => {
   const endDate = startDate.add(1, "h");
 
   // mock the api call for getting the club info
-  cy.intercept("GET", "/api/trpc/*,club.getByClubId?*", {
+  cy.intercept("GET", "/api/trpc/**club.getByClubId**", {
     fixture: "club.getByClubId.json",
   }).as("getClub");
 
