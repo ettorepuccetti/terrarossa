@@ -2,7 +2,7 @@ import { type inferRouterOutputs } from "@trpc/server";
 import FullCalendarWrapper from "~/components/FullCalendarWrapper";
 import { type AppRouter } from "~/server/api/root";
 import { formatTimeString } from "~/utils/utils";
-import { club, clubSettings, courts } from "./constants";
+import { club, clubSettings, courts, mountWithContexts } from "./_constants";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type ClubData = RouterOutput["club"]["getByClubId"];
@@ -18,60 +18,58 @@ describe("<FullCalendarWrapper />", () => {
 
     cy.wrap(clubData).as("clubData");
     cy.wrap(courtData).as("courtData");
+
+    // just to avoid error in console
+    cy.intercept("GET", "/api/auth/session", { body: {} });
   });
 
-  it("GIVEN club with reservation first and last hour WHEN select first and second last slot THEN constrains respected", function () {
-    const testBody = (closingMinute: number, lastSlotLabelSelector: string) => {
-      cy.log("CLUB LAST BOOKABLE SLOT (minutes)", closingMinute);
+  describe("GIVEN club with reservation first and last hour WHEN select first and second last slot THEN constrains respected", () => {
+    [
+      { closingMinute: 0, nthLastSlotSelector: 2 },
+      { closingMinute: 30, nthLastSlotSelector: 3 },
+    ].forEach(({ closingMinute, nthLastSlotSelector }) => {
+      it(`closingMinute: ${closingMinute}`, function () {
+        cy.log("CLUB LAST BOOKABLE SLOT (minutes)", closingMinute);
 
-      const clubData = this.clubData as ClubData;
+        const clubData = this.clubData as ClubData;
+        mountWithContexts(
+          <FullCalendarWrapper
+            clubData={{
+              ...clubData,
+              clubSettings: {
+                ...clubData.clubSettings,
+                lastBookableMinute: closingMinute,
+              },
+            }}
+            courtData={this.courtData as CourtData}
+            reservationData={[]}
+          />
+        );
 
-      cy.mount(
-        <FullCalendarWrapper
-          clubData={{
-            ...clubData,
-            clubSettings: {
-              ...clubData.clubSettings,
-              lastBookableMinute: closingMinute,
-            },
-          }}
-          courtData={this.courtData as CourtData}
-          onDateClick={() => alert("date click")}
-          onEventClick={() => null}
-          reservationData={[]}
-        />
-      );
+        // check time of the first slot
+        cy.get(
+          ":nth-child(1) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion"
+        ).should(
+          "have.text",
+          formatTimeString(
+            (this.clubData as ClubData).clubSettings.firstBookableHour,
+            (this.clubData as ClubData).clubSettings.firstBookableMinute,
+            0
+          )
+        );
 
-      // check time of the first slot
-      cy.get(
-        ":nth-child(1) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion"
-      ).should(
-        "have.text",
-        formatTimeString(
-          (this.clubData as ClubData).clubSettings.firstBookableHour,
-          (this.clubData as ClubData).clubSettings.firstBookableMinute,
-          1
-        )
-      );
-
-      // check time of the second last slot (containing the last bookable hour)
-      cy.get(lastSlotLabelSelector).should(
-        "have.text",
-        formatTimeString(
-          (this.clubData as ClubData).clubSettings.lastBookableHour,
-          (this.clubData as ClubData).clubSettings.lastBookableMinute,
-          1
-        )
-      );
-    };
-    // repeat test for different closing minutes
-    testBody(
-      0,
-      ":nth-last-child(2) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion"
-    );
-    testBody(
-      30,
-      ":nth-last-child(3) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion"
-    );
+        // check time of the second last slot (containing the last bookable hour)
+        cy.get(
+          `:nth-last-child(${nthLastSlotSelector}) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion`
+        ).should(
+          "have.text",
+          formatTimeString(
+            (this.clubData as ClubData).clubSettings.lastBookableHour,
+            (this.clubData as ClubData).clubSettings.lastBookableMinute,
+            0
+          )
+        );
+      });
+    });
   });
 });

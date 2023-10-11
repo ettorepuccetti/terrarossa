@@ -1,53 +1,76 @@
-import { type ClubSettings } from "@prisma/client";
+import { type DateClickArg } from "@fullcalendar/interaction";
 import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
 import ReserveDialog from "~/components/ReserveDialog";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { type RouterOutputs } from "~/utils/api";
 import {
+  buildApiResponse,
+  club,
   clubSettings,
   getAdminSession,
   mountWithContexts,
   session,
-} from "./constants";
+  type ApiResponse,
+} from "./_constants";
 dayjs.extend(duration);
 
-const mountComponent = ({
+function ReserveDialogWrapper(props: { startDate: Date; clubId: string }) {
+  const dateClick: DateClickArg = {
+    date: props.startDate,
+    resource: {
+      id: "court1",
+      title: "Campo 1",
+    },
+  } as DateClickArg;
+
+  useCalendarStoreContext((store) => store.setClubId)(props.clubId);
+  useCalendarStoreContext((store) => store.setDateClick)(dateClick);
+  return <ReserveDialog />;
+}
+
+function mountComponent<T = unknown>({
   startDate,
   session,
-  clubId = "my_club_Id",
-  clubSettings: clubSettingsInput = clubSettings,
+  overrideApiCall,
+  clubId = "1",
 }: {
-  startDate: Dayjs | undefined;
+  startDate: Dayjs;
   session: Session | undefined;
+  overrideApiCall?: ApiResponse<T>;
   clubId?: string;
-  clubSettings?: ClubSettings;
-}) => {
+}) {
+  cy.intercept(
+    "GET",
+    "/api/trpc/*",
+    overrideApiCall ?? { fixture: "club.getByClubId.json" }
+  ).as("generalApiCall");
   mountWithContexts(
-    <ReserveDialog
-      open={true}
-      clubId={clubId}
-      startDate={startDate?.toDate()}
-      resource={"Campo 1"}
-      onConfirm={(endDate) => console.log("end date :", endDate)}
-      onDialogClose={() => null}
-      clubSettings={clubSettingsInput}
-    />,
+    <ReserveDialogWrapper startDate={startDate.toDate()} clubId={clubId} />,
     session
   );
-  if (!startDate) {
-    return;
-  }
-  // wait for the useEffect hook to set the endTime
-  cy.get("input")
-    .filter("[data-test='endTime']")
-    .should("have.value", startDate?.add(1, "hour").format("HH:mm"));
-};
+
+  // wait for the useEffect hook to set the endTime, if user is logged
+  session &&
+    cy
+      .get("input")
+      .filter("[data-test='endTime']")
+      .should("have.value", startDate?.add(1, "hour").format("HH:mm"));
+
+  cy.wait("@generalApiCall");
+}
 
 describe("USER", () => {
   it("GIVEN I am not logged in WHEN dialog THEN show login button", () => {
-    mountComponent({ startDate: undefined, session: undefined });
+    // empty session for not logged user
+    cy.intercept("GET", "/api/auth/session", { body: {} });
+    mountComponent({ startDate: dayjs(), session: undefined });
+    // check Login button present
     cy.get("h2").should("contain", "Prenota");
     cy.get(".MuiButtonBase-root").should("contain", "Effettua il login");
+    // no other input fields present
+    cy.get("input").should("not.exist");
   });
 
   it("GIVEN logged user WHEN reserve one hour in the future THEN can press reserve button", () => {
@@ -79,6 +102,7 @@ describe("USER", () => {
       //default duration is 1 hour
       .should("have.value", startDate.add(1, "hour").format("HH:mm"))
       //EDIT endTime
+      .should("be.visible")
       .type("14:30");
 
     // check end time after edit
@@ -145,7 +169,10 @@ describe("USER", () => {
     cy.get("input").filter("[data-test='endTime']").clear();
     cy.get("[data-test=reserveButton]").should("be.disabled");
 
-    cy.get("input").filter("[data-test='endTime']").type("14:00");
+    cy.get("input")
+      .filter("[data-test='endTime']")
+      .should("be.visible")
+      .type("14:00");
     cy.get("[data-test=reserveButton]").should("be.enabled");
   });
 
@@ -180,12 +207,14 @@ describe("USER", () => {
     mountComponent({ startDate, session });
 
     //try to reserve for 2h30min, not allowed
-    cy.get("input").filter("[data-test='endTime']").type("15:30");
+    cy.get("input")
+      .filter("[data-test='endTime']")
+      .should("be.visible")
+      .type("15:30");
 
     // check end time after edit and error status
     cy.get("input")
       .filter("[data-test='endTime']")
-      .filter(":focus")
       .should("have.value", startDate.hour(15).minute(30).format("HH:mm"))
       .should("have.attr", "aria-invalid", "true");
     // check error message
@@ -198,64 +227,88 @@ describe("USER", () => {
     cy.get("[data-test=reserveButton]").should("be.disabled");
   });
 
-  it("GIVEN logged user WHEN reservation end time is after club closing time THEN show error and cannot press button", () => {
-    function testBody(clubClosingMinute: number) {
-      //TIME: LAST BOOKABLE HOUR = 20:30
-      const customClubSettings = {
-        ...clubSettings,
-        lastBookableHour: 20,
-        lastBookableMinute: clubClosingMinute,
-      };
-      const startDate = dayjs()
-        .add(1, "day")
-        .hour(customClubSettings.lastBookableHour)
-        .minute(customClubSettings.lastBookableMinute)
-        .second(0)
-        .millisecond(0);
-      cy.log("CLUB LAST BOOKABLE SLOT", startDate.format("HH:mm"));
+  describe("GIVEN logged user WHEN reservation end time is after club closing time THEN show error and cannot press button", () => {
+    [0, 30].forEach((clubClosingMinute) => {
+      it(`clubClosingMinute: ${clubClosingMinute}`, () => {
+        //LAST BOOKABLE HOUR = 20:00 or 20:30
+        const customClubSettings = {
+          ...clubSettings,
+          lastBookableHour: 20,
+          lastBookableMinute: clubClosingMinute,
+        };
+        const startDate = dayjs()
+          .add(1, "day")
+          .hour(customClubSettings.lastBookableHour)
+          .minute(customClubSettings.lastBookableMinute)
+          .second(0)
+          .millisecond(0);
 
-      let endDate = startDate.add(1, "hour").format("HH:mm");
+        cy.log("CLUB LAST BOOKABLE SLOT", startDate.format("HH:mm"));
 
-      //enter last allowed endTime: LAST BOOKABLE HOUR + 1h = 21:30
-      mountComponent({ startDate, session, clubSettings: customClubSettings });
-      cy.get("input").filter("[data-test='endTime']").type(endDate);
-      cy.get("[data-test='endTime']")
-        .should("have.value", endDate)
-        .and("have.attr", "aria-invalid", "false");
+        let endDate = startDate.add(1, "hour").format("HH:mm");
 
-      //enter invalid hour, after closing time: LAST BOOKABLE HOUR + 1.5h = 22:00
-      mountComponent({ startDate, session, clubSettings: customClubSettings });
-      endDate = startDate
-        .add(dayjs.duration({ hours: 1, minutes: 30 }))
-        .format("HH:mm");
-      cy.get("input").filter("[data-test='endTime']").type(endDate);
-      cy.get("[data-test='endTime']")
-        .should("have.value", endDate)
-        .and("have.attr", "aria-invalid", "true");
-      // check error message
-      cy.get(".MuiFormHelperText-root").should(
-        "have.text",
-        "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
-      );
+        const responseBody = { ...club, clubSettings: customClubSettings };
+        const response: ApiResponse<RouterOutputs["club"]["getByClubId"]> =
+          buildApiResponse(responseBody);
 
-      //enter invalid hour, after closing time: LAST BOOKABLE HOUR + 2h = 22:30
-      mountComponent({ startDate, session, clubSettings: customClubSettings });
-      endDate = startDate
-        .add(dayjs.duration({ hours: 2, minutes: 0 }))
-        .format("HH:mm");
-      cy.get("input").filter("[data-test='endTime']").type(endDate);
-      cy.get("[data-test='endTime']")
-        .should("have.value", endDate)
-        .and("have.attr", "aria-invalid", "true");
-      // check error message
-      cy.get(".MuiFormHelperText-root").should(
-        "have.text",
-        "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
-      );
-    }
-    // repeat test for all possible club closing minutes
-    testBody(30);
-    testBody(0);
+        //enter last allowed endTime: LAST BOOKABLE HOUR + 1h = 21:30
+        mountComponent<typeof responseBody>({
+          startDate,
+          session,
+          overrideApiCall: response,
+        });
+
+        cy.get("input")
+          .filter("[data-test='endTime']")
+          .should("be.visible")
+          .type(endDate);
+        cy.get("[data-test='endTime']")
+          .should("have.value", endDate)
+          .and("have.attr", "aria-invalid", "false");
+
+        //enter invalid hour, after closing time: LAST BOOKABLE HOUR + 1.5h
+        endDate = startDate
+          .add(dayjs.duration({ hours: 1, minutes: 30 }))
+          .format("HH:mm");
+        //clear both minute and hour slot and type new end date
+        cy.get("input")
+          .filter("[data-test='endTime']")
+          .clear()
+          .type("{leftarrow}")
+          .clear()
+          .type(endDate);
+        // check validation error
+        cy.get("[data-test='endTime']")
+          .should("have.value", endDate)
+          .and("have.attr", "aria-invalid", "true");
+        // check error message
+        cy.get(".MuiFormHelperText-root").should(
+          "have.text",
+          "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
+        );
+
+        //enter invalid hour, after closing time: LAST BOOKABLE HOUR + 2h = 22:30
+        endDate = startDate
+          .add(dayjs.duration({ hours: 2, minutes: 0 }))
+          .format("HH:mm");
+        //clear both minute and hour slot and type new end date
+        cy.get("input")
+          .filter("[data-test='endTime']")
+          .clear()
+          .type("{leftarrow}")
+          .clear()
+          .type(endDate);
+        // check validation error
+        cy.get("[data-test='endTime']")
+          .should("have.value", endDate)
+          .and("have.attr", "aria-invalid", "true");
+        // check error message
+        cy.get(".MuiFormHelperText-root").should(
+          "have.text",
+          "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
+        );
+      });
+    });
   });
 
   it("GIVEN logged user WHEN end time or start time is not 00 or 30 THEN show error cannot press button", () => {
@@ -267,7 +320,10 @@ describe("USER", () => {
     const endDate = startDate
       .add(dayjs.duration({ hours: 1, minutes: 12 }))
       .format("HH:mm");
-    cy.get("input").filter("[data-test='endTime']").type(endDate);
+    cy.get("input")
+      .filter("[data-test='endTime']")
+      .should("be.visible")
+      .type(endDate);
 
     // check end time after edit
     cy.get("[data-test='endTime']")
@@ -284,17 +340,25 @@ describe("USER", () => {
 
   describe("ADMIN", () => {
     beforeEach(() => {
-      const clubId = "my_club_Id";
+      const clubId = "clubid_for_which_user_is_admin";
       const adminSession = getAdminSession(clubId);
+      const payload = { ...club, id: clubId, clubSettings: clubSettings };
+      const response: ApiResponse<RouterOutputs["club"]["getByClubId"]> =
+        buildApiResponse(payload);
+
       mountComponent({
         startDate: dayjs().hour(13).minute(0).second(0).millisecond(0),
         session: adminSession,
+        overrideApiCall: response,
         clubId: clubId,
       });
     });
 
     it("GIVEN admin WHEN reserve THEN can book more than 2 hours", () => {
-      cy.get("input").filter("[data-test='endTime']").type("18:00");
+      cy.get("input")
+        .filter("[data-test='endTime']")
+        .should("be.visible")
+        .type("18:00");
       cy.get("[data-test='endTime']").should(
         "have.attr",
         "aria-invalid",
@@ -316,17 +380,17 @@ describe("USER", () => {
 
       it("GIVEN admin WHEN enable recurrent switch and set end date THEN button enabled", () => {
         cy.get("[data-test=recurrent-switch]").click();
-        cy.get("[data-test=recurrent-end-date]").type(
-          dayjs().add(1, "week").format("DD/MM/YYYY")
-        );
+        cy.get("[data-test=recurrent-end-date]")
+          .should("be.visible")
+          .type(dayjs().add(1, "week").format("DD/MM/YYYY"));
         cy.get("[data-test=reserveButton]").should("be.enabled");
       });
 
       it("GIVEN admin WHEN set recurrent end date not same week day THEN show error and button disabled", () => {
         cy.get("[data-test=recurrent-switch]").click();
-        cy.get("[data-test=recurrent-end-date]").type(
-          dayjs().add(8, "day").format("DD/MM/YYYY")
-        );
+        cy.get("[data-test=recurrent-end-date]")
+          .should("be.visible")
+          .type(dayjs().add(8, "day").format("DD/MM/YYYY"));
         cy.get("[data-test=reserveButton]").should("be.disabled");
         cy.get("[data-test=recurrent-end-date]").should(
           "have.attr",
@@ -343,9 +407,15 @@ describe("USER", () => {
       it("GIVEN admin WHEN set recurrent end date next year THEN show error and button disabled", () => {
         cy.get("[data-test=recurrent-switch]").click();
         const dayOfTheWeek = dayjs().day();
-        cy.get("[data-test=recurrent-end-date]").type(
-          dayjs().add(1, "year").month(0).day(dayOfTheWeek).format("DD/MM/YYYY")
-        );
+        cy.get("[data-test=recurrent-end-date]")
+          .should("be.visible")
+          .type(
+            dayjs()
+              .add(1, "year")
+              .month(0)
+              .day(dayOfTheWeek)
+              .format("DD/MM/YYYY")
+          );
         cy.get("[data-test=reserveButton]").should("be.disabled");
         cy.get("[data-test=recurrent-end-date]").should(
           "have.attr",

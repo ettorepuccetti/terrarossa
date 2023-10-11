@@ -9,32 +9,93 @@ import {
   RadioGroup,
 } from "@mui/material";
 import React from "react";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import {
+  useRecurrentReservationDelete,
+  useReservationDelete,
+} from "./Calendar";
 import DialogLayout from "./DialogLayout";
+import ErrorAlert from "./ErrorAlert";
+import Spinner from "./Spinner";
 
-interface CancelRecurrentDialogProps {
-  open: boolean;
-  onDialogClose: () => void;
-  onCancelSingle: () => void;
-  onCancelRecurrent: () => void;
-}
+export default function CancelRecurrentDialog() {
+  const deleteOpen = useCalendarStoreContext(
+    (state) => state.deleteConfirmationOpen
+  );
+  const setDeleteConfirmationOpen = useCalendarStoreContext(
+    (state) => state.setDeleteConfirmationOpen
+  );
+  const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
+  const setEventDetails = useCalendarStoreContext(
+    (state) => state.setEventDetails
+  );
+  const clubId = useCalendarStoreContext((state) => state.getClubId());
+  const reservationDelete = useReservationDelete(clubId);
+  const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
 
-export default function CancelRecurrentDialog(
-  props: CancelRecurrentDialogProps
-) {
   const [value, setValue] = React.useState("single");
 
   const handleConfirmation = () => {
-    if (value === "single") {
-      props.onCancelSingle();
-      return;
+    if (!eventDetails) {
+      throw new Error("Si è verificato un problema, per favore riprova.");
     }
-    if (value === "recurrent") {
-      props.onCancelRecurrent();
+    switch (value) {
+      case "single":
+        deleteReservation(eventDetails.id);
+        break;
+      case "recurrent":
+        deleteRecurrentReservation(
+          eventDetails.extendedProps.recurrentId as string
+        );
+        break;
     }
   };
 
+  const deleteReservation = (reservationId: string) => {
+    reservationDelete.mutate({
+      reservationId: reservationId,
+      clubId: clubId,
+    });
+    console.log("delete event: ", reservationId);
+    setEventDetails(null);
+    setDeleteConfirmationOpen(false);
+  };
+
+  const deleteRecurrentReservation = (recurentReservationId: string) => {
+    recurrentReservationDelete.mutate({
+      recurrentReservationId: recurentReservationId,
+      clubId: clubId,
+    });
+    console.log("delete recurrent event: ", recurentReservationId);
+    setEventDetails(null);
+    setDeleteConfirmationOpen(false);
+  };
+
+  // error handling
+  if (reservationDelete.error || recurrentReservationDelete.error) {
+    return (
+      <ErrorAlert
+        error={reservationDelete.error || recurrentReservationDelete.error}
+        onClose={() => {
+          reservationDelete.error && reservationDelete.reset();
+          recurrentReservationDelete.error &&
+            recurrentReservationDelete.reset();
+        }}
+      />
+    );
+  }
+
+  // loading handling
+  if (reservationDelete.isLoading || recurrentReservationDelete.isLoading) {
+    return <Spinner isLoading={true} />;
+  }
+
   return (
-    <Dialog open={props.open} onClose={() => props.onDialogClose()}>
+    <Dialog
+      data-test="cancel-recurrent-dialog"
+      open={deleteOpen && !!eventDetails?.extendedProps.recurrentId}
+      onClose={() => setDeleteConfirmationOpen(false)}
+    >
       <DialogLayout title="Cancellazione">
         <Alert severity="error">
           Questa prenotazione fa parte di un{"'"}ora fissa. Cosa vuoi
@@ -65,7 +126,7 @@ export default function CancelRecurrentDialog(
         <DialogActions>
           <Button
             data-test="cancel-button"
-            onClick={() => props.onDialogClose()}
+            onClick={() => setDeleteConfirmationOpen(false)}
             color="info"
           >
             Annulla

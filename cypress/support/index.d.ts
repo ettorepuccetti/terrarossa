@@ -53,7 +53,18 @@ declare global {
 
       getClubSettings(clubId: string): Chainable<ClubSettings>;
 
+      /**
+       * Logout to the application using logout callback.
+       * It store the session using cypress so that it can switch from logged out to logged in state without having to login again
+       */
       logout(): void;
+
+      /**
+       * Delete a reservation from the database
+       * The command does not refresh the page, so the reservation will still be displayed in the calendar
+       * @param reservationId id of the reservation to delete
+       */
+      deleteReservationFromDb(reservationId: string): void;
     }
   }
 }

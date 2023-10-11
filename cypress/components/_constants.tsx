@@ -2,14 +2,18 @@ import { CacheProvider, ThemeProvider } from "@emotion/react";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { type Club, type ClubSettings, type Court } from "@prisma/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { httpBatchLink } from "@trpc/client";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import { useState } from "react";
+import superjson from "superjson";
 import lightTheme from "~/styles/lightTheme";
+import { api, getBaseUrl } from "~/utils/api";
 import { UserRoles } from "~/utils/constants";
 import createEmotionCache from "~/utils/createEmotionCache";
-
 dayjs.extend(duration);
 
 export const session: Session = {
@@ -76,22 +80,103 @@ export function getAdminSession(clubId: string): Session {
   };
 }
 
+/**
+ * Component that provides to the children the contexts needed for testing.
+ * It provides:
+ * - Emotion cache (for ssr rendering)
+ * - Theme (for MUI components)
+ * - Localization (for using dayjs in MUI components)
+ * - Session (for nextAuth)
+ * - Trpc client (for trpc queries)
+ * - React-query client (used internally by trpc)
+ * @param children the component to be wrapped with the contexts
+ * @param session the nextAuth session
+ * @returns
+ */
+function WrapperComponentForTesting({
+  children,
+  session,
+}: {
+  children: React.ReactNode;
+  session?: Session;
+}) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      })
+  );
+  const [trpcClient] = useState(() =>
+    api.createClient({
+      transformer: superjson,
+      links: [
+        httpBatchLink({
+          url: `${getBaseUrl()}/api/trpc`,
+        }),
+      ],
+    })
+  );
+
+  return (
+    <CacheProvider value={createEmotionCache()}>
+      <ThemeProvider theme={lightTheme}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <SessionProvider session={session}>
+            <CalendarStoreProvider>
+              <api.Provider client={trpcClient} queryClient={queryClient}>
+                <QueryClientProvider client={queryClient}>
+                  {children}
+                </QueryClientProvider>
+              </api.Provider>
+            </CalendarStoreProvider>
+          </SessionProvider>
+        </LocalizationProvider>
+      </ThemeProvider>
+    </CacheProvider>
+  );
+}
+
+/**
+ * Mounts the component wrapped with the contexts needed for testing.
+ * The contexts provided are:
+ * - Emotion cache (for ssr rendering)
+ * - Theme (for MUI components)
+ * - Localization (for using dayjs in MUI components)
+ * - Session (for nextAuth)
+ * - Trpc client (for trpc queries)
+ * - React-query client (used internally by trpc)
+ * @param children the component to be wrapped with the contexts
+ * @param session the nextAuth session
+ */
+
 export const mountWithContexts = (
   children: React.ReactNode,
   session?: Session
 ) => {
   cy.mount(
-    // <MockNextRouter>
-    <CacheProvider value={createEmotionCache()}>
-      <ThemeProvider theme={lightTheme}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <SessionProvider session={session}>{children}</SessionProvider>
-        </LocalizationProvider>
-      </ThemeProvider>
-    </CacheProvider>
-    // </MockNextRouter>
+    <WrapperComponentForTesting session={session}>
+      {children}
+    </WrapperComponentForTesting>
   );
 };
+
+export type ApiResponse<T> = {
+  result: {
+    data: {
+      json: T;
+    };
+  };
+};
+
+export function buildApiResponse<T>(payload: T): ApiResponse<T> {
+  return {
+    result: {
+      data: {
+        json: payload,
+      },
+    },
+  };
+}
 
 // ------- END OF FILE -------
 // try to mock NextRouter (not succeed) - see:
@@ -102,6 +187,7 @@ import {
   type AppRouterInstance,
 } from "next/dist/shared/lib/app-router-context";
 import { HeadManagerContext } from "next/dist/shared/lib/head-manager-context";
+import { CalendarStoreProvider } from "~/hooks/useCalendarStoreContext";
 
 const createRouter = (params: Partial<AppRouterInstance>) => ({
   back: cy.spy().as("back"),

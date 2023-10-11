@@ -1,17 +1,22 @@
 import { Box, Switch, Typography } from "@mui/material";
 import { DatePicker, type DateValidationError } from "@mui/x-date-pickers";
-import { type Dayjs } from "dayjs";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 
-export default function ReserveDialogRecurrent(props: {
-  clubId: string;
-  startDate: Dayjs;
-  recurrentDateEventHandler: (dayJsDate: Dayjs | null) => void;
-  recurrentDateErrorEventHandler: (error: boolean) => void;
-  recurrentEndDate: Dayjs | null;
-}) {
+export default function ReserveDialogRecurrent() {
+  const clubId = useCalendarStoreContext((state) => state.getClubId());
+  const startDate = useCalendarStoreContext((state) => state.getStartDate());
+  const recurrentEndDate = useCalendarStoreContext(
+    (state) => state.recurrentEndDate
+  );
+  const setRecurrentEndDate = useCalendarStoreContext(
+    (state) => state.setRecurrentEndDate
+  );
+  const setRecurrentEndDateError = useCalendarStoreContext(
+    (state) => state.setRecurringEndDateError
+  );
   const [recurrentView, setRecurrentView] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string | null>(null);
   const { data: sessionData } = useSession();
@@ -19,16 +24,16 @@ export default function ReserveDialogRecurrent(props: {
   return (
     <>
       {/* swticher for recurrent reservation */}
-      {isAdminOfTheClub(sessionData, props.clubId) && (
+      {isAdminOfTheClub(sessionData, clubId) && (
         <Box display={"flex"} gap={0.5} alignItems={"center"}>
           <Switch
             data-test="recurrent-switch"
             checked={recurrentView}
             onChange={() => {
               setRecurrentView(!recurrentView);
-              props.recurrentDateErrorEventHandler(
+              setRecurrentEndDateError(
                 !recurrentView &&
-                  (errorText != null || props.recurrentEndDate == null)
+                  (errorText != null || recurrentEndDate == null)
               );
             }}
             color="info"
@@ -47,26 +52,24 @@ export default function ReserveDialogRecurrent(props: {
               inputProps: { "data-test": "recurrent-end-date" },
               color: "info",
               helperText: errorText,
+              // to enable red border on null date (but give problem in component testing):
+              // set this:  `error: errorText != null || recurrentEndDate == null,`
             },
           }}
-          value={props.recurrentEndDate}
+          value={recurrentEndDate}
           label={"Data di fine validità"}
           onChange={(dayJsDate) => {
-            props.recurrentDateEventHandler(dayJsDate);
+            setRecurrentEndDate(dayJsDate);
             // date changed from null to not null or viceversa
-            if ((props.recurrentEndDate == null) != (dayJsDate == null)) {
-              props.recurrentDateErrorEventHandler(dayJsDate == null);
+            if ((recurrentEndDate == null) != (dayJsDate == null)) {
+              setRecurrentEndDateError(dayJsDate == null);
             }
           }}
-          minDate={props.startDate}
-          maxDate={props.startDate.endOf("year")}
-          shouldDisableDate={(dayJsDate) =>
-            dayJsDate.day() !== props.startDate.day()
-          }
-          onError={(error, value) => {
-            props.recurrentDateErrorEventHandler(
-              error != null || value == null
-            );
+          minDate={startDate}
+          maxDate={startDate.endOf("year")}
+          shouldDisableDate={(dayJsDate) => dayJsDate.day() !== startDate.day()}
+          onError={(error) => {
+            setRecurrentEndDateError(error != null);
             setErrorText(mapErrorToText(error));
           }}
           views={["day"]}

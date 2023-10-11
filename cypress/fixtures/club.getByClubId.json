@@ -1,0 +1,37 @@
+{
+  "result": {
+    "data": {
+      "json": {
+        "id": "clmiygecu0000i5mwbiauogf4",
+        "name": "Foro Italico",
+        "imageSrc": "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/bnl-image.jpg",
+        "logoSrc": "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/bnl-logo.png",
+        "clubSettingsId": "clmiygecv0004i5mwj16ozipc",
+        "createdAt": "2023-09-14T09:15:20.622Z",
+        "updatedAt": "2023-09-14T09:15:20.622Z",
+        "clubSettings": {
+          "id": "clmiygecv0004i5mwj16ozipc",
+          "description": null,
+          "firstBookableHour": 8,
+          "firstBookableMinute": 0,
+          "lastBookableHour": 22,
+          "lastBookableMinute": 0,
+          "daysInThePastVisible": 3,
+          "daysInFutureVisible": 8,
+          "maxReservationPerUser": 5,
+          "createdAt": "2023-09-14T09:15:20.622Z",
+          "updatedAt": "2023-09-18T18:40:09.995Z",
+          "hoursBeforeCancel": 4
+        }
+      },
+      "meta": {
+        "values": {
+          "createdAt": ["Date"],
+          "updatedAt": ["Date"],
+          "clubSettings.createdAt": ["Date"],
+          "clubSettings.updatedAt": ["Date"]
+        }
+      }
+    }
+  }
+}

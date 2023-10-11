@@ -158,9 +158,10 @@ export const reservationMutationRouter = createTRPCRouter({
           where: { id: input.reservationId },
         });
 
-      //checks for NON ADMIN user
+      // checks for NON ADMIN user
       // TODO: check that user is admin of the club for which the reservation is made.
       // Possible exploit: admin of club A can delete reservation of club B
+      // get clubId from the reservationToDelete
       if (!isUserAdminOfClub(ctx, input.clubId)) {
         // delete reservation of other users
         if (reservationToDelete.userId !== ctx.session.user.id) {
