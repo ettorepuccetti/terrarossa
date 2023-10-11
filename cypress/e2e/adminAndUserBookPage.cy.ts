@@ -10,7 +10,7 @@ import {
   USER1,
   loginAndVisitCalendarPage,
   saveClubInfoAndCleanReservations,
-} from "./constants";
+} from "./_constants";
 
 beforeEach("Retrieve clubs and delete reservations (no login)", function () {
   saveClubInfoAndCleanReservations(

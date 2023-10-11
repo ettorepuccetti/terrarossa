@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import ReserveDialogRecurrent from "~/components/ReserveDialogRecurrent";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { getAdminSession, mountWithContexts } from "./constants";
+import { getAdminSession, mountWithContexts } from "./_constants";
 
 function ReserveDialogRecurrentContext() {
   // setting stubs

@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import EventDetailDialog from "~/components/EventDetailDialog";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { mountWithContexts, session } from "./constants";
+import { mountWithContexts, session } from "./_constants";
 dayjs.extend(duration);
 
 function EventDetailDialogWrapper(props: { startDate: Date; endDate: Date }) {

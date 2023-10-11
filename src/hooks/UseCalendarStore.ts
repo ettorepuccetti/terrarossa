@@ -11,6 +11,7 @@ export interface IStore {
   endDateError: boolean;
   recurrentEndDate: Dayjs | null;
   recurringEndDateError: boolean;
+  deleteConfirmationOpen: boolean;
   setDateClick: (dateClick: DateClickArg | null) => void;
   setEventDetails: (eventDetails: EventImpl | null) => void;
   setClubId: (clubId: string) => void;
@@ -18,6 +19,7 @@ export interface IStore {
   setEndDateError: (endDateError: boolean) => void;
   setRecurrentEndDate: (recurrentEndDate: Dayjs | null) => void;
   setRecurringEndDateError: (recurringEndDateError: boolean) => void;
+  setDeleteConfirmationOpen: (deleteConfirmationOpen: boolean) => void;
   getClubId: () => string;
   getStartDate: () => Dayjs;
   //for testing only
@@ -35,6 +37,7 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   endDateError: false,
   recurrentEndDate: null,
   recurringEndDateError: false,
+  deleteConfirmationOpen: false,
   setDateClick: (dateClick) => {
     set({ dateClick: dateClick });
     set({ endDate: dayjs(dateClick?.date).add(1, "h") });
@@ -47,6 +50,8 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
     set({ recurrentEndDate: recurrentEndDate }),
   setRecurringEndDateError: (recurringEndDateError) =>
     set({ recurringEndDateError: recurringEndDateError }),
+  setDeleteConfirmationOpen: (deleteConfirmationOpen) =>
+    set({ deleteConfirmationOpen: deleteConfirmationOpen }),
 
   getClubId: () => {
     const clubId = get().clubId;

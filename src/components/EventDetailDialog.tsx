@@ -8,7 +8,6 @@ import {
 import { DateField, TimeField } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
-import React from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 import {
@@ -32,7 +31,12 @@ export default function EventDetailDialog() {
   const reservationDelete = useReservationDelete(clubId);
   const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
   const clubQuery = useClubQuery(clubId);
-  const [confirmationOpen, setConfirmationOpen] = React.useState(false);
+  const deleteConfirmationOpen = useCalendarStoreContext(
+    (state) => state.deleteConfirmationOpen
+  );
+  const setDeleteConfirmationOpen = useCalendarStoreContext(
+    (state) => state.setDeleteConfirmationOpen
+  );
 
   const canDelete =
     isAdminOfTheClub(sessionData, clubId) ||
@@ -59,7 +63,7 @@ export default function EventDetailDialog() {
     });
     console.log("delete event: ", reservationId);
     setEventDetails(null);
-    setConfirmationOpen(false);
+    setDeleteConfirmationOpen(false);
   };
 
   // error handling
@@ -159,7 +163,7 @@ export default function EventDetailDialog() {
           {/* delete button */}
           {canDelete && (
             <Button
-              onClick={() => setConfirmationOpen(true)}
+              onClick={() => setDeleteConfirmationOpen(true)}
               color={"error"}
               disabled={tooLateToCancel(
                 eventDetails.start,
@@ -172,34 +176,15 @@ export default function EventDetailDialog() {
           )}
 
           {/* show recurrent confirmation dialog */}
-          {eventDetails?.extendedProps.recurrentId && (
-            <CancelRecurrentDialog
-              open={confirmationOpen}
-              onDialogClose={() => setConfirmationOpen(false)}
-              onCancelSingle={() => deleteReservation(eventDetails.id)}
-              onCancelRecurrent={() => {
-                recurrentReservationDelete.mutate({
-                  recurrentReservationId: eventDetails.extendedProps
-                    .recurrentId as string,
-                  clubId: clubId,
-                });
-                console.log(
-                  "delete recurrent event: ",
-                  eventDetails.extendedProps.recurrentId
-                );
-                setEventDetails(null);
-                setConfirmationOpen(false);
-              }}
-            />
-          )}
+          {eventDetails?.extendedProps.recurrentId && <CancelRecurrentDialog />}
 
           {/* show confirmation dialog */}
           {!eventDetails?.extendedProps.recurrentId && (
             <ConfirmationDialog
-              open={confirmationOpen}
+              open={deleteConfirmationOpen}
               title={"Cancellazione"}
               message={"Sei sicuro di voler cancellare la prenotazione?"}
-              onDialogClose={() => setConfirmationOpen(false)}
+              onDialogClose={() => setDeleteConfirmationOpen(false)}
               onConfirm={() => deleteReservation(eventDetails.id)}
             />
           )}

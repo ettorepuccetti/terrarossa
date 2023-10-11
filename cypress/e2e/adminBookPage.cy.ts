@@ -9,7 +9,7 @@ import {
 import {
   loginAndVisitCalendarPage,
   saveClubInfoAndCleanReservations,
-} from "./constants";
+} from "./_constants";
 
 beforeEach("Retrieve clubs, delete reservations and login", function () {
   saveClubInfoAndCleanReservations(

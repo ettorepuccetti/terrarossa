@@ -2,7 +2,7 @@ import { type inferRouterOutputs } from "@trpc/server";
 import FullCalendarWrapper from "~/components/FullCalendarWrapper";
 import { type AppRouter } from "~/server/api/root";
 import { formatTimeString } from "~/utils/utils";
-import { club, clubSettings, courts, mountWithContexts } from "./constants";
+import { club, clubSettings, courts, mountWithContexts } from "./_constants";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type ClubData = RouterOutput["club"]["getByClubId"];

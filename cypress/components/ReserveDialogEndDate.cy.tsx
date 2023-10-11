@@ -3,7 +3,7 @@ import { type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
 import ReserveDialogEndDate from "~/components/ReserveDialogEndDate";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { mountWithContexts, session } from "./constants";
+import { mountWithContexts, session } from "./_constants";
 
 function ReserveDialogEndDateContext() {
   //setting stubs

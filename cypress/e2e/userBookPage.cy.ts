@@ -13,7 +13,7 @@ import { formatTimeString } from "~/utils/utils";
 import {
   loginAndVisitCalendarPage,
   saveClubInfoAndCleanReservations,
-} from "./constants";
+} from "./_constants";
 
 beforeEach("Initial clean up and retrieve Clubs", function () {
   saveClubInfoAndCleanReservations(

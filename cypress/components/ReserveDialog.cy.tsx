@@ -13,7 +13,7 @@ import {
   mountWithContexts,
   session,
   type ApiResponse,
-} from "./constants";
+} from "./_constants";
 dayjs.extend(duration);
 
 function ReserveDialogWrapper(props: { startDate: Date; clubId: string }) {
@@ -64,7 +64,7 @@ function mountComponent<T = unknown>({
 describe("USER", () => {
   it("GIVEN I am not logged in WHEN dialog THEN show login button", () => {
     // empty session for not logged user
-    cy.intercept("GET", "/api/auth/session", {});
+    cy.intercept("GET", "/api/auth/session", { body: {} });
     mountComponent({ startDate: dayjs(), session: undefined });
     // check Login button present
     cy.get("h2").should("contain", "Prenota");
