@@ -44,13 +44,13 @@ export default function ReserveDialog() {
   const endDateError = useCalendarStoreContext((store) => store.endDateError);
 
   const recurrentEndDate = useCalendarStoreContext(
-    (state) => state.recurrentEndDate
+    (state) => state.recurrentEndDate,
   );
   const setRecurrentEndDate = useCalendarStoreContext(
-    (state) => state.setRecurrentEndDate
+    (state) => state.setRecurrentEndDate,
   );
   const recurrentEndDateError = useCalendarStoreContext(
-    (state) => state.recurringEndDateError
+    (state) => state.recurringEndDateError,
   );
 
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
@@ -64,7 +64,7 @@ export default function ReserveDialog() {
         "startDate",
         startDate,
         "resource",
-        resource
+        resource,
       );
       throw new Error("Si è verificato un problema, per favore riprova.");
     }
@@ -83,7 +83,7 @@ export default function ReserveDialog() {
       "resource title: ",
       resource.title,
       "clubId: ",
-      clubId
+      clubId,
     );
     //todo: use a single api end point for both reservation and recurrent reservation
     const name = overwriteName !== "" ? overwriteName : undefined; //manage undefined of input for controlled component
@@ -246,7 +246,7 @@ export default function ReserveDialog() {
 export const startDateIsFuture = (
   sessionData: Session | null,
   clubId: string,
-  startDate: Dayjs
+  startDate: Dayjs,
 ) => {
   return isAdminOfTheClub(sessionData, clubId) || startDate.isAfter(dayjs());
 };

@@ -20,13 +20,13 @@ import Spinner from "./Spinner";
 export default function EventDetailDialog() {
   const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
   const setEventDetails = useCalendarStoreContext(
-    (state) => state.setEventDetails
+    (state) => state.setEventDetails,
   );
   const clubId = useCalendarStoreContext((state) => state.getClubId());
   const { data: sessionData } = useSession();
   const clubQuery = useClubQuery(clubId);
   const setDeleteConfirmationOpen = useCalendarStoreContext(
-    (state) => state.setDeleteConfirmationOpen
+    (state) => state.setDeleteConfirmationOpen,
   );
 
   const canDelete =
@@ -36,7 +36,7 @@ export default function EventDetailDialog() {
 
   const tooLateToCancel = (
     startTime: Date | null | undefined,
-    hoursBeforeCancel: number
+    hoursBeforeCancel: number,
   ) => {
     return (
       dayjs(startTime).isBefore(dayjs().add(hoursBeforeCancel, "hour")) &&
@@ -114,7 +114,7 @@ export default function EventDetailDialog() {
           {canDelete &&
             tooLateToCancel(
               eventDetails?.start,
-              clubQuery.data.clubSettings.hoursBeforeCancel
+              clubQuery.data.clubSettings.hoursBeforeCancel,
             ) && (
               <Alert data-test="alert" severity="warning">
                 Non puoi cancellare una prenotazione meno di{" "}
@@ -130,7 +130,7 @@ export default function EventDetailDialog() {
               color={"error"}
               disabled={tooLateToCancel(
                 eventDetails?.start,
-                clubQuery.data.clubSettings.hoursBeforeCancel
+                clubQuery.data.clubSettings.hoursBeforeCancel,
               )}
               data-test="delete-button"
             >

@@ -10,10 +10,10 @@ export default function CancelSingleDialog() {
   const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
   const reservationDelete = useReservationDelete(clubId);
   const setDeleteConfirmationOpen = useCalendarStoreContext(
-    (state) => state.setDeleteConfirmationOpen
+    (state) => state.setDeleteConfirmationOpen,
   );
   const setEventDetails = useCalendarStoreContext(
-    (state) => state.setEventDetails
+    (state) => state.setEventDetails,
   );
 
   const deleteReservation = (reservationId?: string) => {

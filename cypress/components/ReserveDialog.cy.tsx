@@ -44,11 +44,11 @@ function mountComponent<T = unknown>({
   cy.intercept(
     "GET",
     "/api/trpc/*",
-    overrideApiCall ?? { fixture: "club.getByClubId.json" }
+    overrideApiCall ?? { fixture: "club.getByClubId.json" },
   ).as("generalApiCall");
   mountWithContexts(
     <ReserveDialogWrapper startDate={startDate.toDate()} clubId={clubId} />,
-    session
+    session,
   );
 
   // wait for the useEffect hook to set the endTime, if user is logged
@@ -134,7 +134,7 @@ describe("USER", () => {
     // show warning
     cy.get("[data-test=past-warning]").should(
       "contain",
-      "Non puoi prenotare una data nel passato"
+      "Non puoi prenotare una data nel passato",
     );
 
     // reserve button is disabled
@@ -220,7 +220,7 @@ describe("USER", () => {
     // check error message
     cy.get(".MuiFormHelperText-root").should(
       "have.text",
-      "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
+      "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo",
     );
 
     // reserve button is disabled
@@ -284,7 +284,7 @@ describe("USER", () => {
         // check error message
         cy.get(".MuiFormHelperText-root").should(
           "have.text",
-          "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
+          "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo",
         );
 
         //enter invalid hour, after closing time: LAST BOOKABLE HOUR + 2h = 22:30
@@ -305,7 +305,7 @@ describe("USER", () => {
         // check error message
         cy.get(".MuiFormHelperText-root").should(
           "have.text",
-          "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
+          "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo",
         );
       });
     });
@@ -332,7 +332,7 @@ describe("USER", () => {
     // check error message
     cy.get(".MuiFormHelperText-root").should(
       "have.text",
-      "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+      "Prenota 1 ora, 1 ora e mezzo o 2 ore",
     );
     // check button disabled
     cy.get("[data-test=reserveButton]").should("be.disabled");
@@ -362,7 +362,7 @@ describe("USER", () => {
       cy.get("[data-test='endTime']").should(
         "have.attr",
         "aria-invalid",
-        "false"
+        "false",
       );
       cy.get("[data-test=reserveButton]").should("be.enabled");
     });
@@ -395,11 +395,11 @@ describe("USER", () => {
         cy.get("[data-test=recurrent-end-date]").should(
           "have.attr",
           "aria-invalid",
-          "true"
+          "true",
         );
         cy.get(".MuiFormHelperText-root").should(
           "have.text",
-          "La data deve essere lo stesso giorno della settimana della prenotazione"
+          "La data deve essere lo stesso giorno della settimana della prenotazione",
         );
         cy.get("[data-test=reserveButton]").should("be.disabled");
       });
@@ -414,17 +414,17 @@ describe("USER", () => {
               .add(1, "year")
               .month(0)
               .day(dayOfTheWeek)
-              .format("DD/MM/YYYY")
+              .format("DD/MM/YYYY"),
           );
         cy.get("[data-test=reserveButton]").should("be.disabled");
         cy.get("[data-test=recurrent-end-date]").should(
           "have.attr",
           "aria-invalid",
-          "true"
+          "true",
         );
         cy.get(".MuiFormHelperText-root").should(
           "have.text",
-          "La data di fine validità deve essere entro la fine dell'anno"
+          "La data di fine validità deve essere entro la fine dell'anno",
         );
         cy.get("[data-test=reserveButton]").should("be.disabled");
       });

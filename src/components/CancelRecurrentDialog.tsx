@@ -20,14 +20,14 @@ import Spinner from "./Spinner";
 
 export default function CancelRecurrentDialog() {
   const deleteOpen = useCalendarStoreContext(
-    (state) => state.deleteConfirmationOpen
+    (state) => state.deleteConfirmationOpen,
   );
   const setDeleteConfirmationOpen = useCalendarStoreContext(
-    (state) => state.setDeleteConfirmationOpen
+    (state) => state.setDeleteConfirmationOpen,
   );
   const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
   const setEventDetails = useCalendarStoreContext(
-    (state) => state.setEventDetails
+    (state) => state.setEventDetails,
   );
   const clubId = useCalendarStoreContext((state) => state.getClubId());
   const reservationDelete = useReservationDelete(clubId);
@@ -45,7 +45,7 @@ export default function CancelRecurrentDialog() {
         break;
       case "recurrent":
         deleteRecurrentReservation(
-          eventDetails.extendedProps.recurrentId as string
+          eventDetails.extendedProps.recurrentId as string,
         );
         break;
     }

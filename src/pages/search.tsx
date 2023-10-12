@@ -22,7 +22,7 @@ const Search: NextPage = () => {
     setFilteredClubs(
       clubQuery.data?.filter((club) => {
         return club.name.toLowerCase().includes(term.toLowerCase());
-      })
+      }),
     );
     console.log("Filtered Clubs: ", filteredClubs);
   };

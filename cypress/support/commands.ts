@@ -28,7 +28,7 @@ Cypress.Commands.add("loginToAuth0", (username: string, password: string) => {
           cy.get("button[value=default]")
             .filter("[data-action-button-primary='true']")
             .click();
-        }
+        },
       );
       // Ensure Auth0 has redirected us back to the RWA.
       cy.url().should("equal", "http://localhost:3000/");
@@ -41,7 +41,7 @@ Cypress.Commands.add("loginToAuth0", (username: string, password: string) => {
           .its("user")
           .should("include", { email: username });
       },
-    }
+    },
   );
 
   log.snapshot("after");
@@ -68,7 +68,7 @@ Cypress.Commands.add("getUsername", () => {
       expect(response.body.user.name).to.not.be.undefined;
 
       return response.body.user.name;
-    }
+    },
   );
 });
 
@@ -78,7 +78,7 @@ Cypress.Commands.add("navigateDaysFromToday", (n: number) => {
     const futureDate = new Date(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate() + nOfDays
+      now.getDate() + nOfDays,
     );
     return futureDate.getDate().toString().padStart(2, "0");
   };
@@ -98,7 +98,7 @@ Cypress.Commands.add(
     endDate: Date,
     clubId: string,
     courtName: string,
-    userName: string
+    userName: string,
   ) => {
     cy.task("prisma:makeReservation", {
       startTime: startDate,
@@ -107,7 +107,7 @@ Cypress.Commands.add(
       courtName: courtName,
       userMail: userName,
     });
-  }
+  },
 );
 
 Cypress.Commands.add("waitForCalendarPageToLoad", () => {
@@ -128,7 +128,7 @@ Cypress.Commands.add(
         }
         cy.wrap(
           $column[0].getBoundingClientRect().left +
-            $column[0].getBoundingClientRect().width / 2
+            $column[0].getBoundingClientRect().width / 2,
         ).as("slotX");
       });
 
@@ -150,9 +150,9 @@ Cypress.Commands.add(
       dayjs()
         .hour(hour + 1)
         .minute(minute)
-        .format("HH:mm")
+        .format("HH:mm"),
     );
-  }
+  },
 );
 
 Cypress.Commands.add("getClubSettings", (settingsId: string) => {
@@ -171,7 +171,7 @@ Cypress.Commands.add("logout", () => {
       validate: () => {
         cy.request("/api/auth/session").its("body").should("be.empty");
       },
-    }
+    },
   );
 });
 

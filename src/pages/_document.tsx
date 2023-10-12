@@ -82,8 +82,9 @@ MyDocument.getInitialProps = async (ctx) => {
   /* eslint-disable */
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: (App: any) => (props) =>
-        <App emotionCache={cache} {...props} />,
+      enhanceApp: (App: any) => (props) => (
+        <App emotionCache={cache} {...props} />
+      ),
     });
   /* eslint-enable */
 

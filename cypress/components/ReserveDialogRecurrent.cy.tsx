@@ -11,7 +11,7 @@ function ReserveDialogRecurrentContext() {
   const setErrorStub = cy.stub().as("setErrorStub");
   useCalendarStoreContext((store) => store.setSetRecurrentEndDate)(setDateStub);
   useCalendarStoreContext((store) => store.setSetRecurringEndDateError)(
-    setErrorStub
+    setErrorStub,
   );
 
   //setting dateClick
@@ -58,11 +58,11 @@ describe("ReserveDialogRecurrent", () => {
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-end-date]").click();
     cy.get("[data-test=recurrent-end-date]").type(
-      dayjs().add(1, "week").format("DD/MM/YYYY")
+      dayjs().add(1, "week").format("DD/MM/YYYY"),
     );
     cy.get("@setDateStub").should(
       "be.calledWith",
-      dayjs().add(1, "week").hour(0).minute(0).second(0).millisecond(0)
+      dayjs().add(1, "week").hour(0).minute(0).second(0).millisecond(0),
     );
     cy.get("@setErrorStub").should("be.calledWithExactly", false);
   });
@@ -71,15 +71,15 @@ describe("ReserveDialogRecurrent", () => {
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-end-date]").click();
     cy.get("[data-test=recurrent-end-date]").type(
-      dayjs().subtract(1, "week").format("DD/MM/YYYY")
+      dayjs().subtract(1, "week").format("DD/MM/YYYY"),
     );
     cy.get(".MuiFormHelperText-root").should(
       "have.text",
-      "La data di fine validità deve essere successiva alla data di inizio"
+      "La data di fine validità deve essere successiva alla data di inizio",
     );
     cy.get("@setDateStub").should(
       "be.calledWith",
-      dayjs().subtract(1, "week").hour(0).minute(0).second(0).millisecond(0)
+      dayjs().subtract(1, "week").hour(0).minute(0).second(0).millisecond(0),
     );
     cy.get("@setErrorStub").should("be.calledWithExactly", true);
   });
@@ -90,7 +90,7 @@ describe("ReserveDialogRecurrent", () => {
     // enter invalid date
     cy.get("[data-test=recurrent-end-date]").click();
     cy.get("[data-test=recurrent-end-date]").type(
-      dayjs().subtract(1, "week").format("DD/MM/YYYY")
+      dayjs().subtract(1, "week").format("DD/MM/YYYY"),
     );
     // check error is send
     cy.get("@setErrorStub").should("be.calledWithExactly", true);
@@ -103,7 +103,7 @@ describe("ReserveDialogRecurrent", () => {
     // check error is still present and send again
     cy.get(".MuiFormHelperText-root").should(
       "have.text",
-      "La data di fine validità deve essere successiva alla data di inizio"
+      "La data di fine validità deve essere successiva alla data di inizio",
     );
     cy.get("@setErrorStub").should("be.calledWithExactly", true);
   });
@@ -116,7 +116,7 @@ describe("ReserveDialogRecurrent", () => {
 
     cy.get("@setDateStub").should(
       "be.calledWith",
-      dayjs().hour(0).minute(0).second(0).millisecond(0)
+      dayjs().hour(0).minute(0).second(0).millisecond(0),
     );
     cy.get("@setErrorStub").should("be.calledWithExactly", false);
   });
@@ -125,7 +125,7 @@ describe("ReserveDialogRecurrent", () => {
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-end-date]").click();
     cy.get("[data-test=recurrent-end-date]").type(
-      dayjs().add(1, "week").format("DD/MM/YYYY")
+      dayjs().add(1, "week").format("DD/MM/YYYY"),
     );
 
     //clear the three fields of the date

@@ -43,31 +43,31 @@ describe("<FullCalendarWrapper />", () => {
             }}
             courtData={this.courtData as CourtData}
             reservationData={[]}
-          />
+          />,
         );
 
         // check time of the first slot
         cy.get(
-          ":nth-child(1) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion"
+          ":nth-child(1) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion",
         ).should(
           "have.text",
           formatTimeString(
             (this.clubData as ClubData).clubSettings.firstBookableHour,
             (this.clubData as ClubData).clubSettings.firstBookableMinute,
-            0
-          )
+            0,
+          ),
         );
 
         // check time of the second last slot (containing the last bookable hour)
         cy.get(
-          `:nth-last-child(${nthLastSlotSelector}) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion`
+          `:nth-last-child(${nthLastSlotSelector}) > .fc-timegrid-slot > .fc-timegrid-slot-label-frame > .fc-timegrid-slot-label-cushion`,
         ).should(
           "have.text",
           formatTimeString(
             (this.clubData as ClubData).clubSettings.lastBookableHour,
             (this.clubData as ClubData).clubSettings.lastBookableMinute,
-            0
-          )
+            0,
+          ),
         );
       });
     });

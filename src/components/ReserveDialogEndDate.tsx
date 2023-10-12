@@ -16,7 +16,7 @@ export default function ReserveDialogEndDate(props: {
   const endDate = useCalendarStoreContext((store) => store.endDate);
   const setEndDate = useCalendarStoreContext((store) => store.setEndDate);
   const setEndDateError = useCalendarStoreContext(
-    (store) => store.setEndDateError
+    (store) => store.setEndDateError,
   );
   const { data: sessionData } = useSession();
   const [endDateErrorText, setEndDateErrorText] = useState<string | null>(null);
@@ -48,7 +48,7 @@ export default function ReserveDialogEndDate(props: {
         sessionData,
         clubId,
         props.clubSettings.lastBookableHour,
-        props.clubSettings.lastBookableMinute
+        props.clubSettings.lastBookableMinute,
       )}
       disabled={!startDateIsFuture(sessionData, clubId, startDate)}
       autoFocus
@@ -66,7 +66,7 @@ const maxTime = (
   sessionData: Session | null,
   clubId: string,
   lastBookableHour: number,
-  lastBookableMinute: number
+  lastBookableMinute: number,
 ) => {
   // default case
   const maxTime = startDate.add(2, "hours");

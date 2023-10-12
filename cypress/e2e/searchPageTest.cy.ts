@@ -28,7 +28,7 @@ describe("search", () => {
     cy.visit("/search");
     cy.get("input#search").type(filterString);
     cy.queryFilteredClubs(filterString).then(
-      (clubs: Club[]) => assert(clubs.length === 0) //check that effectively no club is present in DB
+      (clubs: Club[]) => assert(clubs.length === 0), //check that effectively no club is present in DB
     );
     cy.get(".MuiCardContent-root").should("not.exist"); // check that no club is displayed in the UI
   });

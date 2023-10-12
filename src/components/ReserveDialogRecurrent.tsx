@@ -9,13 +9,13 @@ export default function ReserveDialogRecurrent() {
   const clubId = useCalendarStoreContext((state) => state.getClubId());
   const startDate = useCalendarStoreContext((state) => state.getStartDate());
   const recurrentEndDate = useCalendarStoreContext(
-    (state) => state.recurrentEndDate
+    (state) => state.recurrentEndDate,
   );
   const setRecurrentEndDate = useCalendarStoreContext(
-    (state) => state.setRecurrentEndDate
+    (state) => state.setRecurrentEndDate,
   );
   const setRecurrentEndDateError = useCalendarStoreContext(
-    (state) => state.setRecurringEndDateError
+    (state) => state.setRecurringEndDateError,
   );
   const [recurrentView, setRecurrentView] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export default function ReserveDialogRecurrent() {
               setRecurrentView(!recurrentView);
               setRecurrentEndDateError(
                 !recurrentView &&
-                  (errorText != null || recurrentEndDate == null)
+                  (errorText != null || recurrentEndDate == null),
               );
             }}
             color="info"

@@ -19,7 +19,7 @@ describe("Homepage", () => {
 
     cy.loginToAuth0(
       Cypress.env("USER1_MAIL") as string,
-      Cypress.env("USER1_PWD") as string
+      Cypress.env("USER1_PWD") as string,
     );
 
     cy.visit("/");

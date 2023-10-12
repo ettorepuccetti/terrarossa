@@ -26,7 +26,7 @@ export const clubRouter = createTRPCRouter({
         .catch((_error: Error) => {
           throw new TRPCClientError(
             "Si è verificato un errore, per favore riprova",
-            { cause: _error }
+            { cause: _error },
           );
         });
     }),

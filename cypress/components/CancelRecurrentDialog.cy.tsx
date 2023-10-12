@@ -41,7 +41,7 @@ function mountComponent() {
   cy.intercept(
     "GET",
     "/api/trpc/reservationQuery.getAllVisibleInCalendarByClubId?**",
-    { fixture: "empty-response.json" }
+    { fixture: "empty-response.json" },
   ).as("getReservationsApi");
 
   mountWithContexts(<CancelRecurrentDialogContext />, session);

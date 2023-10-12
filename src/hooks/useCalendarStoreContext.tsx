@@ -33,12 +33,12 @@ export const CalendarStoreProvider = ({
 export type UseCalendarStoreContextSelector<T> = (store: IStore) => T;
 
 export const useCalendarStoreContext = <T,>(
-  selector: UseCalendarStoreContextSelector<T>
+  selector: UseCalendarStoreContextSelector<T>,
 ): T => {
   const calendarStoreContext = useContext(CalendarStoreContext);
   if (!calendarStoreContext) {
     throw new Error(
-      "useCalendarStoreContext must be used within a CalendarStoreProvider"
+      "useCalendarStoreContext must be used within a CalendarStoreProvider",
     );
   }
   return useStoreWithEqualityFn(calendarStoreContext, selector, shallow);

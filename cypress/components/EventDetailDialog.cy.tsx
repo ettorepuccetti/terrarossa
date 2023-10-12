@@ -43,7 +43,7 @@ it("check base EventDetailDialog", () => {
       startDate={startDate.toDate()}
       endDate={endDate.toDate()}
     />,
-    session
+    session,
   );
 
   cy.get("h2").should("contain", "Prenotazione");

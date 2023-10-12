@@ -20,13 +20,13 @@ beforeEach("Initial clean up and retrieve Clubs", function () {
     foroItalicoName,
     "clubIdForoItalico",
     "foroItalico",
-    "clubSettingsForoItalico"
+    "clubSettingsForoItalico",
   );
   saveClubInfoAndCleanReservations(
     allEnglandClubName,
     "clubIdAllEngland",
     "allEngland",
-    "clubSettingsAllEngland"
+    "clubSettingsAllEngland",
   );
 
   // .then() so I can use previous aliases
@@ -34,7 +34,7 @@ beforeEach("Initial clean up and retrieve Clubs", function () {
     loginAndVisitCalendarPage(
       Cypress.env("USER1_MAIL") as string,
       Cypress.env("USER1_PWD") as string,
-      this.clubIdForoItalico as string
+      this.clubIdForoItalico as string,
     );
   });
 });
@@ -45,7 +45,7 @@ describe("Calendar navigation", () => {
     const firstSelectableDay = dayjs()
       .subtract(
         (this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible,
-        "day"
+        "day",
       )
       .date()
       .toString()
@@ -59,7 +59,7 @@ describe("Calendar navigation", () => {
     const lastSelectableDay = dayjs()
       .add(
         (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible,
-        "day"
+        "day",
       )
       .date()
       .toString()
@@ -75,11 +75,11 @@ describe("Calendar navigation", () => {
     const firstVisibleStartDate = dayjs()
       .subtract(
         (this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible,
-        "day"
+        "day",
       )
       .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
       .minute(
-        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute,
       )
       .second(0)
       .millisecond(0);
@@ -89,14 +89,14 @@ describe("Calendar navigation", () => {
       firstVisibleStartDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
       pietrangeliCourtName,
-      Cypress.env("USER1_MAIL") as string
+      Cypress.env("USER1_MAIL") as string,
     );
 
     // create FUTURE reservation
     const lastVisibleStartDate = dayjs()
       .add(
         (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible,
-        "day"
+        "day",
       )
       .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
       .minute((this.clubSettingsForoItalico as ClubSettings).lastBookableMinute)
@@ -108,26 +108,26 @@ describe("Calendar navigation", () => {
       lastVisibleStartDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
       pietrangeliCourtName,
-      Cypress.env("USER1_MAIL") as string
+      Cypress.env("USER1_MAIL") as string,
     );
 
     // CHECKS
     cy.reload().waitForCalendarPageToLoad();
 
     cy.navigateDaysFromToday(
-      -(this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible
+      -(this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible,
     );
     cy.get('[data-test="calendar-event"]').should("be.visible");
 
     cy.navigateDaysFromToday(
-      (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible
+      (this.clubSettingsForoItalico as ClubSettings).daysInFutureVisible,
     );
     cy.get('[data-test="calendar-event"]').should("be.visible");
   });
 
   it("GIVEN club with reservation first and last hour WHEN select first and second last slot THEN constrains respected", function () {
     cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-child(1) > .fc-timegrid-slot"
+      ".fc-timegrid-slots > table > tbody > :nth-child(1) > .fc-timegrid-slot",
     ).click(); // click on first slot
 
     // check startTime of first bookable slot
@@ -135,8 +135,8 @@ describe("Calendar navigation", () => {
       "have.value",
       formatTimeString(
         (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
-        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
-      )
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute,
+      ),
     );
 
     // click outside the dialog to close it
@@ -144,7 +144,7 @@ describe("Calendar navigation", () => {
 
     // select the last slot bookable
     cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot"
+      ".fc-timegrid-slots > table > tbody > :nth-last-child(2) > .fc-timegrid-slot",
     ).click();
 
     // check endTime of last bookable slot
@@ -153,8 +153,8 @@ describe("Calendar navigation", () => {
         "have.value",
         formatTimeString(
           (this.clubSettingsForoItalico as ClubSettings).lastBookableHour + 1, //TODO: implicit assumption
-          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
-        )
+          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute,
+        ),
       )
       .and("have.attr", "aria-invalid", "false");
   });
@@ -162,7 +162,7 @@ describe("Calendar navigation", () => {
   it("GIVEN club with reservation last hour WHEN click on very last slot THEN no reservation dialog showed", function () {
     // click on the last slot
     cy.get(
-      ".fc-timegrid-slots > table > tbody > :last-child > .fc-timegrid-slot"
+      ".fc-timegrid-slots > table > tbody > :last-child > .fc-timegrid-slot",
     ).click();
 
     cy.get("[data-test='event-detail-dialog']").should("not.exist");
@@ -181,7 +181,7 @@ describe("Calendar navigation", () => {
       startDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
       court1ForoName,
-      Cypress.env("USER1_MAIL") as string
+      Cypress.env("USER1_MAIL") as string,
     );
 
     cy.addReservationToDB(
@@ -189,7 +189,7 @@ describe("Calendar navigation", () => {
       startDate.add(1, "hour").toDate(),
       this.clubIdAllEngland as string,
       court1AllEngName,
-      Cypress.env("USER1_MAIL") as string
+      Cypress.env("USER1_MAIL") as string,
     );
 
     cy.reload().waitForCalendarPageToLoad();
@@ -204,12 +204,12 @@ describe("New Reservation", () => {
     cy.logout();
 
     cy.visit(
-      `/prenota?clubId=${this.clubIdForoItalico as string}`
+      `/prenota?clubId=${this.clubIdForoItalico as string}`,
     ).waitForCalendarPageToLoad();
 
     // select a random slot
     cy.get(
-      ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot"
+      ".fc-timegrid-slots > table > tbody > :nth-child(6) > .fc-timegrid-slot",
     ).click();
 
     // I should see the login button and nothing else
@@ -230,7 +230,7 @@ describe("New Reservation", () => {
 
     cy.get(".MuiFormHelperText-root").should(
       "have.text",
-      "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+      "Prenota 1 ora, 1 ora e mezzo o 2 ore",
     );
 
     // try to reserve by clicking confirm button
@@ -251,7 +251,7 @@ describe("New Reservation", () => {
       startDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
       pietrangeliCourtName,
-      Cypress.env("USER1_MAIL") as string
+      Cypress.env("USER1_MAIL") as string,
     );
 
     cy.reload().waitForCalendarPageToLoad();
@@ -268,7 +268,7 @@ describe("New Reservation", () => {
       .should("be.visible")
       .and(
         "have.text",
-        "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero"
+        "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero",
       );
     // close the error dialog
     cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
@@ -291,7 +291,7 @@ describe("New Reservation", () => {
     // check error message
     cy.get(".MuiFormHelperText-root").should(
       "have.text",
-      "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo"
+      "Prenota al massimo 2 ore. Rispetta l'orario di chiusura del circolo",
     );
   });
 
@@ -300,7 +300,7 @@ describe("New Reservation", () => {
       .add(2, "days")
       .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
       .minute(
-        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute,
       )
       .second(0)
       .millisecond(0);
@@ -315,7 +315,7 @@ describe("New Reservation", () => {
         startDate.add(i + 1, "hour").toDate(),
         this.clubIdForoItalico as string,
         i % 2 === 0 ? pietrangeliCourtName : centralCourtName,
-        Cypress.env("USER1_MAIL") as string
+        Cypress.env("USER1_MAIL") as string,
       );
     }
     // check that all reservation have been added
@@ -324,7 +324,7 @@ describe("New Reservation", () => {
     cy.navigateDaysFromToday(2);
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser,
     );
 
     // try to add another reservation, fairly far from the others.
@@ -336,13 +336,13 @@ describe("New Reservation", () => {
       "have.text",
       `Hai raggiunto il numero massimo di prenotazioni attive (${
         (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
-      })`
+      })`,
     );
     // Number of reservations should not change
     cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser,
     );
 
     // delete one reservation and try again
@@ -351,7 +351,7 @@ describe("New Reservation", () => {
     cy.get("[data-test='confirm-button']").click();
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser - 1
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser - 1,
     );
 
     //add reservation in different club and check that does not affect the count
@@ -372,7 +372,7 @@ describe("New Reservation", () => {
         .toDate(),
       this.clubIdAllEngland as string,
       centerCourtName,
-      Cypress.env("USER1_MAIL") as string
+      Cypress.env("USER1_MAIL") as string,
     );
 
     // try again, succeed this time
@@ -381,7 +381,7 @@ describe("New Reservation", () => {
     cy.get("[data-test='error-alert']").should("not.exist");
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser,
     );
   });
 });
@@ -400,7 +400,7 @@ describe("Reservation details", () => {
       startDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
       pietrangeliCourtName,
-      Cypress.env("USER2_MAIL") as string
+      Cypress.env("USER2_MAIL") as string,
     );
     cy.reload().waitForCalendarPageToLoad();
     cy.navigateDaysFromToday(dayInAdvance);
@@ -416,7 +416,7 @@ describe("Reservation details", () => {
     let firstStartDateNotDeletable = dayjs()
       .add(
         (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel,
-        "hour"
+        "hour",
       )
       .millisecond(0)
       .second(0)
@@ -431,14 +431,14 @@ describe("Reservation details", () => {
       .add(1, "day")
       .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
       .minute(
-        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute,
       )
       .second(0)
       .millisecond(0);
     const clubOpeningTimeToday = dayjs()
       .hour((this.clubSettingsForoItalico as ClubSettings).firstBookableHour)
       .minute(
-        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+        (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute,
       )
       .second(0)
       .millisecond(0);
@@ -450,7 +450,7 @@ describe("Reservation details", () => {
         .subtract(1, "day")
         .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
         .minute(
-          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute,
         )
         .second(0)
         .millisecond(0);
@@ -465,7 +465,7 @@ describe("Reservation details", () => {
       firstStartDateNotDeletable = dayjs()
         .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
         .minute(
-          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+          (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute,
         )
         .second(0)
         .millisecond(0);
@@ -476,7 +476,7 @@ describe("Reservation details", () => {
       firstStartDateNotDeletable.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
       pietrangeliCourtName,
-      Cypress.env("USER1_MAIL") as string
+      Cypress.env("USER1_MAIL") as string,
     );
     cy.reload().waitForCalendarPageToLoad();
     cy.navigateDaysFromToday(firstStartDateNotDeletable.day() - dayjs().day());
@@ -487,7 +487,7 @@ describe("Reservation details", () => {
       "have.text",
       `Non puoi cancellare una prenotazione meno di ${
         (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel
-      } ore prima del suo inizio`
+      } ore prima del suo inizio`,
     );
   });
 });

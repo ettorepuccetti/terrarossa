@@ -104,7 +104,7 @@ function WrapperComponentForTesting({
     () =>
       new QueryClient({
         defaultOptions: { queries: { retry: false } },
-      })
+      }),
   );
   const [trpcClient] = useState(() =>
     api.createClient({
@@ -114,7 +114,7 @@ function WrapperComponentForTesting({
           url: `${getBaseUrl()}/api/trpc`,
         }),
       ],
-    })
+    }),
   );
 
   return (
@@ -151,12 +151,12 @@ function WrapperComponentForTesting({
 
 export const mountWithContexts = (
   children: React.ReactNode,
-  session?: Session
+  session?: Session,
 ) => {
   cy.mount(
     <WrapperComponentForTesting session={session}>
       {children}
-    </WrapperComponentForTesting>
+    </WrapperComponentForTesting>,
   );
 };
 

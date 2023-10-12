@@ -11,7 +11,7 @@ export default function SearchBar(props: { onSearch: (term: string) => void }) {
       props.onSearch(searchTerm);
     },
     [searchTerm],
-    300
+    300,
   );
 
   const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {

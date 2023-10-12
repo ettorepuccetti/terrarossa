@@ -9,7 +9,7 @@ describe("<ErrorAlert />", () => {
       <ErrorAlert
         error={new TRPCClientError(errorMessage)}
         onClose={() => null}
-      />
+      />,
     );
     cy.get(".MuiAlert-message").should("contain", errorMessage);
   });

@@ -30,7 +30,7 @@ const Prenota = () => {
         col4: reservation.court.name,
         col5: reservation.startTime,
       };
-    }
+    },
   );
 
   const columns: GridColDef[] = [

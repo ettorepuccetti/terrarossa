@@ -16,13 +16,13 @@ beforeEach("Retrieve clubs, delete reservations and login", function () {
     foroItalicoName,
     "clubIdForoItalico",
     "foroItalico",
-    "clubSettingsForoItalico"
+    "clubSettingsForoItalico",
   );
   saveClubInfoAndCleanReservations(
     allEnglandClubName,
     "clubIdAllEngland",
     "allEngland",
-    "clubSettingsAllEngland"
+    "clubSettingsAllEngland",
   );
 
   // so I can use previous aliases
@@ -30,7 +30,7 @@ beforeEach("Retrieve clubs, delete reservations and login", function () {
     loginAndVisitCalendarPage(
       Cypress.env("ADMIN_FORO_MAIL") as string,
       Cypress.env("ADMIN_FORO_PWD") as string,
-      this.clubIdForoItalico as string
+      this.clubIdForoItalico as string,
     );
   });
 });
@@ -75,7 +75,7 @@ describe("New reservation", () => {
         startDate.add(i + 1, "hour").toDate(),
         this.clubIdForoItalico as string,
         i % 2 === 0 ? pietrangeliCourtName : centralCourtName,
-        Cypress.env("ADMIN_FORO_MAIL") as string
+        Cypress.env("ADMIN_FORO_MAIL") as string,
       );
     }
     // check that all reservation have been added
@@ -84,7 +84,7 @@ describe("New reservation", () => {
     cy.navigateDaysFromToday(2);
     cy.get("[data-test='calendar-event']").should(
       "have.length",
-      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser
+      (this.clubSettingsForoItalico as ClubSettings).maxReservationPerUser,
     );
 
     // try to add another reservation
@@ -98,7 +98,7 @@ describe("New reservation", () => {
     cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-end-date]").type(
-      dayjs().add(2, "week").format("DD/MM/YYYY")
+      dayjs().add(2, "week").format("DD/MM/YYYY"),
     );
     cy.get("[data-test=reserveButton]").click();
     cy.get("[data-test=calendar-event]").should("be.visible");
@@ -120,14 +120,14 @@ describe("New reservation", () => {
       conflictStartDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
       pietrangeliCourtName,
-      Cypress.env("ADMIN_FORO_MAIL") as string
+      Cypress.env("ADMIN_FORO_MAIL") as string,
     );
 
     // create recurrent reservation
     cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-end-date]").type(
-      dayjs().add(2, "week").format("DD/MM/YYYY")
+      dayjs().add(2, "week").format("DD/MM/YYYY"),
     );
     cy.get("[data-test=reserveButton]").click();
 
@@ -136,7 +136,7 @@ describe("New reservation", () => {
     cy.get("[data-test=error-alert]").should(
       "contain.text",
       "Errore nella creazione della prenotazione ricorrente. Conflitto in data " +
-        conflictStartDate.format("DD/MM/YYYY")
+        conflictStartDate.format("DD/MM/YYYY"),
     );
     cy.get("[data-testid=CloseIcon]").click();
 
@@ -159,7 +159,7 @@ describe("Existing reservation", () => {
       startDate.add(1, "hour").toDate(),
       this.clubIdForoItalico as string,
       pietrangeliCourtName,
-      Cypress.env("USER2_MAIL") as string //user_2 because is already added to db in seeding script
+      Cypress.env("USER2_MAIL") as string, //user_2 because is already added to db in seeding script
     );
 
     cy.reload().waitForCalendarPageToLoad();
@@ -177,7 +177,7 @@ describe("Existing reservation", () => {
       dayjs().add(2, "hour").set("minute", 0).toDate(),
       this.clubIdForoItalico as string,
       pietrangeliCourtName,
-      Cypress.env("ADMIN_FORO_MAIL") as string
+      Cypress.env("ADMIN_FORO_MAIL") as string,
     );
   });
 
@@ -186,7 +186,7 @@ describe("Existing reservation", () => {
     cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-end-date]").type(
-      dayjs().add(1, "week").format("DD/MM/YYYY")
+      dayjs().add(1, "week").format("DD/MM/YYYY"),
     );
     cy.get("[data-test=reserveButton]").click();
 
@@ -207,7 +207,7 @@ describe("Existing reservation", () => {
     cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-end-date]").type(
-      dayjs().add(1, "week").format("DD/MM/YYYY")
+      dayjs().add(1, "week").format("DD/MM/YYYY"),
     );
     cy.get("[data-test=reserveButton]").click();
 

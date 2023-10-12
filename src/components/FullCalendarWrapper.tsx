@@ -41,7 +41,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   const clubId = useCalendarStoreContext((state) => state.clubId);
   const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
   const setEventDetails = useCalendarStoreContext(
-    (state) => state.setEventDetails
+    (state) => state.setEventDetails,
   );
   const { data: sessionData } = useSession();
 
@@ -75,14 +75,14 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       "selected date: ",
       selectInfo.dateStr,
       "resource: ",
-      selectInfo.resource?.id
+      selectInfo.resource?.id,
     );
 
     if (
       !isSelectableSlot(
         selectInfo.date,
         props.clubData.clubSettings.lastBookableHour,
-        props.clubData.clubSettings.lastBookableMinute
+        props.clubData.clubSettings.lastBookableMinute,
       )
     ) {
       console.log("last slot is not selectable", "date: ", selectInfo.date);
@@ -129,11 +129,11 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
           selectable={false}
           slotMinTime={formatTimeString(
             props.clubData.clubSettings.firstBookableHour,
-            props.clubData.clubSettings.firstBookableMinute
+            props.clubData.clubSettings.firstBookableMinute,
           )}
           slotMaxTime={formatTimeString(
             props.clubData.clubSettings.lastBookableHour + 1,
-            props.clubData.clubSettings.lastBookableMinute
+            props.clubData.clubSettings.lastBookableMinute,
           )}
           selectLongPressDelay={0}
           slotLabelFormat={{

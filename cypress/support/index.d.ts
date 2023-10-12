@@ -35,7 +35,7 @@ declare global {
         endDate: Date,
         clubId: string,
         courtName: string,
-        userMail: string
+        userMail: string,
       ): void;
 
       waitForCalendarPageToLoad(): void;
@@ -48,7 +48,7 @@ declare global {
       clickOnCalendarSlot(
         courtName: string,
         hour: number,
-        minute: number
+        minute: number,
       ): void;
 
       getClubSettings(clubId: string): Chainable<ClubSettings>;

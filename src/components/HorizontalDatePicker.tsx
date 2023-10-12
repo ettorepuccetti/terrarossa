@@ -30,7 +30,7 @@ export const HorizonalDatePicker = ({
     },
     (_, i) => {
       return today.subtract(daysInThePastVisible, "day").add(i, "day");
-    }
+    },
   );
 
   const onDateClick = (date: dayjs.Dayjs) => {

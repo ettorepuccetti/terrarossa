@@ -50,7 +50,7 @@ const MyApp = (props: MyAppProps) => {
           url: `${getBaseUrl()}/api/trpc`,
         }),
       ],
-    })
+    }),
   );
 
   const {

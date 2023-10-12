@@ -49,7 +49,7 @@ export const useClubQuery = (clubId: string | undefined) => {
       refetchOnWindowFocus: false,
       enabled: clubId !== undefined,
       staleTime: Infinity,
-    }
+    },
   );
 };
 
@@ -60,14 +60,14 @@ export const useCourtQuery = (clubId: string | undefined) =>
       refetchOnWindowFocus: false,
       enabled: clubId !== undefined,
       staleTime: Infinity,
-    }
+    },
   );
 
 export const useReservationQuery = (clubId: string | undefined) => {
   const query = api.reservationQuery.getAllVisibleInCalendarByClubId;
   return query.useQuery(
     { clubId: clubId },
-    { refetchOnWindowFocus: false, enabled: clubId !== undefined }
+    { refetchOnWindowFocus: false, enabled: clubId !== undefined },
   );
 };
 

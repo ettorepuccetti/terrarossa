@@ -17,7 +17,7 @@ export const capitaliseFirstChar = (s: string) => {
 export function formatTimeString(
   hour: number,
   minute: number,
-  paddingHour = 2
+  paddingHour = 2,
 ): string {
   return (
     hour.toString().padStart(paddingHour, "0") +
@@ -34,7 +34,7 @@ export function formatTimeString(
  */
 export function isAdminOfTheClub(
   sessionData: Session | null | undefined,
-  clubId: string
+  clubId: string,
 ): boolean {
   return (
     !!sessionData &&
@@ -54,7 +54,7 @@ export function isAdminOfTheClub(
 export function isSelectableSlot(
   selectedStartDate: Date,
   lastBookableHour: number,
-  lastBookableMinute: number
+  lastBookableMinute: number,
 ): boolean {
   const fixedDate = dayjs();
   // !(selectedStartDate > lastBookableHour)
@@ -67,7 +67,7 @@ export function isSelectableSlot(
         //last bookable hour
         fixedDate
           .set("hours", lastBookableHour)
-          .set("minutes", lastBookableMinute)
+          .set("minutes", lastBookableMinute),
       )
   );
 }

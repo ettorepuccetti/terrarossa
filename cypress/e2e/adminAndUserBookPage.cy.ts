@@ -20,13 +20,13 @@ beforeEach("Retrieve clubs and delete reservations (no login)", function () {
     foroItalicoName,
     "clubIdForoItalico",
     "foroItalico",
-    "clubSettingsForoItalico"
+    "clubSettingsForoItalico",
   );
   saveClubInfoAndCleanReservations(
     allEnglandClubName,
     "clubIdAllEngland",
     "allEngland",
-    "clubSettingsAllEngland"
+    "clubSettingsAllEngland",
   );
 });
 
@@ -38,7 +38,7 @@ describe("New Reservation", () => {
         loginAndVisitCalendarPage(
           user.username,
           user.password,
-          this.clubIdForoItalico as string
+          this.clubIdForoItalico as string,
         );
 
         cy.navigateDaysFromToday(2);
@@ -70,7 +70,7 @@ describe("New Reservation", () => {
         loginAndVisitCalendarPage(
           user.username,
           user.password,
-          this.clubIdForoItalico as string
+          this.clubIdForoItalico as string,
         );
         // create a reservation in the next day, for avoiding `reservation in the past` warning
         const startDate = dayjs()
@@ -85,7 +85,7 @@ describe("New Reservation", () => {
           startDate.add(1, "hour").toDate(),
           this.clubIdForoItalico as string,
           pietrangeliCourtName,
-          Cypress.env("USER1_MAIL") as string
+          Cypress.env("USER1_MAIL") as string,
         );
 
         cy.reload().waitForCalendarPageToLoad();
@@ -102,7 +102,7 @@ describe("New Reservation", () => {
           .should("be.visible")
           .and(
             "have.text",
-            "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero"
+            "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero",
           );
         // close the error dialog
         cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
@@ -119,7 +119,7 @@ describe("New Reservation", () => {
         loginAndVisitCalendarPage(
           user.username,
           user.password,
-          this.clubIdForoItalico as string
+          this.clubIdForoItalico as string,
         );
         cy.navigateDaysFromToday(2);
 
@@ -130,7 +130,7 @@ describe("New Reservation", () => {
 
         cy.get(".MuiFormHelperText-root").should(
           "have.text",
-          "Prenota 1 ora, 1 ora e mezzo o 2 ore"
+          "Prenota 1 ora, 1 ora e mezzo o 2 ore",
         );
 
         // try to reserve by clicking confirm button
@@ -148,7 +148,7 @@ describe("Existing reservation", () => {
         loginAndVisitCalendarPage(
           user.username,
           user.password,
-          this.clubIdForoItalico as string
+          this.clubIdForoItalico as string,
         );
         const dayInAdvance = 2;
         const startDate = dayjs()
@@ -162,7 +162,7 @@ describe("Existing reservation", () => {
           startDate.add(1, "hour").toDate(),
           this.clubIdForoItalico as string,
           pietrangeliCourtName,
-          user.username
+          user.username,
         );
         cy.reload().waitForCalendarPageToLoad();
         cy.navigateDaysFromToday(dayInAdvance);
@@ -183,7 +183,7 @@ describe("Existing reservation", () => {
         loginAndVisitCalendarPage(
           user.username,
           user.password,
-          this.clubIdForoItalico as string
+          this.clubIdForoItalico as string,
         );
         let startDateSafeToDelete = dayjs()
           .millisecond(0)
@@ -192,33 +192,33 @@ describe("Existing reservation", () => {
           .add(
             (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel +
               1, // add 1 hour to be sure being after the hoursBeforeCancel time limit
-            "hour"
+            "hour",
           );
 
         const clubClosingTimeToday = dayjs()
           .hour((this.clubSettingsForoItalico as ClubSettings).lastBookableHour)
           .minute(
-            (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute
+            (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute,
           )
           .second(0)
           .millisecond(0);
         const clubOpeningTimeTomorrow = dayjs()
           .add(1, "day")
           .hour(
-            (this.clubSettingsForoItalico as ClubSettings).firstBookableHour
+            (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
           )
           .minute(
-            (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+            (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute,
           )
           .second(0)
           .millisecond(0);
 
         const clubOpeningTimeToday = dayjs()
           .hour(
-            (this.clubSettingsForoItalico as ClubSettings).firstBookableHour
+            (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
           )
           .minute(
-            (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+            (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute,
           )
           .second(0)
           .millisecond(0);
@@ -228,10 +228,11 @@ describe("Existing reservation", () => {
         if (startDateSafeToDelete.isBefore(clubOpeningTimeToday)) {
           startDateSafeToDelete = dayjs()
             .hour(
-              (this.clubSettingsForoItalico as ClubSettings).firstBookableHour
+              (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
             )
             .minute(
-              (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+              (this.clubSettingsForoItalico as ClubSettings)
+                .firstBookableMinute,
             )
             .second(0)
             .millisecond(0);
@@ -246,10 +247,11 @@ describe("Existing reservation", () => {
           startDateSafeToDelete = dayjs()
             .add(1, "day")
             .hour(
-              (this.clubSettingsForoItalico as ClubSettings).firstBookableHour
+              (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
             )
             .minute(
-              (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute
+              (this.clubSettingsForoItalico as ClubSettings)
+                .firstBookableMinute,
             )
             .second(0)
             .millisecond(0);
@@ -262,7 +264,7 @@ describe("Existing reservation", () => {
           startDateSafeToDelete.add(dayjs.duration({ hours: 1 })).toDate(),
           this.clubIdForoItalico as string,
           pietrangeliCourtName,
-          user.username
+          user.username,
         );
         cy.reload().waitForCalendarPageToLoad();
         cy.navigateDaysFromToday(startDateSafeToDelete.day() - dayjs().day());
@@ -283,7 +285,7 @@ describe("Existing reservation", () => {
         loginAndVisitCalendarPage(
           user.username,
           user.password,
-          this.clubIdForoItalico as string
+          this.clubIdForoItalico as string,
         );
 
         const startDate = dayjs()
@@ -298,7 +300,7 @@ describe("Existing reservation", () => {
           startDate.add(1, "hour").toDate(),
           this.clubIdForoItalico as string,
           pietrangeliCourtName,
-          user.username
+          user.username,
         );
 
         cy.reload().waitForCalendarPageToLoad();

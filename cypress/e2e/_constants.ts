@@ -23,7 +23,7 @@ export function saveClubInfoAndCleanReservations(
   clubName: string,
   clubIdAliasName: string,
   clubAliasName: string,
-  clubSettingsAliasName: string
+  clubSettingsAliasName: string,
 ) {
   cy.queryFilteredClubs(clubName).then(function (clubs: Club[]) {
     if (clubs[0] === undefined) {
@@ -49,7 +49,7 @@ export function saveClubInfoAndCleanReservations(
 export function loginAndVisitCalendarPage(
   mail: string,
   pwd: string,
-  clubId: string
+  clubId: string,
 ) {
   cy.loginToAuth0(mail, pwd);
   cy.visit(`/prenota?clubId=${clubId}`).waitForCalendarPageToLoad();
