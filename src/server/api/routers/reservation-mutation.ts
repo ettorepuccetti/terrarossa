@@ -1,6 +1,7 @@
-import { type Prisma, type PrismaClient } from "@prisma/client";
+import { type PrismaClient } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
 import dayjs from "dayjs";
+import { type Session } from "next-auth";
 import {
   RecurrentReservationDeleteInputSchema,
   RecurrentReservationInputSchema,
@@ -8,13 +9,13 @@ import {
   ReservationInputSchema,
 } from "~/components/Calendar";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { UserRoles, type UserRole } from "~/utils/constants";
+import { UserRoles } from "~/utils/constants";
 
 export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
     .input(ReservationInputSchema)
     .mutation(async ({ ctx, input }) => {
-      const clubSettings = await getClubSettings(ctx, input.clubId);
+      const clubSettings = await getClubSettings(ctx.prisma, input.clubId);
 
       //collision check [UI does NOT check for this]
       if (
@@ -22,18 +23,18 @@ export const reservationMutationRouter = createTRPCRouter({
           ctx.prisma,
           input.startDateTime,
           input.endDateTime,
-          input.courtId
+          input.courtId,
         )
       ) {
         throw new TRPCClientError(
-          "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero"
+          "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero",
         );
       }
 
       // start date before end date [UI already prevents this]
       if (input.startDateTime.getTime() > input.endDateTime.getTime()) {
         throw new TRPCClientError(
-          "L'orario di inizio deve essere prima di quello di fine"
+          "L'orario di inizio deve essere prima di quello di fine",
         );
       }
 
@@ -43,40 +44,41 @@ export const reservationMutationRouter = createTRPCRouter({
         input.endDateTime.getMinutes() % 30 !== 0
       ) {
         throw new TRPCClientError(
-          "L'orario di inizio e di fine deve essere un multiplo di 30 minuti"
+          "L'orario di inizio e di fine deve essere un multiplo di 30 minuti",
         );
       }
 
       //checks for NON ADMIN user
-      if (!isUserAdminOfClub(ctx, input.clubId)) {
+      if (!isUserAdminOfClub(ctx.session, input.clubId)) {
         // check limit of active reservations per users [UI does NOT check for this]
         const activeReservationsForUser = await getUserActiveReservations(
-          ctx,
-          input.clubId
+          ctx.prisma,
+          ctx.session,
+          input.clubId,
         );
         if (activeReservationsForUser >= clubSettings.maxReservationPerUser) {
           throw new TRPCClientError(
-            `Hai raggiunto il numero massimo di prenotazioni attive (${clubSettings.maxReservationPerUser})`
+            `Hai raggiunto il numero massimo di prenotazioni attive (${clubSettings.maxReservationPerUser})`,
           );
         }
         // reservation length [UI already prevents this]
         if (!checkDuration(input.startDateTime, input.endDateTime)) {
           throw new TRPCClientError(
-            "Error: Reservations needs to be at least 1 hour and not longer than 2 hours"
+            "Error: Reservations needs to be at least 1 hour and not longer than 2 hours",
           );
         }
 
         // reservation in the past [UI already prevents this]
         if (input.startDateTime.getTime() < Date.now()) {
           throw new TRPCClientError(
-            "Error: Reservations cannot be in the past"
+            "Error: Reservations cannot be in the past",
           );
         }
 
         // name overwrite [UI already prevents this]
         if (input.overwriteName) {
           throw new TRPCClientError(
-            "Error: you are not authorized to overwrite the name of the reservation"
+            "Error: you are not authorized to overwrite the name of the reservation",
           );
         }
       }
@@ -96,9 +98,9 @@ export const reservationMutationRouter = createTRPCRouter({
     .input(RecurrentReservationInputSchema)
     .mutation(async ({ ctx, input }) => {
       // check for privileges [UI already prevents this]
-      if (!isUserAdminOfClub(ctx, input.clubId)) {
+      if (!isUserAdminOfClub(ctx.session, input.clubId)) {
         throw new TRPCClientError(
-          "Error: Only admins can create recurrent reservations"
+          "Error: Only admins can create recurrent reservations",
         );
       }
       // create the recurrent reservation at which the reservations will refer to
@@ -133,12 +135,12 @@ export const reservationMutationRouter = createTRPCRouter({
             ctx.prisma,
             reservationInput.startTime,
             reservationInput.endTime,
-            reservationInput.courtId
+            reservationInput.courtId,
           )
         ) {
           throw new TRPCClientError(
             "Errore nella creazione della prenotazione ricorrente. Conflitto in data " +
-              date.format("DD/MM/YYYY")
+              date.format("DD/MM/YYYY"),
           );
         }
         reservations.push(reservationInput);
@@ -152,7 +154,7 @@ export const reservationMutationRouter = createTRPCRouter({
   deleteOne: protectedProcedure
     .input(ReservationDeleteInputSchema)
     .mutation(async ({ ctx, input }) => {
-      const clubSettings = await getClubSettings(ctx, input.clubId);
+      const clubSettings = await getClubSettings(ctx.prisma, input.clubId);
       const reservationToDelete =
         await ctx.prisma.reservation.findUniqueOrThrow({
           where: { id: input.reservationId },
@@ -162,11 +164,11 @@ export const reservationMutationRouter = createTRPCRouter({
       // TODO: check that user is admin of the club for which the reservation is made.
       // Possible exploit: admin of club A can delete reservation of club B
       // get clubId from the reservationToDelete
-      if (!isUserAdminOfClub(ctx, input.clubId)) {
+      if (!isUserAdminOfClub(ctx.session, input.clubId)) {
         // delete reservation of other users
         if (reservationToDelete.userId !== ctx.session.user.id) {
           throw new TRPCClientError(
-            "You are not authorized to delete this reservation"
+            "You are not authorized to delete this reservation",
           );
         }
 
@@ -177,7 +179,7 @@ export const reservationMutationRouter = createTRPCRouter({
             .isBefore(Date.now())
         ) {
           throw new TRPCClientError(
-            `Error: Reservations cannot be deleted ${clubSettings.hoursBeforeCancel} hours before the start time`
+            `Error: Reservations cannot be deleted ${clubSettings.hoursBeforeCancel} hours before the start time`,
           );
         }
       }
@@ -193,9 +195,9 @@ export const reservationMutationRouter = createTRPCRouter({
     .input(RecurrentReservationDeleteInputSchema)
     .mutation(async ({ ctx, input }) => {
       // check for privileges [UI already prevents this]
-      if (!isUserAdminOfClub(ctx, input.clubId)) {
+      if (!isUserAdminOfClub(ctx.session, input.clubId)) {
         throw new TRPCClientError(
-          "Error: Only admins can delete recurrent reservations"
+          "Error: Only admins can delete recurrent reservations",
         );
       }
       // delete all reservations that refer to the recurrent reservation
@@ -208,8 +210,8 @@ export const reservationMutationRouter = createTRPCRouter({
     }),
 });
 
-async function getClubSettings(ctx: CtxType, clubId: string) {
-  return await ctx.prisma.clubSettings.findFirstOrThrow({
+async function getClubSettings(prisma: PrismaClient, clubId: string) {
+  return await prisma.clubSettings.findFirstOrThrow({
     where: {
       club: {
         id: clubId,
@@ -218,18 +220,21 @@ async function getClubSettings(ctx: CtxType, clubId: string) {
   });
 }
 
-function isUserAdminOfClub(ctx: CtxType, clubId: string) {
+function isUserAdminOfClub(session: Session, clubId: string) {
   return (
-    ctx.session.user.role === UserRoles.ADMIN &&
-    ctx.session.user.clubId === clubId
+    session.user.role === UserRoles.ADMIN && session.user.clubId === clubId
   );
 }
 
-async function getUserActiveReservations(ctx: CtxType, clubId: string) {
-  const activeReservationsForUser = await ctx.prisma.reservation.groupBy({
+async function getUserActiveReservations(
+  prisma: PrismaClient,
+  session: Session,
+  clubId: string,
+) {
+  const activeReservationsForUser = await prisma.reservation.groupBy({
     by: ["userId"],
     where: {
-      userId: ctx.session.user.id,
+      userId: session.user.id,
       endTime: {
         gte: dayjs().toDate(),
       },
@@ -244,7 +249,7 @@ async function getUserActiveReservations(ctx: CtxType, clubId: string) {
   });
   console.log(
     "Active reservations",
-    activeReservationsForUser[0]?._count.userId
+    activeReservationsForUser[0]?._count.userId,
   );
   return activeReservationsForUser[0]?._count.userId ?? 0;
 }
@@ -259,7 +264,7 @@ async function collision(
   prisma: PrismaClient,
   startDateTime: Date,
   endDateTime: Date,
-  courtId: string
+  courtId: string,
 ): Promise<boolean> {
   const reservations = await prisma.reservation.findMany({
     where: {
@@ -297,19 +302,3 @@ async function collision(
   });
   return reservations.length !== 0;
 }
-
-type CtxType = {
-  prisma: PrismaClient<Prisma.PrismaClientOptions, never | undefined>;
-  session: {
-    user: {
-      id: string;
-      role: UserRole;
-      clubId?: string | undefined;
-    } & {
-      name?: string | null | undefined;
-      email?: string | null | undefined;
-      image?: string | null | undefined;
-    };
-    expires: string;
-  };
-};
