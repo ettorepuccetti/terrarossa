@@ -2,7 +2,7 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 # lint
-npx pretty-quick --staged
+npx lint-staged
 
 # remove `.only` from tests under `/cypress`
 # note that '' after `sed -i` is required only for macOS

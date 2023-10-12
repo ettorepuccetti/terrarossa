@@ -220,14 +220,22 @@ on push event:
 
 ## Linting before commit
 
-install husky and pretty-quick:
+install husky and lint-staged:
 
 ```
 
 npx husky-init
-npm install --save-dev pretty-quick
-npx husky set .husky/pre-commit "npx pretty-quick --staged"
+npm install --save-dev lint-staged
+npx husky set .husky/pre-commit "npx lint-staged"
 
+```
+
+configure lint-staged in `package.json`:
+
+```
+"lint-staged": {
+    "*": "prettier --ignore-unknown --write"
+  },
 ```
 
 run once:
@@ -236,7 +244,7 @@ run once:
 npm run prepare
 ```
 
-On each commit, husky will run pretty-quick, which will run prettier on all staged files.
+On each commit, husky will run lint-staged, which will run prettier on all staged files.
 
 ## Providing context to component in Cypress component testing
 
