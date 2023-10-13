@@ -64,8 +64,7 @@ export const useCourtQuery = (clubId: string | undefined) =>
   );
 
 export const useReservationQuery = (clubId: string | undefined) => {
-  const query = api.reservationQuery.getAllVisibleInCalendarByClubId;
-  return query.useQuery(
+  return api.reservationQuery.getAllVisibleInCalendarByClubId.useQuery(
     { clubId: clubId },
     { refetchOnWindowFocus: false, enabled: clubId !== undefined },
   );
