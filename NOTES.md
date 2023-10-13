@@ -272,3 +272,11 @@ https://github.com/abrahamgr/msw-cypress
 
 discussion on trpc repo on how to mock calls:
 https://github.com/trpc/trpc/discussions/1879
+
+## Ignoring commit in git blame:
+
+https://akrabat.com/ignoring-revisions-with-git-blame/
+
+- add the file `.git-blame-ignore-revs`
+- run: `git config blame.ignoreRevsFile .git-blame-ignore-revs`
+- write the 40 chars commit hash in it of the commit to ignore
