@@ -10,15 +10,18 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import {
-  useRecurrentReservationDelete,
-  useReservationDelete,
-} from "./Calendar";
 import DialogLayout from "./DialogLayout";
-import ErrorAlert from "./ErrorAlert";
-import Spinner from "./Spinner";
 
-export default function CancelRecurrentDialog() {
+export default function CancelRecurrentDialog(props: {
+  useReservationDelete: (arg0: {
+    reservationId: string;
+    clubId: string;
+  }) => void;
+  useRecurrentReservationDelete: (arg0: {
+    recurrentReservationId: string;
+    clubId: string;
+  }) => void;
+}) {
   const deleteOpen = useCalendarStoreContext(
     (state) => state.deleteConfirmationOpen,
   );
@@ -30,8 +33,6 @@ export default function CancelRecurrentDialog() {
     (state) => state.setEventDetails,
   );
   const clubId = useCalendarStoreContext((state) => state.getClubId());
-  const reservationDelete = useReservationDelete(clubId);
-  const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
 
   const [value, setValue] = React.useState("single");
 
@@ -49,46 +50,25 @@ export default function CancelRecurrentDialog() {
         );
         break;
     }
+    setEventDetails(null);
+    setDeleteConfirmationOpen(false);
   };
 
   const deleteReservation = (reservationId: string) => {
-    reservationDelete.mutate({
+    console.log("delete event: ", reservationId);
+    props.useReservationDelete({
       reservationId: reservationId,
       clubId: clubId,
     });
-    console.log("delete event: ", reservationId);
-    setEventDetails(null);
-    setDeleteConfirmationOpen(false);
   };
 
   const deleteRecurrentReservation = (recurentReservationId: string) => {
-    recurrentReservationDelete.mutate({
+    console.log("delete recurrent event: ", recurentReservationId);
+    props.useRecurrentReservationDelete({
       recurrentReservationId: recurentReservationId,
       clubId: clubId,
     });
-    console.log("delete recurrent event: ", recurentReservationId);
-    setEventDetails(null);
-    setDeleteConfirmationOpen(false);
   };
-
-  // error handling
-  if (reservationDelete.error || recurrentReservationDelete.error) {
-    return (
-      <ErrorAlert
-        error={reservationDelete.error || recurrentReservationDelete.error}
-        onClose={() => {
-          reservationDelete.error && reservationDelete.reset();
-          recurrentReservationDelete.error &&
-            recurrentReservationDelete.reset();
-        }}
-      />
-    );
-  }
-
-  // loading handling
-  if (reservationDelete.isLoading || recurrentReservationDelete.isLoading) {
-    return <Spinner isLoading={true} />;
-  }
 
   return (
     <Dialog

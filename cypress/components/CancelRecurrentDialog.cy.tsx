@@ -25,54 +25,59 @@ function CancelRecurrentDialogContext() {
     },
   } as unknown as EventImpl);
 
-  return <CancelRecurrentDialog />;
+  const deleteSingle = cy.stub().as("deleteOne");
+  const deleteRecurrent = cy.stub().as("deleteRecurrent");
+  return (
+    <CancelRecurrentDialog
+      useReservationDelete={deleteSingle}
+      useRecurrentReservationDelete={deleteRecurrent}
+    />
+  );
 }
 
 function mountComponent() {
-  cy.intercept("POST", "/api/trpc/reservationMutation.deleteOne?*", {
-    fixture: "empty-response.json",
-  }).as("deleteOneApi");
-
-  cy.intercept("POST", "/api/trpc/reservationMutation.deleteRecurrent?*", {
-    fixture: "empty-response.json",
-  }).as("deleteRecurrentApi");
-
-  //just to avoid error in console
-  cy.intercept(
-    "GET",
-    "/api/trpc/reservationQuery.getAllVisibleInCalendarByClubId?**",
-    { fixture: "empty-response.json" },
-  ).as("getReservationsApi");
-
   mountWithContexts(<CancelRecurrentDialogContext />, session);
 }
 
 describe("CancelRecurrentDialog", () => {
   it("GIVEN radio button group WHEN selection single and confirm THEN invoke deleteOne api", () => {
+    //given
     mountComponent();
-    const deleteOne = cy.spy().as("deleteOne");
 
+    //when
     cy.get("[data-test=single]").click();
     cy.get("[data-test=confirm-button]").click();
 
-    cy.wait("@deleteOneApi").then((_interception) => {
-      deleteOne();
-    });
+    //then
     cy.get("@deleteOne").should("be.calledOnce");
+    cy.get("@deleteRecurrent").should("not.be.called");
     cy.get("[data-test=cancel-recurrent-dialog]").should("not.exist");
   });
 
   it("GIVEN radio button group WHEN selection recurrent and confirm THEN invoke deleteRecurrent api", () => {
+    //given
     mountComponent();
-    const deleteRecurrent = cy.spy().as("deleteRecurrent");
 
+    //when
     cy.get("[data-test=recurrent]").click();
     cy.get("[data-test=confirm-button]").click();
 
-    cy.wait("@deleteRecurrentApi").then((_interception) => {
-      deleteRecurrent();
-    });
+    //then
     cy.get("@deleteRecurrent").should("be.calledOnce");
+    cy.get("@deleteOne").should("not.be.called");
+    cy.get("[data-test=cancel-recurrent-dialog]").should("not.exist");
+  });
+
+  it("GIVEN radio button group WHEN click cancel THEN no invokation called", () => {
+    //given
+    mountComponent();
+
+    //when
+    cy.get("[data-test=cancel-button]").click();
+
+    //then
+    cy.get("@deleteRecurrent").should("not.be.called");
+    cy.get("@deleteOne").should("not.be.called");
     cy.get("[data-test=cancel-recurrent-dialog]").should("not.exist");
   });
 });

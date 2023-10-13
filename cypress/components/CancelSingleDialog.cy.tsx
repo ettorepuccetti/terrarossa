@@ -24,46 +24,36 @@ function CancelSingleDialogContext() {
     },
   } as unknown as EventImpl);
 
-  return <CancelSingleDialog />;
+  const deleteOne = cy.stub().as("deleteOne");
+  return <CancelSingleDialog useReservationDelete={deleteOne} />;
 }
 
 function mountComponent() {
-  cy.intercept("POST", "/api/trpc/reservationMutation.deleteOne?*", {
-    fixture: "empty-response.json",
-  }).as("deleteSingleApi");
-
-  //just to avoid error in console
-  cy.intercept(
-    "GET",
-    "/api/trpc/reservationQuery.getAllVisibleInCalendarByClubId?**",
-    { fixture: "empty-response.json" },
-  ).as("getReservationsApi");
-
   mountWithContexts(<CancelSingleDialogContext />, session);
 }
 
 describe("CancelSingleDialog", () => {
   it("GIVEN confirmation dialog WHEN click on confirm THEN invoke deleteOne api", () => {
-    const deleteOne = cy.spy().as("deleteOne");
-
+    //given
     mountComponent();
+
+    //when
     cy.get("[data-test=confirm-button]").click();
 
-    cy.wait("@deleteSingleApi").then((_interception) => {
-      deleteOne();
-    });
-
+    //then
     cy.get("@deleteOne").should("be.calledOnce");
     cy.get("[data-test=cancel-single-dialog]").should("not.exist");
   });
 
   it("GIVEN confirmation dialog WHEN click on cancel THEN not invoke deleteOne api", () => {
+    //given
     mountComponent();
-    const deleteOne = cy.spy().as("deleteOne");
-    cy.wait("@getReservationsApi").then((_interception) => {
-      deleteOne();
-    });
+
+    //when
     cy.get("[data-test=cancel-button]").click();
+
+    //then
+    cy.get("@deleteOne").should("not.be.called");
     cy.get("[data-test=cancel-single-dialog]").should("not.exist");
   });
 });

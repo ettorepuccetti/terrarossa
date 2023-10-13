@@ -277,10 +277,9 @@ describe("Existing reservation", () => {
     });
   });
 
-  // not working anymore since opening the dialog refresh the reservation query. FIX by preventing the query to be refreshed
   describe("GIVEN logged user WHEN delete a reservation already deleted THEN show error banner", () => {
     [USER1, ADMIN_FORO].forEach((user) => {
-      it.skip(`testing for ${user.type}`, function () {
+      it(`testing for ${user.type}`, function () {
         //initial setup
         loginAndVisitCalendarPage(
           user.username,

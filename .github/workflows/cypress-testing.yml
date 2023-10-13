@@ -1,6 +1,5 @@
 # keep name short as it is displayed in readme badge
 name: Cypress CI
-run-name: branch {${{ github.head_ref || github.ref_name }}} commit {${{ github.event.head_commit.message || 'pull request'}}}
 on:
   push:
     branches: [main]

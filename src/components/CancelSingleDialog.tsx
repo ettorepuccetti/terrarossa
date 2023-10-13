@@ -1,14 +1,16 @@
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { useReservationDelete } from "./Calendar";
 import ConfirmationDialog from "./ConfirmationDialog";
-import ErrorAlert from "./ErrorAlert";
-import Spinner from "./Spinner";
 
-export default function CancelSingleDialog() {
+export default function CancelSingleDialog(props: {
+  useReservationDelete: (arg0: {
+    reservationId: string;
+    clubId: string;
+  }) => void;
+}) {
   const clubId = useCalendarStoreContext((state) => state.getClubId());
   const open = useCalendarStoreContext((state) => state.deleteConfirmationOpen);
   const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
-  const reservationDelete = useReservationDelete(clubId);
+  // const reservationDelete = useReservationDelete(clubId);
   const setDeleteConfirmationOpen = useCalendarStoreContext(
     (state) => state.setDeleteConfirmationOpen,
   );
@@ -20,31 +22,14 @@ export default function CancelSingleDialog() {
     if (!reservationId) {
       throw new Error("Si è verificato un problema, per favore riprova.");
     }
-    reservationDelete.mutate({
+    props.useReservationDelete({
       reservationId: reservationId,
       clubId: clubId,
     });
     console.log("delete event: ", reservationId);
-    setEventDetails(null);
     setDeleteConfirmationOpen(false);
+    setEventDetails(null);
   };
-
-  // error handling
-  if (reservationDelete.error) {
-    return (
-      <ErrorAlert
-        error={reservationDelete.error}
-        onClose={() => {
-          reservationDelete.reset();
-        }}
-      />
-    );
-  }
-
-  // loading handling
-  if (reservationDelete.isLoading) {
-    return <Spinner isLoading={true} />;
-  }
 
   return (
     <>

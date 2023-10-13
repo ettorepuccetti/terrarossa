@@ -10,7 +10,11 @@ import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
-import { useClubQuery } from "./Calendar";
+import {
+  useClubQuery,
+  useRecurrentReservationDelete,
+  useReservationDelete,
+} from "./Calendar";
 import CancelRecurrentDialog from "./CancelRecurrentDialog";
 import CancelSingleDialog from "./CancelSingleDialog";
 import DialogLayout from "./DialogLayout";
@@ -25,6 +29,8 @@ export default function EventDetailDialog() {
   const clubId = useCalendarStoreContext((state) => state.getClubId());
   const { data: sessionData } = useSession();
   const clubQuery = useClubQuery(clubId);
+  const reservationDelete = useReservationDelete(clubId);
+  const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
   const setDeleteConfirmationOpen = useCalendarStoreContext(
     (state) => state.setDeleteConfirmationOpen,
   );
@@ -45,19 +51,34 @@ export default function EventDetailDialog() {
   };
 
   // error handling
-  if (clubQuery.error) {
+  if (
+    clubQuery.error ||
+    reservationDelete.error ||
+    recurrentReservationDelete.error
+  ) {
     return (
       <ErrorAlert
-        error={clubQuery.error}
+        error={
+          clubQuery.error ||
+          reservationDelete.error ||
+          recurrentReservationDelete.error
+        }
         onClose={() => {
-          void clubQuery.refetch();
+          clubQuery.error && void clubQuery.refetch();
+          reservationDelete.error && void reservationDelete.reset();
+          recurrentReservationDelete.error &&
+            void recurrentReservationDelete.reset();
         }}
       />
     );
   }
 
   // loading handling
-  if (clubQuery.isLoading) {
+  if (
+    clubQuery.isLoading ||
+    reservationDelete.isLoading ||
+    recurrentReservationDelete.isLoading
+  ) {
     return <Spinner isLoading={true} />;
   }
 
@@ -139,10 +160,13 @@ export default function EventDetailDialog() {
           )}
 
           {/* show recurrent confirmation dialog */}
-          <CancelRecurrentDialog />
+          <CancelRecurrentDialog
+            useRecurrentReservationDelete={recurrentReservationDelete.mutate}
+            useReservationDelete={reservationDelete.mutate}
+          />
 
           {/* show confirmation dialog */}
-          <CancelSingleDialog />
+          <CancelSingleDialog useReservationDelete={reservationDelete.mutate} />
         </DialogLayout>
       </Dialog>
     </>
