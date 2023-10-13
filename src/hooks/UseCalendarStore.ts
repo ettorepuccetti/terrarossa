@@ -1,6 +1,8 @@
 import { type EventImpl } from "@fullcalendar/core/internal";
 import { type DateClickArg } from "@fullcalendar/interaction";
+import type FullCalendar from "@fullcalendar/react";
 import dayjs, { type Dayjs } from "dayjs";
+import { type RefObject } from "react";
 import { type StateCreator } from "zustand";
 
 export interface IStore {
@@ -12,6 +14,8 @@ export interface IStore {
   recurrentEndDate: Dayjs | null;
   recurringEndDateError: boolean;
   deleteConfirmationOpen: boolean;
+  calendarRef: RefObject<FullCalendar>;
+  calendarIsLoading: boolean;
   setDateClick: (dateClick: DateClickArg | null) => void;
   setEventDetails: (eventDetails: EventImpl | null) => void;
   setClubId: (clubId: string) => void;
@@ -20,6 +24,8 @@ export interface IStore {
   setRecurrentEndDate: (recurrentEndDate: Dayjs | null) => void;
   setRecurringEndDateError: (recurringEndDateError: boolean) => void;
   setDeleteConfirmationOpen: (deleteConfirmationOpen: boolean) => void;
+  setCalendarRef: (calendarRef: RefObject<FullCalendar>) => void;
+  setCalendarIsLoading: (calendarIsLoading: boolean) => void;
   getClubId: () => string;
   getStartDate: () => Dayjs;
   //for testing only
@@ -38,6 +44,9 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   recurrentEndDate: null,
   recurringEndDateError: false,
   deleteConfirmationOpen: false,
+  calendarRef: { current: null },
+  calendarIsLoading: false,
+  // reservationAdd: ,
   setDateClick: (dateClick) => {
     set({ dateClick: dateClick });
     set({ endDate: dayjs(dateClick?.date).add(1, "h") });
@@ -52,7 +61,9 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
     set({ recurringEndDateError: recurringEndDateError }),
   setDeleteConfirmationOpen: (deleteConfirmationOpen) =>
     set({ deleteConfirmationOpen: deleteConfirmationOpen }),
-
+  setCalendarRef: (calendarRef) => set({ calendarRef: calendarRef }),
+  setCalendarIsLoading: (calendarIsLoading) =>
+    set({ calendarIsLoading: calendarIsLoading }),
   getClubId: () => {
     const clubId = get().clubId;
     if (clubId === undefined) {
@@ -62,9 +73,6 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   },
   getStartDate: () => {
     const startDate = get().dateClick?.date;
-    // if (startDate === undefined) {
-    //   throw new Error("startDate is undefined");
-    // }
     return dayjs(startDate);
   },
 

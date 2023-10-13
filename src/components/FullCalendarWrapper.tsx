@@ -13,17 +13,15 @@ import ScrollGrid from "@fullcalendar/scrollgrid";
 import { Box } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useSession } from "next-auth/react";
-import { useRef, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { type AppRouter } from "~/server/api/root";
-import { defaultImg } from "~/utils/constants";
 import {
   formatTimeString,
   isAdminOfTheClub,
   isSelectableSlot,
 } from "~/utils/utils";
 import CalendarEventCard from "./CalendarEventCard";
-import { HorizonalDatePicker } from "./HorizontalDatePicker";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type ReservationFromDb =
@@ -38,12 +36,21 @@ interface FullCalendarWrapperProps {
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
+  const setCalendarRef = useCalendarStoreContext(
+    (state) => state.setCalendarRef,
+  );
   const clubId = useCalendarStoreContext((state) => state.clubId);
   const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
   const setEventDetails = useCalendarStoreContext(
     (state) => state.setEventDetails,
   );
   const { data: sessionData } = useSession();
+
+  // to fix: https://stackoverflow.com/questions/62336340/cannot-update-a-component-while-rendering-a-different-component-warning
+  useEffect(() => {
+    setCalendarRef(calendarRef);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const reservationToEvent = (reservation: ReservationFromDb): EventInput => {
     return {
@@ -106,55 +113,47 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   };
 
   return (
-    <Box width={"100%"} display={"flex"} flexDirection={"column"}>
-      <HorizonalDatePicker
-        calendarRef={calendarRef}
-        clubImg={props.clubData.imageSrc ?? defaultImg}
-        daysInThePastVisible={props.clubData.clubSettings.daysInThePastVisible}
-        daysInTheFutureVisible={props.clubData.clubSettings.daysInFutureVisible}
+    <Box padding={"0.5rem"}>
+      <FullCalendar
+        ref={calendarRef}
+        schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
+        plugins={[interactionPlugin, resourceTimeGridPlugin, ScrollGrid]}
+        initialView="resourceTimeGridDay"
+        navLinks={true}
+        height="auto"
+        headerToolbar={false}
+        events={props.reservationData.map(reservationToEvent)}
+        resources={props.courtData.map(courtToResource)}
+        eventClick={openEventDialog}
+        dateClick={openReservationDialog}
+        selectable={false}
+        slotMinTime={formatTimeString(
+          props.clubData.clubSettings.firstBookableHour,
+          props.clubData.clubSettings.firstBookableMinute,
+        )}
+        slotMaxTime={formatTimeString(
+          props.clubData.clubSettings.lastBookableHour + 1,
+          props.clubData.clubSettings.lastBookableMinute,
+        )}
+        selectLongPressDelay={0}
+        slotLabelFormat={{
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: false,
+        }}
+        eventTimeFormat={{
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: false,
+        }}
+        allDaySlot={false}
+        eventContent={(eventInfo: EventContentArg) => {
+          return <CalendarEventCard eventInfo={eventInfo} />;
+        }}
+        titleFormat={{ month: "short", day: "numeric" }}
+        locale={"it-it"}
+        dayMinWidth={150}
       />
-      <Box padding={"0.5rem"}>
-        <FullCalendar
-          ref={calendarRef}
-          schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
-          plugins={[interactionPlugin, resourceTimeGridPlugin, ScrollGrid]}
-          initialView="resourceTimeGridDay"
-          navLinks={true}
-          height="auto"
-          headerToolbar={false}
-          events={props.reservationData.map(reservationToEvent)}
-          resources={props.courtData.map(courtToResource)}
-          eventClick={openEventDialog}
-          dateClick={openReservationDialog}
-          selectable={false}
-          slotMinTime={formatTimeString(
-            props.clubData.clubSettings.firstBookableHour,
-            props.clubData.clubSettings.firstBookableMinute,
-          )}
-          slotMaxTime={formatTimeString(
-            props.clubData.clubSettings.lastBookableHour + 1,
-            props.clubData.clubSettings.lastBookableMinute,
-          )}
-          selectLongPressDelay={0}
-          slotLabelFormat={{
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: false,
-          }}
-          eventTimeFormat={{
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: false,
-          }}
-          allDaySlot={false}
-          eventContent={(eventInfo: EventContentArg) => {
-            return <CalendarEventCard eventInfo={eventInfo} />;
-          }}
-          titleFormat={{ month: "short", day: "numeric" }}
-          locale={"it-it"}
-          dayMinWidth={150}
-        />
-      </Box>
     </Box>
   );
 }

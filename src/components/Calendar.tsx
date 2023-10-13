@@ -11,6 +11,7 @@ import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
 import Header from "./Header";
+import { HorizonalDatePicker } from "./HorizontalDatePicker";
 import Spinner from "./Spinner";
 import SpinnerPartial from "./SpinnerPartial";
 
@@ -121,6 +122,9 @@ export const useRecurrentReservationDelete = (clubId: string | undefined) => {
 export default function Calendar() {
   const clubId = useCalendarStoreContext((state) => state.clubId);
   const setClubId = useCalendarStoreContext((state) => state.setClubId);
+  const calendarIsLoading = useCalendarStoreContext(
+    (state) => state.calendarIsLoading,
+  );
 
   //get the club id from the router when is available
   const router = useRouter();
@@ -133,6 +137,8 @@ export default function Calendar() {
   const clubQuery = useClubQuery(clubId);
   const courtQuery = useCourtQuery(clubId);
   const reservationQuery = useReservationQuery(clubId);
+  // const reservationAdd = useReservationAdd(clubId);
+  // useCalendarStoreContext((state) => state.setReservationAdd(reservationAdd));
 
   // error handling
   if (clubQuery.error || courtQuery.error || reservationQuery.error) {
@@ -154,21 +160,38 @@ export default function Calendar() {
   }
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <>
       <Header
         headerName={clubQuery.data.name}
         logoSrc={clubQuery.data.logoSrc}
       />
-      <SpinnerPartial open={reservationQuery.isLoading}>
-        <FullCalendarWrapper
-          clubData={clubQuery.data}
-          courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
-          reservationData={reservationQuery.data ?? []} //same as above
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <HorizonalDatePicker
+          clubImage={clubQuery.data.imageSrc}
+          daysInTheFutureVisible={
+            clubQuery.data.clubSettings.daysInFutureVisible
+          }
+          daysInThePastVisible={
+            clubQuery.data.clubSettings.daysInThePastVisible
+          }
         />
-      </SpinnerPartial>
+        <SpinnerPartial
+          open={
+            reservationQuery.isLoading ||
+            reservationQuery.isRefetching ||
+            calendarIsLoading
+          }
+        >
+          <FullCalendarWrapper
+            clubData={clubQuery.data}
+            courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
+            reservationData={reservationQuery.data ?? []} //same as above
+          />
+        </SpinnerPartial>
 
-      <ReserveDialog />
-      <EventDetailDialog />
-    </LocalizationProvider>
+        <ReserveDialog />
+        <EventDetailDialog />
+      </LocalizationProvider>
+    </>
   );
 }

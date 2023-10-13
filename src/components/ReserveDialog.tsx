@@ -11,7 +11,7 @@ import { DateField, TimeField } from "@mui/x-date-pickers";
 import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 import {
@@ -24,7 +24,6 @@ import ErrorAlert from "./ErrorAlert";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
-import Spinner from "./Spinner";
 
 export default function ReserveDialog() {
   const { data: sessionData } = useSession();
@@ -40,6 +39,12 @@ export default function ReserveDialog() {
   const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
   const endDate = useCalendarStoreContext((store) => store.endDate);
   const setEndDate = useCalendarStoreContext((store) => store.setEndDate);
+  const calendarIsLoading = useCalendarStoreContext(
+    (state) => state.calendarIsLoading,
+  );
+  const setCalendarIsLoading = useCalendarStoreContext(
+    (state) => state.setCalendarIsLoading,
+  );
 
   const endDateError = useCalendarStoreContext((store) => store.endDateError);
 
@@ -105,12 +110,29 @@ export default function ReserveDialog() {
         clubId: clubId,
       });
     }
-
+    setCalendarIsLoading(true);
     setDateClick(null);
     setOverwriteName("");
     setEndDate(null);
     setRecurrentEndDate(null);
   };
+
+  // loading handling
+  useEffect(() => {
+    if (
+      !(reservationAdd.isLoading || recurrentReservationAdd.isLoading) &&
+      calendarIsLoading
+    ) {
+      setCalendarIsLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    calendarIsLoading,
+    reservationAdd.isLoading,
+    recurrentReservationAdd.isLoading,
+  ]);
+
+  if (!clubQuery.data) return;
 
   // error handling
   if (
@@ -132,15 +154,6 @@ export default function ReserveDialog() {
         }}
       />
     );
-  }
-
-  // loading handling
-  if (
-    reservationAdd.isLoading ||
-    recurrentReservationAdd.isLoading ||
-    clubQuery.isLoading
-  ) {
-    return <Spinner isLoading={true} />;
   }
 
   return (

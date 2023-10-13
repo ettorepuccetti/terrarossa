@@ -1,25 +1,25 @@
-import { type RefObject } from "@fullcalendar/core/preact";
-import type FullCalendar from "@fullcalendar/react";
 import { Box, Typography } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
 import Image from "next/image";
 import { useState } from "react";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { defaultClubImage } from "~/utils/constants";
 import { capitaliseFirstChar } from "~/utils/utils";
 import { DayCard } from "./DayCard";
 require("dayjs/locale/it");
 dayjs.locale("it");
 
 export const HorizonalDatePicker = ({
-  calendarRef,
-  clubImg,
+  clubImage,
   daysInThePastVisible,
   daysInTheFutureVisible,
 }: {
-  calendarRef: RefObject<FullCalendar>;
-  clubImg: string;
+  clubImage: string | null;
   daysInThePastVisible: number;
   daysInTheFutureVisible: number;
 }) => {
+  const calendarRef = useCalendarStoreContext((state) => state.calendarRef);
+
   const today = dayjs().set("hour", 0).set("minute", 0).set("second", 0);
   const [selectedDate, setSelectedDate] = useState<Dayjs>(today);
 
@@ -43,7 +43,7 @@ export const HorizonalDatePicker = ({
       <Box position={"relative"} height={250}>
         <Image
           alt={""}
-          src={clubImg}
+          src={clubImage || defaultClubImage}
           fill={true}
           style={{ objectFit: "cover" }}
         />
