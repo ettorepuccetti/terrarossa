@@ -21,8 +21,9 @@ export default function Header() {
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const theme = useTheme();
 
-  const headerName = useCalendarStoreContext((state) => state.headerName);
-  const logoSrc = useCalendarStoreContext((state) => state.logoSrc);
+  const clubData = useCalendarStoreContext((state) => state.clubData);
+  const headerName = clubData?.name;
+  const logoSrc = clubData?.logoSrc;
   return (
     <>
       <AppBar position={"fixed"}>

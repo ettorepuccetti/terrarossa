@@ -30,8 +30,6 @@ export interface IStore {
   recurrentReservationDelete:
     | ReturnType<typeof useRecurrentReservationDelete>
     | undefined;
-  headerName: string | undefined;
-  logoSrc: string | undefined | null;
   clubData: RouterOutputs["club"]["getByClubId"] | undefined;
   setDateClick: (dateClick: DateClickArg | null) => void;
   setEventDetails: (eventDetails: EventImpl | null) => void;
@@ -56,8 +54,6 @@ export interface IStore {
       typeof useRecurrentReservationDelete
     >,
   ) => void;
-  setHeaderName: (headerName: string | undefined) => void;
-  setLogoSrc: (logoSrc: string | undefined | null) => void;
   setClubData: (
     clubData: RouterOutputs["club"]["getByClubId"] | undefined,
   ) => void;
@@ -93,8 +89,6 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   recurrentReservationAdd: undefined,
   reservationDelete: undefined,
   recurrentReservationDelete: undefined,
-  headerName: undefined,
-  logoSrc: undefined,
   clubData: undefined,
   setDateClick: (dateClick) => {
     set({ dateClick: dateClick });
@@ -120,12 +114,8 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
     set({ reservationDelete: reservationDelete }),
   setRecurrentReservationDelete: (recurrentReservationDelete) =>
     set({ recurrentReservationDelete: recurrentReservationDelete }),
-  setHeaderName: (headerName) => set({ headerName: headerName }),
-  setLogoSrc: (logoSrc) => set({ logoSrc: logoSrc }),
   setClubData: (clubData) => {
     set({ clubData: clubData });
-    set({ headerName: clubData?.name });
-    set({ logoSrc: clubData?.logoSrc });
   },
   //getters
   getStartDate: () => {
