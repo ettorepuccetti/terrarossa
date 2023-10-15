@@ -9,16 +9,12 @@ import { DayCard } from "./DayCard";
 require("dayjs/locale/it");
 dayjs.locale("it");
 
-export const HorizonalDatePicker = ({
-  clubImage,
-  daysInThePastVisible,
-  daysInTheFutureVisible,
-}: {
-  clubImage: string | null;
-  daysInThePastVisible: number;
-  daysInTheFutureVisible: number;
-}) => {
-  const calendarRef = useCalendarStoreContext((state) => state.calendarRef);
+export function HorizonalDatePicker() {
+  const calendarRef = useCalendarStoreContext((store) => store.calendarRef);
+
+  const clubData = useCalendarStoreContext((state) => state.getClubData());
+  const daysInThePastVisible = clubData.clubSettings.daysInThePastVisible;
+  const daysInTheFutureVisible = clubData.clubSettings.daysInFutureVisible;
 
   const today = dayjs().set("hour", 0).set("minute", 0).set("second", 0);
   const [selectedDate, setSelectedDate] = useState<Dayjs>(today);
@@ -43,7 +39,7 @@ export const HorizonalDatePicker = ({
       <Box position={"relative"} height={250}>
         <Image
           alt={""}
-          src={clubImage || defaultClubImage}
+          src={clubData?.imageSrc || defaultClubImage}
           fill={true}
           style={{ objectFit: "cover" }}
         />
@@ -92,4 +88,4 @@ export const HorizonalDatePicker = ({
       </Typography>
     </Box>
   );
-};
+}

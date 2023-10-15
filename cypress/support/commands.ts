@@ -73,22 +73,12 @@ Cypress.Commands.add("getUsername", () => {
 });
 
 Cypress.Commands.add("navigateDaysFromToday", (n: number) => {
-  const nextDaysAsString = (nOfDays: number): string => {
-    const now = new Date();
-    const futureDate = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + nOfDays,
-    );
-    return futureDate.getDate().toString().padStart(2, "0");
-  };
+  const dayToSelect = dayjs().add(n, "day").format("DD");
 
-  cy.log("Selecting day of the month: " + nextDaysAsString(n));
+  cy.log("Selecting day of the month: " + dayToSelect);
 
   // select a date two day in the future
-  cy.get("[data-test='day-card']")
-    .contains(nextDaysAsString(n))
-    .click({ force: true });
+  cy.get("[data-test='day-card']").contains(dayToSelect).click({ force: true });
 });
 
 Cypress.Commands.add(
@@ -177,4 +167,8 @@ Cypress.Commands.add("logout", () => {
 
 Cypress.Commands.add("deleteReservationFromDb", (reservationId: string) => {
   cy.task("prisma:deleteReservationFromDb", reservationId);
+});
+
+Cypress.Commands.add("getByDataTest", (dataTest: string) => {
+  return cy.get(`[data-test="${dataTest}"]`);
 });

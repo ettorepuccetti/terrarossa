@@ -19,6 +19,7 @@ export const ClubSearchCard = ({ club }: { club: Club }) => {
         pathname: "prenota",
         query: { clubId: club.id },
       }}
+      data-test={"club-card-" + club.name}
     >
       <Card>
         <CardMedia sx={{ height: 140, position: "relative" }}>

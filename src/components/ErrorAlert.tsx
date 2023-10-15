@@ -4,7 +4,7 @@ import { type DefaultErrorShape } from "@trpc/server";
 
 interface ErrorAlertProps<T extends DefaultErrorShape> {
   onClose: () => void;
-  error: TRPCClientErrorBase<T> | null;
+  error: TRPCClientErrorBase<T> | null | undefined;
 }
 
 export default function ErrorAlert(props: ErrorAlertProps<DefaultErrorShape>) {

@@ -6,11 +6,11 @@ import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 
 export default function ReserveDialogRecurrent() {
-  const clubId = useCalendarStoreContext((state) => state.getClubId());
   const startDate = useCalendarStoreContext((state) => state.getStartDate());
   const recurrentEndDate = useCalendarStoreContext(
     (state) => state.recurrentEndDate,
   );
+  const clubData = useCalendarStoreContext((state) => state.getClubData());
   const setRecurrentEndDate = useCalendarStoreContext(
     (state) => state.setRecurrentEndDate,
   );
@@ -24,7 +24,7 @@ export default function ReserveDialogRecurrent() {
   return (
     <>
       {/* swticher for recurrent reservation */}
-      {isAdminOfTheClub(sessionData, clubId) && (
+      {isAdminOfTheClub(sessionData, clubData.id) && (
         <Box display={"flex"} gap={0.5} alignItems={"center"}>
           <Switch
             data-test="recurrent-switch"

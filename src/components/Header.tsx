@@ -5,6 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Image from "next/image";
 import React from "react";
+import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { appNameInHeader, defaultLogoSrc } from "~/utils/constants";
 import Drawer from "./DrawerWrapper";
 
@@ -16,16 +17,12 @@ const toolbarStyle: SxProps = {
   display: "flex",
 };
 
-export default function Header({
-  headerName,
-  logoSrc,
-}: {
-  headerName?: string | undefined;
-  logoSrc?: string | undefined | null;
-}) {
+export default function Header() {
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const theme = useTheme();
 
+  const headerName = useCalendarStoreContext((state) => state.headerName);
+  const logoSrc = useCalendarStoreContext((state) => state.logoSrc);
   return (
     <>
       <AppBar position={"fixed"}>
@@ -45,6 +42,7 @@ export default function Header({
 
           {/* Name */}
           <Typography
+            data-test="header-name"
             variant="h5"
             fontWeight={500}
             color={headerName ? "black" : theme.palette.primary.main}
@@ -55,6 +53,7 @@ export default function Header({
           {/* Logo */}
           <Box display={"flex"} flex={1} justifyContent={"flex-end"}>
             <Image
+              data-test="header-logo"
               src={logoSrc ?? defaultLogoSrc}
               alt="logo"
               width={50}

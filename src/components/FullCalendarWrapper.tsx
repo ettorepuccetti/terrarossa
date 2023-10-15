@@ -39,7 +39,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   const setCalendarRef = useCalendarStoreContext(
     (state) => state.setCalendarRef,
   );
-  const clubId = useCalendarStoreContext((state) => state.clubId);
+  const clubData = useCalendarStoreContext((state) => state.getClubData());
   const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
   const setEventDetails = useCalendarStoreContext(
     (state) => state.setEventDetails,
@@ -99,14 +99,11 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   };
 
   const openEventDialog = (eventClickInfo: EventClickArg) => {
-    if (!clubId) {
-      throw new Error("ClubId not found");
-    }
     eventClickInfo.jsEvent.preventDefault();
     //open eventDetail dialog only for the user who made the reservation or for the admin
     if (
       eventClickInfo.event.extendedProps.userId === sessionData?.user.id ||
-      isAdminOfTheClub(sessionData, clubId)
+      isAdminOfTheClub(sessionData, clubData.id)
     ) {
       setEventDetails(eventClickInfo.event);
     }

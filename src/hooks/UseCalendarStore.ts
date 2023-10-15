@@ -4,11 +4,17 @@ import type FullCalendar from "@fullcalendar/react";
 import dayjs, { type Dayjs } from "dayjs";
 import { type RefObject } from "react";
 import { type StateCreator } from "zustand";
+import {
+  type useRecurrentReservationAdd,
+  type useRecurrentReservationDelete,
+  type useReservationAdd,
+  type useReservationDelete,
+} from "~/components/Calendar";
+import { type RouterOutputs } from "~/utils/api";
 
 export interface IStore {
   dateClick: DateClickArg | null;
   eventDetails: EventImpl | null;
-  clubId: string | undefined;
   endDate: Dayjs | null;
   endDateError: boolean;
   recurrentEndDate: Dayjs | null;
@@ -16,9 +22,19 @@ export interface IStore {
   deleteConfirmationOpen: boolean;
   calendarRef: RefObject<FullCalendar>;
   calendarIsLoading: boolean;
+  reservationAdd: ReturnType<typeof useReservationAdd> | undefined;
+  recurrentReservationAdd:
+    | ReturnType<typeof useRecurrentReservationAdd>
+    | undefined;
+  reservationDelete: ReturnType<typeof useReservationDelete> | undefined;
+  recurrentReservationDelete:
+    | ReturnType<typeof useRecurrentReservationDelete>
+    | undefined;
+  headerName: string | undefined;
+  logoSrc: string | undefined | null;
+  clubData: RouterOutputs["club"]["getByClubId"] | undefined;
   setDateClick: (dateClick: DateClickArg | null) => void;
   setEventDetails: (eventDetails: EventImpl | null) => void;
-  setClubId: (clubId: string) => void;
   setEndDate: (endDate: Dayjs | null) => void;
   setEndDateError: (endDateError: boolean) => void;
   setRecurrentEndDate: (recurrentEndDate: Dayjs | null) => void;
@@ -26,8 +42,36 @@ export interface IStore {
   setDeleteConfirmationOpen: (deleteConfirmationOpen: boolean) => void;
   setCalendarRef: (calendarRef: RefObject<FullCalendar>) => void;
   setCalendarIsLoading: (calendarIsLoading: boolean) => void;
-  getClubId: () => string;
+  setReservationAdd: (
+    reservationAdd: ReturnType<typeof useReservationAdd>,
+  ) => void;
+  setRecurrentReservationAdd: (
+    reservationAdd: ReturnType<typeof useRecurrentReservationAdd>,
+  ) => void;
+  setReservationDelete: (
+    reservationDelete: ReturnType<typeof useReservationDelete>,
+  ) => void;
+  setRecurrentReservationDelete: (
+    recurrentReservationDelete: ReturnType<
+      typeof useRecurrentReservationDelete
+    >,
+  ) => void;
+  setHeaderName: (headerName: string | undefined) => void;
+  setLogoSrc: (logoSrc: string | undefined | null) => void;
+  setClubData: (
+    clubData: RouterOutputs["club"]["getByClubId"] | undefined,
+  ) => void;
+  //getter
   getStartDate: () => Dayjs;
+  getClubData: () => RouterOutputs["club"]["getByClubId"];
+  getReservationAdd: () => ReturnType<typeof useReservationAdd>;
+  getRecurrentReservationAdd: () => ReturnType<
+    typeof useRecurrentReservationAdd
+  >;
+  getReservationDelete: () => ReturnType<typeof useReservationDelete>;
+  getRecurrentReservationDelete: () => ReturnType<
+    typeof useRecurrentReservationDelete
+  >;
   //for testing only
   setSetEndDate: (stub: (endDate: Dayjs | null) => void) => void;
   setSetEndDateError: (stub: (endDate: boolean) => void) => void;
@@ -38,7 +82,6 @@ export interface IStore {
 export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   dateClick: null,
   eventDetails: null,
-  clubId: undefined,
   endDate: null,
   endDateError: false,
   recurrentEndDate: null,
@@ -46,13 +89,18 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   deleteConfirmationOpen: false,
   calendarRef: { current: null },
   calendarIsLoading: false,
-  // reservationAdd: ,
+  reservationAdd: undefined,
+  recurrentReservationAdd: undefined,
+  reservationDelete: undefined,
+  recurrentReservationDelete: undefined,
+  headerName: undefined,
+  logoSrc: undefined,
+  clubData: undefined,
   setDateClick: (dateClick) => {
     set({ dateClick: dateClick });
     set({ endDate: dayjs(dateClick?.date).add(1, "h") });
   },
   setEventDetails: (setEventDetails) => set({ eventDetails: setEventDetails }),
-  setClubId: (clubId) => set({ clubId: clubId }),
   setEndDate: (endDate) => set({ endDate: endDate }),
   setEndDateError: (endDateError) => set({ endDateError: endDateError }),
   setRecurrentEndDate: (recurrentEndDate) =>
@@ -64,16 +112,43 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   setCalendarRef: (calendarRef) => set({ calendarRef: calendarRef }),
   setCalendarIsLoading: (calendarIsLoading) =>
     set({ calendarIsLoading: calendarIsLoading }),
-  getClubId: () => {
-    const clubId = get().clubId;
-    if (clubId === undefined) {
-      throw new Error("clubId is undefined");
-    }
-    return clubId;
+  setReservationAdd: (reservationAdd) =>
+    set({ reservationAdd: reservationAdd }),
+  setRecurrentReservationAdd: (recurrentReservationAdd) =>
+    set({ recurrentReservationAdd: recurrentReservationAdd }),
+  setReservationDelete: (reservationDelete) =>
+    set({ reservationDelete: reservationDelete }),
+  setRecurrentReservationDelete: (recurrentReservationDelete) =>
+    set({ recurrentReservationDelete: recurrentReservationDelete }),
+  setHeaderName: (headerName) => set({ headerName: headerName }),
+  setLogoSrc: (logoSrc) => set({ logoSrc: logoSrc }),
+  setClubData: (clubData) => {
+    set({ clubData: clubData });
+    set({ headerName: clubData?.name });
+    set({ logoSrc: clubData?.logoSrc });
   },
+  //getters
   getStartDate: () => {
     const startDate = get().dateClick?.date;
     return dayjs(startDate);
+  },
+
+  getClubData: () => {
+    return getOrThrow(() => get().clubData);
+  },
+
+  getReservationAdd: () => {
+    return getOrThrow(() => get().reservationAdd);
+  },
+
+  getRecurrentReservationAdd: () => {
+    return getOrThrow(() => get().recurrentReservationAdd);
+  },
+  getReservationDelete: () => {
+    return getOrThrow(() => get().reservationDelete);
+  },
+  getRecurrentReservationDelete: () => {
+    return getOrThrow(() => get().recurrentReservationDelete);
   },
 
   //for testing only
@@ -86,3 +161,11 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   setSetRecurringEndDateError: (stub: (endDateError: boolean) => void) =>
     set({ setRecurringEndDateError: stub }),
 });
+
+const getOrThrow = <T>(getter: () => T | undefined): T => {
+  const result = getter();
+  if (result === undefined) {
+    throw new Error("result is undefined");
+  }
+  return result;
+};

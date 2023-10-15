@@ -10,33 +10,25 @@ import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
-import {
-  useClubQuery,
-  useRecurrentReservationDelete,
-  useReservationDelete,
-} from "./Calendar";
 import CancelRecurrentDialog from "./CancelRecurrentDialog";
 import CancelSingleDialog from "./CancelSingleDialog";
 import DialogLayout from "./DialogLayout";
-import ErrorAlert from "./ErrorAlert";
-import Spinner from "./Spinner";
 
 export default function EventDetailDialog() {
   const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
   const setEventDetails = useCalendarStoreContext(
     (state) => state.setEventDetails,
   );
-  const clubId = useCalendarStoreContext((state) => state.getClubId());
+  const clubData = useCalendarStoreContext((state) => state.getClubData());
+
   const { data: sessionData } = useSession();
-  const clubQuery = useClubQuery(clubId);
-  const reservationDelete = useReservationDelete(clubId);
-  const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
+
   const setDeleteConfirmationOpen = useCalendarStoreContext(
     (state) => state.setDeleteConfirmationOpen,
   );
 
   const canDelete =
-    isAdminOfTheClub(sessionData, clubId) ||
+    isAdminOfTheClub(sessionData, clubData.id) ||
     (sessionData?.user?.id &&
       sessionData.user.id === eventDetails?.extendedProps?.userId);
 
@@ -46,41 +38,9 @@ export default function EventDetailDialog() {
   ) => {
     return (
       dayjs(startTime).isBefore(dayjs().add(hoursBeforeCancel, "hour")) &&
-      !isAdminOfTheClub(sessionData, clubId)
+      !isAdminOfTheClub(sessionData, clubData.id)
     );
   };
-
-  // error handling
-  if (
-    clubQuery.error ||
-    reservationDelete.error ||
-    recurrentReservationDelete.error
-  ) {
-    return (
-      <ErrorAlert
-        error={
-          clubQuery.error ||
-          reservationDelete.error ||
-          recurrentReservationDelete.error
-        }
-        onClose={() => {
-          clubQuery.error && void clubQuery.refetch();
-          reservationDelete.error && void reservationDelete.reset();
-          recurrentReservationDelete.error &&
-            void recurrentReservationDelete.reset();
-        }}
-      />
-    );
-  }
-
-  // loading handling
-  if (
-    clubQuery.isLoading ||
-    reservationDelete.isLoading ||
-    recurrentReservationDelete.isLoading
-  ) {
-    return <Spinner isLoading={true} />;
-  }
 
   return (
     <>
@@ -135,12 +95,12 @@ export default function EventDetailDialog() {
           {canDelete &&
             tooLateToCancel(
               eventDetails?.start,
-              clubQuery.data.clubSettings.hoursBeforeCancel,
+              clubData.clubSettings.hoursBeforeCancel,
             ) && (
               <Alert data-test="alert" severity="warning">
                 Non puoi cancellare una prenotazione meno di{" "}
-                {clubQuery.data.clubSettings.hoursBeforeCancel} ore prima del
-                suo inizio
+                {clubData.clubSettings.hoursBeforeCancel} ore prima del suo
+                inizio
               </Alert>
             )}
 
@@ -151,7 +111,7 @@ export default function EventDetailDialog() {
               color={"error"}
               disabled={tooLateToCancel(
                 eventDetails?.start,
-                clubQuery.data.clubSettings.hoursBeforeCancel,
+                clubData.clubSettings.hoursBeforeCancel,
               )}
               data-test="delete-button"
             >
@@ -160,13 +120,10 @@ export default function EventDetailDialog() {
           )}
 
           {/* show recurrent confirmation dialog */}
-          <CancelRecurrentDialog
-            useRecurrentReservationDelete={recurrentReservationDelete.mutate}
-            useReservationDelete={reservationDelete.mutate}
-          />
+          <CancelRecurrentDialog />
 
           {/* show confirmation dialog */}
-          <CancelSingleDialog useReservationDelete={reservationDelete.mutate} />
+          <CancelSingleDialog />
         </DialogLayout>
       </Dialog>
     </>
