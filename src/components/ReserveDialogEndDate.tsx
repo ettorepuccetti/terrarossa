@@ -11,7 +11,7 @@ import { startDateIsFuture } from "./ReserveDialog";
 export default function ReserveDialogEndDate(props: {
   clubSettings: ClubSettings;
 }) {
-  const clubId = useCalendarStoreContext((store) => store.getClubId());
+  const clubData = useCalendarStoreContext((store) => store.getClubData());
   const startDate = useCalendarStoreContext((store) => store.getStartDate());
   const endDate = useCalendarStoreContext((store) => store.endDate);
   const setEndDate = useCalendarStoreContext((store) => store.setEndDate);
@@ -46,11 +46,11 @@ export default function ReserveDialogEndDate(props: {
       maxTime={maxTime(
         startDate,
         sessionData,
-        clubId,
+        clubData.id,
         props.clubSettings.lastBookableHour,
         props.clubSettings.lastBookableMinute,
       )}
-      disabled={!startDateIsFuture(sessionData, clubId, startDate)}
+      disabled={!startDateIsFuture(sessionData, clubData.id, startDate)}
       autoFocus
       sx={{ width: "100%" }}
       onError={(error) => {

@@ -10,7 +10,7 @@ import {
 import { type Club } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { defaultImg } from "~/utils/constants";
+import { defaultClubImage } from "~/utils/constants";
 
 export const ClubSearchCard = ({ club }: { club: Club }) => {
   return (
@@ -19,13 +19,14 @@ export const ClubSearchCard = ({ club }: { club: Club }) => {
         pathname: "prenota",
         query: { clubId: club.id },
       }}
+      data-test={"club-card-" + club.name}
     >
       <Card>
         <CardMedia sx={{ height: 140, position: "relative" }}>
           <Image
             fill={true}
             alt={club.name}
-            src={club.imageSrc ?? defaultImg}
+            src={club.imageSrc ?? defaultClubImage}
             style={{ objectFit: "cover" }}
           />
         </CardMedia>

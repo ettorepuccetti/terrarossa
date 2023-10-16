@@ -12,16 +12,7 @@ import React from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import DialogLayout from "./DialogLayout";
 
-export default function CancelRecurrentDialog(props: {
-  useReservationDelete: (arg0: {
-    reservationId: string;
-    clubId: string;
-  }) => void;
-  useRecurrentReservationDelete: (arg0: {
-    recurrentReservationId: string;
-    clubId: string;
-  }) => void;
-}) {
+export default function CancelRecurrentDialog() {
   const deleteOpen = useCalendarStoreContext(
     (state) => state.deleteConfirmationOpen,
   );
@@ -32,7 +23,15 @@ export default function CancelRecurrentDialog(props: {
   const setEventDetails = useCalendarStoreContext(
     (state) => state.setEventDetails,
   );
-  const clubId = useCalendarStoreContext((state) => state.getClubId());
+
+  const clubData = useCalendarStoreContext((state) => state.getClubData());
+
+  const recurrentReservationDelete = useCalendarStoreContext((state) =>
+    state.getRecurrentReservationDelete(),
+  );
+  const reservationDelete = useCalendarStoreContext((state) =>
+    state.getReservationDelete(),
+  );
 
   const [value, setValue] = React.useState("single");
 
@@ -56,17 +55,17 @@ export default function CancelRecurrentDialog(props: {
 
   const deleteReservation = (reservationId: string) => {
     console.log("delete event: ", reservationId);
-    props.useReservationDelete({
+    reservationDelete.mutate({
       reservationId: reservationId,
-      clubId: clubId,
+      clubId: clubData.id,
     });
   };
 
   const deleteRecurrentReservation = (recurentReservationId: string) => {
     console.log("delete recurrent event: ", recurentReservationId);
-    props.useRecurrentReservationDelete({
+    recurrentReservationDelete.mutate({
       recurrentReservationId: recurentReservationId,
-      clubId: clubId,
+      clubId: clubData.id,
     });
   };
 

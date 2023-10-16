@@ -1,16 +1,14 @@
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
 
-import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useRouter } from "next/router";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { api } from "~/utils/api";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
-import Header from "./Header";
+import { HorizonalDatePicker } from "./HorizontalDatePicker";
 import Spinner from "./Spinner";
 import SpinnerPartial from "./SpinnerPartial";
 
@@ -119,56 +117,145 @@ export const useRecurrentReservationDelete = (clubId: string | undefined) => {
 };
 
 export default function Calendar() {
-  const clubId = useCalendarStoreContext((state) => state.clubId);
-  const setClubId = useCalendarStoreContext((state) => state.setClubId);
+  const [clubId, setClubId] = useState<string | undefined>(undefined);
+
+  // --------------------------------
+  // ------  QUERY & MUTATIONS ------
+  // --------------------------------
+
+  // reservationAdd
+  const setReservationAdd = useCalendarStoreContext(
+    (store) => store.setReservationAdd,
+  );
+  const reservationAdd = useReservationAdd(clubId);
+
+  // recurrentReservationAdd
+  const setRecurrentReservationAdd = useCalendarStoreContext(
+    (store) => store.setRecurrentReservationAdd,
+  );
+  const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
+
+  // reservationDelete
+  const setReservationDelete = useCalendarStoreContext(
+    (store) => store.setReservationDelete,
+  );
+  const reservationDelete = useReservationDelete(clubId);
+
+  // recurrentReservationDelete
+  const setRecurrentReservationDelete = useCalendarStoreContext(
+    (store) => store.setRecurrentReservationDelete,
+  );
+  const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
+
+  // clubQuery
+  const setClubData = useCalendarStoreContext((store) => store.setClubData);
+  const clubQuery = useClubQuery(clubId);
+  // data to check for rendering calendar and other sub components,
+  // if I call `store.getClubData` when still undefined, I get an exception
+  const clubDataInStore = useCalendarStoreContext((store) => store.clubData);
+
+  // queries for which I want to pass down their data as props to the calendar,
+  // I want to manage them in a way that the subComponent render even if their data are not yet available
+  // so I still show the calendar under the spinner while waiting for the queries to finish
+  const courtQuery = useCourtQuery(clubId);
+  const reservationQuery = useReservationQuery(clubId);
+
+  // -------------------
+  // ----- EFFECTS -----
+  // -------------------
 
   //get the club id from the router when is available
   const router = useRouter();
   useEffect(() => {
     if (router.isReady) {
+      //clubId is in local state
       setClubId(router.query.clubId as string);
     }
-  }, [router.isReady, router.query.clubId, setClubId]);
+  }, [router.isReady]);
 
-  const clubQuery = useClubQuery(clubId);
-  const courtQuery = useCourtQuery(clubId);
-  const reservationQuery = useReservationQuery(clubId);
+  // set clubData in the store when data is available
+  useEffect(() => {
+    if (clubQuery.data) {
+      setClubData(clubQuery.data);
+    }
+  }, [clubQuery.data]);
 
-  // error handling
-  if (clubQuery.error || courtQuery.error || reservationQuery.error) {
+  // set reservationAdd, recurrentReservationAdd, reservationDelete, recurrentReservationDelete in the store on the first render
+  // then clean clubData on component unmount
+  useEffect(() => {
+    setReservationAdd(reservationAdd);
+    setRecurrentReservationAdd(recurrentReservationAdd);
+    setReservationDelete(reservationDelete);
+    setRecurrentReservationDelete(recurrentReservationDelete);
+    //onComponentUnmount: reset the clubData
+    return () => {
+      setClubData(undefined);
+    };
+  }, []);
+
+  // -------------------
+
+  //if there is an error in the clubQuery, show an error alert and not render any other component (FullCalendar, ReserveDialog, EventDetailDialog)
+  if (clubQuery.isError) {
     return (
       <ErrorAlert
-        error={clubQuery.error ?? courtQuery.error ?? reservationQuery.error}
+        error={clubQuery.error}
         onClose={() => {
-          clubQuery.error && void clubQuery.refetch();
-          courtQuery.error && void courtQuery.refetch();
-          reservationQuery.error && void reservationQuery.refetch();
+          void clubQuery.refetch();
         }}
       />
     );
   }
 
-  // loading handling
-  if (clubQuery.isLoading || !clubId) {
+  // if club data is not available yet, show a spinner and not render any other component (FullCalendar, ReserveDialog, EventDetailDialog)
+  // different then checking `if (clubQuery.isLoading)` because when finish loading,
+  // clubData is not yet available in store , but the sub-component would try to render anyway
+  // Should I check also reservationAdd, reservationDelete, recurrentReservationAdd, recurrentReservationDelete?
+  if (!clubDataInStore) {
     return <Spinner isLoading={true} />;
   }
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Header
-        headerName={clubQuery.data.name}
-        logoSrc={clubQuery.data.logoSrc}
+    <>
+      <HorizonalDatePicker />
+
+      <ErrorAlert
+        error={
+          courtQuery.error ||
+          reservationQuery.error ||
+          reservationAdd.error ||
+          recurrentReservationAdd.error ||
+          reservationDelete.error ||
+          recurrentReservationDelete.error
+        }
+        onClose={() => {
+          courtQuery.error && void courtQuery.refetch();
+          reservationQuery.error && void reservationQuery.refetch();
+          reservationAdd.error && void reservationAdd.reset();
+          recurrentReservationAdd.error && void recurrentReservationAdd.reset();
+          reservationDelete.error && void reservationDelete.reset();
+          recurrentReservationDelete.error &&
+            void recurrentReservationDelete.reset();
+        }}
       />
-      <SpinnerPartial open={reservationQuery.isLoading}>
+
+      <SpinnerPartial
+        open={
+          reservationQuery.isLoading ||
+          reservationQuery.isRefetching ||
+          reservationAdd.isLoading ||
+          reservationDelete.isLoading ||
+          recurrentReservationAdd.isLoading ||
+          recurrentReservationDelete.isLoading
+        }
+      >
         <FullCalendarWrapper
-          clubData={clubQuery.data}
           courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
           reservationData={reservationQuery.data ?? []} //same as above
         />
       </SpinnerPartial>
-
       <ReserveDialog />
       <EventDetailDialog />
-    </LocalizationProvider>
+    </>
   );
 }

@@ -14,35 +14,29 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
-import {
-  useClubQuery,
-  useRecurrentReservationAdd,
-  useReservationAdd,
-} from "./Calendar";
 import DialogLayout from "./DialogLayout";
-import ErrorAlert from "./ErrorAlert";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
-import Spinner from "./Spinner";
 
 export default function ReserveDialog() {
   const { data: sessionData } = useSession();
 
   const startDate = useCalendarStoreContext((store) => store.getStartDate());
-  const clubId = useCalendarStoreContext((state) => state.getClubId());
 
-  const clubQuery = useClubQuery(clubId);
-  const reservationAdd = useReservationAdd(clubId);
-  const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
+  const clubData = useCalendarStoreContext((store) => store.getClubData());
+  const reservationAdd = useCalendarStoreContext((store) =>
+    store.getReservationAdd(),
+  );
+  const recurrentReservationAdd = useCalendarStoreContext((store) =>
+    store.getRecurrentReservationAdd(),
+  );
 
   const dateClick = useCalendarStoreContext((state) => state.dateClick);
   const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
   const endDate = useCalendarStoreContext((store) => store.endDate);
   const setEndDate = useCalendarStoreContext((store) => store.setEndDate);
-
   const endDateError = useCalendarStoreContext((store) => store.endDateError);
-
   const recurrentEndDate = useCalendarStoreContext(
     (state) => state.recurrentEndDate,
   );
@@ -83,13 +77,13 @@ export default function ReserveDialog() {
       "resource title: ",
       resource.title,
       "clubId: ",
-      clubId,
+      clubData.id,
     );
     //todo: use a single api end point for both reservation and recurrent reservation
     const name = overwriteName !== "" ? overwriteName : undefined; //manage undefined of input for controlled component
     if (recurrentEndDate) {
       recurrentReservationAdd.mutate({
-        clubId: clubId,
+        clubId: clubData.id,
         courtId: resource.id,
         startDateTime: startDate.toDate(),
         endDateTime: endDate.toDate(),
@@ -102,46 +96,14 @@ export default function ReserveDialog() {
         startDateTime: startDate.toDate(),
         endDateTime: endDate.toDate(),
         overwriteName: name,
-        clubId: clubId,
+        clubId: clubData.id,
       });
     }
-
     setDateClick(null);
     setOverwriteName("");
     setEndDate(null);
     setRecurrentEndDate(null);
   };
-
-  // error handling
-  if (
-    reservationAdd.error ||
-    recurrentReservationAdd.error ||
-    clubQuery.error
-  ) {
-    return (
-      <ErrorAlert
-        error={
-          reservationAdd.error ??
-          recurrentReservationAdd.error ??
-          clubQuery.error
-        }
-        onClose={() => {
-          reservationAdd.error && reservationAdd.reset();
-          recurrentReservationAdd.error && recurrentReservationAdd.reset();
-          clubQuery.error && void clubQuery.refetch();
-        }}
-      />
-    );
-  }
-
-  // loading handling
-  if (
-    reservationAdd.isLoading ||
-    recurrentReservationAdd.isLoading ||
-    clubQuery.isLoading
-  ) {
-    return <Spinner isLoading={true} />;
-  }
 
   return (
     <>
@@ -167,7 +129,7 @@ export default function ReserveDialog() {
               </DialogActions>
 
               {/* overwrite name, only if admin mode */}
-              {isAdminOfTheClub(sessionData, clubId) && (
+              {isAdminOfTheClub(sessionData, clubData.id) && (
                 <TextField
                   data-test="overwriteName"
                   variant="outlined"
@@ -205,15 +167,13 @@ export default function ReserveDialog() {
               />
 
               {/* end time */}
-              <ReserveDialogEndDate
-                clubSettings={clubQuery.data.clubSettings}
-              />
+              <ReserveDialogEndDate clubSettings={clubData.clubSettings} />
 
               {/* recurrent reservation */}
               <ReserveDialogRecurrent />
 
               {/* start date in the past warning */}
-              {!startDateIsFuture(sessionData, clubId, startDate) && (
+              {!startDateIsFuture(sessionData, clubData.id, startDate) && (
                 <Box display={"flex"}>
                   <Alert data-test="past-warning" severity={"warning"}>
                     Non puoi prenotare una data nel passato
@@ -224,7 +184,7 @@ export default function ReserveDialog() {
               <Button
                 onClick={onConfirmButton}
                 disabled={
-                  !startDateIsFuture(sessionData, clubId, startDate) ||
+                  !startDateIsFuture(sessionData, clubData.id, startDate) ||
                   endDateError ||
                   recurrentEndDateError
                 }

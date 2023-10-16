@@ -1,4 +1,4 @@
-import { type ClubSettings } from "@prisma/client";
+import { type Club, type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
 import {
   allEnglandClubName,
@@ -489,5 +489,64 @@ describe("Reservation details", () => {
         (this.clubSettingsForoItalico as ClubSettings).hoursBeforeCancel
       } ore prima del suo inizio`,
     );
+  });
+
+  describe("Clubs navigation", () => {
+    it("GIVEN user WHEN change club THEN show updated club info", function () {
+      const foroItalicoSettings = this.clubSettingsForoItalico as ClubSettings;
+      const foroItalico = this.foroItalico as Club;
+
+      //check header name
+      cy.get("[data-test='header-name']").should("contain", foroItalico.name);
+
+      // check last date
+      cy.get("[data-test='day-card']")
+        .last()
+        .should(
+          "contain",
+          dayjs().add(foroItalicoSettings.daysInFutureVisible, "day").date(),
+        );
+
+      // check first date
+      cy.get("[data-test='day-card']")
+        .first()
+        .should(
+          "contain",
+          dayjs()
+            .subtract(foroItalicoSettings.daysInThePastVisible, "day")
+            .date(),
+        );
+
+      // change club
+      const allEnglandSettings = this.clubSettingsAllEngland as ClubSettings;
+      const allEngland = this.allEngland as Club;
+
+      cy.get('[data-test="drawer-button"]').click();
+      cy.get('[data-test="reserve-page-link"]').click();
+      cy.getByDataTest("club-card-" + allEngland.name)
+        .should("be.visible")
+        .click();
+
+      // check header name
+      cy.get("[data-test='header-name']").should("contain", allEngland.name);
+
+      // check last date
+      cy.get("[data-test='day-card']")
+        .last()
+        .should(
+          "contain",
+          dayjs().add(allEnglandSettings.daysInFutureVisible, "day").date(),
+        );
+
+      // check first date
+      cy.get("[data-test='day-card']")
+        .first()
+        .should(
+          "contain",
+          dayjs()
+            .subtract(allEnglandSettings.daysInThePastVisible, "day")
+            .date(),
+        );
+    });
   });
 });

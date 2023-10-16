@@ -3,9 +3,20 @@ import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import ReserveDialogRecurrent from "~/components/ReserveDialogRecurrent";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { getAdminSession, mountWithContexts } from "./_constants";
+import {
+  club,
+  clubSettings,
+  getAdminSession,
+  mountWithContexts,
+} from "./_constants";
 
 function ReserveDialogRecurrentContext() {
+  //setting clubId
+  useCalendarStoreContext((store) => store.setClubData)({
+    clubSettings: clubSettings,
+    ...club,
+  });
+
   // setting stubs
   const setDateStub = cy.stub().as("setDateStub");
   const setErrorStub = cy.stub().as("setErrorStub");
@@ -28,9 +39,6 @@ function ReserveDialogRecurrentContext() {
     },
   } as DateClickArg;
   useCalendarStoreContext((store) => store.setDateClick)(dateClick);
-
-  //setting clubId
-  useCalendarStoreContext((state) => state.setClubId)("1");
 
   return <ReserveDialogRecurrent />;
 }
