@@ -207,7 +207,7 @@ export default function Calendar() {
     );
   }
 
-  //if club data is not available yet, show a spinner and not render any other component (FullCalendar, ReserveDialog, EventDetailDialog)
+  // if club data is not available yet, show a spinner and not render any other component (FullCalendar, ReserveDialog, EventDetailDialog)
   // different then checking `if (clubQuery.isLoading)` because when finish loading,
   // clubData is not yet available in store , but the sub-component would try to render anyway
   // Should I check also reservationAdd, reservationDelete, recurrentReservationAdd, recurrentReservationDelete?
@@ -221,12 +221,21 @@ export default function Calendar() {
 
       <ErrorAlert
         error={
-          courtQuery.error || reservationQuery.error || reservationAdd.error
+          courtQuery.error ||
+          reservationQuery.error ||
+          reservationAdd.error ||
+          recurrentReservationAdd.error ||
+          reservationDelete.error ||
+          recurrentReservationDelete.error
         }
         onClose={() => {
           courtQuery.error && void courtQuery.refetch();
           reservationQuery.error && void reservationQuery.refetch();
           reservationAdd.error && void reservationAdd.reset();
+          recurrentReservationAdd.error && void recurrentReservationAdd.reset();
+          reservationDelete.error && void reservationDelete.reset();
+          recurrentReservationDelete.error &&
+            void recurrentReservationDelete.reset();
         }}
       />
 
@@ -238,7 +247,6 @@ export default function Calendar() {
         }
       >
         <FullCalendarWrapper
-          clubData={clubDataInStore}
           courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
           reservationData={reservationQuery.data ?? []} //same as above
         />

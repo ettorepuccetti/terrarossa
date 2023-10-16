@@ -7,20 +7,22 @@ export const capitaliseFirstChar = (s: string) => {
 };
 
 /**
- * Format a time string in the format HH:MM given the hour and minute as numbers
+ * Format a time string in the format `HH:MM` given the hour and minute as numbers.
+ * By default, it pads the hour with a given number of digits
  * @param hour
  * @param minute
  * @param paddingHour number of digits to pad the hour with
- * @returns a time in the format HH:MM
- * @example 08:00
+ * @returns a time in the format `HH:MM` (or `H:MM`, if paddingHour is false)
+ * @example formatTimeString(9, 30) // returns "09:30"
+ * formatTimeString(9, 30, false) // returns "9:30"
  */
 export function formatTimeString(
   hour: number,
   minute: number,
-  paddingHour = 2,
+  paddingHour: boolean = true,
 ): string {
   return (
-    hour.toString().padStart(paddingHour, "0") +
+    hour.toString().padStart(paddingHour ? 2 : 0, "0") +
     ":" +
     minute.toString().padStart(2, "0")
   );

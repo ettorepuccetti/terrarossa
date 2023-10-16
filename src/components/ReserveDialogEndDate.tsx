@@ -11,9 +11,9 @@ import { startDateIsFuture } from "./ReserveDialog";
 export default function ReserveDialogEndDate(props: {
   clubSettings: ClubSettings;
 }) {
+  const clubData = useCalendarStoreContext((store) => store.getClubData());
   const startDate = useCalendarStoreContext((store) => store.getStartDate());
   const endDate = useCalendarStoreContext((store) => store.endDate);
-  const clubData = useCalendarStoreContext((store) => store.getClubData());
   const setEndDate = useCalendarStoreContext((store) => store.setEndDate);
   const setEndDateError = useCalendarStoreContext(
     (store) => store.setEndDateError,

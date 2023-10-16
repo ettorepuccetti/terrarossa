@@ -29,7 +29,6 @@ type ReservationFromDb =
 type CourtFromDb = RouterOutput["court"]["getAllByClubId"][0];
 
 interface FullCalendarWrapperProps {
-  clubData: RouterOutput["club"]["getByClubId"];
   reservationData: ReservationFromDb[];
   courtData: CourtFromDb[];
 }
@@ -88,8 +87,8 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     if (
       !isSelectableSlot(
         selectInfo.date,
-        props.clubData.clubSettings.lastBookableHour,
-        props.clubData.clubSettings.lastBookableMinute,
+        clubData.clubSettings.lastBookableHour,
+        clubData.clubSettings.lastBookableMinute,
       )
     ) {
       console.log("last slot is not selectable", "date: ", selectInfo.date);
@@ -125,12 +124,12 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         dateClick={openReservationDialog}
         selectable={false}
         slotMinTime={formatTimeString(
-          props.clubData.clubSettings.firstBookableHour,
-          props.clubData.clubSettings.firstBookableMinute,
+          clubData.clubSettings.firstBookableHour,
+          clubData.clubSettings.firstBookableMinute,
         )}
         slotMaxTime={formatTimeString(
-          props.clubData.clubSettings.lastBookableHour + 1,
-          props.clubData.clubSettings.lastBookableMinute,
+          clubData.clubSettings.lastBookableHour + 1,
+          clubData.clubSettings.lastBookableMinute,
         )}
         selectLongPressDelay={0}
         slotLabelFormat={{

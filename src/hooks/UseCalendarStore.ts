@@ -39,7 +39,8 @@ export interface IStore {
   setRecurringEndDateError: (recurringEndDateError: boolean) => void;
   setDeleteConfirmationOpen: (deleteConfirmationOpen: boolean) => void;
   setCalendarRef: (calendarRef: RefObject<FullCalendar>) => void;
-  setCalendarIsLoading: (calendarIsLoading: boolean) => void;
+
+  // trpc mutations and queries
   setReservationAdd: (
     reservationAdd: ReturnType<typeof useReservationAdd>,
   ) => void;
@@ -57,6 +58,7 @@ export interface IStore {
   setClubData: (
     clubData: RouterOutputs["club"]["getByClubId"] | undefined,
   ) => void;
+
   //getter
   getStartDate: () => Dayjs;
   getClubData: () => RouterOutputs["club"]["getByClubId"];
@@ -104,8 +106,8 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   setDeleteConfirmationOpen: (deleteConfirmationOpen) =>
     set({ deleteConfirmationOpen: deleteConfirmationOpen }),
   setCalendarRef: (calendarRef) => set({ calendarRef: calendarRef }),
-  setCalendarIsLoading: (calendarIsLoading) =>
-    set({ calendarIsLoading: calendarIsLoading }),
+
+  // trpc mutations and queries
   setReservationAdd: (reservationAdd) =>
     set({ reservationAdd: reservationAdd }),
   setRecurrentReservationAdd: (recurrentReservationAdd) =>

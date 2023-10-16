@@ -3,9 +3,15 @@ import { type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
 import ReserveDialogEndDate from "~/components/ReserveDialogEndDate";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { mountWithContexts, session } from "./_constants";
+import { club, clubSettings, mountWithContexts, session } from "./_constants";
 
 function ReserveDialogEndDateContext() {
+  //setting clubData
+  useCalendarStoreContext((state) => state.setClubData)({
+    clubSettings: clubSettings,
+    ...club,
+  });
+
   //setting stubs
   const setDateStub = cy.stub().as("setDateStub");
   const setErrorStub = cy.stub().as("setErrorStub");
@@ -27,9 +33,6 @@ function ReserveDialogEndDateContext() {
     },
   } as DateClickArg;
   useCalendarStoreContext((store) => store.setDateClick)(dateClick);
-
-  //setting clubId
-  useCalendarStoreContext((store) => store.setClubId)("1");
 
   return (
     <ReserveDialogEndDate

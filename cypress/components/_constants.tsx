@@ -3,7 +3,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { type Club, type ClubSettings, type Court } from "@prisma/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpBatchLink } from "@trpc/client";
+import { httpBatchLink, type TRPCClientErrorLike } from "@trpc/client";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
@@ -68,6 +68,30 @@ export const courts: Court[] = [
     surface: "CLAY",
   },
 ];
+
+export const eventDetailsSingle: EventImpl = {
+  id: "my_id",
+  extendedProps: {
+    userId: session.user.id,
+  },
+  start: dayjs(),
+  end: dayjs(),
+  getResources() {
+    return [
+      {
+        title: "Campo 1",
+      } as ResourceApi,
+    ];
+  },
+} as unknown as EventImpl;
+
+export const eventDetailsRecurrent: EventImpl = {
+  ...eventDetailsSingle,
+  extendedProps: {
+    recurrentId: "my_recurrent_id",
+    ...eventDetailsSingle.extendedProps,
+  },
+} as unknown as EventImpl;
 
 export function getAdminSession(clubId: string): Session {
   return {
@@ -178,10 +202,50 @@ export function buildApiResponse<T>(payload: T): ApiResponse<T> {
   };
 }
 
+/**
+ * Builds a mock of the trpc mutation hook with the given stub and input variables.
+ * The returned object can be set in the store in place of the real mutation hook.
+ * @param stub cypress stub to be used as mutation
+ * @param inputVariables input for the mutation
+ * @returns a mock of the trpc mutation hook
+ */
+export function buildTrpcMutationMock<TData, TVariables>(
+  stub: SinonStub,
+  inputVariables: TVariables,
+): UseTRPCMutationResult<
+  TData,
+  TRPCClientErrorLike<never>,
+  TVariables,
+  unknown
+> {
+  return {
+    data: undefined,
+    error: null,
+    status: "idle",
+    mutate: stub,
+    context: undefined,
+    isError: false,
+    isLoading: false,
+    isSuccess: false,
+    reset: () => {},
+    isIdle: true,
+    failureCount: 0,
+    failureReason: null,
+    isPaused: false,
+    variables: inputVariables,
+    mutateAsync: stub.resolves(),
+    trpc: { path: "" },
+  };
+}
+
 // ------- END OF FILE -------
 // try to mock NextRouter (not succeed) - see:
 // https://github.com/cypress-io/cypress/discussions/22715
 // https://github.com/mike-plummer/nextjs-cypress-ct-example/blob/main/cypress/support/component.js
+import { type EventImpl } from "@fullcalendar/core/internal";
+import { type ResourceApi } from "@fullcalendar/resource";
+import { type UseTRPCMutationResult } from "@trpc/react-query/shared";
+import { type SinonStub } from "cypress/types/sinon";
 import {
   AppRouterContext,
   type AppRouterInstance,

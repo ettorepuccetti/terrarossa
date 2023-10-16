@@ -2,12 +2,13 @@ import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import ConfirmationDialog from "./ConfirmationDialog";
 
 export default function CancelSingleDialog() {
-  const open = useCalendarStoreContext((state) => state.deleteConfirmationOpen);
-  const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
-  // const reservationDelete = useReservationDelete(clubId);
+  const deleteConfirmationOpen = useCalendarStoreContext(
+    (state) => state.deleteConfirmationOpen,
+  );
   const setDeleteConfirmationOpen = useCalendarStoreContext(
     (state) => state.setDeleteConfirmationOpen,
   );
+  const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
   const setEventDetails = useCalendarStoreContext(
     (state) => state.setEventDetails,
   );
@@ -39,7 +40,9 @@ export default function CancelSingleDialog() {
       <ConfirmationDialog
         data-test="cancel-single-dialog"
         // if the event is recurrent, the delete dialog is handled by CancelRecurrentDialog
-        open={open && !eventDetails?.extendedProps.recurrentId}
+        open={
+          deleteConfirmationOpen && !eventDetails?.extendedProps.recurrentId
+        }
         title={"Cancellazione"}
         message={"Sei sicuro di voler cancellare la prenotazione?"}
         onConfirm={() => deleteReservation(eventDetails?.id)}

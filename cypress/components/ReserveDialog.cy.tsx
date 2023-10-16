@@ -1,64 +1,86 @@
 import { type DateClickArg } from "@fullcalendar/interaction";
+import { type ClubSettings } from "@prisma/client";
 import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
 import ReserveDialog from "~/components/ReserveDialog";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { type RouterOutputs } from "~/utils/api";
 import {
-  buildApiResponse,
+  buildTrpcMutationMock,
   club,
   clubSettings,
+  courts,
   getAdminSession,
   mountWithContexts,
   session,
-  type ApiResponse,
 } from "./_constants";
 dayjs.extend(duration);
 
-function ReserveDialogWrapper(props: { startDate: Date; clubId: string }) {
+function ReserveDialogWrapper(props: {
+  startDate: Date;
+  clubId?: string;
+  clubSettings?: ClubSettings;
+}) {
+  // set clubData
+  useCalendarStoreContext((store) => store.setClubData)({
+    ...club,
+    id: props.clubId ?? club.id,
+    clubSettings: props.clubSettings ?? clubSettings,
+  });
+
+  // set mutations mocks: reservationDelete, recurrentReservationDelete
+  const addSingle = cy.stub().as("addSingle");
+  const addRecurrent = cy.stub().as("addRecurrent");
+  useCalendarStoreContext((store) => store.setReservationAdd)(
+    buildTrpcMutationMock(addSingle, {
+      clubId: club.id,
+      courtId: courts[0]!.id,
+      startDateTime: props.startDate,
+      endDateTime: dayjs(props.startDate).add(1, "hour").toDate(),
+    }),
+  );
+  useCalendarStoreContext((store) => store.setRecurrentReservationAdd)(
+    buildTrpcMutationMock(addRecurrent, {
+      clubId: club.id,
+      courtId: courts[0]!.id,
+      startDateTime: props.startDate,
+      endDateTime: dayjs(props.startDate).add(1, "hour").toDate(),
+      recurrentEndDate: dayjs(props.startDate).add(1, "week").toDate(),
+    }),
+  );
+
+  // set dateClick
   const dateClick: DateClickArg = {
     date: props.startDate,
     resource: {
-      id: "court1",
-      title: "Campo 1",
+      id: courts[0]!.id,
+      title: courts[0]!.name,
     },
   } as DateClickArg;
-
-  useCalendarStoreContext((store) => store.setClubId)(props.clubId);
   useCalendarStoreContext((store) => store.setDateClick)(dateClick);
+
   return <ReserveDialog />;
 }
 
-function mountComponent<T = unknown>({
+function mountComponent({
   startDate,
+  clubId,
+  clubSettings,
   session,
-  overrideApiCall,
-  clubId = "1",
 }: {
   startDate: Dayjs;
-  session: Session | undefined;
-  overrideApiCall?: ApiResponse<T>;
   clubId?: string;
+  clubSettings?: ClubSettings;
+  session?: Session;
 }) {
-  cy.intercept(
-    "GET",
-    "/api/trpc/*",
-    overrideApiCall ?? { fixture: "club.getByClubId.json" },
-  ).as("generalApiCall");
   mountWithContexts(
-    <ReserveDialogWrapper startDate={startDate.toDate()} clubId={clubId} />,
+    <ReserveDialogWrapper
+      startDate={startDate.toDate()}
+      clubId={clubId}
+      clubSettings={clubSettings}
+    />,
     session,
   );
-
-  // wait for the useEffect hook to set the endTime, if user is logged
-  session &&
-    cy
-      .get("input")
-      .filter("[data-test='endTime']")
-      .should("have.value", startDate?.add(1, "hour").format("HH:mm"));
-
-  cy.wait("@generalApiCall");
 }
 
 describe("USER", () => {
@@ -247,15 +269,11 @@ describe("USER", () => {
 
         let endDate = startDate.add(1, "hour").format("HH:mm");
 
-        const responseBody = { ...club, clubSettings: customClubSettings };
-        const response: ApiResponse<RouterOutputs["club"]["getByClubId"]> =
-          buildApiResponse(responseBody);
-
         //enter last allowed endTime: LAST BOOKABLE HOUR + 1h = 21:30
-        mountComponent<typeof responseBody>({
+        mountComponent({
           startDate,
+          clubSettings: customClubSettings,
           session,
-          overrideApiCall: response,
         });
 
         cy.get("input")
@@ -342,15 +360,11 @@ describe("USER", () => {
     beforeEach(() => {
       const clubId = "clubid_for_which_user_is_admin";
       const adminSession = getAdminSession(clubId);
-      const payload = { ...club, id: clubId, clubSettings: clubSettings };
-      const response: ApiResponse<RouterOutputs["club"]["getByClubId"]> =
-        buildApiResponse(payload);
 
       mountComponent({
         startDate: dayjs().hour(13).minute(0).second(0).millisecond(0),
-        session: adminSession,
-        overrideApiCall: response,
         clubId: clubId,
+        session: adminSession,
       });
     });
 

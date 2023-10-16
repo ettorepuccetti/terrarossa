@@ -1,38 +1,43 @@
-import { type EventImpl } from "@fullcalendar/core/internal";
-import { type ResourceApi } from "@fullcalendar/resource";
-import dayjs from "dayjs";
 import CancelRecurrentDialog from "~/components/CancelRecurrentDialog";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { mountWithContexts, session } from "./_constants";
+import {
+  buildTrpcMutationMock,
+  club,
+  clubSettings,
+  eventDetailsRecurrent,
+  mountWithContexts,
+  session,
+} from "./_constants";
 
 function CancelRecurrentDialogContext() {
-  useCalendarStoreContext((store) => store.setClubId)("1");
-  useCalendarStoreContext((store) => store.setDeleteConfirmationOpen)(true);
-  useCalendarStoreContext((store) => store.setEventDetails)({
-    id: "my_id",
-    extendedProps: {
-      userId: session.user.id,
-      recurrentId: "my_recurrent_id",
-    },
-    start: dayjs(),
-    end: dayjs(),
-    getResources() {
-      return [
-        {
-          title: "Campo 1",
-        } as ResourceApi,
-      ];
-    },
-  } as unknown as EventImpl);
+  // set club data
+  useCalendarStoreContext((store) => store.setClubData)({
+    clubSettings: clubSettings,
+    ...club,
+  });
 
+  // set mutations mocks
   const deleteSingle = cy.stub().as("deleteOne");
   const deleteRecurrent = cy.stub().as("deleteRecurrent");
-  return (
-    <CancelRecurrentDialog
-      useReservationDelete={deleteSingle}
-      useRecurrentReservationDelete={deleteRecurrent}
-    />
+  useCalendarStoreContext((store) => store.setReservationDelete)(
+    buildTrpcMutationMock(deleteSingle, {
+      reservationId: "my_id",
+      clubId: club.id,
+    }),
   );
+  useCalendarStoreContext((store) => store.setRecurrentReservationDelete)(
+    buildTrpcMutationMock(deleteRecurrent, {
+      recurrentReservationId: "my_recurrent_id",
+      clubId: club.id,
+    }),
+  );
+
+  useCalendarStoreContext((store) => store.setDeleteConfirmationOpen)(true);
+  useCalendarStoreContext((store) => store.setEventDetails)(
+    eventDetailsRecurrent,
+  );
+
+  return <CancelRecurrentDialog />;
 }
 
 function mountComponent() {

@@ -1,31 +1,33 @@
-import { type EventImpl } from "@fullcalendar/core/internal";
-import { type ResourceApi } from "@fullcalendar/resource";
-import dayjs from "dayjs";
 import CancelSingleDialog from "~/components/CancelSingleDialog";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { mountWithContexts, session } from "./_constants";
+import {
+  buildTrpcMutationMock,
+  club,
+  clubSettings,
+  eventDetailsSingle,
+  mountWithContexts,
+  session,
+} from "./_constants";
 
 function CancelSingleDialogContext() {
-  useCalendarStoreContext((store) => store.setClubId)("1");
-  useCalendarStoreContext((store) => store.setDeleteConfirmationOpen)(true);
-  useCalendarStoreContext((store) => store.setEventDetails)({
-    id: "my_id",
-    extendedProps: {
-      userId: session.user.id,
-    },
-    start: dayjs(),
-    end: dayjs(),
-    getResources() {
-      return [
-        {
-          title: "Campo 1",
-        } as ResourceApi,
-      ];
-    },
-  } as unknown as EventImpl);
+  // set club data
+  useCalendarStoreContext((store) => store.setClubData)({
+    clubSettings: clubSettings,
+    ...club,
+  });
 
+  // set mutations mocks
   const deleteOne = cy.stub().as("deleteOne");
-  return <CancelSingleDialog useReservationDelete={deleteOne} />;
+  useCalendarStoreContext((store) => store.setReservationDelete)(
+    buildTrpcMutationMock(deleteOne, {
+      reservationId: "my_id",
+      clubId: "my_club_id",
+    }),
+  );
+
+  useCalendarStoreContext((store) => store.setDeleteConfirmationOpen)(true);
+  useCalendarStoreContext((store) => store.setEventDetails)(eventDetailsSingle);
+  return <CancelSingleDialog />;
 }
 
 function mountComponent() {
