@@ -9,6 +9,7 @@ import {
   type useRecurrentReservationDelete,
   type useReservationAdd,
   type useReservationDelete,
+  type useReservationQuery,
 } from "~/components/Calendar";
 import { type RouterOutputs } from "~/utils/api";
 
@@ -30,6 +31,7 @@ export interface IStore {
   recurrentReservationDelete:
     | ReturnType<typeof useRecurrentReservationDelete>
     | undefined;
+  reservationQuery: ReturnType<typeof useReservationQuery> | undefined;
   clubData: RouterOutputs["club"]["getByClubId"] | undefined;
   setDateClick: (dateClick: DateClickArg | null) => void;
   setEventDetails: (eventDetails: EventImpl | null) => void;
@@ -39,7 +41,6 @@ export interface IStore {
   setRecurringEndDateError: (recurringEndDateError: boolean) => void;
   setDeleteConfirmationOpen: (deleteConfirmationOpen: boolean) => void;
   setCalendarRef: (calendarRef: RefObject<FullCalendar>) => void;
-
   // trpc mutations and queries
   setReservationAdd: (
     reservationAdd: ReturnType<typeof useReservationAdd>,
@@ -54,6 +55,9 @@ export interface IStore {
     recurrentReservationDelete: ReturnType<
       typeof useRecurrentReservationDelete
     >,
+  ) => void;
+  setReservationQuery: (
+    reservationQuery: ReturnType<typeof useReservationQuery>,
   ) => void;
   setClubData: (
     clubData: RouterOutputs["club"]["getByClubId"] | undefined,
@@ -70,6 +74,7 @@ export interface IStore {
   getRecurrentReservationDelete: () => ReturnType<
     typeof useRecurrentReservationDelete
   >;
+  getReservationQuery: () => ReturnType<typeof useReservationQuery>;
   //for testing only
   setSetEndDate: (stub: (endDate: Dayjs | null) => void) => void;
   setSetEndDateError: (stub: (endDate: boolean) => void) => void;
@@ -91,6 +96,7 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   recurrentReservationAdd: undefined,
   reservationDelete: undefined,
   recurrentReservationDelete: undefined,
+  reservationQuery: undefined,
   clubData: undefined,
   setDateClick: (dateClick) => {
     set({ dateClick: dateClick });
@@ -116,6 +122,8 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
     set({ reservationDelete: reservationDelete }),
   setRecurrentReservationDelete: (recurrentReservationDelete) =>
     set({ recurrentReservationDelete: recurrentReservationDelete }),
+  setReservationQuery: (reservationQuery) =>
+    set({ reservationQuery: reservationQuery }),
   setClubData: (clubData) => {
     set({ clubData: clubData });
   },
@@ -141,6 +149,9 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   },
   getRecurrentReservationDelete: () => {
     return getOrThrow(() => get().recurrentReservationDelete);
+  },
+  getReservationQuery: () => {
+    return getOrThrow(() => get().reservationQuery);
   },
 
   //for testing only

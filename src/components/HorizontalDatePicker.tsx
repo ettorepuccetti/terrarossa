@@ -6,6 +6,8 @@ import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { defaultClubImage } from "~/utils/constants";
 import { capitaliseFirstChar } from "~/utils/utils";
 import { DayCard } from "./DayCard";
+import LegendaButton from "./LegendaButton";
+import RefetchReservationButton from "./RefetchReservationButton";
 require("dayjs/locale/it");
 dayjs.locale("it");
 
@@ -82,10 +84,23 @@ export function HorizonalDatePicker() {
           </Box>
         </Box>
       </Box>
-      {/* Selected date extended */}
-      <Typography variant={"h6"} textAlign={"center"} fontWeight={300}>
-        {capitaliseFirstChar(selectedDate.format("dddd DD MMMM YYYY"))}
-      </Typography>
+      {/* Row between datePicker and calendar */}
+      <Box display={"flex"} paddingX={"0.5rem"}>
+        {/* refresh query button */}
+        <RefetchReservationButton />
+        <LegendaButton />
+        {/* Selected date extended */}
+        <Typography
+          display={"flex"}
+          justifyContent={"center"}
+          flexGrow={1}
+          variant={"h6"}
+          textAlign={"center"}
+          fontWeight={300}
+        >
+          {capitaliseFirstChar(selectedDate.format("dddd DD MMMM YYYY"))}
+        </Typography>
+      </Box>
     </Box>
   );
 }

@@ -32,8 +32,14 @@ export const reservationQueryRouter = createTRPCRouter({
         .set("minute", 0)
         .set("second", 0)
         .set("millisecond", 0);
-      console.log("toDate: ", toDate.toDate());
-      console.log("fromDate: ", fromDate.locale("it").toDate());
+      console.log(
+        "getAllVisibleInCalendarByClubId - fromDate: ",
+        fromDate.locale("it").toDate(),
+        "toDate: ",
+        toDate.locale("it").toDate(),
+        "clubId: ",
+        input.clubId,
+      );
 
       return await ctx.prisma.reservation.findMany({
         where: {

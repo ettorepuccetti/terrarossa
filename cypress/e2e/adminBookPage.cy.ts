@@ -79,8 +79,7 @@ describe("New reservation", () => {
       );
     }
     // check that all reservation have been added
-    cy.reload();
-    cy.waitForCalendarPageToLoad();
+    cy.refetchReservationQuery();
     cy.navigateDaysFromToday(2);
     cy.get("[data-test='calendar-event']").should(
       "have.length",
@@ -140,7 +139,7 @@ describe("New reservation", () => {
     );
     cy.get("[data-testid=CloseIcon]").click();
 
-    cy.reload().waitForCalendarPageToLoad();
+    cy.refetchReservationQuery();
     // check that recurrent reservation has not been created
     cy.get("[calendar-event]").should("not.exist");
 
@@ -162,7 +161,7 @@ describe("Existing reservation", () => {
       Cypress.env("USER2_MAIL") as string, //user_2 because is already added to db in seeding script
     );
 
-    cy.reload().waitForCalendarPageToLoad();
+    cy.refetchReservationQuery();
     cy.navigateDaysFromToday(2);
     cy.get("[data-test=calendar-event]").click();
     cy.get("[data-test=delete-button]").click();
