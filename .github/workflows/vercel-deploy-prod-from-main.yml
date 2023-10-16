@@ -22,7 +22,7 @@ jobs:
           fi
       - name: checkout
         if: ${{ !env.SKIP_DEPLOY }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Vercel CLI
         if: ${{ !env.SKIP_DEPLOY }}
         run: npm install --global vercel@latest
