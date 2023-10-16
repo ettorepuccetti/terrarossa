@@ -70,8 +70,9 @@ declare global {
        * Get an element by its data-test attribute. Additional cypress commands can be chained to the returned element
        * @param dataTest data-test attribute of the element to get
        */
-
       getByDataTest(dataTest: string): Chainable<JQuery<HTMLElement>>;
+
+      refetchReservationQuery(): void;
     }
   }
 }

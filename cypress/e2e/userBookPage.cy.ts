@@ -112,7 +112,7 @@ describe("Calendar navigation", () => {
     );
 
     // CHECKS
-    cy.reload().waitForCalendarPageToLoad();
+    cy.refetchReservationQuery();
 
     cy.navigateDaysFromToday(
       -(this.clubSettingsForoItalico as ClubSettings).daysInThePastVisible,
@@ -192,7 +192,7 @@ describe("Calendar navigation", () => {
       Cypress.env("USER1_MAIL") as string,
     );
 
-    cy.reload().waitForCalendarPageToLoad();
+    cy.refetchReservationQuery();
     cy.navigateDaysFromToday(1);
 
     cy.get("[data-test='calendar-event']").should("have.length", 1);
@@ -254,7 +254,7 @@ describe("New Reservation", () => {
       Cypress.env("USER1_MAIL") as string,
     );
 
-    cy.reload().waitForCalendarPageToLoad();
+    cy.refetchReservationQuery();
 
     cy.navigateDaysFromToday(1);
 
@@ -319,8 +319,7 @@ describe("New Reservation", () => {
       );
     }
     // check that all reservation have been added
-    cy.reload();
-    cy.waitForCalendarPageToLoad();
+    cy.refetchReservationQuery();
     cy.navigateDaysFromToday(2);
     cy.get("[data-test='calendar-event']").should(
       "have.length",
@@ -402,7 +401,7 @@ describe("Reservation details", () => {
       pietrangeliCourtName,
       Cypress.env("USER2_MAIL") as string,
     );
-    cy.reload().waitForCalendarPageToLoad();
+    cy.refetchReservationQuery();
     cy.navigateDaysFromToday(dayInAdvance);
     // check that the reservation is visible
     cy.get("[data-test='calendar-event']").should("have.length", 1);
@@ -478,7 +477,7 @@ describe("Reservation details", () => {
       pietrangeliCourtName,
       Cypress.env("USER1_MAIL") as string,
     );
-    cy.reload().waitForCalendarPageToLoad();
+    cy.refetchReservationQuery();
     cy.navigateDaysFromToday(firstStartDateNotDeletable.day() - dayjs().day());
 
     cy.get("[data-test=calendar-event]").click();

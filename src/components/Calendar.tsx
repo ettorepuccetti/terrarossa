@@ -154,11 +154,16 @@ export default function Calendar() {
   // if I call `store.getClubData` when still undefined, I get an exception
   const clubDataInStore = useCalendarStoreContext((store) => store.clubData);
 
+  // reservationQuery
+  const setReservationQuery = useCalendarStoreContext(
+    (store) => store.setReservationQuery,
+  );
+  const reservationQuery = useReservationQuery(clubId);
+
   // queries for which I want to pass down their data as props to the calendar,
   // I want to manage them in a way that the subComponent render even if their data are not yet available
   // so I still show the calendar under the spinner while waiting for the queries to finish
   const courtQuery = useCourtQuery(clubId);
-  const reservationQuery = useReservationQuery(clubId);
 
   // -------------------
   // ----- EFFECTS -----
@@ -187,6 +192,8 @@ export default function Calendar() {
     setRecurrentReservationAdd(recurrentReservationAdd);
     setReservationDelete(reservationDelete);
     setRecurrentReservationDelete(recurrentReservationDelete);
+    setReservationQuery(reservationQuery);
+
     //onComponentUnmount: reset the clubData
     return () => {
       setClubData(undefined);
@@ -217,8 +224,6 @@ export default function Calendar() {
 
   return (
     <>
-      <HorizonalDatePicker />
-
       <ErrorAlert
         error={
           courtQuery.error ||
@@ -239,6 +244,7 @@ export default function Calendar() {
         }}
       />
 
+      <HorizonalDatePicker />
       <SpinnerPartial
         open={
           reservationQuery.isLoading ||

@@ -101,8 +101,6 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add("waitForCalendarPageToLoad", () => {
-  cy.get(".MuiContainer-root").should("be.visible");
-  cy.wait(100);
   cy.get("[data-test='spinner']").should("not.be.visible");
 });
 
@@ -171,4 +169,8 @@ Cypress.Commands.add("deleteReservationFromDb", (reservationId: string) => {
 
 Cypress.Commands.add("getByDataTest", (dataTest: string) => {
   return cy.get(`[data-test="${dataTest}"]`);
+});
+
+Cypress.Commands.add("refetchReservationQuery", () => {
+  cy.get("[data-test='refetch-button']").click().waitForCalendarPageToLoad();
 });

@@ -88,7 +88,7 @@ describe("New Reservation", () => {
           Cypress.env("USER1_MAIL") as string,
         );
 
-        cy.reload().waitForCalendarPageToLoad();
+        cy.refetchReservationQuery();
 
         cy.navigateDaysFromToday(1);
 
@@ -164,7 +164,7 @@ describe("Existing reservation", () => {
           pietrangeliCourtName,
           user.username,
         );
-        cy.reload().waitForCalendarPageToLoad();
+        cy.refetchReservationQuery();
         cy.navigateDaysFromToday(dayInAdvance);
         // check that the reservation is visible
         cy.get("[data-test='calendar-event']").should("have.length", 1);
@@ -266,7 +266,7 @@ describe("Existing reservation", () => {
           pietrangeliCourtName,
           user.username,
         );
-        cy.reload().waitForCalendarPageToLoad();
+        cy.refetchReservationQuery();
         cy.navigateDaysFromToday(startDateSafeToDelete.day() - dayjs().day());
 
         cy.get("[data-test='calendar-event']").click();
@@ -302,7 +302,7 @@ describe("Existing reservation", () => {
           user.username,
         );
 
-        cy.reload().waitForCalendarPageToLoad();
+        cy.refetchReservationQuery();
         cy.navigateDaysFromToday(1);
         cy.get("[data-test='calendar-event']").then(($event) => {
           const eventId = $event.attr("data-id");
