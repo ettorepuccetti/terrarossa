@@ -11,7 +11,7 @@ export const capitaliseFirstChar = (s: string) => {
  * By default, it pads the hour with a given number of digits
  * @param hour
  * @param minute
- * @param paddingHour number of digits to pad the hour with
+ * @param paddingHour whether to pad the hour with a leading 0, if it has only one digit
  * @returns a time in the format `HH:MM` (or `H:MM`, if paddingHour is false)
  * @example formatTimeString(9, 30) // returns "09:30"
  * formatTimeString(9, 30, false) // returns "9:30"

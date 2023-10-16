@@ -136,7 +136,6 @@ describe("Calendar navigation", () => {
       formatTimeString(
         (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
         (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute,
-        false,
       ),
     );
 
@@ -155,7 +154,6 @@ describe("Calendar navigation", () => {
         formatTimeString(
           (this.clubSettingsForoItalico as ClubSettings).lastBookableHour + 1, //TODO: implicit assumption
           (this.clubSettingsForoItalico as ClubSettings).lastBookableMinute,
-          false,
         ),
       )
       .and("have.attr", "aria-invalid", "false");

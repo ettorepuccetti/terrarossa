@@ -243,7 +243,10 @@ export default function Calendar() {
         open={
           reservationQuery.isLoading ||
           reservationQuery.isRefetching ||
-          reservationAdd.isLoading
+          reservationAdd.isLoading ||
+          reservationDelete.isLoading ||
+          recurrentReservationAdd.isLoading ||
+          recurrentReservationDelete.isLoading
         }
       >
         <FullCalendarWrapper
