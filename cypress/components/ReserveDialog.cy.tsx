@@ -71,7 +71,7 @@ function mountComponent({
   startDate: Dayjs;
   clubId?: string;
   clubSettings?: ClubSettings;
-  session?: Session;
+  session: Session;
 }) {
   mountWithContexts(
     <ReserveDialogWrapper
@@ -87,7 +87,7 @@ describe("USER", () => {
   it("GIVEN I am not logged in WHEN dialog THEN show login button", () => {
     // empty session for not logged user
     cy.intercept("GET", "/api/auth/session", { body: {} });
-    mountComponent({ startDate: dayjs(), session: undefined });
+    mountComponent({ startDate: dayjs(), session: {} as Session });
     // check Login button present
     cy.get("h2").should("contain", "Prenota");
     cy.get(".MuiButtonBase-root").should("contain", "Effettua il login");

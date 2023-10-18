@@ -9,11 +9,13 @@ import {
   foroItalicoName,
   pietrangeliCourtName,
 } from "~/utils/constants";
-import { formatTimeString } from "~/utils/utils";
+import { capitaliseFirstChar, formatTimeString } from "~/utils/utils";
 import {
   loginAndVisitCalendarPage,
   saveClubInfoAndCleanReservations,
 } from "./_constants";
+require("dayjs/locale/it");
+dayjs.locale("it");
 
 beforeEach("Initial clean up and retrieve Clubs", function () {
   saveClubInfoAndCleanReservations(
@@ -546,6 +548,49 @@ describe("Reservation details", () => {
             .subtract(allEnglandSettings.daysInThePastVisible, "day")
             .date(),
         );
+    });
+
+    it("GIVEN user WHEN select date in a club and change club THEN date in new club is reset", function () {
+      const dayInAdvance = 2;
+      const selectedDate = dayjs().add(dayInAdvance, "day");
+      cy.navigateDaysFromToday(dayInAdvance);
+
+      // check that dot exists only for selected date
+      cy.getByDataTest("dot-day-card").should("have.length", 1);
+      cy.getByDataTest("day-card")
+        .filter(`:contains(${selectedDate.date()})`)
+        .find("[data-test='dot-day-card']")
+        .should("be.visible");
+
+      // check that selected date is correct
+      cy.getByDataTest("selected-date-extended").should(
+        "have.text",
+        capitaliseFirstChar(
+          selectedDate.format("dddd DD MMMM YYYY").toLocaleLowerCase(),
+        ),
+      );
+
+      // change club
+      cy.get('[data-test="drawer-button"]').click();
+      cy.get('[data-test="reserve-page-link"]').click();
+      cy.getByDataTest("club-card-" + (this.allEngland as Club).name)
+        .should("be.visible")
+        .click();
+
+      // check that selected date is reset to current day
+      cy.getByDataTest("dot-day-card").should("have.length", 1);
+      cy.getByDataTest("day-card")
+        .filter(`:contains(${dayjs().date()})`)
+        .find("[data-test='dot-day-card']")
+        .should("be.visible");
+
+      // check that selected date is correct
+      cy.getByDataTest("selected-date-extended").should(
+        "have.text",
+        capitaliseFirstChar(
+          dayjs().format("dddd DD MMMM YYYY").toLocaleLowerCase(),
+        ),
+      );
     });
   });
 });

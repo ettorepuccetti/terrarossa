@@ -33,6 +33,8 @@ export interface IStore {
     | undefined;
   reservationQuery: ReturnType<typeof useReservationQuery> | undefined;
   clubData: RouterOutputs["club"]["getByClubId"] | undefined;
+  selectedDate: Dayjs;
+  customDateSelected: boolean;
   setDateClick: (dateClick: DateClickArg | null) => void;
   setEventDetails: (eventDetails: EventImpl | null) => void;
   setEndDate: (endDate: Dayjs | null) => void;
@@ -41,6 +43,9 @@ export interface IStore {
   setRecurringEndDateError: (recurringEndDateError: boolean) => void;
   setDeleteConfirmationOpen: (deleteConfirmationOpen: boolean) => void;
   setCalendarRef: (calendarRef: RefObject<FullCalendar>) => void;
+  setSelectedDate: (selectedDate: Dayjs) => void;
+  setCustomDateSelected: (customDateSelected: boolean) => void;
+
   // trpc mutations and queries
   setReservationAdd: (
     reservationAdd: ReturnType<typeof useReservationAdd>,
@@ -75,6 +80,7 @@ export interface IStore {
     typeof useRecurrentReservationDelete
   >;
   getReservationQuery: () => ReturnType<typeof useReservationQuery>;
+
   //for testing only
   setSetEndDate: (stub: (endDate: Dayjs | null) => void) => void;
   setSetEndDateError: (stub: (endDate: boolean) => void) => void;
@@ -98,6 +104,8 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   recurrentReservationDelete: undefined,
   reservationQuery: undefined,
   clubData: undefined,
+  selectedDate: dayjs().startOf("day"),
+  customDateSelected: false,
   setDateClick: (dateClick) => {
     set({ dateClick: dateClick });
     set({ endDate: dayjs(dateClick?.date).add(1, "h") });
@@ -112,6 +120,9 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   setDeleteConfirmationOpen: (deleteConfirmationOpen) =>
     set({ deleteConfirmationOpen: deleteConfirmationOpen }),
   setCalendarRef: (calendarRef) => set({ calendarRef: calendarRef }),
+  setSelectedDate: (selectedDate) => set({ selectedDate: selectedDate }),
+  setCustomDateSelected: (customDateSelected) =>
+    set({ customDateSelected: customDateSelected }),
 
   // trpc mutations and queries
   setReservationAdd: (reservationAdd) =>
@@ -127,6 +138,7 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   setClubData: (clubData) => {
     set({ clubData: clubData });
   },
+
   //getters
   getStartDate: () => {
     const startDate = get().dateClick?.date;

@@ -175,7 +175,7 @@ function WrapperComponentForTesting({
 
 export const mountWithContexts = (
   children: React.ReactNode,
-  session?: Session,
+  session: Session,
 ) => {
   cy.mount(
     <WrapperComponentForTesting session={session}>
@@ -192,6 +192,9 @@ export type ApiResponse<T> = {
   };
 };
 
+/**
+ * @deprecated instead use `buildTrpcMutationMock`
+ */
 export function buildApiResponse<T>(payload: T): ApiResponse<T> {
   return {
     result: {
@@ -238,13 +241,56 @@ export function buildTrpcMutationMock<TData, TVariables>(
   };
 }
 
+/**
+ * Builds a mock of the trpc query hook with the given mocked data
+ * The returned object can be set in the store in place of the real query hook.
+ * @param mockData mock data to be returned by the query
+ * @returns a mock of the trpc query hook
+ */
+export function buildTrpcQueryMock<TData>(
+  mockData: TData,
+): UseTRPCQueryResult<TData, TRPCClientErrorLike<never>> {
+  return {
+    data: mockData,
+    error: null,
+    status: "success",
+    isError: false,
+    isLoading: false,
+    isSuccess: true,
+    refetch: () =>
+      new Promise((resolve) => resolve(buildTrpcQueryMock(mockData))),
+    failureCount: 0,
+    failureReason: null,
+    isPaused: false,
+    isLoadingError: false,
+    isFetching: false,
+    isFetched: true,
+    dataUpdatedAt: Date.now(),
+    errorUpdateCount: 0,
+    errorUpdatedAt: 0,
+    fetchStatus: "idle",
+    isFetchedAfterMount: true,
+    isInitialLoading: false,
+    isPlaceholderData: false,
+    isPreviousData: false,
+    isRefetchError: false,
+    isRefetching: false,
+    isStale: false,
+    remove: () => {},
+    trpc: { path: "" },
+  };
+}
+
 // ------- END OF FILE -------
 // try to mock NextRouter (not succeed) - see:
 // https://github.com/cypress-io/cypress/discussions/22715
 // https://github.com/mike-plummer/nextjs-cypress-ct-example/blob/main/cypress/support/component.js
 import { type EventImpl } from "@fullcalendar/core/internal";
 import { type ResourceApi } from "@fullcalendar/resource";
-import { type UseTRPCMutationResult } from "@trpc/react-query/shared";
+import {
+  type UseTRPCMutationResult,
+  type UseTRPCQueryResult,
+} from "@trpc/react-query/shared";
 import { type SinonStub } from "cypress/types/sinon";
 import {
   AppRouterContext,

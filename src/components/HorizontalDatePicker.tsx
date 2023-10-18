@@ -1,26 +1,32 @@
 import { Box, Typography } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
 import Image from "next/image";
-import { useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { defaultClubImage } from "~/utils/constants";
 import { capitaliseFirstChar } from "~/utils/utils";
 import { DayCard } from "./DayCard";
+import DayCardFreePicker from "./DayCardFreePicker";
 import LegendaButton from "./LegendaButton";
 import RefetchReservationButton from "./RefetchReservationButton";
 require("dayjs/locale/it");
 dayjs.locale("it");
 
-export function HorizonalDatePicker() {
+export default function HorizonalDatePicker() {
   const calendarRef = useCalendarStoreContext((store) => store.calendarRef);
 
   const clubData = useCalendarStoreContext((state) => state.getClubData());
   const daysInThePastVisible = clubData.clubSettings.daysInThePastVisible;
   const daysInTheFutureVisible = clubData.clubSettings.daysInFutureVisible;
 
-  const today = dayjs().set("hour", 0).set("minute", 0).set("second", 0);
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(today);
+  const selectedDate = useCalendarStoreContext((store) => store.selectedDate);
+  const setSelectedDate = useCalendarStoreContext(
+    (store) => store.setSelectedDate,
+  );
+  const setCustomSelectedDate = useCalendarStoreContext(
+    (store) => store.setCustomDateSelected,
+  );
 
+  const today = dayjs().startOf("day");
   // create an array of dates from today to today - daysInThePastVisible to today + daysInTheFutureVisible
   const dates: Dayjs[] = Array.from(
     {
@@ -33,6 +39,7 @@ export function HorizonalDatePicker() {
 
   const onDateClick = (date: dayjs.Dayjs) => {
     setSelectedDate(date);
+    setCustomSelectedDate(false);
     calendarRef.current?.getApi().gotoDate(date.toDate());
   };
 
@@ -71,6 +78,7 @@ export function HorizonalDatePicker() {
               overflowX: "scroll",
             }}
           >
+            <DayCardFreePicker />
             {dates.map((day) => {
               return (
                 <DayCard
@@ -91,6 +99,7 @@ export function HorizonalDatePicker() {
         <LegendaButton />
         {/* Selected date extended */}
         <Typography
+          data-test={"selected-date-extended"}
           display={"flex"}
           justifyContent={"center"}
           flexGrow={1}
@@ -98,7 +107,9 @@ export function HorizonalDatePicker() {
           textAlign={"center"}
           fontWeight={300}
         >
-          {capitaliseFirstChar(selectedDate.format("dddd DD MMMM YYYY"))}
+          {capitaliseFirstChar(
+            selectedDate.format("dddd DD MMMM YYYY").toLocaleLowerCase(),
+          )}
         </Typography>
       </Box>
     </Box>
