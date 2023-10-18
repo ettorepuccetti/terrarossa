@@ -34,7 +34,7 @@ function HorizonalDatePickerContext(props: {
 
 const mountComponent = (props: { session: Session; clubId: string }) => {
   // to avoid error in console
-  // cy.intercept("GET", "/api/auth/session", { body: [] });
+  cy.intercept("GET", "/api/auth/session", { body: [] });
   return mountWithContexts(
     <HorizonalDatePickerContext {...props} />,
     props.session,
