@@ -9,6 +9,12 @@ const config = {
       parserOptions: {
         project: "tsconfig.json",
       },
+      rules: {
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          { argsIgnorePattern: "^_" },
+        ],
+      },
     },
   ],
   parser: "@typescript-eslint/parser",
@@ -25,7 +31,6 @@ const config = {
         fixStyle: "inline-type-imports",
       },
     ],
-    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
     "comma-dangle": [
       "warn",
       {

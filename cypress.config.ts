@@ -9,6 +9,10 @@ const prisma = new PrismaClient();
 export default defineConfig({
   projectId: "y4edyf",
   e2e: {
+    retries: {
+      runMode: 1,
+      openMode: 0,
+    },
     supportFile: "cypress/support/e2e.ts",
     baseUrl: "http://localhost:3000",
     chromeWebSecurity: false,

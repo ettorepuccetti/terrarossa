@@ -1,3 +1,4 @@
+import { type Session } from "next-auth";
 import FullCalendarWrapper from "~/components/FullCalendarWrapper";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { formatTimeString } from "~/utils/utils";
@@ -31,6 +32,7 @@ describe("<FullCalendarWrapper />", () => {
 
         mountWithContexts(
           <FullCalendarWrapperContext lastBookableMinute={closingMinute} />,
+          {} as Session,
         );
 
         // check time of the first slot

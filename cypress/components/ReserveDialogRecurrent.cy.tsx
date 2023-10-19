@@ -9,6 +9,8 @@ import {
   getAdminSession,
   mountWithContexts,
 } from "./_constants";
+require("dayjs/locale/it");
+dayjs.locale("it");
 
 function ReserveDialogRecurrentContext() {
   //setting clubId
@@ -63,14 +65,17 @@ describe("ReserveDialogRecurrent", () => {
   });
 
   it("GIVEN switch on and null date WHEN type valid date THEN clear error", () => {
+    //given
     cy.get("[data-test=recurrent-switch]").click();
+    //when
     cy.get("[data-test=recurrent-end-date]").click();
     cy.get("[data-test=recurrent-end-date]").type(
       dayjs().add(1, "week").format("DD/MM/YYYY"),
     );
+    //then
     cy.get("@setDateStub").should(
       "be.calledWith",
-      dayjs().add(1, "week").hour(0).minute(0).second(0).millisecond(0),
+      dayjs().add(1, "week").startOf("day"),
     );
     cy.get("@setErrorStub").should("be.calledWithExactly", false);
   });
@@ -87,7 +92,7 @@ describe("ReserveDialogRecurrent", () => {
     );
     cy.get("@setDateStub").should(
       "be.calledWith",
-      dayjs().subtract(1, "week").hour(0).minute(0).second(0).millisecond(0),
+      dayjs().subtract(1, "week").startOf("day"),
     );
     cy.get("@setErrorStub").should("be.calledWithExactly", true);
   });
@@ -122,10 +127,7 @@ describe("ReserveDialogRecurrent", () => {
     cy.get("[data-testid=CalendarIcon]").click();
     cy.get(".MuiPickersDay-today").click();
 
-    cy.get("@setDateStub").should(
-      "be.calledWith",
-      dayjs().hour(0).minute(0).second(0).millisecond(0),
-    );
+    cy.get("@setDateStub").should("be.calledWith", dayjs().startOf("day"));
     cy.get("@setErrorStub").should("be.calledWithExactly", false);
   });
 

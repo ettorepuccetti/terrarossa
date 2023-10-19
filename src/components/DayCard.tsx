@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
+import DayCardLayout from "./DayCardLayout";
 
 export const DayCard = (props: {
   day: Dayjs;
@@ -9,22 +10,21 @@ export const DayCard = (props: {
   const today = dayjs();
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        borderTop: 0,
-        borderRadius: 3,
-        cursor: "pointer",
-      }}
-      onClick={() => {
-        props.onBoxClick();
-        console.log("HorizontalDatePicker - daySelected: ", props.day.toDate());
-      }}
-      data-test="day-card"
-    >
-      {/* Calendar day rounded square */}
-      <Box display={"flex"} flexDirection={"column"} width={50} height={50}>
+    <DayCardLayout showDot={props.day.isSame(props.selected, "day")}>
+      {/* Internal calendar day card container */}
+      <Box
+        display={"flex"}
+        flexDirection={"column"}
+        flexGrow={1}
+        onClick={() => {
+          console.log(
+            "HorizontalDatePicker - daySelected: ",
+            props.day.toDate(),
+          );
+          props.onBoxClick();
+        }}
+        borderRadius={"inherit"}
+      >
         {/* upper part of the card, contain day of the week, red background */}
         <Box
           display={"flex"}
@@ -35,9 +35,8 @@ export const DayCard = (props: {
           sx={{
             backgroundColor: "#F1564E",
             color: "white",
-            borderRadius: 3,
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
+            borderTopLeftRadius: "inherit",
+            borderTopRightRadius: "inherit",
             overflow: "hidden",
             fontSize: 12,
             fontWeight: 500,
@@ -53,10 +52,8 @@ export const DayCard = (props: {
           alignItems={"center"}
           flexGrow={1}
           sx={{
-            borderRadius: 3,
-            borderTopLeftRadius: 0,
-            borderTopRightRadius: 0,
-            boxShadow: 3,
+            borderBottomLeftRadius: "inherit",
+            borderBottomRightRadius: "inherit",
             overflow: "hidden",
             backgroundColor: props.day.isSame(today, "day")
               ? "#FFFAE3"
@@ -68,23 +65,6 @@ export const DayCard = (props: {
           </Typography>
         </Box>
       </Box>
-      {/* dot indicating the selected date */}
-      {props.day.isSame(props.selected, "day") && (
-        <Box
-          sx={{
-            width: 8,
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: "#F1564E",
-            display: "flex",
-            justifyContent: "center",
-            alignSelf: "center",
-            marginTop: 1,
-            marginBottom: 1, //for the scroll bar
-            boxShadow: 3,
-          }}
-        />
-      )}
-    </Box>
+    </DayCardLayout>
   );
 };

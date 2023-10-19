@@ -2,16 +2,20 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
 
+import dayjs, { type Dayjs } from "dayjs";
 import { useRouter } from "next/router";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { api } from "~/utils/api";
+import CalendarHeader from "./CalendarHeader";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
-import { HorizonalDatePicker } from "./HorizontalDatePicker";
 import Spinner from "./Spinner";
 import SpinnerPartial from "./SpinnerPartial";
 
+//--------------------------------
+//-------- INPUT SCHEMAS ---------
+//--------------------------------
 export const ReservationInputSchema = z.object({
   startDateTime: z.date(),
   endDateTime: z.date(),
@@ -40,6 +44,15 @@ export const ClubIdInputSchema = z.object({
   clubId: z.union([z.string(), z.string().array(), z.undefined()]), //router param can also be undefined or array of strings
 });
 
+export const reservationQueryInputSchema = z.object({
+  clubId: z.string().optional(), //router param can also be undefined or array of strings
+  customSelectedDate: z.date().optional(),
+});
+
+//------------------------------------
+//----- QUERIES & MUTATION HOOKS -----
+//------------------------------------
+
 export const useClubQuery = (clubId: string | undefined) => {
   return api.club.getByClubId.useQuery(
     { clubId: clubId },
@@ -61,15 +74,29 @@ export const useCourtQuery = (clubId: string | undefined) =>
     },
   );
 
-export const useReservationQuery = (clubId: string | undefined) => {
+export const useReservationQuery = (
+  clubId: string | undefined,
+  selectedDate: Dayjs,
+) => {
+  const customSelectedDate = useCalendarStoreContext(
+    (store) => store.customDateSelected,
+  );
   return api.reservationQuery.getAllVisibleInCalendarByClubId.useQuery(
-    { clubId: clubId },
+    {
+      clubId: clubId,
+      customSelectedDate: customSelectedDate
+        ? selectedDate.toDate()
+        : undefined,
+    },
     { refetchOnWindowFocus: false, enabled: clubId !== undefined },
   );
 };
 
-export const useReservationAdd = (clubId: string | undefined) => {
-  const reservationQuery = useReservationQuery(clubId);
+export const useReservationAdd = (
+  clubId: string | undefined,
+  selectedDate: Dayjs,
+) => {
+  const reservationQuery = useReservationQuery(clubId, selectedDate);
   return api.reservationMutation.insertOne.useMutation({
     async onSuccess() {
       await reservationQuery.refetch();
@@ -80,8 +107,11 @@ export const useReservationAdd = (clubId: string | undefined) => {
   });
 };
 
-export const useRecurrentReservationAdd = (clubId: string | undefined) => {
-  const reservationQuery = useReservationQuery(clubId);
+export const useRecurrentReservationAdd = (
+  clubId: string | undefined,
+  selectedDate: Dayjs,
+) => {
+  const reservationQuery = useReservationQuery(clubId, selectedDate);
   return api.reservationMutation.insertRecurrent.useMutation({
     async onSuccess() {
       await reservationQuery.refetch();
@@ -92,8 +122,11 @@ export const useRecurrentReservationAdd = (clubId: string | undefined) => {
   });
 };
 
-export const useReservationDelete = (clubId: string | undefined) => {
-  const reservationQuery = useReservationQuery(clubId);
+export const useReservationDelete = (
+  clubId: string | undefined,
+  selectedDate: Dayjs,
+) => {
+  const reservationQuery = useReservationQuery(clubId, selectedDate);
   return api.reservationMutation.deleteOne.useMutation({
     async onSuccess() {
       await reservationQuery.refetch();
@@ -104,8 +137,11 @@ export const useReservationDelete = (clubId: string | undefined) => {
   });
 };
 
-export const useRecurrentReservationDelete = (clubId: string | undefined) => {
-  const reservationQuery = useReservationQuery(clubId);
+export const useRecurrentReservationDelete = (
+  clubId: string | undefined,
+  selectedDate: Dayjs,
+) => {
+  const reservationQuery = useReservationQuery(clubId, selectedDate);
   return api.reservationMutation.deleteRecurrent.useMutation({
     async onSuccess() {
       await reservationQuery.refetch();
@@ -118,6 +154,12 @@ export const useRecurrentReservationDelete = (clubId: string | undefined) => {
 
 export default function Calendar() {
   const [clubId, setClubId] = useState<string | undefined>(undefined);
+  const selectedDateInCalendar = useCalendarStoreContext(
+    (store) => store.selectedDate,
+  );
+  const setSelectedDate = useCalendarStoreContext(
+    (store) => store.setSelectedDate,
+  );
 
   // --------------------------------
   // ------  QUERY & MUTATIONS ------
@@ -127,25 +169,34 @@ export default function Calendar() {
   const setReservationAdd = useCalendarStoreContext(
     (store) => store.setReservationAdd,
   );
-  const reservationAdd = useReservationAdd(clubId);
+  const reservationAdd = useReservationAdd(clubId, selectedDateInCalendar);
 
   // recurrentReservationAdd
   const setRecurrentReservationAdd = useCalendarStoreContext(
     (store) => store.setRecurrentReservationAdd,
   );
-  const recurrentReservationAdd = useRecurrentReservationAdd(clubId);
+  const recurrentReservationAdd = useRecurrentReservationAdd(
+    clubId,
+    selectedDateInCalendar,
+  );
 
   // reservationDelete
   const setReservationDelete = useCalendarStoreContext(
     (store) => store.setReservationDelete,
   );
-  const reservationDelete = useReservationDelete(clubId);
+  const reservationDelete = useReservationDelete(
+    clubId,
+    selectedDateInCalendar,
+  );
 
   // recurrentReservationDelete
   const setRecurrentReservationDelete = useCalendarStoreContext(
     (store) => store.setRecurrentReservationDelete,
   );
-  const recurrentReservationDelete = useRecurrentReservationDelete(clubId);
+  const recurrentReservationDelete = useRecurrentReservationDelete(
+    clubId,
+    selectedDateInCalendar,
+  );
 
   // clubQuery
   const setClubData = useCalendarStoreContext((store) => store.setClubData);
@@ -154,11 +205,11 @@ export default function Calendar() {
   // if I call `store.getClubData` when still undefined, I get an exception
   const clubDataInStore = useCalendarStoreContext((store) => store.clubData);
 
-  // reservationQuery
+  // reservationQuery - also used by refresh button
   const setReservationQuery = useCalendarStoreContext(
     (store) => store.setReservationQuery,
   );
-  const reservationQuery = useReservationQuery(clubId);
+  const reservationQuery = useReservationQuery(clubId, selectedDateInCalendar);
 
   // queries for which I want to pass down their data as props to the calendar,
   // I want to manage them in a way that the subComponent render even if their data are not yet available
@@ -193,10 +244,10 @@ export default function Calendar() {
     setReservationDelete(reservationDelete);
     setRecurrentReservationDelete(recurrentReservationDelete);
     setReservationQuery(reservationQuery);
-
     //onComponentUnmount: reset the clubData
     return () => {
       setClubData(undefined);
+      setSelectedDate(dayjs().startOf("day"));
     };
   }, []);
 
@@ -244,7 +295,7 @@ export default function Calendar() {
         }}
       />
 
-      <HorizonalDatePicker />
+      <CalendarHeader />
       <SpinnerPartial
         open={
           reservationQuery.isLoading ||

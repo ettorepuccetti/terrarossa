@@ -1,4 +1,5 @@
 import { createTheme, type ThemeOptions } from "@mui/material/styles";
+import { itIT } from "@mui/x-date-pickers/locales";
 
 const lightThemeOption: ThemeOptions = {
   palette: {
@@ -12,6 +13,6 @@ const lightThemeOption: ThemeOptions = {
   },
 };
 
-const lightTheme = createTheme(lightThemeOption);
+const lightTheme = createTheme(lightThemeOption, itIT);
 
 export default lightTheme;

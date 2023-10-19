@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { ClubIdInputSchema } from "~/components/Calendar";
+import { reservationQueryInputSchema } from "~/components/Calendar";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -8,7 +8,7 @@ import {
 
 export const reservationQueryRouter = createTRPCRouter({
   getAllVisibleInCalendarByClubId: publicProcedure
-    .input(ClubIdInputSchema)
+    .input(reservationQueryInputSchema)
     .query(async ({ ctx, input }) => {
       if (typeof input.clubId !== "string") {
         throw new Error(`Server: invalid clubId`);
@@ -32,12 +32,19 @@ export const reservationQueryRouter = createTRPCRouter({
         .set("minute", 0)
         .set("second", 0)
         .set("millisecond", 0);
+      const customSelectedDate = input.customSelectedDate
+        ? dayjs(input.customSelectedDate)
+        : undefined;
+
       console.log(
-        "getAllVisibleInCalendarByClubId - fromDate: ",
+        "getAllVisibleInCalendarByClubId",
+        "fromDate:",
         fromDate.locale("it").toDate(),
-        "toDate: ",
+        "toDate:",
         toDate.locale("it").toDate(),
-        "clubId: ",
+        "customSelectedDate:",
+        customSelectedDate?.locale("it").toDate(),
+        "clubId:",
         input.clubId,
       );
 
@@ -49,10 +56,21 @@ export const reservationQueryRouter = createTRPCRouter({
 
             // retrieve only reservations that are in the visible time windows
             {
-              startTime: {
-                gte: fromDate.toDate(),
-                lte: toDate.toDate(),
-              },
+              OR: [
+                {
+                  startTime: {
+                    gte: fromDate.toDate(),
+                    lte: toDate.toDate(),
+                  },
+                },
+                // get also reservations of the custom selected date (selectedDate may fall outside the visible time windows)
+                {
+                  startTime: {
+                    gte: customSelectedDate?.toDate(),
+                    lte: customSelectedDate?.add(1, "day").toDate(),
+                  },
+                },
+              ],
             },
           ],
         },

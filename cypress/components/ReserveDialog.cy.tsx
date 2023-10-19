@@ -15,6 +15,8 @@ import {
   session,
 } from "./_constants";
 dayjs.extend(duration);
+// require("dayjs/locale/it");
+// dayjs.locale("it");
 
 function ReserveDialogWrapper(props: {
   startDate: Date;
@@ -71,7 +73,7 @@ function mountComponent({
   startDate: Dayjs;
   clubId?: string;
   clubSettings?: ClubSettings;
-  session?: Session;
+  session: Session | null;
 }) {
   mountWithContexts(
     <ReserveDialogWrapper
@@ -87,7 +89,7 @@ describe("USER", () => {
   it("GIVEN I am not logged in WHEN dialog THEN show login button", () => {
     // empty session for not logged user
     cy.intercept("GET", "/api/auth/session", { body: {} });
-    mountComponent({ startDate: dayjs(), session: undefined });
+    mountComponent({ startDate: dayjs(), session: null });
     // check Login button present
     cy.get("h2").should("contain", "Prenota");
     cy.get(".MuiButtonBase-root").should("contain", "Effettua il login");
@@ -212,8 +214,8 @@ describe("USER", () => {
     cy.get("[data-test=reserveButton]").should("be.disabled");
 
     cy.get("[data-testid=ClockIcon]").click();
-    cy.get('[aria-label="14 hours"]').click();
-    cy.get('[aria-label="0 minutes"]').click();
+    cy.get('[aria-label="14 ore"]').click();
+    cy.get('[aria-label="0 minuti"]').click();
     cy.get("[data-test=reserveButton]").should("be.enabled");
   });
 

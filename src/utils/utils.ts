@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { UserRoles } from "./constants";
 
@@ -59,7 +59,7 @@ export function isSelectableSlot(
   lastBookableMinute: number,
 ): boolean {
   const fixedDate = dayjs();
-  // !(selectedStartDate > lastBookableHour)
+  // check if !(selectedStartDate > lastBookableHour)
   return !(
     //selected start date
     fixedDate
@@ -71,5 +71,29 @@ export function isSelectableSlot(
           .set("hours", lastBookableHour)
           .set("minutes", lastBookableMinute),
       )
+  );
+}
+
+/**
+ * Check if the given date is in the time range determined by
+ * the given number of days in the past and in the future with respect to the current date
+ * @param date  date to check
+ * @param daysInThePastVisible days in the past of the time range
+ * @param daysInFutureVisible days in the future of the time range
+ * @returns `true` if the given date is in the time range, `false` otherwise
+ */
+export function dateIsInTimeRange(
+  date: Dayjs,
+  daysInThePastVisible: number,
+  daysInFutureVisible: number,
+) {
+  const today = dayjs().startOf("day");
+  const firstDayInRange = today.subtract(daysInThePastVisible, "day");
+  const lastDayInRange = today.add(daysInFutureVisible, "day");
+
+  //check if (date >= firstDayInRange && date <= lastDayInRange)
+  return (
+    (date.isAfter(firstDayInRange) || date.isSame(firstDayInRange)) &&
+    (date.isBefore(lastDayInRange) || date.isSame(lastDayInRange))
   );
 }
