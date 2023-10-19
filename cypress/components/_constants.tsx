@@ -5,7 +5,7 @@ import { type Club, type ClubSettings, type Court } from "@prisma/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, type TRPCClientErrorLike } from "@trpc/client";
 import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
+import "dayjs/locale/it";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
@@ -14,7 +14,6 @@ import lightTheme from "~/styles/lightTheme";
 import { api, getBaseUrl } from "~/utils/api";
 import { UserRoles } from "~/utils/constants";
 import createEmotionCache from "~/utils/createEmotionCache";
-dayjs.extend(duration);
 
 export const session: Session = {
   expires: "2022-10-20T11:00:00.000Z",
@@ -144,7 +143,7 @@ function WrapperComponentForTesting({
   return (
     <CacheProvider value={createEmotionCache()}>
       <ThemeProvider theme={lightTheme}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="it">
           <SessionProvider session={session}>
             <CalendarStoreProvider>
               <api.Provider client={trpcClient} queryClient={queryClient}>

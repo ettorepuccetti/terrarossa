@@ -86,6 +86,7 @@ export interface IStore {
   setSetEndDateError: (stub: (endDate: boolean) => void) => void;
   setSetRecurrentEndDate: (stub: (endDate: Dayjs | null) => void) => void;
   setSetRecurringEndDateError: (stub: (endDate: boolean) => void) => void;
+  setSetSelectedDate: (stub: (selectedDate: Dayjs) => void) => void;
 }
 
 export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
@@ -175,6 +176,8 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
     set({ setRecurrentEndDate: stub }),
   setSetRecurringEndDateError: (stub: (endDateError: boolean) => void) =>
     set({ setRecurringEndDateError: stub }),
+  setSetSelectedDate: (stub: (selectedDate: Dayjs) => void) =>
+    set({ setSelectedDate: stub }),
 });
 
 const getOrThrow = <T>(getter: () => T | undefined): T => {

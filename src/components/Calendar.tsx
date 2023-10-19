@@ -6,10 +6,10 @@ import dayjs, { type Dayjs } from "dayjs";
 import { useRouter } from "next/router";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { api } from "~/utils/api";
+import CalendarHeader from "./CalendarHeader";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
-import HorizonalDatePicker from "./HorizontalDatePicker";
 import Spinner from "./Spinner";
 import SpinnerPartial from "./SpinnerPartial";
 
@@ -295,7 +295,7 @@ export default function Calendar() {
         }}
       />
 
-      <HorizonalDatePicker />
+      <CalendarHeader />
       <SpinnerPartial
         open={
           reservationQuery.isLoading ||
