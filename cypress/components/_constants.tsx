@@ -1,15 +1,23 @@
 import { CacheProvider, ThemeProvider } from "@emotion/react";
+import { type EventImpl } from "@fullcalendar/core/internal";
+import { type ResourceApi } from "@fullcalendar/resource";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { type Club, type ClubSettings, type Court } from "@prisma/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, type TRPCClientErrorLike } from "@trpc/client";
+import {
+  type UseTRPCMutationResult,
+  type UseTRPCQueryResult,
+} from "@trpc/react-query/shared";
+import { type SinonStub } from "cypress/types/sinon";
 import dayjs from "dayjs";
 import "dayjs/locale/it";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import superjson from "superjson";
+import { CalendarStoreProvider } from "~/hooks/useCalendarStoreContext";
 import lightTheme from "~/styles/lightTheme";
 import { api, getBaseUrl } from "~/utils/api";
 import { UserRoles } from "~/utils/constants";
@@ -183,27 +191,6 @@ export const mountWithContexts = (
   );
 };
 
-export type ApiResponse<T> = {
-  result: {
-    data: {
-      json: T;
-    };
-  };
-};
-
-/**
- * @deprecated instead use `buildTrpcMutationMock`
- */
-export function buildApiResponse<T>(payload: T): ApiResponse<T> {
-  return {
-    result: {
-      data: {
-        json: payload,
-      },
-    },
-  };
-}
-
 /**
  * Builds a mock of the trpc mutation hook with the given stub and input variables.
  * The returned object can be set in the store in place of the real mutation hook.
@@ -279,58 +266,3 @@ export function buildTrpcQueryMock<TData>(
     trpc: { path: "" },
   };
 }
-
-// ------- END OF FILE -------
-// try to mock NextRouter (not succeed) - see:
-// https://github.com/cypress-io/cypress/discussions/22715
-// https://github.com/mike-plummer/nextjs-cypress-ct-example/blob/main/cypress/support/component.js
-import { type EventImpl } from "@fullcalendar/core/internal";
-import { type ResourceApi } from "@fullcalendar/resource";
-import {
-  type UseTRPCMutationResult,
-  type UseTRPCQueryResult,
-} from "@trpc/react-query/shared";
-import { type SinonStub } from "cypress/types/sinon";
-import {
-  AppRouterContext,
-  type AppRouterInstance,
-} from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { HeadManagerContext } from "next/dist/shared/lib/head-manager-context.shared-runtime";
-import { CalendarStoreProvider } from "~/hooks/useCalendarStoreContext";
-
-const createRouter = (params: Partial<AppRouterInstance>) => ({
-  back: cy.spy().as("back"),
-  forward: cy.spy().as("forward"),
-  prefetch: cy.stub().as("prefetch").resolves(),
-  push: cy.spy().as("push"),
-  replace: cy.spy().as("replace"),
-  refresh: cy.spy().as("refresh"),
-  ...params,
-});
-
-const createHeadManager = () => ({
-  updateHead: cy.stub().as("head:updateHead"),
-  mountedInstances: new Set(),
-  updateScripts: cy.stub().as("head:updateScripts"),
-  scripts: new Set(),
-  getIsSsr: () => false,
-  appDir: false,
-  nonce: "_",
-});
-
-interface MockNextRouterProps extends Partial<AppRouterInstance> {
-  children: React.ReactNode;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const MockNextRouter = ({ children, ...props }: MockNextRouterProps) => {
-  const router = createRouter(props as AppRouterInstance);
-  const headManager = createHeadManager();
-  return (
-    <HeadManagerContext.Provider value={headManager}>
-      <AppRouterContext.Provider value={router}>
-        {children}
-      </AppRouterContext.Provider>
-    </HeadManagerContext.Provider>
-  );
-};
