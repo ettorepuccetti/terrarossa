@@ -129,7 +129,7 @@ function WrapperComponentForTesting({
   session,
 }: {
   children: React.ReactNode;
-  session?: Session;
+  session: Session | null;
 }) {
   const [queryClient] = useState(
     () =>
@@ -182,7 +182,7 @@ function WrapperComponentForTesting({
 
 export const mountWithContexts = (
   children: React.ReactNode,
-  session: Session,
+  session: Session | null,
 ) => {
   cy.mount(
     <WrapperComponentForTesting session={session}>
