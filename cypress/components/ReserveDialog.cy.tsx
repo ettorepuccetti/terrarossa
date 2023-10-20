@@ -15,8 +15,6 @@ import {
   session,
 } from "./_constants";
 dayjs.extend(duration);
-// require("dayjs/locale/it");
-// dayjs.locale("it");
 
 function ReserveDialogWrapper(props: {
   startDate: Date;
