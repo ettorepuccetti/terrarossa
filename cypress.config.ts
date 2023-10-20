@@ -19,13 +19,13 @@ export default defineConfig({
     watchForFileChanges: false,
     env: {
       DATABASE_URL: process.env.DATABASE_URL,
-      NODE_ENV: "test",
       NEXTAUTH_URL: process.env.NEXTAUTH_URL,
       NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
       AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
       AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
       AUTH0_ISSUER: process.env.AUTH0_ISSUER,
       AUTH0_BASE_URL: process.env.AUTH0_BASE_URL,
+      NODE_ENV: "test",
     },
     setupNodeEvents(on, config) {
       on("before:browser:launch", (browser, launchOptions) => {
