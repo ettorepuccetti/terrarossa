@@ -18,14 +18,13 @@ export default function LoginDrawerButton() {
             <Typography variant="h6">{sessionData.user?.name}</Typography>
           </ListItemButtonStyled>
           <Divider />
-          <ListItemButtonStyled>
+          <ListItemButtonStyled
+            onClick={() => {
+              void router.push("/").then(() => signOut());
+            }}
+          >
             <LogoutIcon />
-            <ListItemText
-              primary=" Logout"
-              onClick={() => {
-                void router.push("/").then(() => signOut());
-              }}
-            />
+            <ListItemText primary=" Logout" />
           </ListItemButtonStyled>
         </>
       )}
@@ -33,12 +32,9 @@ export default function LoginDrawerButton() {
       {/* User not logged in */}
       {!sessionData && (
         <>
-          <ListItemButtonStyled>
+          <ListItemButtonStyled onClick={() => void signIn("auth0")}>
             <LoginIcon />
-            <ListItemText
-              primary="Login"
-              onClick={() => void signIn("auth0")}
-            />
+            <ListItemText primary="Login" />
           </ListItemButtonStyled>
         </>
       )}
