@@ -20,6 +20,8 @@ import { type Session } from "next-auth";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
+import { trpcTracingMiddleware } from "@baselime/node-opentelemetry";
+
 type CreateContextOptions = {
   session: Session | null;
 };
@@ -65,7 +67,6 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { UserRoles } from "~/utils/constants";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -110,22 +111,10 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
-/** Reusable middleware that enforces users are ADMIN of the club */
-const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
-  if (
-    !ctx.session ||
-    !ctx.session.user ||
-    ctx.session.user.role !== UserRoles.ADMIN
-  ) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-  return next({
-    ctx: {
-      // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  });
-});
+const logginProcedure = t.procedure.use(
+  trpcTracingMiddleware({ collectInput: true }),
+);
+
 /**
  * Protected (authenticated) procedure
  *
@@ -134,5 +123,5 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
  *
  * @see https://trpc.io/docs/procedures
  */
-export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
-export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
+
+export const protectedProcedure = logginProcedure.use(enforceUserIsAuthed);
