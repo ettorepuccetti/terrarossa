@@ -10,7 +10,7 @@ jobs:
   deploy-code:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
-    # I want to skip deploy if the committer is Github
+    # I want to skip deploy if the committer is Github (already deployed when merged to main)
     steps:
       - name: Check for github committer
         run: |
