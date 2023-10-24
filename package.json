@@ -53,6 +53,8 @@
     "next": "^13.5.4",
     "next-auth": "^4.23.2",
     "nodemailer": "^6.9.6",
+    "pino": "^8.16.0",
+    "pino-logflare": "^0.4.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "superjson": "2.0.0",

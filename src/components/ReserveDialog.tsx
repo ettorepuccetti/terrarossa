@@ -13,6 +13,7 @@ import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { loggerBuilder } from "~/utils/logger";
 import { isAdminOfTheClub } from "~/utils/utils";
 import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
@@ -49,6 +50,7 @@ export default function ReserveDialog() {
 
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
   const resource = dateClick?.resource;
+  const logger = loggerBuilder("ReserveDialog");
 
   const onConfirmButton = () => {
     if (!endDate || !startDate || !resource) {
@@ -63,23 +65,16 @@ export default function ReserveDialog() {
       throw new Error("Si è verificato un problema, per favore riprova.");
     }
 
-    console.log(
-      "startDate: ",
-      startDate,
-      "endDate: ",
-      endDate,
-      "recurrentEndDate: ",
-      recurrentEndDate,
-      "overwriteName: ",
-      overwriteName,
-      "resource: ",
-      resource.id,
-      "resource title: ",
-      resource.title,
-      "clubId: ",
-      clubData.id,
-    );
-    //todo: use a single api end point for both reservation and recurrent reservation
+    logger.info("onConfirmButton", {
+      startDate: startDate,
+      endDate: endDate,
+      recurrentEndDate: recurrentEndDate,
+      overwriteName: overwriteName,
+      resource: resource.id,
+      resourceTitle: resource.title,
+      clubId: clubData.id,
+    });
+
     const name = overwriteName !== "" ? overwriteName : undefined; //manage undefined of input for controlled component
     if (recurrentEndDate) {
       recurrentReservationAdd.mutate({
