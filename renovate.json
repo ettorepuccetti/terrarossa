@@ -13,5 +13,6 @@
       "automerge": true
     }
   ],
-  "schedule": ["after 3am", "before 9am"]
+  "schedule": ["after 3am", "before 9am"],
+  "automergeSchedule": ["after 3am", "before 9am"]
 }

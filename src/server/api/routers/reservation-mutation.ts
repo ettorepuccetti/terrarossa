@@ -10,11 +10,14 @@ import {
 } from "~/components/Calendar";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { UserRoles } from "~/utils/constants";
+import { loggerBuilder } from "~/utils/logger";
 
 export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
     .input(ReservationInputSchema)
     .mutation(async ({ ctx, input }) => {
+      const logger = loggerBuilder("reservationMutationRouter");
+
       const clubSettings = await getClubSettings(ctx.prisma, input.clubId);
 
       //collision check [UI does NOT check for this]
@@ -82,6 +85,8 @@ export const reservationMutationRouter = createTRPCRouter({
           );
         }
       }
+
+      logger.info("Creating reservation", input);
 
       return ctx.prisma.reservation.create({
         data: {
