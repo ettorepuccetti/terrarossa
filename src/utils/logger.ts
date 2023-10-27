@@ -19,7 +19,7 @@ export const loggerInternal = pino(
         send: send,
       },
     },
-    level: "debug",
+    level: env.NODE_ENV === "test" ? "silent" : "debug",
     base: {
       env: process.env.NODE_ENV,
       vercelEnv: process.env.VERCEL_ENV,
