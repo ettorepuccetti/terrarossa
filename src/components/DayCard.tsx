@@ -16,13 +16,7 @@ export const DayCard = (props: {
         display={"flex"}
         flexDirection={"column"}
         flexGrow={1}
-        onClick={() => {
-          console.log(
-            "HorizontalDatePicker - daySelected: ",
-            props.day.toDate(),
-          );
-          props.onBoxClick();
-        }}
+        onClick={props.onBoxClick}
         borderRadius={"inherit"}
       >
         {/* upper part of the card, contain day of the week, red background */}

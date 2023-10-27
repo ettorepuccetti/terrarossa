@@ -103,6 +103,11 @@ describe("New reservation", () => {
     cy.get("[data-test=calendar-event]").should("be.visible");
     cy.navigateDaysFromToday(7);
     cy.get("[data-test=calendar-event]").should("be.visible");
+    // also check that start and end time are correct
+    cy.get("[data-test=calendar-event]").should(
+      "contain.text",
+      "12:00 - 13:00",
+    );
   });
 
   it("GIVEN admin WHEN make recurrent reservation AND there is a conflict THEN error is shown", function () {

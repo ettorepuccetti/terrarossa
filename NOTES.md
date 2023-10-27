@@ -218,6 +218,15 @@ from [this guide](https://vercel.com/guides/how-can-i-use-github-actions-with-ve
 on push event:
 `github.event.head_commit.committer.name`
 
+### Update deployment section in github repo
+
+Using these actions:
+
+- [deployment-action](https://github.com/marketplace/actions/deployment-action)
+- [deployment-status](https://github.com/marketplace/actions/deployment-status)
+
+Currently applied only for preview environment. On new deploy, it mark the old ones as inactive. Check how to handle the case of having more than one active branches (also in case of renovate bot opening PR).
+
 ## Linting before commit
 
 install husky and lint-staged:
@@ -280,3 +289,20 @@ https://akrabat.com/ignoring-revisions-with-git-blame/
 - add the file `.git-blame-ignore-revs`
 - run: `git config blame.ignoreRevsFile .git-blame-ignore-revs`
 - write the 40 chars commit hash in it of the commit to ignore
+
+## Logs
+
+Pino logger + Logflare. Code example repo: [next-pino-logflare-logging-example
+](https://github.com/Logflare/next-pino-logflare-logging-example)
+
+It use the vercel log drain + logflare vercel [integration](https://vercel.com/integrations/logflare) for logging lambda (server side), and POST request to logdrain client side, everything using the same [logger object](https://github.com/Logflare/next-pino-logflare-logging-example/blob/main/logger/logger.js).
+
+Log [child](https://github.com/pinojs/pino/blob/master/docs/child-loggers.md) for logging the LOGKEY of each component using the logger.
+
+### Server side
+
+On logflare, once installed the integration, create a source (`terrarossa.vercel` in this case) and a log drain that will collect logs from vercel project (so all kind of log: static request, build, lamdba, etc.) and send them to the created source. It is possible for a given source to create a rule which redirect filtered log to another source (`terrarossa.vercel.build` for instance).
+
+### Client side
+
+Create another source (optional) and get `SOURCE_ID` and `API_KEY` for initialize the logger object in the code.
