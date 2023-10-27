@@ -45,10 +45,6 @@ export default defineConfig({
       framework: "next",
       bundler: "webpack",
     },
-    setupNodeEvents(on, config) {
-      tasks(on);
-      return config;
-    },
   },
 });
 
