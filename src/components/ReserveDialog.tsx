@@ -13,7 +13,7 @@ import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { loggerBuilder } from "~/utils/logger";
+import { loggerInternal } from "~/utils/logger";
 import { isAdminOfTheClub } from "~/utils/utils";
 import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
@@ -50,49 +50,41 @@ export default function ReserveDialog() {
 
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
   const resource = dateClick?.resource;
-  const logger = loggerBuilder("ReserveDialog");
+  const logger = loggerInternal.child({ component: "ReserveDialog" });
 
   const onConfirmButton = () => {
     if (!endDate || !startDate || !resource) {
-      console.error(
-        "endDate",
-        endDate,
-        "startDate",
-        startDate,
-        "resource",
-        resource,
+      logger.error(
+        {
+          endDate: endDate?.toDate(),
+          startDate: startDate?.toDate(),
+          resource: resource,
+        },
+        "onConfirmButton: unexpected null value",
       );
       throw new Error("Si è verificato un problema, per favore riprova.");
     }
 
-    logger.info("onConfirmButton", {
-      startDate: startDate,
-      endDate: endDate,
-      recurrentEndDate: recurrentEndDate,
-      overwriteName: overwriteName,
-      resource: resource.id,
-      resourceTitle: resource.title,
+    const dataPayload = {
+      startDateTime: startDate.toDate(),
+      endDateTime: endDate.toDate(),
+      overwriteName: overwriteName !== "" ? overwriteName : undefined, //manage undefined of input for controlled component
       clubId: clubData.id,
-    });
+      courtId: resource.id,
+    };
 
-    const name = overwriteName !== "" ? overwriteName : undefined; //manage undefined of input for controlled component
+    // recurrent reservation add
     if (recurrentEndDate) {
-      recurrentReservationAdd.mutate({
-        clubId: clubData.id,
-        courtId: resource.id,
-        startDateTime: startDate.toDate(),
-        endDateTime: endDate.toDate(),
-        overwriteName: name,
-        recurrentEndDate: recurrentEndDate.hour(23).minute(59).toDate(), //TODO: fix that
-      });
+      const recurrentDataPayload = {
+        ...dataPayload,
+        recurrentEndDate: recurrentEndDate.toDate(),
+      };
+      logger.info(recurrentDataPayload, "recurrent reservation added");
+      recurrentReservationAdd.mutate(recurrentDataPayload);
     } else {
-      reservationAdd.mutate({
-        courtId: resource.id,
-        startDateTime: startDate.toDate(),
-        endDateTime: endDate.toDate(),
-        overwriteName: name,
-        clubId: clubData.id,
-      });
+      // single reservation add
+      logger.info(dataPayload, "reservation added");
+      reservationAdd.mutate(dataPayload);
     }
     setDateClick(null);
     setOverwriteName("");

@@ -11,7 +11,7 @@ const { stream, send } = logflarePinoVercel({
 });
 
 // create pino logger
-const loggerInternal = pino(
+export const loggerInternal = pino(
   {
     browser: {
       transmit: {
@@ -28,36 +28,3 @@ const loggerInternal = pino(
   },
   stream,
 );
-
-/**
- * Wrap the pino logger to add a logkey to the log message and to write the payload in the log message
- * @param logkey to prefix the log message with
- * @returns a logger object that wraps the pino logger methods info, warn, error
- */
-export const loggerBuilder = (logkey: string) => {
-  /**
-   * Write the payload in the log message (to allow better filtering in logflare)
-   * @param message original message
-   * @param objectToLog payload
-   * @returns log message with payload written in it
-   */
-  const buildLogLine = (message: string, objectToLog: unknown) => {
-    return JSON.stringify({
-      LOGKEY: logkey,
-      MESSAGE: message,
-      PAYLOAD: objectToLog,
-    });
-  };
-
-  return {
-    info(message: string, objectToLog: unknown) {
-      loggerInternal.info(objectToLog, buildLogLine(message, objectToLog));
-    },
-    warn(message: string, objectToLog: unknown) {
-      loggerInternal.warn(objectToLog, buildLogLine(message, objectToLog));
-    },
-    error(message: string, objectToLog: unknown) {
-      loggerInternal.error(objectToLog, buildLogLine(message, objectToLog));
-    },
-  };
-};

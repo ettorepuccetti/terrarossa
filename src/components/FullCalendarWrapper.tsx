@@ -16,7 +16,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useRef, type RefObject } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { type AppRouter } from "~/server/api/root";
-import { loggerBuilder } from "~/utils/logger";
+import { loggerInternal } from "~/utils/logger";
 import {
   formatTimeString,
   isAdminOfTheClub,
@@ -35,7 +35,7 @@ interface FullCalendarWrapperProps {
 }
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
-  const logger = loggerBuilder("FullCalendarWrapper");
+  const logger = loggerInternal.child({ component: "FullCalendarWrapper" });
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
   const setCalendarRef = useCalendarStoreContext(
     (state) => state.setCalendarRef,
@@ -105,6 +105,18 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       eventClickInfo.event.extendedProps.userId === sessionData?.user.id ||
       isAdminOfTheClub(sessionData, clubData.id)
     ) {
+      logger.info("open event detail dialog", {
+        reservationId: eventClickInfo.event.id,
+        clubId: clubData.id,
+        clubName: clubData.name,
+        courtId: eventClickInfo.event.getResources()[0]?.id,
+        courtName: eventClickInfo.event.getResources()[0]?.title,
+        startDate: eventClickInfo.event.start,
+        endDate: eventClickInfo.event.end,
+        userId: eventClickInfo.event.extendedProps.userId as string,
+        recurrentReservationId: eventClickInfo.event.extendedProps
+          .recurrentId as string,
+      });
       setEventDetails(eventClickInfo.event);
     }
   };

@@ -10,9 +10,11 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { loggerInternal } from "~/utils/logger";
 import DialogLayout from "./DialogLayout";
 
 export default function CancelRecurrentDialog() {
+  const logger = loggerInternal.child({ component: "CancelRecurrentDialog" });
   const deleteOpen = useCalendarStoreContext(
     (state) => state.deleteConfirmationOpen,
   );
@@ -36,8 +38,14 @@ export default function CancelRecurrentDialog() {
   const [value, setValue] = React.useState("single");
 
   const handleConfirmation = () => {
-    if (!eventDetails) {
-      throw new Error("Si è verificato un problema, per favore riprova.");
+    if (!eventDetails?.id || !eventDetails.extendedProps.recurrentId) {
+      logger.error(
+        { eventDetails: eventDetails },
+        "reservaton id or recurrentId is undefined",
+      );
+      throw new Error(
+        "Si è verificato un problema, la tua prentazione non può essere cancellata al momento, per favore riprova.",
+      );
     }
     switch (value) {
       case "single":
@@ -54,7 +62,7 @@ export default function CancelRecurrentDialog() {
   };
 
   const deleteReservation = (reservationId: string) => {
-    console.log("delete event: ", reservationId);
+    logger.info({ reservationId: reservationId }, "delete single reservation");
     reservationDelete.mutate({
       reservationId: reservationId,
       clubId: clubData.id,
@@ -62,7 +70,12 @@ export default function CancelRecurrentDialog() {
   };
 
   const deleteRecurrentReservation = (recurentReservationId: string) => {
-    console.log("delete recurrent event: ", recurentReservationId);
+    logger.info(
+      {
+        recurrentReservationId: recurentReservationId,
+      },
+      "delete recurrent reservation",
+    );
     recurrentReservationDelete.mutate({
       recurrentReservationId: recurentReservationId,
       clubId: clubData.id,

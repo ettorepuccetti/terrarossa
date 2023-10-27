@@ -59,7 +59,7 @@ export default function ReserveDialogRecurrent() {
           value={recurrentEndDate}
           label={"Data di fine validità"}
           onChange={(dayJsDate) => {
-            setRecurrentEndDate(dayJsDate);
+            setRecurrentEndDate(dayJsDate ? dayJsDate.add(1, "day") : null); //add 1 day because dateTime is 00:00
             // date changed from null to not null or viceversa
             if ((recurrentEndDate == null) != (dayJsDate == null)) {
               setRecurrentEndDateError(dayJsDate == null);

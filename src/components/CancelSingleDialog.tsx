@@ -1,7 +1,9 @@
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { loggerInternal } from "~/utils/logger";
 import ConfirmationDialog from "./ConfirmationDialog";
 
 export default function CancelSingleDialog() {
+  const logger = loggerInternal.child({ component: "CancelSingleDialog" });
   const deleteConfirmationOpen = useCalendarStoreContext(
     (state) => state.deleteConfirmationOpen,
   );
@@ -20,17 +22,19 @@ export default function CancelSingleDialog() {
 
   const deleteReservation = (reservationId?: string) => {
     if (!reservationId) {
-      console.error(
-        "CancelSingleDialog: reservationId is undefined. EventDetails:",
-        eventDetails,
+      logger.error(
+        { eventDetails: eventDetails },
+        "reservationId is undefined",
       );
-      throw new Error("Si è verificato un problema, per favore riprova.");
+      throw new Error(
+        "Si è verificato un problema, la tua prentazione non può essere cancellata al momento, per favore riprova",
+      );
     }
     reservationDelete.mutate({
       reservationId: reservationId,
       clubId: clubData.id,
     });
-    console.log("delete event: ", reservationId);
+    logger.info({ reservationId: reservationId }, "delete reservation");
     setDeleteConfirmationOpen(false);
     setEventDetails(null);
   };
