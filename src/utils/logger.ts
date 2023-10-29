@@ -10,12 +10,6 @@ const { stream, send } = logflarePinoVercel({
   sourceToken: env.NEXT_PUBLIC_LOGFLARE_SOURCE_ID,
 });
 
-// console.log("env.NEXT_PUBLIC_APP_ENV from logger:", env.NEXT_PUBLIC_APP_ENV);
-// console.log(
-//   "env.NEXT_PUBLIC_APP_ENV === 'test': ",
-//   env.NEXT_PUBLIC_APP_ENV === "test",
-// );
-
 // create pino logger
 const loggerInternal = pino(
   {
