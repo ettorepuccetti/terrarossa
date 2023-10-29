@@ -7,7 +7,8 @@ on:
     branches: [main]
   workflow_dispatch:
 env:
-  NODE_ENV: "test"
+  NODE_ENV: "development"
+  NEXT_PUBLIC_APP_ENV: "test"
   DEBUG: "cypress:server:args"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   #address of services is the name of the service if both on containers and no port map needed

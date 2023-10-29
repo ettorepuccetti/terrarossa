@@ -6,7 +6,7 @@ import { z } from "zod";
  */
 const server = z.object({
   DATABASE_URL: z.string().url(),
-  NODE_ENV: z.enum(["development", "test", "production"]),
+  NODE_ENV: z.enum(["development", "production"]),
   NEXTAUTH_SECRET:
     process.env.NODE_ENV === "production"
       ? z.string().min(1)
@@ -31,6 +31,7 @@ const server = z.object({
 const client = z.object({
   NEXT_PUBLIC_LOGFLARE_SOURCE_ID: z.string(),
   NEXT_PUBLIC_LOGFLARE_API_KEY: z.string(),
+  NEXT_PUBLIC_APP_ENV: z.enum(["development", "production", "test"]),
 });
 
 /**
@@ -49,6 +50,7 @@ const processEnv = {
   AUTH0_ISSUER: process.env.AUTH0_ISSUER,
   NEXT_PUBLIC_LOGFLARE_SOURCE_ID: process.env.NEXT_PUBLIC_LOGFLARE_SOURCE_ID,
   NEXT_PUBLIC_LOGFLARE_API_KEY: process.env.NEXT_PUBLIC_LOGFLARE_API_KEY,
+  NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
 };
 
 // Don't touch the part below

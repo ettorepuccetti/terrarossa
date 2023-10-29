@@ -19,13 +19,15 @@ export const loggerInternal = pino(
         send: send,
       },
     },
-    level:
-      (() => {
-        console.log("process.env.NODE_ENV from logger: ", process.env.NODE_ENV);
-        return process.env.NODE_ENV;
-      })() === "test"
-        ? "silent"
-        : "debug",
+    level: (() => {
+      console.log(
+        "env.NEXT_PUBLIC_APP_ENV from logger: ",
+        env.NEXT_PUBLIC_APP_ENV,
+      );
+      return env.NEXT_PUBLIC_APP_ENV === "test";
+    })()
+      ? "silent"
+      : "debug",
     base: {
       env: process.env.NODE_ENV,
       vercelEnv: process.env.VERCEL_ENV,

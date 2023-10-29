@@ -196,6 +196,60 @@ parallel: true
 group: "UI - Chrome [ - mobile]"
 ```
 
+### Environment variables
+
+[source](https://docs.cypress.io/guides/guides/environment-variables)
+
+#### 1. `cypress.config.ts`
+
+```
+export default defineConfig({
+  env: {
+    login_url: '/login',
+  },
+})
+```
+
+became accessible in test file as
+
+```
+Cypress.env('login_url') // '/login'
+```
+
+#### 2. `cypress.env.json`
+
+```
+{
+ login_url: '/login_local',
+}
+```
+
+#### 3. `CYPRESS_*`
+
+Any exported environment variables set on the command line or in your CI provider that start with either `CYPRESS*` or `cypress*` will automatically be parsed by Cypress.
+
+Environment variables that do not match configuration options will be set as environment variables for use in tests with `Cypress.env()`, and will override any existing values in the Cypress configuration `env` object and `cypress.env.json` files.
+
+example, from command line:
+
+```
+export CYPRESS_api_server=http://localhost:8888/api/v1/
+```
+
+in test:
+
+```
+Cypress.env('api_server') // 'http://localhost:8888/api/v1/'
+```
+
+#### 4. `--env`
+
+from command line:
+
+```
+cypress run --env api_server=http://localhost:8888/api/v1
+```
+
 ## Github Actions
 
 ### Skip pull request and push workflows
@@ -306,3 +360,81 @@ On logflare, once installed the integration, create a source (`terrarossa.vercel
 ### Client side
 
 Create another source (optional) and get `SOURCE_ID` and `API_KEY` for initialize the logger object in the code.
+
+## NODE_ENV (for enabling features client side)
+
+Nextjs actually support only two values: `development` and `production` (see this [discussion](https://github.com/vercel/next.js/issues/17032#issuecomment-691491353)).
+To overcome this, best option is to use `APP_ENV`. Since it needs to be read client side, it became:
+`NEXT_PUBLIC_APP_ENV` = `production` | `development` | `test`
+
+### Environment Variable Load Order
+
+Environment variables are looked up in the following places, in order, stopping once the variable is found ([source](https://nextjs.org/docs/pages/building-your-application/configuring/environment-variables)).
+
+1. `process.env`
+2. `.env.$(NODE_ENV).local`
+3. `.env.local` (Not checked when `NODE_ENV` is `test`.)
+4. `.env.$(NODE_ENV)`
+5. `.env`
+
+### `.env`:
+
+```
+NODE_ENV="development"
+NEXT_PUBLIC_APP_ENV="development"
+
+```
+
+### `cypress-testing.yml`:
+
+```
+env:
+  NODE_ENV="development"
+  NEXT_PUBLIC_APP_ENV="test"
+
+```
+
+### `package.json`:
+
+```
+    "dev": "next"
+
+    "dev:test": "NEXT_PUBLIC_APP_ENV='test'
+
+    "cypress": "NEXT_PUBLIC_APP_ENV='test' cypress open",
+
+    "cypress-run": "npx cypress run",
+
+    "cypress-run-component": "NEXT_PUBLIC_APP_ENV='test' npx cypress run --component",
+```
+
+### Local development
+
+I set `NEXT_PUBLIC_APP_ENV="development"`
+in `.env` file. Easy as that
+
+TODO: What if I want to make a production build locally and run that one (with variable set to production)?
+
+### Vercel
+
+I set an env variable to `NEXT_PUBLIC_APP_ENV="production"`. Easy
+
+### Cypress
+
+I need to set that variable to `test` both locally and on the CI, for both e2e testing and component testing
+
+#### Locally
+
+E2E: I need to run the local dev server with that variable set to `test`. Unfortunalty now I cannot use anymore the same instance of the server for both development and testing.
+Cypress depend on the NEXT_PUBLIC_APP_ENV set when the server is launched.
+
+- start local server: `npm run dev:test` = `"NEXT_PUBLIC_APP_ENV='test' npm run dev"` (since `process.env` take precedence of what is defined in `.env` file)
+- start cypress: `npm run cypress`
+
+COMPONENT: I can set `NEXT_PUBLIC_APP_ENV='test'` from the command line before lunching `npm run cypress` and that value will be read correctly, since component testing does not depend from local server
+
+- start cypress: `npm run cypress` = `"NEXT_PUBLIC_APP_ENV='test' cypress open"`
+
+#### on CI
+
+env variables are set in the `env` section of the `.yml` file, so it should be enough to set `NEXT_PUBLIC_APP_ENV='test'` in the workflow file, no other dependecies.
