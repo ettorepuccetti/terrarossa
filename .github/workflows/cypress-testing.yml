@@ -7,7 +7,7 @@ on:
     branches: [main]
   workflow_dispatch:
 env:
-  NODE_ENV: "development"
+  NODE_ENV: "test" # to fix this: https://github.com/vercel/next.js/issues/55804#issuecomment-1735124191 Ideally it should be test, but I disable for consistency
   NEXT_PUBLIC_APP_ENV: "test"
   DEBUG: "cypress:server:args"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
