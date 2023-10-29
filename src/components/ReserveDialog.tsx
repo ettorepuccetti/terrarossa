@@ -13,12 +13,12 @@ import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { loggerInternal } from "~/utils/logger";
 import { isAdminOfTheClub } from "~/utils/utils";
 import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
+import { getLogger } from "~/utils/logger";
 
 export default function ReserveDialog() {
   const { data: sessionData } = useSession();
@@ -50,7 +50,7 @@ export default function ReserveDialog() {
 
   const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
   const resource = dateClick?.resource;
-  const logger = loggerInternal.child({ component: "ReserveDialog" });
+  const logger = getLogger({ component: "ReserveDialog" });
 
   const onConfirmButton = () => {
     if (!endDate || !startDate || !resource) {

@@ -16,7 +16,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useRef, type RefObject } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { type AppRouter } from "~/server/api/root";
-import { loggerInternal } from "~/utils/logger";
+import { getLogger } from "~/utils/logger";
 import {
   formatTimeString,
   isAdminOfTheClub,
@@ -35,7 +35,7 @@ interface FullCalendarWrapperProps {
 }
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
-  const logger = loggerInternal.child({ component: "FullCalendarWrapper" });
+  const logger = getLogger({ component: "FullCalendarWrapper" });
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
   const setCalendarRef = useCalendarStoreContext(
     (state) => state.setCalendarRef,

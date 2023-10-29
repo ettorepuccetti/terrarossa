@@ -1,6 +1,6 @@
-import React from "react";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import React from "react";
 
 const SpinnerPartial = ({
   open,

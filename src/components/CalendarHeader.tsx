@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { defaultClubImage } from "~/utils/constants";
 import { capitaliseFirstChar } from "~/utils/utils";
-import HorizonalDatePickerNew from "./HorizontalDatePicker";
+import HorizonalDatePicker from "./HorizontalDatePicker";
 import LegendaButton from "./LegendaButton";
 import RefetchReservationButton from "./RefetchReservationButton";
 require("dayjs/locale/it");
@@ -37,7 +37,7 @@ export default function CalendarHeader() {
             alignItems: "flex-end",
           }}
         >
-          <HorizonalDatePickerNew />
+          <HorizonalDatePicker />
         </Box>
       </Box>
       {/* Row between datePicker and calendar */}

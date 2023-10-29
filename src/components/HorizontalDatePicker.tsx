@@ -1,11 +1,12 @@
 import { Box } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { loggerInternal } from "~/utils/logger";
+import { getLogger } from "~/utils/logger";
 import { DayCard } from "./DayCard";
 import DayCardFreePicker from "./DayCardFreePicker";
 
-export default function HorizonalDatePickerNew() {
+export default function HorizonalDatePicker() {
+  const logger = getLogger({ component: "HorizontalDatePicker" });
   const clubData = useCalendarStoreContext((store) => store.getClubData());
   const daysInThePastVisible = clubData.clubSettings.daysInThePastVisible;
   const daysInTheFutureVisible = clubData.clubSettings.daysInFutureVisible;
@@ -31,9 +32,7 @@ export default function HorizonalDatePickerNew() {
   );
 
   const onDateClick = (date: dayjs.Dayjs) => {
-    loggerInternal
-      .child({ component: "HorizontalDatePicker" })
-      .info({ selectedDate: date.toDate() }, "Date selected");
+    logger.info({ selectedDate: date.toDate() }, "Date selected");
     setSelectedDate(date);
     setCustomSelectedDate(false);
     calendarRef.current?.getApi().gotoDate(date.toDate());
