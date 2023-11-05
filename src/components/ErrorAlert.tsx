@@ -1,6 +1,7 @@
 import { Alert, Backdrop } from "@mui/material";
 import { type TRPCClientErrorBase } from "@trpc/client";
 import { type DefaultErrorShape } from "@trpc/server";
+import { useEffect } from "react";
 import { useLogger } from "~/utils/logger";
 
 interface ErrorAlertProps<T extends DefaultErrorShape> {
@@ -15,9 +16,14 @@ export default function ErrorAlert({
   const logger = useLogger({
     component: "ErrorAlert",
   });
-  if (error) {
-    logger.error({ error: error.message }, "Error shown in ErrorAlert");
-  }
+
+  // to avoid logging the error twice
+  useEffect(() => {
+    if (error) {
+      logger.error({ error: error.message }, "Error shown in ErrorAlert");
+    }
+  }, [error]);
+
   return (
     error && (
       <Backdrop
