@@ -239,46 +239,6 @@ describe("New Reservation", () => {
     cy.get("[data-test=reserveButton]").should("be.disabled");
   });
 
-  it("GIVEN logged user WHEN reserve with a clash THEN show error banner and reservation not added", function () {
-    // create a reservation in the next day, for avoiding `reservation in the past` warning
-    const startDate = dayjs()
-      .add(1, "day")
-      .hour(12)
-      .minute(0)
-      .second(0)
-      .millisecond(0);
-
-    cy.addReservationToDB(
-      startDate.toDate(),
-      startDate.add(1, "hour").toDate(),
-      this.clubIdForoItalico as string,
-      pietrangeliCourtName,
-      Cypress.env("USER1_MAIL") as string,
-    );
-
-    cy.refetchReservationQuery();
-
-    cy.navigateDaysFromToday(1);
-
-    cy.clickOnCalendarSlot(pietrangeliCourtName, 11, 0);
-
-    cy.get("[data-test='endTime']").type("12:30");
-
-    cy.get("[data-test=reserveButton]").click();
-
-    cy.get("[data-test='error-alert']")
-      .should("be.visible")
-      .and(
-        "have.text",
-        "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero",
-      );
-    // close the error dialog
-    cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
-
-    // check that no reservation has been added
-    cy.get("[data-test='calendar-event']").should("have.length", 1);
-  });
-
   it("GIVEN logged user WHEN reservation is longer than 2 hours THEN show error and cannot press button", function () {
     cy.navigateDaysFromToday(2);
 

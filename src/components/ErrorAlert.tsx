@@ -1,7 +1,7 @@
 import { Alert, Backdrop } from "@mui/material";
 import { type TRPCClientErrorBase } from "@trpc/client";
 import { type DefaultErrorShape } from "@trpc/server";
-import { getLogger } from "~/utils/logger";
+import { useLogger } from "~/utils/logger";
 
 interface ErrorAlertProps<T extends DefaultErrorShape> {
   error: TRPCClientErrorBase<T> | null;
@@ -12,7 +12,12 @@ export default function ErrorAlert({
   error,
   onClose,
 }: ErrorAlertProps<DefaultErrorShape>) {
-  const logger = getLogger({ component: "ErrorAlert" });
+  const logger = useLogger({
+    component: "ErrorAlert",
+  });
+  if (error) {
+    logger.error({ error: error.message }, "Error shown in ErrorAlert");
+  }
   return (
     error && (
       <Backdrop
@@ -23,7 +28,6 @@ export default function ErrorAlert({
           data-test="error-alert"
           severity="error"
           onClose={() => {
-            logger.error({ error: error }, "error alert closed");
             onClose();
           }}
         >

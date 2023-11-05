@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import pino from "pino";
 import { logflarePinoVercel } from "pino-logflare";
 import { env } from "~/env.mjs";
@@ -11,7 +12,7 @@ const { stream, send } = logflarePinoVercel({
 });
 
 // create pino logger
-const loggerInternal = pino(
+export const loggerInternal = pino(
   {
     browser: {
       transmit: {
@@ -28,7 +29,8 @@ const loggerInternal = pino(
   stream,
 );
 
-export const getLogger = (context: { [key: string]: string }) => {
+export const useLogger = (context: { [key: string]: string | undefined }) => {
+  const { data: session } = useSession();
   if (env.NEXT_PUBLIC_APP_ENV === "test") {
     // return a void logger
     return {
@@ -38,6 +40,6 @@ export const getLogger = (context: { [key: string]: string }) => {
       warn: () => {},
     };
   } else {
-    return loggerInternal.child(context);
+    return loggerInternal.child({ ...context, userId: session?.user.id });
   }
 };

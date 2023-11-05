@@ -13,12 +13,12 @@ import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useLogger } from "~/utils/logger";
 import { isAdminOfTheClub } from "~/utils/utils";
 import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
-import { getLogger } from "~/utils/logger";
 
 export default function ReserveDialog() {
   const { data: sessionData } = useSession();
@@ -48,9 +48,11 @@ export default function ReserveDialog() {
     (state) => state.recurringEndDateError,
   );
 
-  const [overwriteName, setOverwriteName] = useState<string>(""); //cannot set to undefined because of controlled component
+  const [overwriteName, setOverwriteName] = useState<string | undefined>(
+    undefined,
+  ); //cannot set to undefined because of controlled component
   const resource = dateClick?.resource;
-  const logger = getLogger({ component: "ReserveDialog" });
+  const logger = useLogger({ component: "ReserveDialog" });
 
   const onConfirmButton = () => {
     if (!endDate || !startDate || !resource) {
@@ -68,7 +70,7 @@ export default function ReserveDialog() {
     const dataPayload = {
       startDateTime: startDate.toDate(),
       endDateTime: endDate.toDate(),
-      overwriteName: overwriteName !== "" ? overwriteName : undefined, //manage undefined of input for controlled component
+      overwriteName: overwriteName, //manage undefined of input for controlled component
       clubId: clubData.id,
       courtId: resource.id,
     };
@@ -87,7 +89,7 @@ export default function ReserveDialog() {
       reservationAdd.mutate(dataPayload);
     }
     setDateClick(null);
-    setOverwriteName("");
+    setOverwriteName(undefined);
     setEndDate(null);
     setRecurrentEndDate(null);
   };
@@ -99,7 +101,7 @@ export default function ReserveDialog() {
         open={dateClick !== null}
         onClose={() => {
           setDateClick(null);
-          setOverwriteName("");
+          setOverwriteName(undefined);
           setEndDate(null);
           setRecurrentEndDate(null);
         }}
@@ -122,7 +124,7 @@ export default function ReserveDialog() {
                   variant="outlined"
                   placeholder="Nome"
                   label="Nome prenotazione"
-                  value={overwriteName}
+                  value={overwriteName || ""}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setOverwriteName(e.target.value)
                   }

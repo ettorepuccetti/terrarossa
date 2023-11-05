@@ -1,12 +1,12 @@
 import { Box } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { getLogger } from "~/utils/logger";
+import { useLogger } from "~/utils/logger";
 import { DayCard } from "./DayCard";
 import DayCardFreePicker from "./DayCardFreePicker";
 
 export default function HorizonalDatePicker() {
-  const logger = getLogger({ component: "HorizontalDatePicker" });
+  const logger = useLogger({ component: "HorizontalDatePicker" });
   const clubData = useCalendarStoreContext((store) => store.getClubData());
   const daysInThePastVisible = clubData.clubSettings.daysInThePastVisible;
   const daysInTheFutureVisible = clubData.clubSettings.daysInFutureVisible;

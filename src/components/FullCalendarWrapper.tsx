@@ -16,7 +16,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useRef, type RefObject } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { type AppRouter } from "~/server/api/root";
-import { getLogger } from "~/utils/logger";
+import { useLogger } from "~/utils/logger";
 import {
   formatTimeString,
   isAdminOfTheClub,
@@ -35,7 +35,10 @@ interface FullCalendarWrapperProps {
 }
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
-  const logger = getLogger({ component: "FullCalendarWrapper" });
+  const { data: sessionData } = useSession();
+  const logger = useLogger({
+    component: "FullCalendarWrapper",
+  });
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
   const setCalendarRef = useCalendarStoreContext(
     (state) => state.setCalendarRef,
@@ -45,7 +48,6 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   const setEventDetails = useCalendarStoreContext(
     (state) => state.setEventDetails,
   );
-  const { data: sessionData } = useSession();
 
   // to fix: https://stackoverflow.com/questions/62336340/cannot-update-a-component-while-rendering-a-different-component-warning
   useEffect(() => {

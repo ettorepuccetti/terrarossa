@@ -5,9 +5,9 @@ import { type Dayjs } from "dayjs";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useLogger } from "~/utils/logger";
 import { dateIsInTimeRange, isAdminOfTheClub } from "~/utils/utils";
 import DayCardLayout from "./DayCardLayout";
-import { getLogger } from "~/utils/logger";
 
 export default function DayCardFreePicker() {
   const { data: sessionData } = useSession();
@@ -56,7 +56,9 @@ function DayCardFreePickerDialog({
   open: boolean;
   onClose: () => void;
 }) {
-  const logger = getLogger({ component: "DayCardFreePickerDialog" });
+  const logger = useLogger({
+    component: "DayCardFreePickerDialog",
+  });
   const clubData = useCalendarStoreContext((store) => store.getClubData());
   const calendarRef = useCalendarStoreContext((store) => store.calendarRef);
   const setSelectedDate = useCalendarStoreContext(

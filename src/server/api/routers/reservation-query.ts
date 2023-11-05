@@ -5,11 +5,15 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { loggerInternal } from "~/utils/logger";
 
 export const reservationQueryRouter = createTRPCRouter({
   getAllVisibleInCalendarByClubId: publicProcedure
     .input(reservationQueryInputSchema)
     .query(async ({ ctx, input }) => {
+      const logger = loggerInternal.child({
+        apiEndPoint: "reservationQueryRouter.getAllVisibleInCalendarByClubId",
+      });
       if (typeof input.clubId !== "string") {
         throw new Error(`Server: invalid clubId`);
       }
@@ -22,31 +26,22 @@ export const reservationQueryRouter = createTRPCRouter({
       });
       const fromDate = dayjs()
         .subtract(clubSettings.daysInThePastVisible, "day")
-        .set("hour", 0) //TODO: use the opening time of the club
-        .set("minute", 0)
-        .set("second", 0)
-        .set("millisecond", 0);
+        .startOf("day");
+
       const toDate = dayjs()
-        .add(clubSettings.daysInFutureVisible + 1, "day") // +1 because hour is 00:00 (so the last day wouldn't be visible)
-        .set("hour", 0) //TODO: use the closing time of the club
-        .set("minute", 0)
-        .set("second", 0)
-        .set("millisecond", 0);
+        .add(clubSettings.daysInFutureVisible, "day")
+        .endOf("day");
+
       const customSelectedDate = input.customSelectedDate
         ? dayjs(input.customSelectedDate)
         : undefined;
 
-      console.log(
-        "getAllVisibleInCalendarByClubId",
-        "fromDate:",
-        fromDate.locale("it").toDate(),
-        "toDate:",
-        toDate.locale("it").toDate(),
-        "customSelectedDate:",
-        customSelectedDate?.locale("it").toDate(),
-        "clubId:",
-        input.clubId,
-      );
+      logger.info({
+        ...input,
+        fromDate: fromDate.locale("it").toDate(),
+        toDate: toDate.locale("it").toDate(),
+        customSelectedDate: customSelectedDate?.locale("it").toDate(),
+      });
 
       return await ctx.prisma.reservation.findMany({
         where: {
@@ -89,6 +84,10 @@ export const reservationQueryRouter = createTRPCRouter({
     }),
 
   getMine: protectedProcedure.query(({ ctx }) => {
+    const logger = loggerInternal.child({
+      apiEndPoint: "reservationQueryRouter.getMine",
+    });
+    logger.info({ userId: ctx.session?.user.id }, "get all reservations");
     return ctx.prisma.reservation.findMany({
       where: {
         userId: ctx.session.user.id,

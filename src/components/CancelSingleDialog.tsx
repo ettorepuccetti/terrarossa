@@ -1,9 +1,11 @@
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useLogger } from "~/utils/logger";
 import ConfirmationDialog from "./ConfirmationDialog";
-import { getLogger } from "~/utils/logger";
 
 export default function CancelSingleDialog() {
-  const logger = getLogger({ component: "CancelSingleDialog" });
+  const logger = useLogger({
+    component: "CancelSingleDialog",
+  });
   const deleteConfirmationOpen = useCalendarStoreContext(
     (state) => state.deleteConfirmationOpen,
   );

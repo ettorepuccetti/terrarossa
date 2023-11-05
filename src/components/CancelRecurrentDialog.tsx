@@ -10,11 +10,13 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { getLogger } from "~/utils/logger";
+import { useLogger } from "~/utils/logger";
 import DialogLayout from "./DialogLayout";
 
 export default function CancelRecurrentDialog() {
-  const logger = getLogger({ component: "CancelRecurrentDialog" });
+  const logger = useLogger({
+    component: "CancelRecurrentDialog",
+  });
   const deleteOpen = useCalendarStoreContext(
     (state) => state.deleteConfirmationOpen,
   );

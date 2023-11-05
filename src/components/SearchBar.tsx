@@ -2,10 +2,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import { InputAdornment, TextField } from "@mui/material";
 import { useState } from "react";
 import useDebounce from "~/hooks/UseDebounce";
-import { getLogger } from "~/utils/logger";
+import { useLogger } from "~/utils/logger";
 
 export default function SearchBar(props: { onSearch: (term: string) => void }) {
-  const logger = getLogger({ component: "SearchBar" });
+  const logger = useLogger({ component: "SearchBar" });
   const [searchTerm, setSearchTerm] = useState("");
 
   // It listen for changes on `searchTerm`. Every time `searchTerm` changes, we wait 300ms before calling `props.onSearch`
