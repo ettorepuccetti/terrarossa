@@ -33,6 +33,10 @@ export default defineConfig({
   },
 
   component: {
+    retries: {
+      runMode: 1,
+      openMode: 0,
+    },
     watchForFileChanges: false,
     devServer: {
       framework: "next",
