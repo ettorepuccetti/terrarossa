@@ -6,6 +6,7 @@
     "dev": "next dev",
     "dev:test": "NEXT_PUBLIC_APP_ENV='test' next dev",
     "build": "NEXT_PUBLIC_APP_ENV='production' next build",
+    "build:test": "NEXT_PUBLIC_APP_ENV='test' next build",
     "start": "next start",
     "postinstall": "prisma generate",
     "lint": "next lint",

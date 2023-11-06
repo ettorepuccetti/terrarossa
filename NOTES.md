@@ -438,3 +438,4 @@ COMPONENT: I can set `NEXT_PUBLIC_APP_ENV='test'` from the command line before l
 #### on CI
 
 env variables are set in the `env` section of the `.yml` file, so it should be enough to set `NEXT_PUBLIC_APP_ENV='test'` in the workflow file, no other dependecies.
+NO! I need to set also `"NEXT_PUBLIC_APP_ENV='test'` in the build command used for building the nextjs project
