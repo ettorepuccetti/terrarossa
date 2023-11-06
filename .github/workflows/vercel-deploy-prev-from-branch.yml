@@ -8,6 +8,8 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 jobs:
   deploy-code:
+    permissions:
+      deployments: write
     name: Deploy to Vercel - preview
     runs-on: ubuntu-latest
     steps:
@@ -16,4 +18,20 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
       - name: Deploy to Vercel - preview
-        run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          vercel deploy --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
+          echo "DEPLOYMENT_URL=$(cat deployment-url.txt)" >> $GITHUB_ENV
+      - name: Create GitHub deployment
+        uses: chrnorm/deployment-action@v2
+        id: deployment
+        with:
+          token: "${{ github.token }}"
+          environment-url: ${{ env.DEPLOYMENT_URL}}
+          environment: preview
+      - name: Update GitHub deployment status
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: "${{ github.token }}"
+          environment-url: ${{ env.DEPLOYMENT_URL}}
+          state: "success"
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}

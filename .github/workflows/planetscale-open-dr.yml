@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: install
+      - name: install prisma
         # install only prisma
         run: npm install prisma --no-save
       - name: Set DB branch name

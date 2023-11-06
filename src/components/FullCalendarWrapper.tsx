@@ -16,6 +16,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useRef, type RefObject } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { type AppRouter } from "~/server/api/root";
+import { useLogger } from "~/utils/logger";
 import {
   formatTimeString,
   isAdminOfTheClub,
@@ -34,6 +35,10 @@ interface FullCalendarWrapperProps {
 }
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
+  const { data: sessionData } = useSession();
+  const logger = useLogger({
+    component: "FullCalendarWrapper",
+  });
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
   const setCalendarRef = useCalendarStoreContext(
     (state) => state.setCalendarRef,
@@ -43,7 +48,6 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   const setEventDetails = useCalendarStoreContext(
     (state) => state.setEventDetails,
   );
-  const { data: sessionData } = useSession();
 
   // to fix: https://stackoverflow.com/questions/62336340/cannot-update-a-component-while-rendering-a-different-component-warning
   useEffect(() => {
@@ -77,12 +81,11 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   };
 
   const openReservationDialog = (selectInfo: DateClickArg) => {
-    console.log(
-      "selected date: ",
-      selectInfo.dateStr,
-      "resource: ",
-      selectInfo.resource?.id,
-    );
+    logger.info("openReservationDialog", {
+      selectedDate: selectInfo.dateStr,
+      resourceId: selectInfo.resource?.id,
+      resourceTitle: selectInfo.resource?.title,
+    });
 
     if (
       !isSelectableSlot(
@@ -104,6 +107,18 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       eventClickInfo.event.extendedProps.userId === sessionData?.user.id ||
       isAdminOfTheClub(sessionData, clubData.id)
     ) {
+      logger.info("open event detail dialog", {
+        reservationId: eventClickInfo.event.id,
+        clubId: clubData.id,
+        clubName: clubData.name,
+        courtId: eventClickInfo.event.getResources()[0]?.id,
+        courtName: eventClickInfo.event.getResources()[0]?.title,
+        startDate: eventClickInfo.event.start,
+        endDate: eventClickInfo.event.end,
+        userId: eventClickInfo.event.extendedProps.userId as string,
+        recurrentReservationId: eventClickInfo.event.extendedProps
+          .recurrentId as string,
+      });
       setEventDetails(eventClickInfo.event);
     }
   };

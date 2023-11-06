@@ -5,6 +5,7 @@ import { type Dayjs } from "dayjs";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useLogger } from "~/utils/logger";
 import { dateIsInTimeRange, isAdminOfTheClub } from "~/utils/utils";
 import DayCardLayout from "./DayCardLayout";
 
@@ -55,6 +56,9 @@ function DayCardFreePickerDialog({
   open: boolean;
   onClose: () => void;
 }) {
+  const logger = useLogger({
+    component: "DayCardFreePickerDialog",
+  });
   const clubData = useCalendarStoreContext((store) => store.getClubData());
   const calendarRef = useCalendarStoreContext((store) => store.calendarRef);
   const setSelectedDate = useCalendarStoreContext(
@@ -66,14 +70,17 @@ function DayCardFreePickerDialog({
 
   const onDateChanged = (date: Dayjs | null) => {
     if (date) {
-      setSelectedDate(date);
-      setCustomSelectedDate(
-        !dateIsInTimeRange(
-          date,
-          clubData.clubSettings.daysInThePastVisible,
-          clubData.clubSettings.daysInFutureVisible,
-        ),
+      const dateIsOutsideRange = !dateIsInTimeRange(
+        date,
+        clubData.clubSettings.daysInThePastVisible,
+        clubData.clubSettings.daysInFutureVisible,
       );
+      logger.info(
+        { date: date.toDate(), dateIsOutsideRange: dateIsOutsideRange },
+        "Date selected from free picker",
+      );
+      setSelectedDate(date);
+      setCustomSelectedDate(dateIsOutsideRange);
       calendarRef.current?.getApi().gotoDate(date.toDate());
       onClose();
     }

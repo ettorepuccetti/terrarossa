@@ -50,18 +50,6 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    // FacebookProvider({
-    //   clientId: env.FACEBOOK_CLIENT_ID,
-    //   clientSecret: env.FACEBOOK_CLIENT_SECRET,
-    // }),
-    // GoogleProvider({
-    //   clientId: env.GOOGLE_CLIENT_ID,
-    //   clientSecret: env.GOOGLE_CLIENT_SECRET,
-    // }),
-    // GitHubProvider({
-    //   clientId: env.GITHUB_CLIENT_ID,
-    //   clientSecret: env.GITHUB_CLIENT_SECRET,
-    // }),
     Auth0Provider({
       clientId: env.AUTH0_CLIENT_ID,
       clientSecret: env.AUTH0_CLIENT_SECRET,

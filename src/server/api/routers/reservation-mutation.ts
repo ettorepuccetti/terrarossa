@@ -10,11 +10,15 @@ import {
 } from "~/components/Calendar";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { UserRoles } from "~/utils/constants";
+import { loggerInternal } from "~/utils/logger";
 
 export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
     .input(ReservationInputSchema)
     .mutation(async ({ ctx, input }) => {
+      const logger = loggerInternal.child({
+        apiEndPoint: "reservationMutationRouter.insertOne",
+      });
       const clubSettings = await getClubSettings(ctx.prisma, input.clubId);
 
       //collision check [UI does NOT check for this]
@@ -83,6 +87,11 @@ export const reservationMutationRouter = createTRPCRouter({
         }
       }
 
+      logger.info("Creating reservation", {
+        ...input,
+        userId: ctx.session.user.id,
+      });
+
       return ctx.prisma.reservation.create({
         data: {
           courtId: input.courtId,
@@ -97,29 +106,37 @@ export const reservationMutationRouter = createTRPCRouter({
   insertRecurrent: protectedProcedure
     .input(RecurrentReservationInputSchema)
     .mutation(async ({ ctx, input }) => {
+      const logger = loggerInternal.child({
+        apiEndPoint: "reservationMutationRouter.insertRecurrent",
+      });
       // check for privileges [UI already prevents this]
       if (!isUserAdminOfClub(ctx.session, input.clubId)) {
         throw new TRPCClientError(
           "Error: Only admins can create recurrent reservations",
         );
       }
+      const startDate = dayjs(input.startDateTime).startOf("day");
       // create the recurrent reservation at which the reservations will refer to
       const recurrentDbEntity = await ctx.prisma.recurrentReservation.create({
         data: {
+          startDate: startDate.toDate(),
           endDate: input.recurrentEndDate,
-          startDate: input.startDateTime,
         },
       });
       //add to reservations array a reservation for each week from input.startDate to input.endDate
       const reservations = [];
       for (
-        let date = dayjs(input.startDateTime);
-        date.isBefore(input.recurrentEndDate);
+        let date = dayjs(startDate); //instantiate a new object to avoid modifying the original one
+        date.isBefore(input.recurrentEndDate) ||
+        date.isSame(input.recurrentEndDate);
         date = date.add(1, "week")
       ) {
         const reservationInput = {
           courtId: input.courtId,
-          startTime: date.toDate(),
+          startTime: date
+            .hour(input.startDateTime.getHours())
+            .minute(input.startDateTime.getMinutes())
+            .toDate(),
           endTime: date
             .hour(input.endDateTime.getHours())
             .minute(input.endDateTime.getMinutes())
@@ -138,13 +155,25 @@ export const reservationMutationRouter = createTRPCRouter({
             reservationInput.courtId,
           )
         ) {
+          // delete the recurrent reservation
+          await ctx.prisma.recurrentReservation.delete({
+            where: {
+              id: recurrentDbEntity.id,
+            },
+          });
           throw new TRPCClientError(
             "Errore nella creazione della prenotazione ricorrente. Conflitto in data " +
-              date.format("DD/MM/YYYY"),
+              date.locale("it").format("DD/MM/YYYY"),
           );
         }
+        // if no collision, add the reservation to the array
         reservations.push(reservationInput);
       }
+
+      logger.info("Create recurrent reservations", {
+        ...input,
+        userId: ctx.session.user.id,
+      });
 
       await ctx.prisma.reservation.createMany({
         data: reservations,
@@ -154,6 +183,9 @@ export const reservationMutationRouter = createTRPCRouter({
   deleteOne: protectedProcedure
     .input(ReservationDeleteInputSchema)
     .mutation(async ({ ctx, input }) => {
+      const logger = loggerInternal.child({
+        apiEndPoint: "reservationMutationRouter.deleteOne",
+      });
       const clubSettings = await getClubSettings(ctx.prisma, input.clubId);
       const reservationToDelete =
         await ctx.prisma.reservation.findUniqueOrThrow({
@@ -184,6 +216,10 @@ export const reservationMutationRouter = createTRPCRouter({
         }
       }
 
+      logger.info("Deleting reservation", {
+        ...input,
+        userId: ctx.session.user.id,
+      });
       return ctx.prisma.reservation.delete({
         where: {
           id: input.reservationId,
@@ -194,15 +230,22 @@ export const reservationMutationRouter = createTRPCRouter({
   deleteRecurrent: protectedProcedure
     .input(RecurrentReservationDeleteInputSchema)
     .mutation(async ({ ctx, input }) => {
+      const logger = loggerInternal.child({
+        apiEndPoint: "reservationMutationRouter.deleteRecurrent",
+      });
       // check for privileges [UI already prevents this]
       if (!isUserAdminOfClub(ctx.session, input.clubId)) {
         throw new TRPCClientError(
           "Error: Only admins can delete recurrent reservations",
         );
       }
-      // delete all reservations that refer to the recurrent reservation
+      logger.info("Deleting recurrent reservation", {
+        ...input,
+        userId: ctx.session.user.id,
+      });
+      // delete all reservations that refer to the recurrent reservation.
+      // Is enough to explicit delete only the recurrent reservation, because Prisma cascade delete the normal reservations too.
       return ctx.prisma.recurrentReservation.delete({
-        //delete all reservations that refer to the recurrent reservation and are in the future
         where: {
           id: input.recurrentReservationId,
         },
@@ -236,7 +279,7 @@ async function getUserActiveReservations(
     where: {
       userId: session.user.id,
       endTime: {
-        gte: dayjs().toDate(),
+        gte: new Date(),
       },
       //check that clubId is the same as the one of the court
       court: {

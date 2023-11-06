@@ -6,6 +6,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import { useRouter } from "next/router";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { api } from "~/utils/api";
+import { useLogger } from "~/utils/logger";
 import CalendarHeader from "./CalendarHeader";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
@@ -153,6 +154,9 @@ export const useRecurrentReservationDelete = (
 };
 
 export default function Calendar() {
+  const logger = useLogger({
+    component: "Calendar",
+  });
   const [clubId, setClubId] = useState<string | undefined>(undefined);
   const selectedDateInCalendar = useCalendarStoreContext(
     (store) => store.selectedDate,
@@ -255,6 +259,7 @@ export default function Calendar() {
 
   //if there is an error in the clubQuery, show an error alert and not render any other component (FullCalendar, ReserveDialog, EventDetailDialog)
   if (clubQuery.isError) {
+    logger.error({ error: clubQuery.error }, "error in clubQuery");
     return (
       <ErrorAlert
         error={clubQuery.error}
