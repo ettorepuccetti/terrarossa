@@ -1,4 +1,4 @@
-name: Vercel - production deployment on push to main (no DB changes)
+name: Vercel - demo deployment on push to main
 on:
   push:
     branches: [main]
