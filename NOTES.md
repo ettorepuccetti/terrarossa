@@ -466,3 +466,19 @@ Get this values to be saved as Vercel secrets:
 - `AUTH0_CLIENT_SECRET`
 - `AUTH0_ISSUER` (same as prod env)
 - `AUTH0_BASE_URL` (https://terrarossa-demo.vercel.app)
+
+### Workflow on GH Action
+
+It needs these secrets:
+
+- `VERCEL_ORG_ID`: ${{ secrets.VERCEL_ORG_ID }}
+- `VERCEL_PROJECT_ID`: ${{ secrets.VERCEL_PROJECT_ID_DEMO }}
+- `PLANETSCALE_SERVICE_TOKEN_ID`: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID_DEMO }}
+- `PLANETSCALE_SERVICE_TOKEN`: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_DEMO }}
+- `PSCALE_BRANCH_NAME`: main
+- `database name`: ${{secrets.PLANETSCALE_DATABASE_NAME}}-demo
+
+1. install prisma and pscale cli
+2. connect to demo db through pscale cli and launch reset and seed command
+3. install vercel cli
+4. deploy in production on vercel
