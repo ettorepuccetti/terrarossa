@@ -100,6 +100,7 @@ async function main() {
     },
   });
 
+  // adding another user for when I want to create a reservation for an user different from the one who is logged in
   const user2 = await prisma.user.upsert({
     where: { email: process.env.CYPRESS_USER2_MAIL },
     update: {},

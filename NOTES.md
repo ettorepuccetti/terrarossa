@@ -439,3 +439,30 @@ COMPONENT: I can set `NEXT_PUBLIC_APP_ENV='test'` from the command line before l
 
 env variables are set in the `env` section of the `.yml` file, so it should be enough to set `NEXT_PUBLIC_APP_ENV='test'` in the workflow file, no other dependecies.
 NO! I need to set also `"NEXT_PUBLIC_APP_ENV='test'` in the build command used for building the nextjs project
+
+## DEMO env
+
+### Vercel
+
+- [Vercel project](https://vercel.com/ettorepuccetti/terrarossa-demo)
+- URL: https://terrarossa-demo.vercel.app
+
+Extract `projectId` from `.vercel` folder and saved on Github secrets as `VERCEL_PROJECT_ID_DEMO`
+
+### Planetscale
+
+- [db demo](https://app.planetscale.com/terrarouge-vercel/terrarossa-demo) saved in vercel secrets as `DATABASE_URL`.
+
+Create service token for accessing through CLI as described [here](https://planetscale.com/docs/concepts/service-tokens)
+
+Save new service token as Github secrets `PLANETSCALE_SERVICE_TOKEN_ID_DEMO` and `PLANETSCALE_SERVICE_TOKEN_DEMO`.
+
+### Auth0
+
+New app under `terrarossa.auth0.` provider
+Get this values to be saved as Vercel secrets:
+
+- `AUTH0_CLIENT_ID`
+- `AUTH0_CLIENT_SECRET`
+- `AUTH0_ISSUER` (same as prod env)
+- `AUTH0_BASE_URL` (https://terrarossa-demo.vercel.app)

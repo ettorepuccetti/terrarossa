@@ -18,7 +18,6 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: install prisma
-        # install only prisma
         run: npm install prisma --no-save
       - name: Set DB branch name
         run: echo "PSCALE_BRANCH_NAME=$(echo ${{ github.head_ref }} | tr -cd '[:alnum:]-'| tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
