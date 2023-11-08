@@ -22,7 +22,8 @@
     "*": "prettier --ignore-unknown --write"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
+    "seed:demo": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed-demo.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.11.0",
