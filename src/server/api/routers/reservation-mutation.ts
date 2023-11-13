@@ -243,8 +243,8 @@ export const reservationMutationRouter = createTRPCRouter({
         ...input,
         userId: ctx.session.user.id,
       });
-      // delete all reservations that refer to the recurrent reservation.
-      // Is enough to explicit delete only the recurrent reservation, because Prisma cascade delete the normal reservations too.
+      // DELETE all reservations that refer to the recurrent reservation.
+      // Is enough to explicit delete only the recurrent reservation, because Prisma CASCADE delete the normal reservations too.
       return ctx.prisma.recurrentReservation.delete({
         where: {
           id: input.recurrentReservationId,

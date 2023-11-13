@@ -13,12 +13,18 @@ export default function CalendarEventCard({
 }) {
   return (
     <Box
+      // need to disable property `className={"fc-event-main"}` because it prevent applying the color text
       display={"flex"}
       gap={1}
-      className={"fc-event-main"}
+      paddingLeft={"10px!important"}
       alignItems={"center"}
       data-test="calendar-event"
       data-id={eventInfo.event.id}
+      //to replicate .fc-event-main
+      position={"relative"}
+      zIndex={2}
+      height={"100%"}
+      padding={"1px 1px 0px"}
     >
       {eventInfo.event.extendedProps.userImg && (
         <Avatar

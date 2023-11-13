@@ -50,7 +50,7 @@ export default function ReserveDialog() {
 
   const [overwriteName, setOverwriteName] = useState<string | undefined>(
     undefined,
-  ); //cannot set to undefined because of controlled component
+  );
   const resource = dateClick?.resource;
   const logger = useLogger({ component: "ReserveDialog" });
 

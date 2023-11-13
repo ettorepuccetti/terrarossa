@@ -10,7 +10,7 @@ import FullCalendar from "@fullcalendar/react";
 import { type ResourceInput } from "@fullcalendar/resource";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import ScrollGrid from "@fullcalendar/scrollgrid";
-import { Box } from "@mui/material";
+import { Box, useTheme, type PaletteColor } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, type RefObject } from "react";
@@ -35,6 +35,7 @@ interface FullCalendarWrapperProps {
 }
 
 export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
+  const theme = useTheme();
   const { data: sessionData } = useSession();
   const logger = useLogger({
     component: "FullCalendarWrapper",
@@ -56,6 +57,21 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   }, []);
 
   const reservationToEvent = (reservation: ReservationFromDb): EventInput => {
+    const getColors = (): PaletteColor => {
+      if (reservation.recurrentReservationId) {
+        return theme.palette.orange;
+      }
+      if (reservation.user?.role === "ADMIN") {
+        return theme.palette.yellow;
+      }
+      if (reservation.user?.id === sessionData?.user.id) {
+        return theme.palette.blue;
+      }
+      return theme.palette.lightBlue;
+    };
+
+    const paletteColor = getColors();
+
     return {
       id: reservation.id.toString(),
       title: reservation.overwriteName
@@ -64,7 +80,9 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
       start: reservation.startTime,
       end: reservation.endTime,
       resourceId: reservation.courtId,
-      // color: reservation.user?.role === "ADMIN" ? "red" : "green",
+      color: paletteColor.main,
+      borderColor: paletteColor.dark,
+      textColor: paletteColor.contrastText,
       extendedProps: {
         userId: reservation.user?.id,
         userImg: reservation.user?.image,
