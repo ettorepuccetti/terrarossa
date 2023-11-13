@@ -116,6 +116,8 @@ export const reservationMutationRouter = createTRPCRouter({
         );
       }
       const startDate = dayjs(input.startDateTime).startOf("day");
+      console.log("startDate (backend)", startDate.toDate());
+      logger.info("startDate (backend - pino)", startDate.toDate());
       // create the recurrent reservation at which the reservations will refer to
       const recurrentDbEntity = await ctx.prisma.recurrentReservation.create({
         data: {
@@ -215,6 +217,12 @@ export const reservationMutationRouter = createTRPCRouter({
           );
         }
       }
+
+      console.log(
+        "dayjs(reservationToDelete.startTime)",
+        dayjs(reservationToDelete.startTime),
+      );
+      console.log("Date.now()", Date.now());
 
       logger.info("Deleting reservation", {
         ...input,
