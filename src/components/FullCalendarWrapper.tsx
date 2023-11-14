@@ -112,7 +112,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         clubData.clubSettings.lastBookableMinute,
       )
     ) {
-      console.log("last slot is not selectable", "date: ", selectInfo.date);
+      logger.info({ date: selectInfo.date }, "last slot is not selectable");
       return;
     }
     setDateClick(selectInfo);

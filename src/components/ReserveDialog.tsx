@@ -12,9 +12,14 @@ import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { type z } from "zod";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
 import { isAdminOfTheClub } from "~/utils/utils";
+import {
+  type RecurrentReservationInputSchema,
+  type ReservationInputSchema,
+} from "./Calendar";
 import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
@@ -67,7 +72,7 @@ export default function ReserveDialog() {
       throw new Error("Si è verificato un problema, per favore riprova.");
     }
 
-    const dataPayload = {
+    const dataPayload: z.infer<typeof ReservationInputSchema> = {
       startDateTime: startDate.toDate(),
       endDateTime: endDate.toDate(),
       overwriteName: overwriteName, //manage undefined of input for controlled component
@@ -77,8 +82,11 @@ export default function ReserveDialog() {
 
     // recurrent reservation add
     if (recurrentEndDate) {
-      const recurrentDataPayload = {
+      const recurrentDataPayload: z.infer<
+        typeof RecurrentReservationInputSchema
+      > = {
         ...dataPayload,
+        recurrentStartDate: startDate.startOf("day").toDate(),
         recurrentEndDate: recurrentEndDate.toDate(),
       };
       logger.info(recurrentDataPayload, "recurrent reservation added");

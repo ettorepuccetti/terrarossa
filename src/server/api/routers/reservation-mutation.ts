@@ -12,6 +12,11 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { UserRoles } from "~/utils/constants";
 import { loggerInternal } from "~/utils/logger";
 
+import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
     .input(ReservationInputSchema)
@@ -115,20 +120,17 @@ export const reservationMutationRouter = createTRPCRouter({
           "Error: Only admins can create recurrent reservations",
         );
       }
-      const startDate = dayjs(input.startDateTime).startOf("day");
-      console.log("startDate (backend)", startDate.toDate());
-      logger.info("startDate (backend - pino)", startDate.toDate());
       // create the recurrent reservation at which the reservations will refer to
       const recurrentDbEntity = await ctx.prisma.recurrentReservation.create({
         data: {
-          startDate: startDate.toDate(),
+          startDate: input.recurrentStartDate,
           endDate: input.recurrentEndDate,
         },
       });
       //add to reservations array a reservation for each week from input.startDate to input.endDate
       const reservations = [];
       for (
-        let date = dayjs(startDate); //instantiate a new object to avoid modifying the original one
+        let date = dayjs(input.recurrentStartDate); //instantiate a new object to avoid modifying the original one
         date.isBefore(input.recurrentEndDate) ||
         date.isSame(input.recurrentEndDate);
         date = date.add(1, "week")
@@ -172,6 +174,7 @@ export const reservationMutationRouter = createTRPCRouter({
         reservations.push(reservationInput);
       }
 
+      console.log("default timezone", dayjs.locale());
       logger.info("Create recurrent reservations", {
         ...input,
         userId: ctx.session.user.id,
@@ -217,13 +220,6 @@ export const reservationMutationRouter = createTRPCRouter({
           );
         }
       }
-
-      console.log(
-        "dayjs(reservationToDelete.startTime)",
-        dayjs(reservationToDelete.startTime),
-      );
-      console.log("Date.now()", Date.now());
-
       logger.info("Deleting reservation", {
         ...input,
         userId: ctx.session.user.id,

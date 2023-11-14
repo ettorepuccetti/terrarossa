@@ -27,6 +27,7 @@ export const ReservationInputSchema = z.object({
 
 export const RecurrentReservationInputSchema = z
   .object({
+    recurrentStartDate: z.date(),
     recurrentEndDate: z.date(),
   })
   .and(ReservationInputSchema);
