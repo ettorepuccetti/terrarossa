@@ -74,7 +74,7 @@ export default function EventDetailDialog() {
           <TimeField
             data-test="startTime"
             color="info"
-            value={eventDetails?.start}
+            value={dayjs(eventDetails?.start)}
             label={"Orario di inizio"}
             readOnly={true}
             ampm={false}
@@ -84,7 +84,7 @@ export default function EventDetailDialog() {
           <TimeField
             data-test="endTime"
             color="info"
-            value={eventDetails?.end}
+            value={dayjs(eventDetails?.end)}
             label={"Orario di fine"}
             readOnly={true}
             ampm={false}

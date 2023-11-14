@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { DateField, TimeField } from "@mui/x-date-pickers";
 import dayjs, { type Dayjs } from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
@@ -24,6 +25,7 @@ import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
+dayjs.extend(utc);
 
 export default function ReserveDialog() {
   const { data: sessionData } = useSession();
@@ -80,14 +82,20 @@ export default function ReserveDialog() {
       courtId: resource.id,
     };
 
-    // recurrent reservation add
+    // recurrent reservation add. Need to convert dates to UTC for better handling in backend
     if (recurrentEndDate) {
+      const recurrentEndDateUtc = dayjs
+        .utc()
+        .year(recurrentEndDate.year())
+        .month(recurrentEndDate.month())
+        .date(recurrentEndDate.date())
+        .startOf("day");
       const recurrentDataPayload: z.infer<
         typeof RecurrentReservationInputSchema
       > = {
         ...dataPayload,
-        recurrentStartDate: startDate.startOf("day").toDate(),
-        recurrentEndDate: recurrentEndDate.toDate(),
+        recurrentStartDate: startDate.utc().startOf("day").toDate(),
+        recurrentEndDate: recurrentEndDateUtc.toDate(),
       };
       logger.info(recurrentDataPayload, "recurrent reservation added");
       recurrentReservationAdd.mutate(recurrentDataPayload);
