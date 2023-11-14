@@ -45,6 +45,7 @@ function ReserveDialogWrapper(props: {
       courtId: courts[0]!.id,
       startDateTime: props.startDate,
       endDateTime: dayjs(props.startDate).add(1, "hour").toDate(),
+      recurrentStartDate: dayjs(props.startDate).startOf("day").toDate(),
       recurrentEndDate: dayjs(props.startDate).add(1, "week").toDate(),
     }),
   );
