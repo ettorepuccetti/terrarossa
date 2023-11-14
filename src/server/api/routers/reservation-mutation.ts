@@ -12,11 +12,6 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { UserRoles } from "~/utils/constants";
 import { loggerInternal } from "~/utils/logger";
 
-import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
 export const reservationMutationRouter = createTRPCRouter({
   insertOne: protectedProcedure
     .input(ReservationInputSchema)

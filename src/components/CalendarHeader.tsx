@@ -1,5 +1,4 @@
 import { Box, Typography } from "@mui/material";
-import dayjs from "dayjs";
 import Image from "next/image";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { defaultClubImage } from "~/utils/constants";
@@ -7,8 +6,6 @@ import { capitaliseFirstChar } from "~/utils/utils";
 import HorizonalDatePicker from "./HorizontalDatePicker";
 import LegendaButton from "./LegendaButton";
 import RefetchReservationButton from "./RefetchReservationButton";
-require("dayjs/locale/it");
-dayjs.locale("it");
 
 export default function CalendarHeader() {
   const clubData = useCalendarStoreContext((state) => state.getClubData());
@@ -56,7 +53,7 @@ export default function CalendarHeader() {
           fontWeight={300}
         >
           {capitaliseFirstChar(
-            selectedDate.format("dddd DD MMMM YYYY").toLocaleLowerCase(),
+            selectedDate.locale("it").format("dddd DD MMMM YYYY"),
           )}
         </Typography>
       </Box>

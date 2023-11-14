@@ -525,9 +525,7 @@ describe("Reservation details", () => {
       // check that selected date is correct
       cy.getByDataTest("selected-date-extended").should(
         "have.text",
-        capitaliseFirstChar(
-          selectedDate.format("dddd DD MMMM YYYY").toLocaleLowerCase(),
-        ),
+        capitaliseFirstChar(selectedDate.format("dddd DD MMMM YYYY")),
       );
 
       // change club
@@ -547,9 +545,7 @@ describe("Reservation details", () => {
       // check that selected date is correct
       cy.getByDataTest("selected-date-extended").should(
         "have.text",
-        capitaliseFirstChar(
-          dayjs().format("dddd DD MMMM YYYY").toLocaleLowerCase(),
-        ),
+        capitaliseFirstChar(dayjs().format("dddd DD MMMM YYYY")),
       );
     });
   });

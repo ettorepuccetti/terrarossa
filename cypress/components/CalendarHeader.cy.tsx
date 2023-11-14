@@ -62,9 +62,7 @@ describe("ADMIN", () => {
     // check selected date
     cy.getByDataTest("selected-date-extended").should(
       "have.text",
-      capitalizeFirstChar(
-        selectedDate.format("dddd DD MMMM YYYY").toLocaleLowerCase(),
-      ),
+      capitalizeFirstChar(selectedDate.format("dddd DD MMMM YYYY")),
     );
 
     // check selection dot
@@ -90,9 +88,7 @@ describe("ADMIN", () => {
     cy.getByDataTest("selected-date-extended").should(
       "have.text",
       capitalizeFirstChar(
-        lastDayOfNextMonthTimestamp
-          .format("dddd DD MMMM YYYY")
-          .toLocaleLowerCase(),
+        lastDayOfNextMonthTimestamp.format("dddd DD MMMM YYYY"),
       ),
     );
 
@@ -123,9 +119,7 @@ describe("ADMIN", () => {
     // check selected date
     cy.getByDataTest("selected-date-extended").should(
       "have.text",
-      capitalizeFirstChar(
-        selectedDate.format("dddd DD MMMM YYYY").toLocaleLowerCase(),
-      ),
+      capitalizeFirstChar(selectedDate.format("dddd DD MMMM YYYY")),
     );
 
     // check selection dot

@@ -38,9 +38,9 @@ export const reservationQueryRouter = createTRPCRouter({
 
       logger.info({
         ...input,
-        fromDate: fromDate.locale("it").toDate(),
-        toDate: toDate.locale("it").toDate(),
-        customSelectedDate: customSelectedDate?.locale("it").toDate(),
+        fromDate: fromDate.toDate(),
+        toDate: toDate.toDate(),
+        customSelectedDate: customSelectedDate?.toDate(),
       });
 
       return await ctx.prisma.reservation.findMany({
