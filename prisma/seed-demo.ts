@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import {
   allEnglandClubName,
   centerCourtName,
@@ -9,6 +11,11 @@ import {
   foroItalicoName,
   pietrangeliCourtName,
 } from "../src/utils/constants";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+dayjs.tz.setDefault("Europe/Rome");
 
 const prisma = new PrismaClient();
 async function main() {
@@ -170,8 +177,8 @@ async function main() {
   //recurrent reservations (by admin only)
   await prisma.recurrentReservation.create({
     data: {
-      startDate: dayjs().startOf("day").toDate(),
-      endDate: dayjs().add(2, "weeks").startOf("day").toDate(),
+      startDate: dayjs.tz().startOf("day").toDate(),
+      endDate: dayjs.tz().add(2, "weeks").startOf("day").toDate(),
       reservations: {
         createMany: {
           data: [
@@ -179,19 +186,25 @@ async function main() {
               overwriteName: "Mini Tennis U10",
               courtId: pietrangeli.id,
               userId: adminUser.id,
-              startTime: dayjs().hour(14).startOf("hour").toDate(),
-              endTime: dayjs().hour(16).startOf("hour").toDate(),
+              startTime: dayjs.tz().hour(14).startOf("hour").toDate(),
+              endTime: dayjs.tz().hour(16).startOf("hour").toDate(),
             },
             {
-              overwriteName: "Mario Rossi",
+              overwriteName: "Mini Tennis U10",
               courtId: pietrangeli.id,
               userId: adminUser.id,
-              startTime: dayjs()
+              startTime: dayjs
+                .tz()
                 .add(1, "week")
                 .hour(14)
                 .startOf("hour")
                 .toDate(),
-              endTime: dayjs().add(1, "week").hour(16).startOf("hour").toDate(),
+              endTime: dayjs
+                .tz()
+                .add(1, "week")
+                .hour(16)
+                .startOf("hour")
+                .toDate(),
             },
           ],
         },
@@ -201,8 +214,8 @@ async function main() {
 
   await prisma.recurrentReservation.create({
     data: {
-      startDate: dayjs().startOf("day").toDate(),
-      endDate: dayjs().add(2, "weeks").startOf("day").toDate(),
+      startDate: dayjs.tz().startOf("day").toDate(),
+      endDate: dayjs.tz().add(2, "weeks").startOf("day").toDate(),
       reservations: {
         createMany: {
           data: [
@@ -210,19 +223,25 @@ async function main() {
               overwriteName: "Ago U16",
               courtId: court1foro.id,
               userId: adminUser.id,
-              startTime: dayjs().hour(14).startOf("hour").toDate(),
-              endTime: dayjs().hour(16).startOf("hour").toDate(),
+              startTime: dayjs.tz().hour(14).startOf("hour").toDate(),
+              endTime: dayjs.tz().hour(16).startOf("hour").toDate(),
             },
             {
               overwriteName: "Ago U16",
               courtId: court1foro.id,
               userId: adminUser.id,
-              startTime: dayjs()
+              startTime: dayjs
+                .tz()
                 .add(1, "week")
                 .hour(14)
                 .startOf("hour")
                 .toDate(),
-              endTime: dayjs().add(1, "week").hour(16).startOf("hour").toDate(),
+              endTime: dayjs
+                .tz()
+                .add(1, "week")
+                .hour(16)
+                .startOf("hour")
+                .toDate(),
             },
           ],
         },
@@ -236,26 +255,26 @@ async function main() {
       {
         courtId: pietrangeli.id,
         userId: marioRossi.id,
-        startTime: dayjs().hour(17).startOf("hour").toDate(),
-        endTime: dayjs().hour(19).startOf("hour").toDate(),
+        startTime: dayjs.tz().hour(17).startOf("hour").toDate(),
+        endTime: dayjs.tz().hour(19).startOf("hour").toDate(),
       },
       {
         courtId: centraleForo.id,
         userId: demoUser.id,
-        startTime: dayjs().hour(10).startOf("hour").toDate(),
-        endTime: dayjs().hour(11).startOf("hour").toDate(),
+        startTime: dayjs.tz().hour(10).startOf("hour").toDate(),
+        endTime: dayjs.tz().hour(11).startOf("hour").toDate(),
       },
       {
         courtId: centraleForo.id,
         userId: federerUser.id,
-        startTime: dayjs().hour(12).startOf("hour").toDate(),
-        endTime: dayjs().hour(13).startOf("hour").toDate(),
+        startTime: dayjs.tz().hour(12).startOf("hour").toDate(),
+        endTime: dayjs.tz().hour(13).startOf("hour").toDate(),
       },
       {
         courtId: court1foro.id,
         userId: giovanni.id,
-        startTime: dayjs().hour(19).minute(30).startOf("minute").toDate(),
-        endTime: dayjs().hour(20).minute(30).startOf("minute").toDate(),
+        startTime: dayjs.tz().hour(19).minute(30).startOf("minute").toDate(),
+        endTime: dayjs.tz().hour(20).minute(30).startOf("minute").toDate(),
       },
     ],
   });
@@ -264,17 +283,10 @@ async function main() {
   await prisma.reservation.createMany({
     data: [
       {
-        courtId: court1foro.id,
-        userId: adminUser.id,
-        startTime: dayjs().hour(14).startOf("hour").toDate(),
-        endTime: dayjs().hour(17).startOf("hour").toDate(),
-        overwriteName: "S.A.T.",
-      },
-      {
         courtId: centraleForo.id,
         userId: adminUser.id,
-        startTime: dayjs().hour(15).startOf("hour").toDate(),
-        endTime: dayjs().hour(16).startOf("hour").toDate(),
+        startTime: dayjs.tz().hour(15).startOf("hour").toDate(),
+        endTime: dayjs.tz().hour(16).startOf("hour").toDate(),
         overwriteName: "Prenotazione esterno",
       },
     ],
