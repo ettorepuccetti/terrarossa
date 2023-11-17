@@ -80,8 +80,50 @@ Run db migration:
 Deploy schema then code:
 
 - if the PR has been merged and there's a DR with same branch name:
+
   - merge the DR on Planetscale (and wait for it)
   - deploy to vercel
+
+### Prisma cloud platform [BLOCKED by NextAuth]
+
+- in `db.ts` add `.$extends(withAccelerate())` after `new PrismaClient({...})`
+
+```
+// src/server/db.ts
+
+import { PrismaClient } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
+
+new PrismaClient({
+  datasources: { db: { url: env.ACCELERATE_URL } },
+}).$extends(withAccelerate());
+```
+
+- Define `ACCELERATE_URL` used above
+- In `prisma/schema.prisma` in the section `datasource db` define
+
+```
+directUrl = env("DIRECT_URL")
+url      = env("DATABASE_URL")
+```
+
+see repo example [accelerate-speed-test](https://github.com/prisma/accelerate-speed-test/tree/main)
+
+#### Cypress and seed scripts
+
+They instantiate their `PrismaClient()` internally, so they do not rely on the main one
+
+#### Next Auth
+
+currently (November 2023), it is a blocker, since
+
+```
+// scr/server/auth.ts
+
+adapter: PrismaAdapter(prisma)
+```
+
+does not recognize the type of `prisma` object created with `$extends(...)`
 
 ## Privacy policy
 
