@@ -1,4 +1,3 @@
-import { Container } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/it";
@@ -15,9 +14,7 @@ const Prenota: NextPage = () => {
       </Head>
       <Header />
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="it">
-        <Container maxWidth={"lg"} sx={{ padding: 0 }}>
-          <Calendar />
-        </Container>
+        <Calendar />
       </LocalizationProvider>
     </>
   );

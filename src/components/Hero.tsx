@@ -9,7 +9,7 @@ const Hero = () => {
       display={"flex"}
       alignItems={"center"}
       justifyContent={"center"}
-      minHeight={"82vh"} // 100vh - 10vh (header) - 8vh (footer)
+      minHeight={"86vh"} // 100vh - 6vh (header) - 8vh (footer)
     >
       <Grid
         container

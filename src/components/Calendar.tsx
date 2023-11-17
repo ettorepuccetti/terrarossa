@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
 
+import { Container, LinearProgress } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
 import { useRouter } from "next/router";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
@@ -11,7 +12,6 @@ import CalendarHeader from "./CalendarHeader";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
-import Spinner from "./Spinner";
 import SpinnerPartial from "./SpinnerPartial";
 
 //--------------------------------
@@ -167,7 +167,7 @@ export default function Calendar() {
   );
 
   // --------------------------------
-  // ------  QUERY & MUTATIONS ------
+  // ------ QUERY & MUTATIONS -------
   // --------------------------------
 
   // reservationAdd
@@ -276,11 +276,11 @@ export default function Calendar() {
   // clubData is not yet available in store , but the sub-component would try to render anyway
   // Should I check also reservationAdd, reservationDelete, recurrentReservationAdd, recurrentReservationDelete?
   if (!clubDataInStore) {
-    return <Spinner isLoading={true} />;
+    return <LinearProgress color="primary" />;
   }
 
   return (
-    <>
+    <Container maxWidth={"lg"} sx={{ padding: 0 }}>
       <ErrorAlert
         error={
           courtQuery.error ||
@@ -319,6 +319,6 @@ export default function Calendar() {
       </SpinnerPartial>
       <ReserveDialog />
       <EventDetailDialog />
-    </>
+    </Container>
   );
 }

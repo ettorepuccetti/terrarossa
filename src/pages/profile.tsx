@@ -109,7 +109,7 @@ const Prenota = () => {
         )}
         <TextField
           variant="standard"
-          label="nome e cognome"
+          label="nome utente"
           defaultValue={authData?.user.name}
           inputProps={{ readOnly: true }}
           sx={{ maxWidth: 300 }}

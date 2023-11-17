@@ -1,7 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import Image from "next/image";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { defaultClubImage } from "~/utils/constants";
 import { capitaliseFirstChar } from "~/utils/utils";
 import HorizonalDatePicker from "./HorizontalDatePicker";
 import LegendaButton from "./LegendaButton";
@@ -14,12 +13,14 @@ export default function CalendarHeader() {
   return (
     <Box display={"flex"} flexDirection={"column"}>
       <Box position={"relative"} height={250}>
-        <Image
-          alt={""}
-          src={clubData?.imageSrc || defaultClubImage}
-          fill={true}
-          style={{ objectFit: "cover" }}
-        />
+        {clubData.imageSrc && (
+          <Image
+            alt={""}
+            src={clubData.imageSrc}
+            fill={true}
+            style={{ objectFit: "cover" }}
+          />
+        )}
         <Box
           sx={{
             display: "flex",
@@ -38,10 +39,15 @@ export default function CalendarHeader() {
         </Box>
       </Box>
       {/* Row between datePicker and calendar */}
-      <Box display={"flex"} paddingX={"0.5rem"}>
+      <Box
+        className={"Calendar-Subheader"}
+        display={"flex"}
+        paddingX={"0.5rem"}
+        alignItems={"center"}
+      >
         {/* refresh query button */}
         <RefetchReservationButton />
-        <LegendaButton />
+
         {/* Selected date extended */}
         <Typography
           data-test={"selected-date-extended"}
@@ -56,6 +62,7 @@ export default function CalendarHeader() {
             selectedDate.locale("it").format("dddd DD MMMM YYYY"),
           )}
         </Typography>
+        <LegendaButton />
       </Box>
     </Box>
   );

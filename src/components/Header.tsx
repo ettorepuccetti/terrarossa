@@ -12,7 +12,8 @@ import Drawer from "./DrawerWrapper";
 const toolbarStyle: SxProps = {
   backgroundColor: "white",
   padding: "20px",
-  height: "10vh",
+  height: "6vh",
+  minHeight: "70px",
   justifyContent: "space-between",
   display: "flex",
 };
@@ -21,7 +22,7 @@ export default function Header() {
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const theme = useTheme();
 
-  const clubData = useCalendarStoreContext((state) => state.clubData);
+  const clubData = useCalendarStoreContext((store) => store.clubData); //mind that is using .clubData and not .getClubData(), so it can be undefined
   const headerName = clubData?.name;
   const logoSrc = clubData?.logoSrc;
   return (
