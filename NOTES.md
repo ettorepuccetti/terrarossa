@@ -83,6 +83,21 @@ Deploy schema then code:
   - merge the DR on Planetscale (and wait for it)
   - deploy to vercel
 
+### Prisma cloud platform
+
+- in `db.ts` add `.$extends(withAccelerate())` after `new PrismaClient({...})`
+
+```
+// src/server/db.ts
+
+import { PrismaClient } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
+
+export const prisma = new PrismaClient({...}).$extends(withAccelerate());
+```
+
+- Temporary use `DATABASE_URL_PRISMA` instead of `DATABASE_URL`
+
 ## Privacy policy
 
 generated using https://www.freeprivacypolicy.com/free-terms-and-conditions-generator/
