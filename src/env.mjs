@@ -22,6 +22,7 @@ const server = z.object({
   AUTH0_CLIENT_ID: z.string(),
   AUTH0_CLIENT_SECRET: z.string(),
   AUTH0_ISSUER: z.string(),
+  ACCELERATE_URL: z.string(),
 });
 
 /**
@@ -51,6 +52,7 @@ const processEnv = {
   NEXT_PUBLIC_LOGFLARE_SOURCE_ID: process.env.NEXT_PUBLIC_LOGFLARE_SOURCE_ID,
   NEXT_PUBLIC_LOGFLARE_API_KEY: process.env.NEXT_PUBLIC_LOGFLARE_API_KEY,
   NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+  ACCELERATE_URL: process.env.ACCELERATE_URL,
 };
 
 // Don't touch the part below
