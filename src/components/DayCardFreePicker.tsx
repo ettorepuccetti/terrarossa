@@ -87,10 +87,12 @@ function DayCardFreePickerDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <Box display={"flex"} flexDirection={"column"}>
-        <StaticDatePicker onAccept={onDateChanged} />
-      </Box>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }} // to fix horizontal scrollbar on small screens
+    >
+      <StaticDatePicker onAccept={onDateChanged} />
     </Dialog>
   );
 }

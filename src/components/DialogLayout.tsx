@@ -8,7 +8,7 @@ export default function DialogLayout({
   title: string;
 }) {
   return (
-    <Box sx={{ padding: "1rem" }}>
+    <Box sx={{ padding: ".75rem" }}>
       <DialogTitle textAlign={"center"}> {props.title} </DialogTitle>
       <Box
         display={"flex"}

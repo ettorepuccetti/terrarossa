@@ -130,7 +130,7 @@ Cypress.Commands.add(
         const slotY = $elem[0].getBoundingClientRect().height / 2;
         cy.wrap($elem).click(this.slotX - offsetLeft, slotY);
         cy.get("[data-test='reserve-dialog']").should("be.visible");
-        cy.get("[data-test='startTime']").should("have.value", startTimeString);
+        cy.get("[data-test='startTime']").should("have.text", startTimeString);
       });
 
     cy.get("[data-test='endTime']").should(

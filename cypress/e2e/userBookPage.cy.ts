@@ -134,7 +134,7 @@ describe("Calendar navigation", () => {
 
     // check startTime of first bookable slot
     cy.get("[data-test='startTime']").should(
-      "have.value",
+      "have.text",
       formatTimeString(
         (this.clubSettingsForoItalico as ClubSettings).firstBookableHour,
         (this.clubSettingsForoItalico as ClubSettings).firstBookableMinute,

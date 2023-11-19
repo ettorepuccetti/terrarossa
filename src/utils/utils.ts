@@ -97,3 +97,19 @@ export function dateIsInTimeRange(
     (date.isBefore(lastDayInRange) || date.isSame(lastDayInRange))
   );
 }
+
+/**
+ * Check that the selected time slot is bookable for the given user. If the user is admin, is always bookable.
+ * If the user is non admin, startDate must be in the future.
+ * @param sessionData object containing the session data of the logged user
+ * @param clubId
+ * @param startDate
+ * @returns true if the user is admin of the club or if the start date is in the future, false otherwise
+ */
+export const startDateIsFuture = (
+  sessionData: Session | null,
+  clubId: string,
+  startDate: Dayjs,
+) => {
+  return isAdminOfTheClub(sessionData, clubId) || startDate.isAfter(dayjs());
+};

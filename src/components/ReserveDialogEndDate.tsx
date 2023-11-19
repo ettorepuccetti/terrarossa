@@ -5,8 +5,7 @@ import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { isAdminOfTheClub } from "~/utils/utils";
-import { startDateIsFuture } from "./ReserveDialog";
+import { isAdminOfTheClub, startDateIsFuture } from "~/utils/utils";
 
 export default function ReserveDialogEndDate(props: {
   clubSettings: ClubSettings;

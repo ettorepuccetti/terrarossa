@@ -1,26 +1,17 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { DateField, TimeField } from "@mui/x-date-pickers";
-import dayjs, { type Dayjs } from "dayjs";
+import { Alert, Box, Button, Dialog, TextField } from "@mui/material";
+import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { type z } from "zod";
 import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
-import { isAdminOfTheClub } from "~/utils/utils";
+import { isAdminOfTheClub, startDateIsFuture } from "~/utils/utils";
 import {
   type RecurrentReservationInputSchema,
   type ReservationInputSchema,
 } from "./Calendar";
+import DialogFieldGrid from "./DialogFieldGrid";
 import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
@@ -128,10 +119,25 @@ export default function ReserveDialog() {
           {/* if not login only show "Login" button with no other fields */}
           {sessionData ? (
             <>
-              {/* court name */}
-              <DialogActions>
-                <Typography gutterBottom>{resource?.title}</Typography>
-              </DialogActions>
+              {/* Static data displayed with grid style for column allignement */}
+              <DialogFieldGrid
+                labelValues={[
+                  { label: "Campo", value: resource?.title },
+                  {
+                    label: "Data",
+                    value: startDate.format("DD/MM/YYYY"),
+                    dataTest: "date",
+                  },
+                  {
+                    label: "Ora inizio",
+                    value: startDate.format("HH:mm"),
+                    dataTest: "startTime",
+                  },
+                ]}
+              />
+
+              {/* end time */}
+              <ReserveDialogEndDate clubSettings={clubData.clubSettings} />
 
               {/* overwrite name, only if admin mode */}
               {isAdminOfTheClub(sessionData, clubData.id) && (
@@ -148,36 +154,11 @@ export default function ReserveDialog() {
                   color="info"
                 />
               )}
-              {/* date */}
-              <DateField
-                inputProps={{ "data-test": "date" }}
-                value={startDate}
-                readOnly={true}
-                label={"Data"}
-                format="DD/MM/YYYY"
-                size="small"
-                fullWidth
-                color="info"
-              />
-              {/* start time */}
-              <TimeField
-                inputProps={{ "data-test": "startTime" }}
-                value={startDate}
-                label={"Orario di inizio"}
-                readOnly={true}
-                ampm={false}
-                size="small"
-                fullWidth
-                color="info"
-              />
 
-              {/* end time */}
-              <ReserveDialogEndDate clubSettings={clubData.clubSettings} />
-
-              {/* recurrent reservation */}
+              {/* recurrent reservation, only if admin mode */}
               <ReserveDialogRecurrent />
 
-              {/* start date in the past warning */}
+              {/* start date in the past warning, only for non admin */}
               {!startDateIsFuture(sessionData, clubData.id, startDate) && (
                 <Box display={"flex"}>
                   <Alert data-test="past-warning" severity={"warning"}>
@@ -207,11 +188,3 @@ export default function ReserveDialog() {
     </>
   );
 }
-
-export const startDateIsFuture = (
-  sessionData: Session | null,
-  clubId: string,
-  startDate: Dayjs,
-) => {
-  return isAdminOfTheClub(sessionData, clubId) || startDate.isAfter(dayjs());
-};

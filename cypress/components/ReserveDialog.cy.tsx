@@ -110,14 +110,16 @@ describe("USER", () => {
     cy.get("h2").should("contain", "Prenota");
 
     // check date
-    cy.get("input")
-      .filter("[data-test='date']")
-      .should("have.value", startDate.format("DD/MM/YYYY"));
+    cy.getByDataTest("date").should(
+      "have.text",
+      startDate.format("DD/MM/YYYY"),
+    );
 
     // check start time
-    cy.get("input")
-      .filter("[data-test='startTime']")
-      .should("have.value", startDate.format("HH:mm"));
+    cy.getByDataTest("startTime").should(
+      "have.text",
+      startDate.format("HH:mm"),
+    );
 
     // check end time
     cy.get("input")
