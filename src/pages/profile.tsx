@@ -6,6 +6,7 @@ import { signIn, useSession } from "next-auth/react";
 import DeleteAccount from "~/components/DeleteAccount";
 import Header from "~/components/Header";
 import Spinner from "~/components/Spinner";
+import UploadImage from "~/components/UploadImage";
 import { api } from "~/utils/api";
 
 const Prenota = () => {
@@ -107,6 +108,7 @@ const Prenota = () => {
         {authData?.user.image && (
           <Avatar src={authData?.user.image} sx={{ width: 70, height: 70 }} />
         )}
+        <UploadImage />
         <TextField
           variant="standard"
           label="nome utente"
