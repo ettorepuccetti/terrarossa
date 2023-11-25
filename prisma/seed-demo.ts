@@ -30,10 +30,8 @@ async function main() {
     update: {},
     create: {
       name: foroItalicoName,
-      logoSrc:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/bnl-logo.png",
-      imageSrc:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/bnl-image.jpg",
+      logoSrc: "https://r2.terrarossa.app/bnl-logo.png",
+      imageSrc: "https://r2.terrarossa.app/bnl-image.jpg",
       clubSettings: {
         create: {
           daysInFutureVisible: 7,
@@ -48,10 +46,8 @@ async function main() {
     update: {},
     create: {
       name: allEnglandClubName,
-      imageSrc:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/wimbledon-image.jpg",
-      logoSrc:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/wimbledon-logo.png",
+      imageSrc: "https://r2.terrarossa.app/wimbledon-image.jpg",
+      logoSrc: "https://r2.terrarossa.app/wimbledon-logo.png",
       clubSettings: {
         create: {
           daysInFutureVisible: 5,
@@ -111,7 +107,7 @@ async function main() {
       email: "adminuser@terrarossa.app",
       name: "admin",
       role: "ADMIN",
-      image: "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/bnl-logo.png",
+      image: "https://r2.terrarossa.app/bnl-logo.png",
       clubId: foroItalico.id,
       accounts: {
         create: {
@@ -131,8 +127,7 @@ async function main() {
       email: "demouser@terrarossa.app",
       name: "demo user",
       role: "USER",
-      image:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/user_demo_avatar.png",
+      image: "https://r2.terrarossa.app/user_demo_avatar.png",
       accounts: {
         create: {
           type: "oauth",
@@ -149,8 +144,7 @@ async function main() {
       email: "r.federer@atp.com",
       name: "Roger Federer",
       role: "USER",
-      image:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/federer_avatar.jpg",
+      image: "https://r2.terrarossa.app/federer_avatar.jpg",
     },
   });
 
@@ -159,8 +153,7 @@ async function main() {
       email: "mariorossi@personal.it",
       name: "Mario Rossi",
       role: "USER",
-      image:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/mario_avatar.jpg",
+      image: "https://r2.terrarossa.app/mario_avatar.jpg",
     },
   });
 
@@ -169,8 +162,7 @@ async function main() {
       email: "giovanni@personal.it",
       name: "Giovanni",
       role: "USER",
-      image:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/giovane_avatar.jpg",
+      image: "https://r2.terrarossa.app/giovane_avatar.jpg",
     },
   });
 

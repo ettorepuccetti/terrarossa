@@ -16,10 +16,8 @@ async function main() {
     update: {},
     create: {
       name: foroItalicoName,
-      logoSrc:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/bnl-logo.png",
-      imageSrc:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/bnl-image.jpg",
+      logoSrc: "https://r2.terrarossa.app/bnl-logo.png",
+      imageSrc: "https://r2.terrarossa.app/bnl-image.jpg",
       courts: {
         create: [
           {
@@ -54,10 +52,8 @@ async function main() {
     update: {},
     create: {
       name: allEnglandClubName,
-      imageSrc:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/wimbledon-image.jpg",
-      logoSrc:
-        "https://pub-f960339d8fe045c9a40b730d5aff9632.r2.dev/wimbledon-logo.png",
+      imageSrc: "https://r2.terrarossa.app/wimbledon-image.jpg",
+      logoSrc: "https://r2.terrarossa.app/wimbledon-logo.png",
       clubSettings: {
         create: {
           daysInFutureVisible: 5,
