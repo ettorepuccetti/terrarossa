@@ -170,7 +170,8 @@ export default function Calendar() {
   // ------ QUERY & MUTATIONS -------
   // --------------------------------
 
-  // reservationAdd
+  // reservationAdd - I save here the callback to store the mutation in the store and the mutation itself, to use them in the useEffect
+  // I cannot invoke the callback to save the mutation in the store here (during the render)
   const setReservationAdd = useCalendarStoreContext(
     (store) => store.setReservationAdd,
   );

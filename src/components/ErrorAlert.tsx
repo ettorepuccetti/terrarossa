@@ -30,13 +30,7 @@ export default function ErrorAlert({
         open={true}
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
-        <Alert
-          data-test="error-alert"
-          severity="error"
-          onClose={() => {
-            onClose();
-          }}
-        >
+        <Alert data-test="error-alert" severity="error" onClose={onClose}>
           {error?.message}
         </Alert>
       </Backdrop>
