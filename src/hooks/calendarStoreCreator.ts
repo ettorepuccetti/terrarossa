@@ -4,16 +4,19 @@ import type FullCalendar from "@fullcalendar/react";
 import dayjs, { type Dayjs } from "dayjs";
 import { type RefObject } from "react";
 import { type StateCreator } from "zustand";
+
+import { type RouterOutputs } from "~/utils/api";
+import { getOrThrow } from "~/utils/utils";
 import {
   type useRecurrentReservationAdd,
   type useRecurrentReservationDelete,
   type useReservationAdd,
   type useReservationDelete,
   type useReservationQuery,
-} from "~/components/Calendar";
-import { type RouterOutputs } from "~/utils/api";
+} from "./calendarTrpcHooks";
+import { type ProfileStore } from "./profileStoreCreator";
 
-export interface IStore {
+export interface CalendarStore {
   dateClick: DateClickArg | null;
   eventDetails: EventImpl | null;
   endDate: Dayjs | null;
@@ -89,7 +92,12 @@ export interface IStore {
   setSetSelectedDate: (stub: (selectedDate: Dayjs) => void) => void;
 }
 
-export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
+export const calendarStoreCreator: StateCreator<
+  CalendarStore & ProfileStore,
+  [],
+  [],
+  CalendarStore
+> = (set, get) => ({
   dateClick: null,
   eventDetails: null,
   endDate: null,
@@ -179,11 +187,3 @@ export const calendarStoreCreator: StateCreator<IStore> = (set, get) => ({
   setSetSelectedDate: (stub: (selectedDate: Dayjs) => void) =>
     set({ setSelectedDate: stub }),
 });
-
-const getOrThrow = <T>(getter: () => T | undefined): T => {
-  const result = getter();
-  if (result === undefined) {
-    throw new Error("result is undefined");
-  }
-  return result;
-};

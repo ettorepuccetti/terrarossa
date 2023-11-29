@@ -1,14 +1,14 @@
 import { Box, Typography } from "@mui/material";
 import Image from "next/image";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { capitaliseFirstChar } from "~/utils/utils";
 import HorizonalDatePicker from "./HorizontalDatePicker";
 import LegendaButton from "./LegendaButton";
 import RefetchReservationButton from "./RefetchReservationButton";
 
 export default function CalendarHeader() {
-  const clubData = useCalendarStoreContext((state) => state.getClubData());
-  const selectedDate = useCalendarStoreContext((store) => store.selectedDate);
+  const clubData = useMergedStoreContext((state) => state.getClubData());
+  const selectedDate = useMergedStoreContext((store) => store.selectedDate);
 
   return (
     <Box display={"flex"} flexDirection={"column"}>

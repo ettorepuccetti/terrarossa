@@ -113,3 +113,11 @@ export const startDateIsFuture = (
 ) => {
   return isAdminOfTheClub(sessionData, clubId) || startDate.isAfter(dayjs());
 };
+
+export const getOrThrow = <T>(getter: () => T | undefined): T => {
+  const result = getter();
+  if (result === undefined) {
+    throw new Error("result is undefined");
+  }
+  return result;
+};

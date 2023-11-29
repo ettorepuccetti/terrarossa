@@ -2,19 +2,19 @@ import { Box, Switch, Typography } from "@mui/material";
 import { DatePicker, type DateValidationError } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 
 export default function ReserveDialogRecurrent() {
-  const startDate = useCalendarStoreContext((state) => state.getStartDate());
-  const recurrentEndDate = useCalendarStoreContext(
+  const startDate = useMergedStoreContext((state) => state.getStartDate());
+  const recurrentEndDate = useMergedStoreContext(
     (state) => state.recurrentEndDate,
   );
-  const clubData = useCalendarStoreContext((state) => state.getClubData());
-  const setRecurrentEndDate = useCalendarStoreContext(
+  const clubData = useMergedStoreContext((state) => state.getClubData());
+  const setRecurrentEndDate = useMergedStoreContext(
     (state) => state.setRecurrentEndDate,
   );
-  const setRecurrentEndDateError = useCalendarStoreContext(
+  const setRecurrentEndDateError = useMergedStoreContext(
     (state) => state.setRecurringEndDateError,
   );
   const [recurrentView, setRecurrentView] = useState<boolean>(false);

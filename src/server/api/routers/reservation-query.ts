@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { reservationQueryInputSchema } from "~/components/Calendar";
+import { reservationQueryInputSchema } from "~/hooks/calendarTrpcHooks";
 import {
   createTRPCRouter,
   protectedProcedure,

@@ -4,7 +4,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
 import ReserveDialog from "~/components/ReserveDialog";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import {
   buildTrpcMutationMock,
   club,
@@ -22,7 +22,7 @@ function ReserveDialogWrapper(props: {
   clubSettings?: ClubSettings;
 }) {
   // set clubData
-  useCalendarStoreContext((store) => store.setClubData)({
+  useMergedStoreContext((store) => store.setClubData)({
     ...club,
     id: props.clubId ?? club.id,
     clubSettings: props.clubSettings ?? clubSettings,
@@ -31,7 +31,7 @@ function ReserveDialogWrapper(props: {
   // set mutations mocks: reservationDelete, recurrentReservationDelete
   const addSingle = cy.stub().as("addSingle");
   const addRecurrent = cy.stub().as("addRecurrent");
-  useCalendarStoreContext((store) => store.setReservationAdd)(
+  useMergedStoreContext((store) => store.setReservationAdd)(
     buildTrpcMutationMock(addSingle, {
       clubId: club.id,
       courtId: courts[0]!.id,
@@ -39,7 +39,7 @@ function ReserveDialogWrapper(props: {
       endDateTime: dayjs(props.startDate).add(1, "hour").toDate(),
     }),
   );
-  useCalendarStoreContext((store) => store.setRecurrentReservationAdd)(
+  useMergedStoreContext((store) => store.setRecurrentReservationAdd)(
     buildTrpcMutationMock(addRecurrent, {
       clubId: club.id,
       courtId: courts[0]!.id,
@@ -58,7 +58,7 @@ function ReserveDialogWrapper(props: {
       title: courts[0]!.name,
     },
   } as DateClickArg;
-  useCalendarStoreContext((store) => store.setDateClick)(dateClick);
+  useMergedStoreContext((store) => store.setDateClick)(dateClick);
 
   return <ReserveDialog />;
 }

@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
-import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
 
 import { Container, LinearProgress } from "@mui/material";
-import dayjs, { type Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { useRouter } from "next/router";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { api } from "~/utils/api";
+import {
+  useClubQuery,
+  useCourtQuery,
+  useRecurrentReservationAdd,
+  useRecurrentReservationDelete,
+  useReservationAdd,
+  useReservationDelete,
+  useReservationQuery,
+} from "~/hooks/calendarTrpcHooks";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
 import CalendarHeader from "./CalendarHeader";
 import ErrorAlert from "./ErrorAlert";
@@ -14,155 +21,15 @@ import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
 import SpinnerPartial from "./SpinnerPartial";
 
-//--------------------------------
-//-------- INPUT SCHEMAS ---------
-//--------------------------------
-export const ReservationInputSchema = z.object({
-  startDateTime: z.date(),
-  endDateTime: z.date(),
-  courtId: z.string(),
-  overwriteName: z.string().optional(),
-  clubId: z.string(),
-});
-
-export const RecurrentReservationInputSchema = z
-  .object({
-    recurrentStartDate: z.date(),
-    recurrentEndDate: z.date(),
-  })
-  .and(ReservationInputSchema);
-
-export const ReservationDeleteInputSchema = z.object({
-  reservationId: z.string(),
-  clubId: z.string(),
-});
-
-export const RecurrentReservationDeleteInputSchema = z.object({
-  recurrentReservationId: z.string(),
-  clubId: z.string(),
-});
-
-export const ClubIdInputSchema = z.object({
-  clubId: z.union([z.string(), z.string().array(), z.undefined()]), //router param can also be undefined or array of strings
-});
-
-export const reservationQueryInputSchema = z.object({
-  clubId: z.string().optional(), //router param can also be undefined or array of strings
-  customSelectedDate: z.date().optional(),
-});
-
-//------------------------------------
-//----- QUERIES & MUTATION HOOKS -----
-//------------------------------------
-
-export const useClubQuery = (clubId: string | undefined) => {
-  return api.club.getByClubId.useQuery(
-    { clubId: clubId },
-    {
-      refetchOnWindowFocus: false,
-      enabled: clubId !== undefined,
-      staleTime: Infinity,
-    },
-  );
-};
-
-export const useCourtQuery = (clubId: string | undefined) =>
-  api.court.getAllByClubId.useQuery(
-    { clubId: clubId },
-    {
-      refetchOnWindowFocus: false,
-      enabled: clubId !== undefined,
-      staleTime: Infinity,
-    },
-  );
-
-export const useReservationQuery = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const customSelectedDate = useCalendarStoreContext(
-    (store) => store.customDateSelected,
-  );
-  return api.reservationQuery.getAllVisibleInCalendarByClubId.useQuery(
-    {
-      clubId: clubId,
-      customSelectedDate: customSelectedDate
-        ? selectedDate.toDate()
-        : undefined,
-    },
-    { refetchOnWindowFocus: false, enabled: clubId !== undefined },
-  );
-};
-
-export const useReservationAdd = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
-  return api.reservationMutation.insertOne.useMutation({
-    async onSuccess() {
-      await reservationQuery.refetch();
-    },
-    async onError() {
-      await reservationQuery.refetch();
-    },
-  });
-};
-
-export const useRecurrentReservationAdd = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
-  return api.reservationMutation.insertRecurrent.useMutation({
-    async onSuccess() {
-      await reservationQuery.refetch();
-    },
-    async onError() {
-      await reservationQuery.refetch();
-    },
-  });
-};
-
-export const useReservationDelete = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
-  return api.reservationMutation.deleteOne.useMutation({
-    async onSuccess() {
-      await reservationQuery.refetch();
-    },
-    async onError() {
-      await reservationQuery.refetch();
-    },
-  });
-};
-
-export const useRecurrentReservationDelete = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
-  return api.reservationMutation.deleteRecurrent.useMutation({
-    async onSuccess() {
-      await reservationQuery.refetch();
-    },
-    async onError() {
-      await reservationQuery.refetch();
-    },
-  });
-};
-
 export default function Calendar() {
   const logger = useLogger({
     component: "Calendar",
   });
   const [clubId, setClubId] = useState<string | undefined>(undefined);
-  const selectedDateInCalendar = useCalendarStoreContext(
+  const selectedDateInCalendar = useMergedStoreContext(
     (store) => store.selectedDate,
   );
-  const setSelectedDate = useCalendarStoreContext(
+  const setSelectedDate = useMergedStoreContext(
     (store) => store.setSelectedDate,
   );
 
@@ -172,13 +39,13 @@ export default function Calendar() {
 
   // reservationAdd - I save here the callback to store the mutation in the store and the mutation itself, to use them in the useEffect
   // I cannot invoke the callback to save the mutation in the store here (during the render)
-  const setReservationAdd = useCalendarStoreContext(
+  const setReservationAdd = useMergedStoreContext(
     (store) => store.setReservationAdd,
   );
   const reservationAdd = useReservationAdd(clubId, selectedDateInCalendar);
 
   // recurrentReservationAdd
-  const setRecurrentReservationAdd = useCalendarStoreContext(
+  const setRecurrentReservationAdd = useMergedStoreContext(
     (store) => store.setRecurrentReservationAdd,
   );
   const recurrentReservationAdd = useRecurrentReservationAdd(
@@ -187,7 +54,7 @@ export default function Calendar() {
   );
 
   // reservationDelete
-  const setReservationDelete = useCalendarStoreContext(
+  const setReservationDelete = useMergedStoreContext(
     (store) => store.setReservationDelete,
   );
   const reservationDelete = useReservationDelete(
@@ -196,7 +63,7 @@ export default function Calendar() {
   );
 
   // recurrentReservationDelete
-  const setRecurrentReservationDelete = useCalendarStoreContext(
+  const setRecurrentReservationDelete = useMergedStoreContext(
     (store) => store.setRecurrentReservationDelete,
   );
   const recurrentReservationDelete = useRecurrentReservationDelete(
@@ -205,14 +72,14 @@ export default function Calendar() {
   );
 
   // clubQuery
-  const setClubData = useCalendarStoreContext((store) => store.setClubData);
+  const setClubData = useMergedStoreContext((store) => store.setClubData);
   const clubQuery = useClubQuery(clubId);
   // data to check for rendering calendar and other sub components,
   // if I call `store.getClubData` when still undefined, I get an exception
-  const clubDataInStore = useCalendarStoreContext((store) => store.clubData);
+  const clubDataInStore = useMergedStoreContext((store) => store.clubData);
 
   // reservationQuery - also used by refresh button
-  const setReservationQuery = useCalendarStoreContext(
+  const setReservationQuery = useMergedStoreContext(
     (store) => store.setReservationQuery,
   );
   const reservationQuery = useReservationQuery(clubId, selectedDateInCalendar);

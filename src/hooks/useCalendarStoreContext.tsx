@@ -9,33 +9,40 @@ import {
 import { createStore, type StoreApi } from "zustand";
 import { shallow } from "zustand/shallow";
 import { useStoreWithEqualityFn } from "zustand/traditional";
-import { calendarStoreCreator, type IStore } from "./UseCalendarStore";
+import {
+  calendarStoreCreator,
+  type CalendarStore,
+} from "./calendarStoreCreator";
+import { profileStoreCreator, type ProfileStore } from "./profileStoreCreator";
 
-const createCalandarStore = () => {
-  return createStore<IStore>(calendarStoreCreator);
+type MergedStores = CalendarStore & ProfileStore;
+
+const createMergedStore = () => {
+  return createStore<MergedStores>()((...a) => ({
+    ...calendarStoreCreator(...a),
+    ...profileStoreCreator(...a),
+  }));
 };
 
-const CalendarStoreContext = createContext<StoreApi<IStore>>(null as never);
+const MergedStoreContext = createContext<StoreApi<MergedStores>>(null as never);
 
-export type CalendarStoreProviderProps = PropsWithChildren<Partial<IStore>>;
+export type MergedStoreProviderProps = PropsWithChildren<Partial<MergedStores>>;
 
-export const CalendarStoreProvider = ({
-  children,
-}: CalendarStoreProviderProps) => {
-  const calendarStoreRef = useRef(createCalandarStore());
+export const MergedStoreProvider = ({ children }: MergedStoreProviderProps) => {
+  const calendarStoreRef = useRef(createMergedStore());
   return (
-    <CalendarStoreContext.Provider value={calendarStoreRef.current}>
+    <MergedStoreContext.Provider value={calendarStoreRef.current}>
       {children}
-    </CalendarStoreContext.Provider>
+    </MergedStoreContext.Provider>
   );
 };
 
-export type UseCalendarStoreContextSelector<T> = (store: IStore) => T;
+export type UseMergedStoreContextSelector<T> = (store: MergedStores) => T;
 
-export const useCalendarStoreContext = <T,>(
-  selector: UseCalendarStoreContextSelector<T>,
+export const useMergedStoreContext = <T,>(
+  selector: UseMergedStoreContextSelector<T>,
 ): T => {
-  const calendarStoreContext = useContext(CalendarStoreContext);
+  const calendarStoreContext = useContext(MergedStoreContext);
   if (!calendarStoreContext) {
     throw new Error(
       "useCalendarStoreContext must be used within a CalendarStoreProvider",

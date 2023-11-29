@@ -2,7 +2,7 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import EventDetailDialog from "~/components/EventDetailDialog";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import {
   buildTrpcMutationMock,
   club,
@@ -16,7 +16,7 @@ dayjs.extend(duration);
 
 function EventDetailDialogWrapper(props: { startDate: Date; endDate: Date }) {
   // set clubData
-  useCalendarStoreContext((store) => store.setClubData)({
+  useMergedStoreContext((store) => store.setClubData)({
     ...club,
     clubSettings: clubSettings,
   });
@@ -24,13 +24,13 @@ function EventDetailDialogWrapper(props: { startDate: Date; endDate: Date }) {
   // set mutations mocks: reservationDelete, recurrentReservationDelete
   const deleteOne = cy.stub().as("deleteOne");
   const deleteRecurrent = cy.stub().as("deleteRecurrent");
-  useCalendarStoreContext((store) => store.setReservationDelete)(
+  useMergedStoreContext((store) => store.setReservationDelete)(
     buildTrpcMutationMock(deleteOne, {
       reservationId: eventDetailsSingle.id,
       clubId: club.id,
     }),
   );
-  useCalendarStoreContext((store) => store.setRecurrentReservationDelete)(
+  useMergedStoreContext((store) => store.setRecurrentReservationDelete)(
     buildTrpcMutationMock(deleteRecurrent, {
       recurrentReservationId: eventDetailsRecurrent.extendedProps
         .recurrentId as string,
@@ -39,7 +39,7 @@ function EventDetailDialogWrapper(props: { startDate: Date; endDate: Date }) {
   );
 
   // set eventDetails
-  useCalendarStoreContext((store) => store.setEventDetails)({
+  useMergedStoreContext((store) => store.setEventDetails)({
     ...eventDetailsSingle,
     start: props.startDate,
     end: props.endDate,

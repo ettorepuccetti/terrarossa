@@ -17,7 +17,7 @@ import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import superjson from "superjson";
-import { CalendarStoreProvider } from "~/hooks/useCalendarStoreContext";
+import { MergedStoreProvider } from "~/hooks/useCalendarStoreContext";
 import lightTheme from "~/styles/lightTheme";
 import { api, getBaseUrl } from "~/utils/api";
 import { UserRoles } from "~/utils/constants";
@@ -153,13 +153,13 @@ function WrapperComponentForTesting({
       <ThemeProvider theme={lightTheme}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="it">
           <SessionProvider session={session}>
-            <CalendarStoreProvider>
+            <MergedStoreProvider>
               <api.Provider client={trpcClient} queryClient={queryClient}>
                 <QueryClientProvider client={queryClient}>
                   {children}
                 </QueryClientProvider>
               </api.Provider>
-            </CalendarStoreProvider>
+            </MergedStoreProvider>
           </SessionProvider>
         </LocalizationProvider>
       </ThemeProvider>

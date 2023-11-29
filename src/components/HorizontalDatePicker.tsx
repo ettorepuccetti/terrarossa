@@ -1,22 +1,22 @@
 import { Box } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
 import { DayCard } from "./DayCard";
 import DayCardFreePicker from "./DayCardFreePicker";
 
 export default function HorizonalDatePicker() {
   const logger = useLogger({ component: "HorizontalDatePicker" });
-  const clubData = useCalendarStoreContext((store) => store.getClubData());
+  const clubData = useMergedStoreContext((store) => store.getClubData());
   const daysInThePastVisible = clubData.clubSettings.daysInThePastVisible;
   const daysInTheFutureVisible = clubData.clubSettings.daysInFutureVisible;
 
-  const calendarRef = useCalendarStoreContext((store) => store.calendarRef);
-  const selectedDate = useCalendarStoreContext((store) => store.selectedDate);
-  const setSelectedDate = useCalendarStoreContext(
+  const calendarRef = useMergedStoreContext((store) => store.calendarRef);
+  const selectedDate = useMergedStoreContext((store) => store.selectedDate);
+  const setSelectedDate = useMergedStoreContext(
     (store) => store.setSelectedDate,
   );
-  const setCustomSelectedDate = useCalendarStoreContext(
+  const setCustomSelectedDate = useMergedStoreContext(
     (store) => store.setCustomDateSelected,
   );
 

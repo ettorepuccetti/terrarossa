@@ -1,12 +1,11 @@
 import { Avatar, Box } from "@mui/material";
 import { useState } from "react";
-import { api } from "~/utils/api";
-import { useUserQuery } from "./Profile";
+import { useGetSignedUrl, useUpdateImageSrc, useUserQuery } from "./Profile";
 
 export default function ProfilePicture() {
   const userQuery = useUserQuery();
-  const uploadImage = api.user.uploadImage.useMutation();
-  const updateImageSrc = api.user.updateImageSrc.useMutation();
+  const getSignedUrl = useGetSignedUrl();
+  const updateImageSrc = useUpdateImageSrc();
 
   const [file, setFile] = useState<File>();
 
@@ -16,7 +15,7 @@ export default function ProfilePicture() {
     }
     const formData = new FormData();
     formData.append("image", file);
-    const { url: presignedUrl } = await uploadImage.mutateAsync();
+    const { url: presignedUrl } = await getSignedUrl.mutateAsync();
     await fetch(presignedUrl, {
       method: "PUT",
       body: formData.get("image"),
@@ -33,12 +32,12 @@ export default function ProfilePicture() {
     }
   }
 
-  if (userQuery.isLoading) {
-    return null;
+  if (userQuery.isLoading || userQuery.isRefetching) {
+    return "loading...";
   }
 
   if (userQuery.isError) {
-    return null;
+    return "error";
   }
 
   return (

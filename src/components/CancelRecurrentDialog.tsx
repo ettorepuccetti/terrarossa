@@ -9,7 +9,7 @@ import {
   RadioGroup,
 } from "@mui/material";
 import React from "react";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
 import DialogLayout from "./DialogLayout";
 
@@ -17,23 +17,23 @@ export default function CancelRecurrentDialog() {
   const logger = useLogger({
     component: "CancelRecurrentDialog",
   });
-  const deleteOpen = useCalendarStoreContext(
+  const deleteOpen = useMergedStoreContext(
     (state) => state.deleteConfirmationOpen,
   );
-  const setDeleteConfirmationOpen = useCalendarStoreContext(
+  const setDeleteConfirmationOpen = useMergedStoreContext(
     (state) => state.setDeleteConfirmationOpen,
   );
-  const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
-  const setEventDetails = useCalendarStoreContext(
+  const eventDetails = useMergedStoreContext((state) => state.eventDetails);
+  const setEventDetails = useMergedStoreContext(
     (state) => state.setEventDetails,
   );
 
-  const clubData = useCalendarStoreContext((state) => state.getClubData());
+  const clubData = useMergedStoreContext((state) => state.getClubData());
 
-  const recurrentReservationDelete = useCalendarStoreContext((state) =>
+  const recurrentReservationDelete = useMergedStoreContext((state) =>
     state.getRecurrentReservationDelete(),
   );
-  const reservationDelete = useCalendarStoreContext((state) =>
+  const reservationDelete = useMergedStoreContext((state) =>
     state.getReservationDelete(),
   );
 

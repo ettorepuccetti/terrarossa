@@ -1,12 +1,12 @@
 import { type Session } from "next-auth";
 import FullCalendarWrapper from "~/components/FullCalendarWrapper";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { formatTimeString } from "~/utils/utils";
 import { club, clubSettings, courts, mountWithContexts } from "./_constants";
 
 function FullCalendarWrapperContext(props: { lastBookableMinute: number }) {
   // set clubData
-  useCalendarStoreContext((state) => state.setClubData)({
+  useMergedStoreContext((state) => state.setClubData)({
     ...club,
     clubSettings: {
       ...clubSettings,

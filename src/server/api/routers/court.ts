@@ -1,4 +1,4 @@
-import { ClubIdInputSchema } from "~/components/Calendar";
+import { ClubIdInputSchema } from "~/hooks/calendarTrpcHooks";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { loggerInternal } from "~/utils/logger";
 

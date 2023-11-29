@@ -2,7 +2,7 @@ import { type DateClickArg } from "@fullcalendar/interaction";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import ReserveDialogRecurrent from "~/components/ReserveDialogRecurrent";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import {
   club,
   clubSettings,
@@ -14,7 +14,7 @@ dayjs.locale("it");
 
 function ReserveDialogRecurrentContext() {
   //setting clubId
-  useCalendarStoreContext((store) => store.setClubData)({
+  useMergedStoreContext((store) => store.setClubData)({
     clubSettings: clubSettings,
     ...club,
   });
@@ -22,8 +22,8 @@ function ReserveDialogRecurrentContext() {
   // setting stubs
   const setDateStub = cy.stub().as("setDateStub");
   const setErrorStub = cy.stub().as("setErrorStub");
-  useCalendarStoreContext((store) => store.setSetRecurrentEndDate)(setDateStub);
-  useCalendarStoreContext((store) => store.setSetRecurringEndDateError)(
+  useMergedStoreContext((store) => store.setSetRecurrentEndDate)(setDateStub);
+  useMergedStoreContext((store) => store.setSetRecurringEndDateError)(
     setErrorStub,
   );
 
@@ -40,7 +40,7 @@ function ReserveDialogRecurrentContext() {
       title: "Campo 1",
     },
   } as DateClickArg;
-  useCalendarStoreContext((store) => store.setDateClick)(dateClick);
+  useMergedStoreContext((store) => store.setDateClick)(dateClick);
 
   return <ReserveDialogRecurrent />;
 }

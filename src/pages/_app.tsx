@@ -1,7 +1,7 @@
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppProps } from "next/app";
-import { CalendarStoreProvider } from "~/hooks/useCalendarStoreContext";
+import { MergedStoreProvider } from "~/hooks/useCalendarStoreContext";
 
 import { api, getBaseUrl } from "~/utils/api";
 
@@ -65,11 +65,11 @@ const MyApp = (props: MyAppProps) => {
         <CacheProvider value={emotionCache}>
           <ThemeProvider theme={lightTheme}>
             <SessionProvider session={session}>
-              <CalendarStoreProvider>
+              <MergedStoreProvider>
                 <CssBaseline />
                 <ReactQueryDevtools initialIsOpen={false} />
                 <Component {...pageProps} />
-              </CalendarStoreProvider>
+              </MergedStoreProvider>
             </SessionProvider>
           </ThemeProvider>
         </CacheProvider>

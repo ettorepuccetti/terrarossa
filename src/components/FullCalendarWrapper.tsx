@@ -14,7 +14,7 @@ import { Box, useTheme, type PaletteColor } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, type RefObject } from "react";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { type AppRouter } from "~/server/api/root";
 import { useLogger } from "~/utils/logger";
 import {
@@ -41,12 +41,10 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     component: "FullCalendarWrapper",
   });
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
-  const setCalendarRef = useCalendarStoreContext(
-    (state) => state.setCalendarRef,
-  );
-  const clubData = useCalendarStoreContext((state) => state.getClubData());
-  const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
-  const setEventDetails = useCalendarStoreContext(
+  const setCalendarRef = useMergedStoreContext((state) => state.setCalendarRef);
+  const clubData = useMergedStoreContext((state) => state.getClubData());
+  const setDateClick = useMergedStoreContext((state) => state.setDateClick);
+  const setEventDetails = useMergedStoreContext(
     (state) => state.setEventDetails,
   );
 

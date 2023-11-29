@@ -1,4 +1,4 @@
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
 import ConfirmationDialog from "./ConfirmationDialog";
 
@@ -6,19 +6,19 @@ export default function CancelSingleDialog() {
   const logger = useLogger({
     component: "CancelSingleDialog",
   });
-  const deleteConfirmationOpen = useCalendarStoreContext(
+  const deleteConfirmationOpen = useMergedStoreContext(
     (state) => state.deleteConfirmationOpen,
   );
-  const setDeleteConfirmationOpen = useCalendarStoreContext(
+  const setDeleteConfirmationOpen = useMergedStoreContext(
     (state) => state.setDeleteConfirmationOpen,
   );
-  const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
-  const setEventDetails = useCalendarStoreContext(
+  const eventDetails = useMergedStoreContext((state) => state.eventDetails);
+  const setEventDetails = useMergedStoreContext(
     (state) => state.setEventDetails,
   );
 
-  const clubData = useCalendarStoreContext((state) => state.getClubData());
-  const reservationDelete = useCalendarStoreContext((state) =>
+  const clubData = useMergedStoreContext((state) => state.getClubData());
+  const reservationDelete = useMergedStoreContext((state) =>
     state.getReservationDelete(),
   );
 
