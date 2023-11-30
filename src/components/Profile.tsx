@@ -1,39 +1,15 @@
 import { Box, LinearProgress, Typography } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
-import { api } from "~/utils/api";
+import {
+  useMyReservationsQuery,
+  useUpdateImageSrc,
+  useUserQuery,
+} from "~/hooks/profileTrpcHooks";
 import DeleteAccount from "./DeleteAccount";
 import ErrorAlert from "./ErrorAlert";
 import ProfilePicture from "./ProfilePicture";
 import { ProfileReservationsGrid } from "./ProfileReservationsGrid";
 import { ProfileTextInfo } from "./ProfileTextInfo";
-
-export const useUserQuery = () => {
-  return api.user.getInfo.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
-};
-
-export const useMyReservationsQuery = () => {
-  return api.reservationQuery.getMine.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    retry: false,
-  });
-};
-
-export const useGetSignedUrl = () => {
-  return api.user.getSignedUrlForUploadImage.useMutation();
-};
-
-export const useUpdateImageSrc = () => {
-  const userQuery = useUserQuery();
-  return api.user.updateImageSrc.useMutation({
-    async onSuccess() {
-      userQuery.remove();
-      await userQuery.refetch();
-    },
-  });
-};
 
 export const Profile = () => {
   const userQuery = useUserQuery();

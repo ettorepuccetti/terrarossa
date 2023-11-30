@@ -1,6 +1,10 @@
 import { Avatar, Box } from "@mui/material";
 import { useState } from "react";
-import { useGetSignedUrl, useUpdateImageSrc, useUserQuery } from "./Profile";
+import {
+  useGetSignedUrl,
+  useUpdateImageSrc,
+  useUserQuery,
+} from "~/hooks/profileTrpcHooks";
 
 export default function ProfilePicture() {
   const userQuery = useUserQuery();

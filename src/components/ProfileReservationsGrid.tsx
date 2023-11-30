@@ -2,7 +2,7 @@ import { Box, Skeleton } from "@mui/material";
 import { DataGrid, type GridColDef, type GridRowsProp } from "@mui/x-data-grid";
 import { type GridInitialStateCommunity } from "@mui/x-data-grid/models/gridStateCommunity";
 import dayjs from "dayjs";
-import { useMyReservationsQuery } from "./Profile";
+import { useMyReservationsQuery } from "~/hooks/profileTrpcHooks";
 
 export const ProfileReservationsGrid = () => {
   const myReservationsQuery = useMyReservationsQuery();

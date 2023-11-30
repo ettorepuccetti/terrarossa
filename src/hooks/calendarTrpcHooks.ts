@@ -40,9 +40,9 @@ export const reservationQueryInputSchema = z.object({
   customSelectedDate: z.date().optional(),
 });
 
-//------------------------------------
-//----- QUERIES & MUTATION HOOKS -----
-//------------------------------------
+//------------------------------
+//------- QUERIES HOOKS --------
+//------------------------------
 
 export const useClubQuery = (clubId: string | undefined) => {
   return api.club.getByClubId.useQuery(
@@ -83,62 +83,62 @@ export const useReservationQuery = (
   );
 };
 
-export const useReservationAdd = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
+//-------------------------------
+//------- MUTATION HOOKS --------
+//-------------------------------
+
+export const useReservationAdd = () => {
+  const reservationQuery = useMergedStoreContext(
+    (store) => store.reservationQuery,
+  );
   return api.reservationMutation.insertOne.useMutation({
     async onSuccess() {
-      await reservationQuery.refetch();
+      await reservationQuery?.refetch();
     },
     async onError() {
-      await reservationQuery.refetch();
+      await reservationQuery?.refetch();
     },
   });
 };
 
-export const useRecurrentReservationAdd = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
+export const useRecurrentReservationAdd = () => {
+  const reservationQuery = useMergedStoreContext(
+    (store) => store.reservationQuery,
+  );
   return api.reservationMutation.insertRecurrent.useMutation({
     async onSuccess() {
-      await reservationQuery.refetch();
+      await reservationQuery?.refetch();
     },
     async onError() {
-      await reservationQuery.refetch();
+      await reservationQuery?.refetch();
     },
   });
 };
 
-export const useReservationDelete = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
+export const useReservationDelete = () => {
+  const reservationQuery = useMergedStoreContext(
+    (store) => store.reservationQuery,
+  );
   return api.reservationMutation.deleteOne.useMutation({
     async onSuccess() {
-      await reservationQuery.refetch();
+      await reservationQuery?.refetch();
     },
     async onError() {
-      await reservationQuery.refetch();
+      await reservationQuery?.refetch();
     },
   });
 };
 
-export const useRecurrentReservationDelete = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
+export const useRecurrentReservationDelete = () => {
+  const reservationQuery = useMergedStoreContext(
+    (store) => store.reservationQuery,
+  );
   return api.reservationMutation.deleteRecurrent.useMutation({
     async onSuccess() {
-      await reservationQuery.refetch();
+      await reservationQuery?.refetch();
     },
     async onError() {
-      await reservationQuery.refetch();
+      await reservationQuery?.refetch();
     },
   });
 };

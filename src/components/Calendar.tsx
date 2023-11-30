@@ -37,39 +37,39 @@ export default function Calendar() {
   // ------ QUERY & MUTATIONS -------
   // --------------------------------
 
+  // reservationQuery - also used by refresh button
+  const setReservationQuery = useMergedStoreContext(
+    (store) => store.setReservationQuery,
+  );
+  const reservationQuery = useReservationQuery(clubId, selectedDateInCalendar);
+  const reservationQueryInStore = useMergedStoreContext(
+    (store) => store.reservationQuery,
+  );
+
   // reservationAdd - I save here the callback to store the mutation in the store and the mutation itself, to use them in the useEffect
   // I cannot invoke the callback to save the mutation in the store here (during the render)
   const setReservationAdd = useMergedStoreContext(
     (store) => store.setReservationAdd,
   );
-  const reservationAdd = useReservationAdd(clubId, selectedDateInCalendar);
+  const reservationAdd = useReservationAdd();
 
   // recurrentReservationAdd
   const setRecurrentReservationAdd = useMergedStoreContext(
     (store) => store.setRecurrentReservationAdd,
   );
-  const recurrentReservationAdd = useRecurrentReservationAdd(
-    clubId,
-    selectedDateInCalendar,
-  );
+  const recurrentReservationAdd = useRecurrentReservationAdd();
 
   // reservationDelete
   const setReservationDelete = useMergedStoreContext(
     (store) => store.setReservationDelete,
   );
-  const reservationDelete = useReservationDelete(
-    clubId,
-    selectedDateInCalendar,
-  );
+  const reservationDelete = useReservationDelete();
 
   // recurrentReservationDelete
   const setRecurrentReservationDelete = useMergedStoreContext(
     (store) => store.setRecurrentReservationDelete,
   );
-  const recurrentReservationDelete = useRecurrentReservationDelete(
-    clubId,
-    selectedDateInCalendar,
-  );
+  const recurrentReservationDelete = useRecurrentReservationDelete();
 
   // clubQuery
   const setClubData = useMergedStoreContext((store) => store.setClubData);
@@ -77,12 +77,6 @@ export default function Calendar() {
   // data to check for rendering calendar and other sub components,
   // if I call `store.getClubData` when still undefined, I get an exception
   const clubDataInStore = useMergedStoreContext((store) => store.clubData);
-
-  // reservationQuery - also used by refresh button
-  const setReservationQuery = useMergedStoreContext(
-    (store) => store.setReservationQuery,
-  );
-  const reservationQuery = useReservationQuery(clubId, selectedDateInCalendar);
 
   // queries for which I want to pass down their data as props to the calendar,
   // I want to manage them in a way that the subComponent render even if their data are not yet available
@@ -100,6 +94,7 @@ export default function Calendar() {
       //clubId is in local state
       setClubId(router.query.clubId as string);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady]);
 
   // set clubData in the store when data is available
@@ -107,6 +102,7 @@ export default function Calendar() {
     if (clubQuery.data) {
       setClubData(clubQuery.data);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clubQuery.data]);
 
   // set reservationAdd, recurrentReservationAdd, reservationDelete, recurrentReservationDelete in the store on the first render
@@ -122,6 +118,7 @@ export default function Calendar() {
       setClubData(undefined);
       setSelectedDate(dayjs().startOf("day"));
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // -------------------
@@ -143,7 +140,7 @@ export default function Calendar() {
   // different then checking `if (clubQuery.isLoading)` because when finish loading,
   // clubData is not yet available in store , but the sub-component would try to render anyway
   // Should I check also reservationAdd, reservationDelete, recurrentReservationAdd, recurrentReservationDelete?
-  if (!clubDataInStore) {
+  if (!clubDataInStore || !reservationQueryInStore) {
     return <LinearProgress color="primary" />;
   }
 

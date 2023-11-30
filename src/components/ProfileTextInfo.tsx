@@ -1,7 +1,7 @@
 import { TextField } from "@mui/material";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
-import { useUserQuery } from "./Profile";
+import { useUserQuery } from "~/hooks/profileTrpcHooks";
 
 export const ProfileTextInfo = ({ authData }: { authData: Session }) => {
   const userQuery = useUserQuery();
