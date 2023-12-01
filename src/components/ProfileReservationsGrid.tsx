@@ -1,13 +1,15 @@
-import { Box, Skeleton } from "@mui/material";
+import { Box } from "@mui/material";
 import { DataGrid, type GridColDef, type GridRowsProp } from "@mui/x-data-grid";
 import { type GridInitialStateCommunity } from "@mui/x-data-grid/models/gridStateCommunity";
 import dayjs from "dayjs";
-import { useMyReservationsQuery } from "~/hooks/profileTrpcHooks";
+import { type RouterOutputs } from "~/utils/api";
 
-export const ProfileReservationsGrid = () => {
-  const myReservationsQuery = useMyReservationsQuery();
-
-  const rows: GridRowsProp | undefined = myReservationsQuery.data?.map(
+export const ProfileReservationsGrid = ({
+  reservations,
+}: {
+  reservations: RouterOutputs["reservationQuery"]["getMine"];
+}) => {
+  const rows: GridRowsProp | undefined = reservations.map(
     (reservation, index) => {
       return {
         id: index,
@@ -16,6 +18,7 @@ export const ProfileReservationsGrid = () => {
         col3: dayjs(reservation.endTime).format("HH:mm"),
         col4: reservation.court.name,
         col5: reservation.startTime,
+        col6: reservation.court.Club.name,
       };
     },
   );
@@ -51,11 +54,19 @@ export const ProfileReservationsGrid = () => {
       maxWidth: 120,
     },
     {
+      // hidden column to sort by date
       field: "col5",
       headerName: "FullDate",
       sortable: false,
       flex: 1,
       minWidth: 100,
+    },
+    {
+      field: "col6",
+      headerName: "Club",
+      sortable: false,
+      flex: 1,
+      minWidth: 120,
     },
   ];
 
@@ -70,25 +81,10 @@ export const ProfileReservationsGrid = () => {
     },
   };
 
-  if (myReservationsQuery.isError) {
-    return null;
-  }
-
-  if (myReservationsQuery.isLoading) {
-    return (
-      <Skeleton
-        variant="rectangular"
-        width={"100%"}
-        height={400}
-        sx={{ maxWidth: "700px" }}
-      />
-    );
-  }
-
   return (
     <Box width={"100%"} height={500} maxWidth={700}>
       <DataGrid
-        rows={rows ? rows : []}
+        rows={rows ?? []}
         columns={columns}
         autoPageSize={true}
         initialState={initialState}

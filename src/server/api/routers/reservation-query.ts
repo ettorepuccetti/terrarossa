@@ -96,6 +96,11 @@ export const reservationQueryRouter = createTRPCRouter({
         court: {
           select: {
             name: true,
+            Club: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },

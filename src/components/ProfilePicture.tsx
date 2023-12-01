@@ -1,68 +1,77 @@
-import { Avatar, Box } from "@mui/material";
-import { useState } from "react";
-import {
-  useGetSignedUrl,
-  useUpdateImageSrc,
-  useUserQuery,
-} from "~/hooks/profileTrpcHooks";
+import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
+import { Avatar, Box, IconButton, styled } from "@mui/material";
+import { useReducer } from "react";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 
 export default function ProfilePicture() {
-  const userQuery = useUserQuery();
-  const getSignedUrl = useGetSignedUrl();
-  const updateImageSrc = useUpdateImageSrc();
+  const [forceUpdateCounter, forceUpdate] = useReducer((x: number) => x + 1, 0);
+  const userData = useMergedStoreContext((store) => store.getUserData());
+  const getSignedUrl = useMergedStoreContext((store) =>
+    store.getGetSignedUrl(),
+  );
+  const updateImageSrc = useMergedStoreContext((store) =>
+    store.getUpdateImageSrc(),
+  );
 
-  const [file, setFile] = useState<File>();
-
-  async function handleUpload() {
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file: File | undefined = e.target.files?.[0];
     if (!file) {
       return;
     }
     const formData = new FormData();
     formData.append("image", file);
-    const { url: presignedUrl } = await getSignedUrl.mutateAsync();
+
+    // get presigned url from server
+    const presignedUrl = await getSignedUrl.mutateAsync();
+
+    // upload image to cloudflare R2
     await fetch(presignedUrl, {
       method: "PUT",
       body: formData.get("image"),
     });
+
+    // update user info in db
     await updateImageSrc.mutateAsync();
-    userQuery.remove();
-    await userQuery.refetch();
-  }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFile(file);
-    }
-  }
-
-  if (userQuery.isLoading || userQuery.isRefetching) {
-    return "loading...";
-  }
-
-  if (userQuery.isError) {
-    return "error";
+    // force update to refresh avatar
+    forceUpdate();
   }
 
   return (
     <>
-      <Avatar
-        src={userQuery.data.image ?? undefined}
-        sx={{ width: 70, height: 70 }}
-      />
-      <Box display={"flex"} alignItems={"center"}>
-        <input
-          type="file"
-          accept="image/*"
-          id="file-upload"
-          name="file-upload"
-          className="sr-only"
-          onChange={handleFileChange}
+      <Box position={"relative"}>
+        <Avatar
+          src={userData.image ?? undefined}
+          sx={{ width: 120, height: 120 }}
+          key={forceUpdateCounter}
         />
-        <button onClick={() => void handleUpload()} disabled={!file}>
-          Upload Image
-        </button>
+        <IconButton
+          component="label"
+          sx={{ position: "absolute", bottom: -15, right: -20 }}
+        >
+          <AddAPhotoIcon />
+          <VisuallyHiddenInput
+            type="file"
+            accept="image/*"
+            id="file-upload"
+            name="file-upload"
+            className="sr-only"
+            onChange={(e) => void handleUpload(e)}
+          />{" "}
+        </IconButton>
       </Box>
     </>
   );
 }
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});

@@ -22,6 +22,7 @@ export default function ErrorAlert({
     if (error) {
       logger.error({ error: error.message }, "Error shown in ErrorAlert");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
 
   return (

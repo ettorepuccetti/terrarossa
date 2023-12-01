@@ -22,7 +22,15 @@ export const useUpdateImageSrc = () => {
   const userQuery = useUserQuery();
   return api.user.updateImageSrc.useMutation({
     async onSuccess() {
-      userQuery.remove();
+      await userQuery.refetch();
+    },
+  });
+};
+
+export const useUpdateUsername = () => {
+  const userQuery = useUserQuery();
+  return api.user.updateUsername.useMutation({
+    async onSuccess() {
       await userQuery.refetch();
     },
   });

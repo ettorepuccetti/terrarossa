@@ -29,6 +29,8 @@ export default function Calendar() {
   const selectedDateInCalendar = useMergedStoreContext(
     (store) => store.selectedDate,
   );
+
+  // used during unmount to reset the selectedDate in the store
   const setSelectedDate = useMergedStoreContext(
     (store) => store.setSelectedDate,
   );
@@ -36,15 +38,6 @@ export default function Calendar() {
   // --------------------------------
   // ------ QUERY & MUTATIONS -------
   // --------------------------------
-
-  // reservationQuery - also used by refresh button
-  const setReservationQuery = useMergedStoreContext(
-    (store) => store.setReservationQuery,
-  );
-  const reservationQuery = useReservationQuery(clubId, selectedDateInCalendar);
-  const reservationQueryInStore = useMergedStoreContext(
-    (store) => store.reservationQuery,
-  );
 
   // reservationAdd - I save here the callback to store the mutation in the store and the mutation itself, to use them in the useEffect
   // I cannot invoke the callback to save the mutation in the store here (during the render)
@@ -70,6 +63,12 @@ export default function Calendar() {
     (store) => store.setRecurrentReservationDelete,
   );
   const recurrentReservationDelete = useRecurrentReservationDelete();
+
+  // reservationQuery - also used by refresh button
+  const setReservationQuery = useMergedStoreContext(
+    (store) => store.setReservationQuery,
+  );
+  const reservationQuery = useReservationQuery(clubId, selectedDateInCalendar);
 
   // clubQuery
   const setClubData = useMergedStoreContext((store) => store.setClubData);
@@ -140,50 +139,53 @@ export default function Calendar() {
   // different then checking `if (clubQuery.isLoading)` because when finish loading,
   // clubData is not yet available in store , but the sub-component would try to render anyway
   // Should I check also reservationAdd, reservationDelete, recurrentReservationAdd, recurrentReservationDelete?
-  if (!clubDataInStore || !reservationQueryInStore) {
+  if (!clubDataInStore) {
     return <LinearProgress color="primary" />;
   }
 
   return (
-    <Container maxWidth={"lg"} sx={{ padding: 0 }}>
-      <ErrorAlert
-        error={
-          courtQuery.error ||
-          reservationQuery.error ||
-          reservationAdd.error ||
-          recurrentReservationAdd.error ||
-          reservationDelete.error ||
-          recurrentReservationDelete.error
-        }
-        onClose={() => {
-          courtQuery.error && void courtQuery.refetch();
-          reservationQuery.error && void reservationQuery.refetch();
-          reservationAdd.error && void reservationAdd.reset();
-          recurrentReservationAdd.error && void recurrentReservationAdd.reset();
-          reservationDelete.error && void reservationDelete.reset();
-          recurrentReservationDelete.error &&
-            void recurrentReservationDelete.reset();
-        }}
-      />
-
-      <CalendarHeader />
-      <SpinnerPartial
-        open={
-          reservationQuery.isLoading ||
-          reservationQuery.isRefetching ||
-          reservationAdd.isLoading ||
-          reservationDelete.isLoading ||
-          recurrentReservationAdd.isLoading ||
-          recurrentReservationDelete.isLoading
-        }
-      >
-        <FullCalendarWrapper
-          courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
-          reservationData={reservationQuery.data ?? []} //same as above
+    <>
+      <Container maxWidth={"lg"} sx={{ padding: 0 }}>
+        <ErrorAlert
+          error={
+            courtQuery.error ||
+            reservationQuery.error ||
+            reservationAdd.error ||
+            recurrentReservationAdd.error ||
+            reservationDelete.error ||
+            recurrentReservationDelete.error
+          }
+          onClose={() => {
+            courtQuery.error && void courtQuery.refetch();
+            reservationQuery.error && void reservationQuery.refetch();
+            reservationAdd.error && void reservationAdd.reset();
+            recurrentReservationAdd.error &&
+              void recurrentReservationAdd.reset();
+            reservationDelete.error && void reservationDelete.reset();
+            recurrentReservationDelete.error &&
+              void recurrentReservationDelete.reset();
+          }}
         />
-      </SpinnerPartial>
+
+        <CalendarHeader />
+        <SpinnerPartial
+          open={
+            reservationQuery.isLoading ||
+            reservationQuery.isRefetching ||
+            reservationAdd.isLoading ||
+            reservationDelete.isLoading ||
+            recurrentReservationAdd.isLoading ||
+            recurrentReservationDelete.isLoading
+          }
+        >
+          <FullCalendarWrapper
+            courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
+            reservationData={reservationQuery.data ?? []} //same as above
+          />
+        </SpinnerPartial>
+      </Container>
       <ReserveDialog />
       <EventDetailDialog />
-    </Container>
+    </>
   );
 }

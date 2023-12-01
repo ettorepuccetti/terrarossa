@@ -1,46 +1,118 @@
-import { TextField } from "@mui/material";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  IconButton,
+  TextField,
+} from "@mui/material";
 import dayjs from "dayjs";
-import { type Session } from "next-auth";
-import { useUserQuery } from "~/hooks/profileTrpcHooks";
+import { useState } from "react";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import DialogLayout from "./DialogLayout";
 
-export const ProfileTextInfo = ({ authData }: { authData: Session }) => {
-  const userQuery = useUserQuery();
-
-  if (userQuery.isLoading) {
-    return null;
-  }
-
-  if (userQuery.isError) {
-    return null;
-  }
+export const ProfileTextInfo = () => {
+  const userData = useMergedStoreContext((store) => store.getUserData());
+  const updateUsername = useMergedStoreContext((store) =>
+    store.getUpdateUsername(),
+  );
+  const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
 
   return (
     <>
-      <TextField
-        variant="standard"
-        label="nome utente"
-        defaultValue={authData?.user.name}
-        inputProps={{ readOnly: true }}
-        sx={{ maxWidth: 300 }}
-        fullWidth
-      />
-      <TextField
-        variant="standard"
-        label="mail"
-        defaultValue={authData?.user.email}
-        inputProps={{ readOnly: true }}
-        sx={{ maxWidth: 300 }}
-        fullWidth
-      />
+      <Box
+        display={"flex"}
+        flexDirection={"column"}
+        alignItems={"center"}
+        gap={"inherit"}
+        width={"100%"}
+      >
+        <Box
+          display={"flex"}
+          width={"100%"}
+          maxWidth={"300px"}
+          alignItems={"center"}
+        >
+          <TextField
+            variant="standard"
+            label="nome utente"
+            value={userData.name}
+            sx={{ maxWidth: 300 }}
+            fullWidth
+            inputProps={{ readOnly: true }}
+          />
+          <IconButton onClick={() => setOpenEditDialog(!openEditDialog)}>
+            <EditOutlinedIcon />
+          </IconButton>
+        </Box>
+        <TextField
+          variant="standard"
+          label="mail"
+          defaultValue={userData.email}
+          disabled
+          inputProps={{ readOnly: true }}
+          sx={{ maxWidth: 300 }}
+          fullWidth
+        />
 
-      <TextField
-        variant="standard"
-        label="iscritto dal"
-        defaultValue={dayjs(userQuery.data.createdAt).format("DD/MM/YYYY")}
-        inputProps={{ readOnly: true }}
-        sx={{ maxWidth: 300 }}
-        fullWidth
+        <TextField
+          variant="standard"
+          label="iscritto dal"
+          defaultValue={dayjs(userData.createdAt).format("DD/MM/YYYY")}
+          inputProps={{ readOnly: true }}
+          sx={{ maxWidth: 300 }}
+          fullWidth
+          disabled
+        />
+      </Box>
+      <EditUsernameDialog
+        open={openEditDialog}
+        oldUsername={userData.name ?? ""}
+        onClose={() => setOpenEditDialog(false)}
+        onSubmit={(newUsername) =>
+          void updateUsername.mutateAsync({ newUsername })
+        }
       />
+    </>
+  );
+};
+
+const EditUsernameDialog = ({
+  open,
+  oldUsername,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean;
+  oldUsername: string;
+  onClose: () => void;
+  onSubmit: (newUsername: string) => void;
+}) => {
+  const [newUsername, setNewUsername] = useState<string>(oldUsername);
+  return (
+    <>
+      <Dialog open={open} onClose={onClose}>
+        <DialogLayout title="Modifica nome utente">
+          <TextField
+            variant="outlined"
+            label="nome utente"
+            sx={{ marginTop: "10px" }}
+            onChange={(e) => setNewUsername(e.target.value)}
+            value={newUsername}
+          />
+          <DialogActions>
+            <Button
+              onClick={() => {
+                onSubmit(newUsername);
+                onClose();
+              }}
+            >
+              ok
+            </Button>
+          </DialogActions>
+        </DialogLayout>
+      </Dialog>
     </>
   );
 };

@@ -1,5 +1,6 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { loggerInternal } from "~/utils/logger";
 import { r2 } from "~/utils/r2";
@@ -46,7 +47,7 @@ export const userRouter = createTRPCRouter({
       { userId: ctx.session?.user.id, signedUrl: signedUrl },
       "Generate signed url for upload image",
     );
-    return { url: signedUrl };
+    return signedUrl;
   }),
 
   updateImageSrc: protectedProcedure.mutation(async ({ ctx }) => {
@@ -67,4 +68,24 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
+
+  updateUsername: protectedProcedure
+    .input(z.object({ newUsername: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const logger = loggerInternal.child({
+        apiEndPoint: "userRouter.updateUsername",
+      });
+      logger.info(
+        { userId: ctx.session?.user.id, newUsername: input.newUsername },
+        "Update username",
+      );
+      await ctx.prisma.user.update({
+        where: {
+          id: ctx.session.user.id,
+        },
+        data: {
+          name: input.newUsername,
+        },
+      });
+    }),
 });

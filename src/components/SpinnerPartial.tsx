@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import React from "react";
@@ -10,7 +11,7 @@ const SpinnerPartial = ({
   children: React.ReactNode;
 }) => {
   return (
-    <div style={{ position: "relative" }}>
+    <Box position={"relative"} maxWidth={"100%"}>
       <Backdrop
         sx={{
           color: "#FFFFFF",
@@ -22,7 +23,7 @@ const SpinnerPartial = ({
         <CircularProgress color="inherit" data-test="spinner" />
       </Backdrop>
       {children}
-    </div>
+    </Box>
   );
 };
 
