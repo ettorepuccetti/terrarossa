@@ -13,7 +13,7 @@ export default function RefetchReservationButton() {
     <IconButton
       data-test="refetch-button"
       onClick={() => {
-        logger.info(null, "Refetching reservation manually");
+        logger.info({}, "Refetching reservation manually");
         void reservationQuery.refetch();
       }}
     >

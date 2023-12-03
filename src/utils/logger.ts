@@ -39,10 +39,10 @@ export const useLogger = (context: { [key: string]: string | undefined }) => {
   if (env.NEXT_PUBLIC_APP_ENV === "test") {
     // return a void logger
     return {
-      debug: () => {},
-      info: () => {},
-      error: () => {},
-      warn: () => {},
+      debug: console.debug,
+      info: console.log,
+      error: console.error,
+      warn: console.warn,
     };
   } else {
     return loggerInternal.child({ ...context, userId: session?.user.id });

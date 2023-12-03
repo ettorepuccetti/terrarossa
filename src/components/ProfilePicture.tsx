@@ -2,8 +2,10 @@ import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import { Avatar, Box, IconButton, styled } from "@mui/material";
 import { useReducer } from "react";
 import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useLogger } from "~/utils/logger";
 
 export default function ProfilePicture() {
+  const logger = useLogger({ component: "ProfilePicture" });
   const [forceUpdateCounter, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const userData = useMergedStoreContext((store) => store.getUserData());
   const getSignedUrl = useMergedStoreContext((store) =>
@@ -18,6 +20,10 @@ export default function ProfilePicture() {
     if (!file) {
       return;
     }
+    logger.info(
+      { fileName: file.name, fileSize: file.size, fileType: file.type },
+      "uploading image",
+    );
     const formData = new FormData();
     formData.append("image", file);
 
