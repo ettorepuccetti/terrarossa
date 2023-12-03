@@ -22,7 +22,7 @@ export default function ProfilePicture() {
     }
     logger.info(
       { fileName: file.name, fileSize: file.size, fileType: file.type },
-      "uploading image",
+      "uploading file",
     );
     const formData = new FormData();
     formData.append("image", file);
@@ -31,10 +31,15 @@ export default function ProfilePicture() {
     const presignedUrl = await getSignedUrl.mutateAsync();
 
     // upload image to cloudflare R2
-    await fetch(presignedUrl, {
+    const result = await fetch(presignedUrl, {
       method: "PUT",
       body: formData.get("image"),
     });
+
+    if (!result.ok) {
+      logger.error({ result }, "failed to upload image");
+      return;
+    }
 
     // update user info in db
     await updateImageSrc.mutateAsync();
