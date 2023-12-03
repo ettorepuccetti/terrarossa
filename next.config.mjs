@@ -30,6 +30,12 @@ const config = {
         port: "",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "r2.terrarossa.app",
+        port: "",
+        pathname: "**",
+      },
     ],
   },
 };

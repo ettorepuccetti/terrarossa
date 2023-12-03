@@ -7,7 +7,7 @@ import {
   RecurrentReservationInputSchema,
   ReservationDeleteInputSchema,
   ReservationInputSchema,
-} from "~/components/Calendar";
+} from "~/hooks/calendarTrpcHooks";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { UserRoles } from "~/utils/constants";
 import { loggerInternal } from "~/utils/logger";

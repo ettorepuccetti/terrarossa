@@ -1,11 +1,11 @@
 import RefreshOutlined from "@mui/icons-material/RefreshOutlined";
 import { IconButton } from "@mui/material";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
 
 export default function RefetchReservationButton() {
   const logger = useLogger({ component: "RefetchReservationButton" });
-  const reservationQuery = useCalendarStoreContext(
+  const reservationQuery = useMergedStoreContext(
     (store) => store.getReservationQuery,
   )();
 
@@ -13,7 +13,7 @@ export default function RefetchReservationButton() {
     <IconButton
       data-test="refetch-button"
       onClick={() => {
-        logger.info(null, "Refetching reservation manually");
+        logger.info({}, "Refetching reservation manually");
         void reservationQuery.refetch();
       }}
     >

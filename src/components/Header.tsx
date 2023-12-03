@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Image from "next/image";
 import React from "react";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { appNameInHeader, defaultLogoSrc } from "~/utils/constants";
 import Drawer from "./DrawerWrapper";
 
@@ -22,7 +22,7 @@ export default function Header() {
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const theme = useTheme();
 
-  const clubData = useCalendarStoreContext((store) => store.clubData); //mind that is using .clubData and not .getClubData(), so it can be undefined
+  const clubData = useMergedStoreContext((store) => store.clubData); //mind that is using .clubData and not .getClubData(), so it can be undefined
   const headerName = clubData?.name;
   const logoSrc = clubData?.logoSrc;
   return (

@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import CalendarHeader from "~/components/CalendarHeader";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { type RouterOutputs } from "~/utils/api";
 import { capitaliseFirstChar as capitalizeFirstChar } from "~/utils/utils";
 import {
@@ -16,7 +16,7 @@ dayjs.locale("it");
 
 function CalendarHeaderContext(props: { session: Session; clubId: string }) {
   // set club data
-  useCalendarStoreContext((store) => store.setClubData)({
+  useMergedStoreContext((store) => store.setClubData)({
     ...club,
     id: props.clubId,
     clubSettings: {
@@ -27,7 +27,7 @@ function CalendarHeaderContext(props: { session: Session; clubId: string }) {
   // set reservation query
   const reservationData: RouterOutputs["reservationQuery"]["getAllVisibleInCalendarByClubId"] =
     [];
-  useCalendarStoreContext((store) => store.setReservationQuery)(
+  useMergedStoreContext((store) => store.setReservationQuery)(
     buildTrpcQueryMock(reservationData),
   );
   return <CalendarHeader />;

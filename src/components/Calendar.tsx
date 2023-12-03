@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
-import { z } from "zod";
 import ReserveDialog from "~/components/ReserveDialog";
 
 import { Container, LinearProgress } from "@mui/material";
-import dayjs, { type Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { useRouter } from "next/router";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
-import { api } from "~/utils/api";
+import {
+  useClubQuery,
+  useCourtQuery,
+  useRecurrentReservationAdd,
+  useRecurrentReservationDelete,
+  useReservationAdd,
+  useReservationDelete,
+  useReservationQuery,
+} from "~/hooks/calendarTrpcHooks";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
 import CalendarHeader from "./CalendarHeader";
 import ErrorAlert from "./ErrorAlert";
@@ -14,155 +21,17 @@ import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
 import SpinnerPartial from "./SpinnerPartial";
 
-//--------------------------------
-//-------- INPUT SCHEMAS ---------
-//--------------------------------
-export const ReservationInputSchema = z.object({
-  startDateTime: z.date(),
-  endDateTime: z.date(),
-  courtId: z.string(),
-  overwriteName: z.string().optional(),
-  clubId: z.string(),
-});
-
-export const RecurrentReservationInputSchema = z
-  .object({
-    recurrentStartDate: z.date(),
-    recurrentEndDate: z.date(),
-  })
-  .and(ReservationInputSchema);
-
-export const ReservationDeleteInputSchema = z.object({
-  reservationId: z.string(),
-  clubId: z.string(),
-});
-
-export const RecurrentReservationDeleteInputSchema = z.object({
-  recurrentReservationId: z.string(),
-  clubId: z.string(),
-});
-
-export const ClubIdInputSchema = z.object({
-  clubId: z.union([z.string(), z.string().array(), z.undefined()]), //router param can also be undefined or array of strings
-});
-
-export const reservationQueryInputSchema = z.object({
-  clubId: z.string().optional(), //router param can also be undefined or array of strings
-  customSelectedDate: z.date().optional(),
-});
-
-//------------------------------------
-//----- QUERIES & MUTATION HOOKS -----
-//------------------------------------
-
-export const useClubQuery = (clubId: string | undefined) => {
-  return api.club.getByClubId.useQuery(
-    { clubId: clubId },
-    {
-      refetchOnWindowFocus: false,
-      enabled: clubId !== undefined,
-      staleTime: Infinity,
-    },
-  );
-};
-
-export const useCourtQuery = (clubId: string | undefined) =>
-  api.court.getAllByClubId.useQuery(
-    { clubId: clubId },
-    {
-      refetchOnWindowFocus: false,
-      enabled: clubId !== undefined,
-      staleTime: Infinity,
-    },
-  );
-
-export const useReservationQuery = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const customSelectedDate = useCalendarStoreContext(
-    (store) => store.customDateSelected,
-  );
-  return api.reservationQuery.getAllVisibleInCalendarByClubId.useQuery(
-    {
-      clubId: clubId,
-      customSelectedDate: customSelectedDate
-        ? selectedDate.toDate()
-        : undefined,
-    },
-    { refetchOnWindowFocus: false, enabled: clubId !== undefined },
-  );
-};
-
-export const useReservationAdd = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
-  return api.reservationMutation.insertOne.useMutation({
-    async onSuccess() {
-      await reservationQuery.refetch();
-    },
-    async onError() {
-      await reservationQuery.refetch();
-    },
-  });
-};
-
-export const useRecurrentReservationAdd = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
-  return api.reservationMutation.insertRecurrent.useMutation({
-    async onSuccess() {
-      await reservationQuery.refetch();
-    },
-    async onError() {
-      await reservationQuery.refetch();
-    },
-  });
-};
-
-export const useReservationDelete = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
-  return api.reservationMutation.deleteOne.useMutation({
-    async onSuccess() {
-      await reservationQuery.refetch();
-    },
-    async onError() {
-      await reservationQuery.refetch();
-    },
-  });
-};
-
-export const useRecurrentReservationDelete = (
-  clubId: string | undefined,
-  selectedDate: Dayjs,
-) => {
-  const reservationQuery = useReservationQuery(clubId, selectedDate);
-  return api.reservationMutation.deleteRecurrent.useMutation({
-    async onSuccess() {
-      await reservationQuery.refetch();
-    },
-    async onError() {
-      await reservationQuery.refetch();
-    },
-  });
-};
-
 export default function Calendar() {
   const logger = useLogger({
     component: "Calendar",
   });
   const [clubId, setClubId] = useState<string | undefined>(undefined);
-  const selectedDateInCalendar = useCalendarStoreContext(
+  const selectedDateInCalendar = useMergedStoreContext(
     (store) => store.selectedDate,
   );
-  const setSelectedDate = useCalendarStoreContext(
+
+  // used during unmount to reset the selectedDate in the store
+  const setSelectedDate = useMergedStoreContext(
     (store) => store.setSelectedDate,
   );
 
@@ -170,51 +39,43 @@ export default function Calendar() {
   // ------ QUERY & MUTATIONS -------
   // --------------------------------
 
-  // reservationAdd
-  const setReservationAdd = useCalendarStoreContext(
+  // reservationAdd - I save here the callback to store the mutation in the store and the mutation itself, to use them in the useEffect
+  // I cannot invoke the callback to save the mutation in the store here (during the render)
+  const setReservationAdd = useMergedStoreContext(
     (store) => store.setReservationAdd,
   );
-  const reservationAdd = useReservationAdd(clubId, selectedDateInCalendar);
+  const reservationAdd = useReservationAdd();
 
   // recurrentReservationAdd
-  const setRecurrentReservationAdd = useCalendarStoreContext(
+  const setRecurrentReservationAdd = useMergedStoreContext(
     (store) => store.setRecurrentReservationAdd,
   );
-  const recurrentReservationAdd = useRecurrentReservationAdd(
-    clubId,
-    selectedDateInCalendar,
-  );
+  const recurrentReservationAdd = useRecurrentReservationAdd();
 
   // reservationDelete
-  const setReservationDelete = useCalendarStoreContext(
+  const setReservationDelete = useMergedStoreContext(
     (store) => store.setReservationDelete,
   );
-  const reservationDelete = useReservationDelete(
-    clubId,
-    selectedDateInCalendar,
-  );
+  const reservationDelete = useReservationDelete();
 
   // recurrentReservationDelete
-  const setRecurrentReservationDelete = useCalendarStoreContext(
+  const setRecurrentReservationDelete = useMergedStoreContext(
     (store) => store.setRecurrentReservationDelete,
   );
-  const recurrentReservationDelete = useRecurrentReservationDelete(
-    clubId,
-    selectedDateInCalendar,
-  );
-
-  // clubQuery
-  const setClubData = useCalendarStoreContext((store) => store.setClubData);
-  const clubQuery = useClubQuery(clubId);
-  // data to check for rendering calendar and other sub components,
-  // if I call `store.getClubData` when still undefined, I get an exception
-  const clubDataInStore = useCalendarStoreContext((store) => store.clubData);
+  const recurrentReservationDelete = useRecurrentReservationDelete();
 
   // reservationQuery - also used by refresh button
-  const setReservationQuery = useCalendarStoreContext(
+  const setReservationQuery = useMergedStoreContext(
     (store) => store.setReservationQuery,
   );
   const reservationQuery = useReservationQuery(clubId, selectedDateInCalendar);
+
+  // clubQuery
+  const setClubData = useMergedStoreContext((store) => store.setClubData);
+  const clubQuery = useClubQuery(clubId);
+  // data to check for rendering calendar and other sub components,
+  // if I call `store.getClubData` when still undefined, I get an exception
+  const clubDataInStore = useMergedStoreContext((store) => store.clubData);
 
   // queries for which I want to pass down their data as props to the calendar,
   // I want to manage them in a way that the subComponent render even if their data are not yet available
@@ -232,6 +93,7 @@ export default function Calendar() {
       //clubId is in local state
       setClubId(router.query.clubId as string);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady]);
 
   // set clubData in the store when data is available
@@ -239,6 +101,7 @@ export default function Calendar() {
     if (clubQuery.data) {
       setClubData(clubQuery.data);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clubQuery.data]);
 
   // set reservationAdd, recurrentReservationAdd, reservationDelete, recurrentReservationDelete in the store on the first render
@@ -254,6 +117,7 @@ export default function Calendar() {
       setClubData(undefined);
       setSelectedDate(dayjs().startOf("day"));
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // -------------------
@@ -280,45 +144,48 @@ export default function Calendar() {
   }
 
   return (
-    <Container maxWidth={"lg"} sx={{ padding: 0 }}>
-      <ErrorAlert
-        error={
-          courtQuery.error ||
-          reservationQuery.error ||
-          reservationAdd.error ||
-          recurrentReservationAdd.error ||
-          reservationDelete.error ||
-          recurrentReservationDelete.error
-        }
-        onClose={() => {
-          courtQuery.error && void courtQuery.refetch();
-          reservationQuery.error && void reservationQuery.refetch();
-          reservationAdd.error && void reservationAdd.reset();
-          recurrentReservationAdd.error && void recurrentReservationAdd.reset();
-          reservationDelete.error && void reservationDelete.reset();
-          recurrentReservationDelete.error &&
-            void recurrentReservationDelete.reset();
-        }}
-      />
-
-      <CalendarHeader />
-      <SpinnerPartial
-        open={
-          reservationQuery.isLoading ||
-          reservationQuery.isRefetching ||
-          reservationAdd.isLoading ||
-          reservationDelete.isLoading ||
-          recurrentReservationAdd.isLoading ||
-          recurrentReservationDelete.isLoading
-        }
-      >
-        <FullCalendarWrapper
-          courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
-          reservationData={reservationQuery.data ?? []} //same as above
+    <>
+      <Container maxWidth={"lg"} sx={{ padding: 0 }}>
+        <ErrorAlert
+          error={
+            courtQuery.error ||
+            reservationQuery.error ||
+            reservationAdd.error ||
+            recurrentReservationAdd.error ||
+            reservationDelete.error ||
+            recurrentReservationDelete.error
+          }
+          onClose={() => {
+            courtQuery.error && void courtQuery.refetch();
+            reservationQuery.error && void reservationQuery.refetch();
+            reservationAdd.error && void reservationAdd.reset();
+            recurrentReservationAdd.error &&
+              void recurrentReservationAdd.reset();
+            reservationDelete.error && void reservationDelete.reset();
+            recurrentReservationDelete.error &&
+              void recurrentReservationDelete.reset();
+          }}
         />
-      </SpinnerPartial>
+
+        <CalendarHeader />
+        <SpinnerPartial
+          open={
+            reservationQuery.isLoading ||
+            reservationQuery.isRefetching ||
+            reservationAdd.isLoading ||
+            reservationDelete.isLoading ||
+            recurrentReservationAdd.isLoading ||
+            recurrentReservationDelete.isLoading
+          }
+        >
+          <FullCalendarWrapper
+            courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
+            reservationData={reservationQuery.data ?? []} //same as above
+          />
+        </SpinnerPartial>
+      </Container>
       <ReserveDialog />
       <EventDetailDialog />
-    </Container>
+    </>
   );
 }

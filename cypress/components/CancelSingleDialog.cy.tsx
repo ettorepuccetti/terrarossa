@@ -1,5 +1,5 @@
 import CancelSingleDialog from "~/components/CancelSingleDialog";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import {
   buildTrpcMutationMock,
   club,
@@ -11,22 +11,19 @@ import {
 
 function CancelSingleDialogContext() {
   // set club data
-  useCalendarStoreContext((store) => store.setClubData)({
+  useMergedStoreContext((store) => store.setClubData)({
     clubSettings: clubSettings,
     ...club,
   });
 
   // set mutations mocks
   const deleteOne = cy.stub().as("deleteOne");
-  useCalendarStoreContext((store) => store.setReservationDelete)(
-    buildTrpcMutationMock(deleteOne, {
-      reservationId: "my_id",
-      clubId: "my_club_id",
-    }),
+  useMergedStoreContext((store) => store.setReservationDelete)(
+    buildTrpcMutationMock(deleteOne),
   );
 
-  useCalendarStoreContext((store) => store.setDeleteConfirmationOpen)(true);
-  useCalendarStoreContext((store) => store.setEventDetails)(eventDetailsSingle);
+  useMergedStoreContext((store) => store.setDeleteConfirmationOpen)(true);
+  useMergedStoreContext((store) => store.setEventDetails)(eventDetailsSingle);
   return <CancelSingleDialog />;
 }
 

@@ -4,16 +4,16 @@ import { StaticDatePicker } from "@mui/x-date-pickers";
 import { type Dayjs } from "dayjs";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
 import { dateIsInTimeRange, isAdminOfTheClub } from "~/utils/utils";
 import DayCardLayout from "./DayCardLayout";
 
 export default function DayCardFreePicker() {
   const { data: sessionData } = useSession();
-  const clubData = useCalendarStoreContext((store) => store.getClubData());
+  const clubData = useMergedStoreContext((store) => store.getClubData());
   const isAdmin = isAdminOfTheClub(sessionData, clubData.id);
-  const customDateSelected = useCalendarStoreContext(
+  const customDateSelected = useMergedStoreContext(
     (store) => store.customDateSelected,
   );
   const [showDialog, setShowDialog] = useState(false);
@@ -59,12 +59,12 @@ function DayCardFreePickerDialog({
   const logger = useLogger({
     component: "DayCardFreePickerDialog",
   });
-  const clubData = useCalendarStoreContext((store) => store.getClubData());
-  const calendarRef = useCalendarStoreContext((store) => store.calendarRef);
-  const setSelectedDate = useCalendarStoreContext(
+  const clubData = useMergedStoreContext((store) => store.getClubData());
+  const calendarRef = useMergedStoreContext((store) => store.calendarRef);
+  const setSelectedDate = useMergedStoreContext(
     (store) => store.setSelectedDate,
   );
-  const setCustomSelectedDate = useCalendarStoreContext(
+  const setCustomSelectedDate = useMergedStoreContext(
     (store) => store.setCustomDateSelected,
   );
 

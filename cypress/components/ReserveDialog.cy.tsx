@@ -4,7 +4,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
 import ReserveDialog from "~/components/ReserveDialog";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import {
   buildTrpcMutationMock,
   club,
@@ -22,7 +22,7 @@ function ReserveDialogWrapper(props: {
   clubSettings?: ClubSettings;
 }) {
   // set clubData
-  useCalendarStoreContext((store) => store.setClubData)({
+  useMergedStoreContext((store) => store.setClubData)({
     ...club,
     id: props.clubId ?? club.id,
     clubSettings: props.clubSettings ?? clubSettings,
@@ -31,23 +31,11 @@ function ReserveDialogWrapper(props: {
   // set mutations mocks: reservationDelete, recurrentReservationDelete
   const addSingle = cy.stub().as("addSingle");
   const addRecurrent = cy.stub().as("addRecurrent");
-  useCalendarStoreContext((store) => store.setReservationAdd)(
-    buildTrpcMutationMock(addSingle, {
-      clubId: club.id,
-      courtId: courts[0]!.id,
-      startDateTime: props.startDate,
-      endDateTime: dayjs(props.startDate).add(1, "hour").toDate(),
-    }),
+  useMergedStoreContext((store) => store.setReservationAdd)(
+    buildTrpcMutationMock(addSingle),
   );
-  useCalendarStoreContext((store) => store.setRecurrentReservationAdd)(
-    buildTrpcMutationMock(addRecurrent, {
-      clubId: club.id,
-      courtId: courts[0]!.id,
-      startDateTime: props.startDate,
-      endDateTime: dayjs(props.startDate).add(1, "hour").toDate(),
-      recurrentStartDate: dayjs(props.startDate).startOf("day").toDate(),
-      recurrentEndDate: dayjs(props.startDate).add(1, "week").toDate(),
-    }),
+  useMergedStoreContext((store) => store.setRecurrentReservationAdd)(
+    buildTrpcMutationMock(addRecurrent),
   );
 
   // set dateClick
@@ -58,7 +46,7 @@ function ReserveDialogWrapper(props: {
       title: courts[0]!.name,
     },
   } as DateClickArg;
-  useCalendarStoreContext((store) => store.setDateClick)(dateClick);
+  useMergedStoreContext((store) => store.setDateClick)(dateClick);
 
   return <ReserveDialog />;
 }
@@ -426,13 +414,7 @@ describe("USER", () => {
         const dayOfTheWeek = dayjs().day();
         cy.get("[data-test=recurrent-end-date]")
           .should("be.visible")
-          .type(
-            dayjs()
-              .add(1, "year")
-              .month(0)
-              .day(dayOfTheWeek)
-              .format("DD/MM/YYYY"),
-          );
+          .type(dayjs().add(1, "year").day(dayOfTheWeek).format("DD/MM/YYYY"));
         cy.get("[data-test=reserveButton]").should("be.disabled");
         cy.get("[data-test=recurrent-end-date]").should(
           "have.attr",

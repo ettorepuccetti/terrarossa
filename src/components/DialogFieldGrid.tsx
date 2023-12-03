@@ -26,9 +26,9 @@ export default function DialogFieldGrid({
         ))}
       </Grid>
       <Grid xs={8} display={"flex"} flexDirection={"column"} gap={gap}>
-        {labelValues.map((labelValue) => (
+        {labelValues.map((labelValue, index) => (
           <Typography
-            key={labelValue.value}
+            key={index}
             color={"InfoText"}
             data-test={labelValue.dataTest}
           >

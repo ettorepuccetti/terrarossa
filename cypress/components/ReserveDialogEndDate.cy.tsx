@@ -2,12 +2,12 @@ import { type DateClickArg } from "@fullcalendar/interaction";
 import { type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
 import ReserveDialogEndDate from "~/components/ReserveDialogEndDate";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { club, clubSettings, mountWithContexts, session } from "./_constants";
 
 function ReserveDialogEndDateContext() {
   //setting clubData
-  useCalendarStoreContext((state) => state.setClubData)({
+  useMergedStoreContext((state) => state.setClubData)({
     clubSettings: clubSettings,
     ...club,
   });
@@ -15,8 +15,8 @@ function ReserveDialogEndDateContext() {
   //setting stubs
   const setDateStub = cy.stub().as("setDateStub");
   const setErrorStub = cy.stub().as("setErrorStub");
-  useCalendarStoreContext((store) => store.setSetEndDate)(setDateStub);
-  useCalendarStoreContext((store) => store.setSetEndDateError)(setErrorStub);
+  useMergedStoreContext((store) => store.setSetEndDate)(setDateStub);
+  useMergedStoreContext((store) => store.setSetEndDateError)(setErrorStub);
 
   //setting dateClick
   const startDate = dayjs()
@@ -32,7 +32,7 @@ function ReserveDialogEndDateContext() {
       title: "Campo 1",
     },
   } as DateClickArg;
-  useCalendarStoreContext((store) => store.setDateClick)(dateClick);
+  useMergedStoreContext((store) => store.setDateClick)(dateClick);
 
   return (
     <ReserveDialogEndDate

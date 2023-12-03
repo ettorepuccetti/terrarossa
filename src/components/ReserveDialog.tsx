@@ -4,13 +4,14 @@ import utc from "dayjs/plugin/utc";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { type z } from "zod";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
 import { isAdminOfTheClub, startDateIsFuture } from "~/utils/utils";
+
 import {
   type RecurrentReservationInputSchema,
   type ReservationInputSchema,
-} from "./Calendar";
+} from "~/hooks/calendarTrpcHooks";
 import DialogFieldGrid from "./DialogFieldGrid";
 import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
@@ -21,28 +22,28 @@ dayjs.extend(utc);
 export default function ReserveDialog() {
   const { data: sessionData } = useSession();
 
-  const startDate = useCalendarStoreContext((store) => store.getStartDate());
+  const startDate = useMergedStoreContext((store) => store.getStartDate());
 
-  const clubData = useCalendarStoreContext((store) => store.getClubData());
-  const reservationAdd = useCalendarStoreContext((store) =>
+  const clubData = useMergedStoreContext((store) => store.getClubData());
+  const reservationAdd = useMergedStoreContext((store) =>
     store.getReservationAdd(),
   );
-  const recurrentReservationAdd = useCalendarStoreContext((store) =>
+  const recurrentReservationAdd = useMergedStoreContext((store) =>
     store.getRecurrentReservationAdd(),
   );
 
-  const dateClick = useCalendarStoreContext((state) => state.dateClick);
-  const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
-  const endDate = useCalendarStoreContext((store) => store.endDate);
-  const setEndDate = useCalendarStoreContext((store) => store.setEndDate);
-  const endDateError = useCalendarStoreContext((store) => store.endDateError);
-  const recurrentEndDate = useCalendarStoreContext(
+  const dateClick = useMergedStoreContext((state) => state.dateClick);
+  const setDateClick = useMergedStoreContext((state) => state.setDateClick);
+  const endDate = useMergedStoreContext((store) => store.endDate);
+  const setEndDate = useMergedStoreContext((store) => store.setEndDate);
+  const endDateError = useMergedStoreContext((store) => store.endDateError);
+  const recurrentEndDate = useMergedStoreContext(
     (state) => state.recurrentEndDate,
   );
-  const setRecurrentEndDate = useCalendarStoreContext(
+  const setRecurrentEndDate = useMergedStoreContext(
     (state) => state.setRecurrentEndDate,
   );
-  const recurrentEndDateError = useCalendarStoreContext(
+  const recurrentEndDateError = useMergedStoreContext(
     (state) => state.recurringEndDateError,
   );
 
@@ -81,6 +82,7 @@ export default function ReserveDialog() {
         .month(recurrentEndDate.month())
         .date(recurrentEndDate.date())
         .startOf("day");
+
       const recurrentDataPayload: z.infer<
         typeof RecurrentReservationInputSchema
       > = {

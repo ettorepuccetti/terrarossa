@@ -4,17 +4,17 @@ import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub, startDateIsFuture } from "~/utils/utils";
 
 export default function ReserveDialogEndDate(props: {
   clubSettings: ClubSettings;
 }) {
-  const clubData = useCalendarStoreContext((store) => store.getClubData());
-  const startDate = useCalendarStoreContext((store) => store.getStartDate());
-  const endDate = useCalendarStoreContext((store) => store.endDate);
-  const setEndDate = useCalendarStoreContext((store) => store.setEndDate);
-  const setEndDateError = useCalendarStoreContext(
+  const clubData = useMergedStoreContext((store) => store.getClubData());
+  const startDate = useMergedStoreContext((store) => store.getStartDate());
+  const endDate = useMergedStoreContext((store) => store.endDate);
+  const setEndDate = useMergedStoreContext((store) => store.setEndDate);
+  const setEndDateError = useMergedStoreContext(
     (store) => store.setEndDateError,
   );
   const { data: sessionData } = useSession();

@@ -524,3 +524,25 @@ It needs these secrets:
 2. connect to demo db through pscale cli and launch reset and seed command
 3. install vercel cli
 4. deploy in production on vercel
+
+## CloudFlare
+
+In order to use R2 with public access, I had to add a custom domain, so I transfer `terrarossa.app` to cloudflare. What does it means?
+
+- Nameservers moved to Cloudflare (edited from Vercel domains dashboard).
+
+| Type | Value                      |
+| ---- | -------------------------- |
+| NS   | elmo.ns.cloudflare.com     |
+| NS   | magnolia.ns.cloudflare.com |
+
+- add DNS record in cloudflare dashboard (most of them are auto discovered).
+
+| Type  | Name              | Content                                                                                                  |
+| ----- | ----------------- | -------------------------------------------------------------------------------------------------------- |
+| A     | terrarossa.app    | 76.76.21.21                                                                                              |
+| CNAME | www               | cname.vercel-dns.com                                                                                     |
+| R2    | r2.terrarossa.app | [terrarossa](https://dash.cloudflare.com/13cc38149d0dd2f1773615d6bf26d59c/r2/default/buckets/terrarossa) |
+| ...   |
+
+- Change SSL/TLS encryption mode to `Full` to avoid redirection error from cloudflare dashboard.

@@ -14,7 +14,7 @@ import { Box, useTheme, type PaletteColor } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, type RefObject } from "react";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { type AppRouter } from "~/server/api/root";
 import { useLogger } from "~/utils/logger";
 import {
@@ -41,12 +41,10 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     component: "FullCalendarWrapper",
   });
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
-  const setCalendarRef = useCalendarStoreContext(
-    (state) => state.setCalendarRef,
-  );
-  const clubData = useCalendarStoreContext((state) => state.getClubData());
-  const setDateClick = useCalendarStoreContext((state) => state.setDateClick);
-  const setEventDetails = useCalendarStoreContext(
+  const setCalendarRef = useMergedStoreContext((state) => state.setCalendarRef);
+  const clubData = useMergedStoreContext((state) => state.getClubData());
+  const setDateClick = useMergedStoreContext((state) => state.setDateClick);
+  const setEventDetails = useMergedStoreContext(
     (state) => state.setEventDetails,
   );
 
@@ -56,7 +54,9 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const reservationToEvent = (reservation: ReservationFromDb): EventInput => {
+  const reservationToEventMapper = (
+    reservation: ReservationFromDb,
+  ): EventInput => {
     const getColors = (): PaletteColor => {
       if (reservation.recurrentReservationId) {
         return theme.palette.orange;
@@ -74,9 +74,10 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
 
     return {
       id: reservation.id.toString(),
-      title: reservation.overwriteName
-        ? reservation.overwriteName
-        : reservation.user?.name || "[deleted user]", //user.name can be null or user can be null TODO: move this logic to backend
+      title:
+        (reservation.overwriteName
+          ? reservation.overwriteName
+          : reservation.user?.name) ?? undefined,
       start: reservation.startTime,
       end: reservation.endTime,
       resourceId: reservation.courtId,
@@ -91,7 +92,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     };
   };
 
-  const courtToResource = (court: CourtFromDb): ResourceInput => {
+  const courtToResourceMapper = (court: CourtFromDb): ResourceInput => {
     return {
       id: court.id,
       title: court.name,
@@ -151,8 +152,8 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         navLinks={true}
         height="auto"
         headerToolbar={false}
-        events={props.reservationData.map(reservationToEvent)}
-        resources={props.courtData.map(courtToResource)}
+        events={props.reservationData.map(reservationToEventMapper)}
+        resources={props.courtData.map(courtToResourceMapper)}
         eventClick={openEventDialog}
         dateClick={openReservationDialog}
         selectable={false}

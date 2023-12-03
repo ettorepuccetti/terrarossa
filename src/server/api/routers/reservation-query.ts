@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { reservationQueryInputSchema } from "~/components/Calendar";
+import { reservationQueryInputSchema } from "~/hooks/calendarTrpcHooks";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -96,6 +96,11 @@ export const reservationQueryRouter = createTRPCRouter({
         court: {
           select: {
             name: true,
+            Club: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },

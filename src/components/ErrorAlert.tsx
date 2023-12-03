@@ -22,6 +22,7 @@ export default function ErrorAlert({
     if (error) {
       logger.error({ error: error.message }, "Error shown in ErrorAlert");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
 
   return (
@@ -30,13 +31,7 @@ export default function ErrorAlert({
         open={true}
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
-        <Alert
-          data-test="error-alert"
-          severity="error"
-          onClose={() => {
-            onClose();
-          }}
-        >
+        <Alert data-test="error-alert" severity="error" onClose={onClose}>
           {error?.message}
         </Alert>
       </Backdrop>

@@ -8,22 +8,22 @@ import {
 import { DateField, TimeField } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
-import { useCalendarStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 import CancelRecurrentDialog from "./CancelRecurrentDialog";
 import CancelSingleDialog from "./CancelSingleDialog";
 import DialogLayout from "./DialogLayout";
 
 export default function EventDetailDialog() {
-  const eventDetails = useCalendarStoreContext((state) => state.eventDetails);
-  const setEventDetails = useCalendarStoreContext(
+  const eventDetails = useMergedStoreContext((state) => state.eventDetails);
+  const setEventDetails = useMergedStoreContext(
     (state) => state.setEventDetails,
   );
-  const clubData = useCalendarStoreContext((state) => state.getClubData());
+  const clubData = useMergedStoreContext((state) => state.getClubData());
 
   const { data: sessionData } = useSession();
 
-  const setDeleteConfirmationOpen = useCalendarStoreContext(
+  const setDeleteConfirmationOpen = useMergedStoreContext(
     (state) => state.setDeleteConfirmationOpen,
   );
 
