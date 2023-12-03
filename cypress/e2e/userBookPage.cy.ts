@@ -440,7 +440,9 @@ describe("Reservation details", () => {
       Cypress.env("USER1_MAIL") as string,
     );
     cy.refetchReservationQuery();
-    cy.navigateDaysFromToday(firstStartDateNotDeletable.day() - dayjs().day());
+    cy.navigateDaysFromToday(
+      firstStartDateNotDeletable.date() - dayjs().date(),
+    );
 
     cy.get("[data-test=calendar-event]").click();
     cy.get("[data-test=delete-button]").should("be.disabled");

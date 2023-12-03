@@ -414,13 +414,7 @@ describe("USER", () => {
         const dayOfTheWeek = dayjs().day();
         cy.get("[data-test=recurrent-end-date]")
           .should("be.visible")
-          .type(
-            dayjs()
-              .add(1, "year")
-              .month(0)
-              .day(dayOfTheWeek)
-              .format("DD/MM/YYYY"),
-          );
+          .type(dayjs().add(1, "year").day(dayOfTheWeek).format("DD/MM/YYYY"));
         cy.get("[data-test=reserveButton]").should("be.disabled");
         cy.get("[data-test=recurrent-end-date]").should(
           "have.attr",

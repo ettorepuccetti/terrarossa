@@ -22,6 +22,9 @@ const server = z.object({
   AUTH0_CLIENT_ID: z.string(),
   AUTH0_CLIENT_SECRET: z.string(),
   AUTH0_ISSUER: z.string(),
+  R2_ACCESS_KEY_ID: z.string(),
+  R2_SECRET_ACCESS_KEY: z.string(),
+  R2_ACCOUNT_ID: z.string(),
 });
 
 /**
@@ -32,6 +35,7 @@ const client = z.object({
   NEXT_PUBLIC_LOGFLARE_SOURCE_ID: z.string(),
   NEXT_PUBLIC_LOGFLARE_API_KEY: z.string(),
   NEXT_PUBLIC_APP_ENV: z.enum(["development", "production", "test"]),
+  NEXT_PUBLIC_R2_BUCKET_NAME: z.string(),
 });
 
 /**
@@ -51,6 +55,10 @@ const processEnv = {
   NEXT_PUBLIC_LOGFLARE_SOURCE_ID: process.env.NEXT_PUBLIC_LOGFLARE_SOURCE_ID,
   NEXT_PUBLIC_LOGFLARE_API_KEY: process.env.NEXT_PUBLIC_LOGFLARE_API_KEY,
   NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+  NEXT_PUBLIC_R2_BUCKET_NAME: process.env.NEXT_PUBLIC_R2_BUCKET_NAME,
+  R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID,
+  R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY,
+  R2_ACCOUNT_ID: process.env.R2_ACCOUNT_ID,
 };
 
 // Don't touch the part below
