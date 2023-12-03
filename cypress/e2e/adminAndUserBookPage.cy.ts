@@ -36,7 +36,7 @@ describe("New Reservation", () => {
       it(`Testing for ${user.type}`, function () {
         //initial setup
         loginAndVisitCalendarPage(
-          user.username,
+          user.mail,
           user.password,
           this.clubIdForoItalico as string,
         );
@@ -68,7 +68,7 @@ describe("New Reservation", () => {
       it(`Testing for ${user.type}`, function () {
         //initial setup
         loginAndVisitCalendarPage(
-          user.username,
+          user.mail,
           user.password,
           this.clubIdForoItalico as string,
         );
@@ -117,7 +117,7 @@ describe("New Reservation", () => {
     [USER1, ADMIN_FORO].forEach((user) => {
       it(`Testing for ${user.type}`, function () {
         loginAndVisitCalendarPage(
-          user.username,
+          user.mail,
           user.password,
           this.clubIdForoItalico as string,
         );
@@ -146,7 +146,7 @@ describe("Existing reservation", () => {
       it(`testing for ${user.type}`, function () {
         //initial setup
         loginAndVisitCalendarPage(
-          user.username,
+          user.mail,
           user.password,
           this.clubIdForoItalico as string,
         );
@@ -162,7 +162,7 @@ describe("Existing reservation", () => {
           startDate.add(1, "hour").toDate(),
           this.clubIdForoItalico as string,
           pietrangeliCourtName,
-          user.username,
+          user.mail,
         );
         cy.refetchReservationQuery();
         cy.navigateDaysFromToday(dayInAdvance);
@@ -181,7 +181,7 @@ describe("Existing reservation", () => {
       it(`Testing for ${user.type}`, function () {
         //initial setup
         loginAndVisitCalendarPage(
-          user.username,
+          user.mail,
           user.password,
           this.clubIdForoItalico as string,
         );
@@ -264,7 +264,7 @@ describe("Existing reservation", () => {
           startDateSafeToDelete.add(dayjs.duration({ hours: 1 })).toDate(),
           this.clubIdForoItalico as string,
           pietrangeliCourtName,
-          user.username,
+          user.mail,
         );
         cy.refetchReservationQuery();
         cy.navigateDaysFromToday(startDateSafeToDelete.day() - dayjs().day());
@@ -282,7 +282,7 @@ describe("Existing reservation", () => {
       it(`testing for ${user.type}`, function () {
         //initial setup
         loginAndVisitCalendarPage(
-          user.username,
+          user.mail,
           user.password,
           this.clubIdForoItalico as string,
         );
@@ -299,7 +299,7 @@ describe("Existing reservation", () => {
           startDate.add(1, "hour").toDate(),
           this.clubIdForoItalico as string,
           pietrangeliCourtName,
-          user.username,
+          user.mail,
         );
 
         cy.refetchReservationQuery();

@@ -31,7 +31,7 @@ beforeEach("Initial clean up and retrieve Clubs", function () {
     "clubSettingsAllEngland",
   );
 
-  // .then() so I can use previous aliases
+  // using `.then()` so I can use previous aliases
   cy.then(() => {
     loginAndVisitCalendarPage(
       Cypress.env("USER1_MAIL") as string,

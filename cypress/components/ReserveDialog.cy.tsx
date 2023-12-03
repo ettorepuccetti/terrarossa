@@ -32,22 +32,10 @@ function ReserveDialogWrapper(props: {
   const addSingle = cy.stub().as("addSingle");
   const addRecurrent = cy.stub().as("addRecurrent");
   useMergedStoreContext((store) => store.setReservationAdd)(
-    buildTrpcMutationMock(addSingle, {
-      clubId: club.id,
-      courtId: courts[0]!.id,
-      startDateTime: props.startDate,
-      endDateTime: dayjs(props.startDate).add(1, "hour").toDate(),
-    }),
+    buildTrpcMutationMock(addSingle),
   );
   useMergedStoreContext((store) => store.setRecurrentReservationAdd)(
-    buildTrpcMutationMock(addRecurrent, {
-      clubId: club.id,
-      courtId: courts[0]!.id,
-      startDateTime: props.startDate,
-      endDateTime: dayjs(props.startDate).add(1, "hour").toDate(),
-      recurrentStartDate: dayjs(props.startDate).startOf("day").toDate(),
-      recurrentEndDate: dayjs(props.startDate).add(1, "week").toDate(),
-    }),
+    buildTrpcMutationMock(addRecurrent),
   );
 
   // set dateClick

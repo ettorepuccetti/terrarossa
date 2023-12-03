@@ -106,7 +106,7 @@ export const Profile = () => {
   }
 
   if (!userDataInStore) {
-    return <LinearProgress />;
+    return <LinearProgress data-test="profile-page-initial-loading" />;
   }
 
   return (
@@ -116,7 +116,9 @@ export const Profile = () => {
         myReservationsQuery.isRefetching ||
         getSignedUrl.isLoading ||
         updateImageSrc.isLoading ||
-        updateUsername.isLoading) && <LinearProgress />}
+        updateUsername.isLoading) && (
+        <LinearProgress data-test="profile-page-additional-loading" />
+      )}
 
       {/* Error handling */}
       <ErrorAlert

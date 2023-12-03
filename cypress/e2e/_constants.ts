@@ -3,19 +3,19 @@ import { UserRoles } from "~/utils/constants";
 
 export interface User {
   type: UserRoles.ADMIN | UserRoles.USER;
-  username: string;
+  mail: string;
   password: string;
 }
 
 export const USER1: User = {
   type: UserRoles.USER,
-  username: Cypress.env("USER1_MAIL") as string,
+  mail: Cypress.env("USER1_MAIL") as string,
   password: Cypress.env("USER1_PWD") as string,
 };
 
-export const ADMIN_FORO = {
+export const ADMIN_FORO: User = {
   type: UserRoles.ADMIN,
-  username: Cypress.env("ADMIN_FORO_MAIL") as string,
+  mail: Cypress.env("ADMIN_FORO_MAIL") as string,
   password: Cypress.env("ADMIN_FORO_PWD") as string,
 };
 
@@ -53,4 +53,11 @@ export function loginAndVisitCalendarPage(
 ) {
   cy.loginToAuth0(mail, pwd);
   cy.visit(`/prenota?clubId=${clubId}`).waitForCalendarPageToLoad();
+}
+
+export function loginAndVisitProfilePage(mail: string, pwd: string) {
+  cy.loginToAuth0(mail, pwd);
+  cy.visit(`/profile`)
+    .getByDataTest("profile-page-initial-loading")
+    .should("not.exist");
 }

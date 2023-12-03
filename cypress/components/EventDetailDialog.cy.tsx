@@ -7,7 +7,6 @@ import {
   buildTrpcMutationMock,
   club,
   clubSettings,
-  eventDetailsRecurrent,
   eventDetailsSingle,
   mountWithContexts,
   session,
@@ -25,17 +24,10 @@ function EventDetailDialogWrapper(props: { startDate: Date; endDate: Date }) {
   const deleteOne = cy.stub().as("deleteOne");
   const deleteRecurrent = cy.stub().as("deleteRecurrent");
   useMergedStoreContext((store) => store.setReservationDelete)(
-    buildTrpcMutationMock(deleteOne, {
-      reservationId: eventDetailsSingle.id,
-      clubId: club.id,
-    }),
+    buildTrpcMutationMock(deleteOne),
   );
   useMergedStoreContext((store) => store.setRecurrentReservationDelete)(
-    buildTrpcMutationMock(deleteRecurrent, {
-      recurrentReservationId: eventDetailsRecurrent.extendedProps
-        .recurrentId as string,
-      clubId: club.id,
-    }),
+    buildTrpcMutationMock(deleteRecurrent),
   );
 
   // set eventDetails

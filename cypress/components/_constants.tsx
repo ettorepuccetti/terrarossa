@@ -3,7 +3,12 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import { type ResourceApi } from "@fullcalendar/resource";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { type Club, type ClubSettings, type Court } from "@prisma/client";
+import {
+  type Club,
+  type ClubSettings,
+  type Court,
+  type User,
+} from "@prisma/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, type TRPCClientErrorLike } from "@trpc/client";
 import {
@@ -111,6 +116,18 @@ export function getAdminSession(clubId: string): Session {
   };
 }
 
+export const user: User = {
+  id: "1",
+  name: "Mario Rossi",
+  email: "mario@personal.it",
+  role: "USER",
+  createdAt: new Date(),
+  clubId: null,
+  emailVerified: null,
+  image: null,
+  updatedAt: null,
+};
+
 /**
  * Component that provides to the children the contexts needed for testing.
  * It provides:
@@ -200,7 +217,6 @@ export const mountWithContexts = (
  */
 export function buildTrpcMutationMock<TData, TVariables>(
   stub: SinonStub,
-  inputVariables: TVariables,
 ): UseTRPCMutationResult<
   TData,
   TRPCClientErrorLike<never>,
@@ -221,7 +237,7 @@ export function buildTrpcMutationMock<TData, TVariables>(
     failureCount: 0,
     failureReason: null,
     isPaused: false,
-    variables: inputVariables,
+    variables: undefined, //input will be passed as argument to the stub, unclear how still...
     mutateAsync: stub.resolves(),
     trpc: { path: "" },
   };

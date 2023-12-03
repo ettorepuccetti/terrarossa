@@ -84,6 +84,7 @@ export const ProfileReservationsGrid = ({
   return (
     <Box width={"100%"} height={500} maxWidth={700}>
       <DataGrid
+        data-test="profile-reservations-grid"
         rows={rows ?? []}
         columns={columns}
         autoPageSize={true}

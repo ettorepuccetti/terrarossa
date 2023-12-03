@@ -19,10 +19,7 @@ function CancelSingleDialogContext() {
   // set mutations mocks
   const deleteOne = cy.stub().as("deleteOne");
   useMergedStoreContext((store) => store.setReservationDelete)(
-    buildTrpcMutationMock(deleteOne, {
-      reservationId: "my_id",
-      clubId: "my_club_id",
-    }),
+    buildTrpcMutationMock(deleteOne),
   );
 
   useMergedStoreContext((store) => store.setDeleteConfirmationOpen)(true);

@@ -123,5 +123,23 @@ function tasks(on: Cypress.PluginEvents) {
         },
       });
     },
+
+    async "prisma:editUsername"({
+      userMail,
+      newUsername,
+    }: {
+      userMail: string;
+      newUsername: string;
+    }) {
+      return await prisma.user.update({
+        data: {
+          name: newUsername,
+          image: null,
+        },
+        where: {
+          email: userMail,
+        },
+      });
+    },
   });
 }

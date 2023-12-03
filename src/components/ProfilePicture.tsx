@@ -46,11 +46,13 @@ export default function ProfilePicture() {
           key={forceUpdateCounter}
         />
         <IconButton
+          data-test="upload-image-button"
           component="label"
           sx={{ position: "absolute", bottom: -15, right: -20 }}
         >
           <AddAPhotoIcon />
           <VisuallyHiddenInput
+            data-test="upload-image-input"
             type="file"
             accept="image/*"
             id="file-upload"

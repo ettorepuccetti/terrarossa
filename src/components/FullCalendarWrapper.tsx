@@ -54,7 +54,9 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const reservationToEvent = (reservation: ReservationFromDb): EventInput => {
+  const reservationToEventMapper = (
+    reservation: ReservationFromDb,
+  ): EventInput => {
     const getColors = (): PaletteColor => {
       if (reservation.recurrentReservationId) {
         return theme.palette.orange;
@@ -72,9 +74,10 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
 
     return {
       id: reservation.id.toString(),
-      title: reservation.overwriteName
-        ? reservation.overwriteName
-        : reservation.user?.name || "[deleted user]", //user.name can be null or user can be null TODO: move this logic to backend
+      title:
+        (reservation.overwriteName
+          ? reservation.overwriteName
+          : reservation.user?.name) ?? undefined,
       start: reservation.startTime,
       end: reservation.endTime,
       resourceId: reservation.courtId,
@@ -89,7 +92,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
     };
   };
 
-  const courtToResource = (court: CourtFromDb): ResourceInput => {
+  const courtToResourceMapper = (court: CourtFromDb): ResourceInput => {
     return {
       id: court.id,
       title: court.name,
@@ -149,8 +152,8 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
         navLinks={true}
         height="auto"
         headerToolbar={false}
-        events={props.reservationData.map(reservationToEvent)}
-        resources={props.courtData.map(courtToResource)}
+        events={props.reservationData.map(reservationToEventMapper)}
+        resources={props.courtData.map(courtToResourceMapper)}
         eventClick={openEventDialog}
         dateClick={openReservationDialog}
         selectable={false}
