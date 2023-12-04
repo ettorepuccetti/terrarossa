@@ -36,7 +36,7 @@ export const DayCard = (props: {
             fontWeight: 500,
           }}
         >
-          {props.day.format("ddd").toUpperCase()}
+          {props.day.locale("it").format("ddd").toUpperCase()}
         </Box>
 
         {/* lower part of the card, contain day of the month, white or yellow background */}

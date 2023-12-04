@@ -27,8 +27,8 @@ export default function Header() {
   const logoSrc = clubData?.logoSrc;
   return (
     <>
-      <AppBar position={"fixed"}>
-        <Toolbar sx={toolbarStyle} disableGutters>
+      <AppBar className="app-bar" position={"fixed"}>
+        <Toolbar className="actual-toolbar" sx={toolbarStyle} disableGutters>
           <Box display={"flex"} flex={1}>
             <IconButton
               size="large"
@@ -66,7 +66,7 @@ export default function Header() {
       </AppBar>
 
       {/* empty toolbar for prevent page content going behind the real toolbar */}
-      <Toolbar sx={toolbarStyle} />
+      <Toolbar className="placeholder-toolbar" sx={toolbarStyle} />
     </>
   );
 }
