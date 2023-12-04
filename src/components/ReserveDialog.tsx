@@ -20,10 +20,9 @@ import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
 dayjs.extend(utc);
 
 export default function ReserveDialog() {
+  const logger = useLogger({ component: "ReserveDialog" });
   const { data: sessionData } = useSession();
-
   const startDate = useMergedStoreContext((store) => store.getStartDate());
-
   const clubData = useMergedStoreContext((store) => store.getClubData());
   const reservationAdd = useMergedStoreContext((store) =>
     store.getReservationAdd(),
@@ -31,7 +30,6 @@ export default function ReserveDialog() {
   const recurrentReservationAdd = useMergedStoreContext((store) =>
     store.getRecurrentReservationAdd(),
   );
-
   const dateClick = useMergedStoreContext((state) => state.dateClick);
   const setDateClick = useMergedStoreContext((state) => state.setDateClick);
   const endDate = useMergedStoreContext((store) => store.endDate);
@@ -47,19 +45,20 @@ export default function ReserveDialog() {
     (state) => state.recurringEndDateError,
   );
 
+  const setOpenReserveSuccess = useMergedStoreContext(
+    (store) => store.setOpenReserveSuccess,
+  );
   const [overwriteName, setOverwriteName] = useState<string | undefined>(
     undefined,
   );
-  const resource = dateClick?.resource;
-  const logger = useLogger({ component: "ReserveDialog" });
 
   const onConfirmButton = () => {
-    if (!endDate || !startDate || !resource) {
+    if (!endDate || !startDate || !dateClick?.resource) {
       logger.error(
         {
           endDate: endDate?.toDate(),
           startDate: startDate?.toDate(),
-          resource: resource,
+          resource: dateClick?.resource,
         },
         "onConfirmButton: unexpected null value",
       );
@@ -71,7 +70,7 @@ export default function ReserveDialog() {
       endDateTime: endDate.toDate(),
       overwriteName: overwriteName, //manage undefined of input for controlled component
       clubId: clubData.id,
-      courtId: resource.id,
+      courtId: dateClick?.resource.id,
     };
 
     // recurrent reservation add. Need to convert dates to UTC for better handling in backend
@@ -91,12 +90,23 @@ export default function ReserveDialog() {
         recurrentEndDate: recurrentEndDateUtc.toDate(),
       };
       logger.info(recurrentDataPayload, "recurrent reservation added");
-      recurrentReservationAdd.mutate(recurrentDataPayload);
+      void recurrentReservationAdd
+        .mutateAsync(recurrentDataPayload)
+        .then(() => {
+          setOpenReserveSuccess(true);
+        })
+        .catch((_error) => {}); //already catched
     } else {
       // single reservation add
       logger.info(dataPayload, "reservation added");
-      reservationAdd.mutate(dataPayload);
+      reservationAdd
+        .mutateAsync(dataPayload)
+        .then(() => {
+          setOpenReserveSuccess(true);
+        })
+        .catch((_error) => {});
     }
+    // setOpenReserveSuccess(true);
     setDateClick(null);
     setOverwriteName(undefined);
     setEndDate(null);
@@ -124,7 +134,7 @@ export default function ReserveDialog() {
               {/* Static data displayed with grid style for column allignement */}
               <DialogFieldGrid
                 labelValues={[
-                  { label: "Campo", value: resource?.title },
+                  { label: "Campo", value: dateClick?.resource?.title },
                   {
                     label: "Data",
                     value: startDate.format("DD/MM/YYYY"),
@@ -170,7 +180,7 @@ export default function ReserveDialog() {
               )}
 
               <Button
-                onClick={onConfirmButton}
+                onClick={() => void onConfirmButton()}
                 disabled={
                   !startDateIsFuture(sessionData, clubData.id, startDate) ||
                   endDateError ||

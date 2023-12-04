@@ -20,6 +20,7 @@ import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
 import SpinnerPartial from "./SpinnerPartial";
+import { ReserveSuccessSnackbar } from "./ReserveSuccessSnackbar";
 
 export default function Calendar() {
   const logger = useLogger({
@@ -186,6 +187,7 @@ export default function Calendar() {
       </Container>
       <ReserveDialog />
       <EventDetailDialog />
+      <ReserveSuccessSnackbar />
     </>
   );
 }

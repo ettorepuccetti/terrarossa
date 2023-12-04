@@ -92,7 +92,7 @@ export const reservationMutationRouter = createTRPCRouter({
         userId: ctx.session.user.id,
       });
 
-      return ctx.prisma.reservation.create({
+      await ctx.prisma.reservation.create({
         data: {
           courtId: input.courtId,
           startTime: input.startDateTime,
