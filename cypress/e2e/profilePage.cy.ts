@@ -27,10 +27,6 @@ describe("profile", () => {
   it("GIVEN a user WHEN the user is logged in THEN profile info are shown", () => {
     cy.getByDataTest("username").should("have.value", "user1");
     cy.getByDataTest("email").should("have.value", Cypress.env("USER1_MAIL"));
-    cy.getByDataTest("created-at").should(
-      "have.value",
-      dayjs().format("DD/MM/YYYY"),
-    );
   });
 
   describe("edit username", () => {

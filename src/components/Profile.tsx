@@ -109,16 +109,23 @@ export const Profile = () => {
     return <LinearProgress data-test="profile-page-initial-loading" />;
   }
 
+  const showLoading =
+    myReservationsQuery.isLoading ||
+    myReservationsQuery.isRefetching ||
+    getSignedUrl.isLoading ||
+    updateImageSrc.isLoading ||
+    updateUsername.isLoading;
+
   return (
     <>
-      {/* Loading handling */}
-      {(myReservationsQuery.isLoading ||
-        myReservationsQuery.isRefetching ||
-        getSignedUrl.isLoading ||
-        updateImageSrc.isLoading ||
-        updateUsername.isLoading) && (
-        <LinearProgress data-test="profile-page-additional-loading" />
-      )}
+      {/* Loading handling, the element must always present to avoid layout shifting */}
+      <LinearProgress
+        data-test="profile-page-additional-loading"
+        variant="query"
+        sx={{
+          visibility: showLoading ? "visible" : "hidden",
+        }}
+      />
 
       {/* Error handling */}
       <ErrorAlert
