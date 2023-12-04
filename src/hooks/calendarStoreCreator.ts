@@ -38,6 +38,7 @@ export interface CalendarStore {
   clubData: RouterOutputs["club"]["getByClubId"] | undefined;
   selectedDate: Dayjs;
   customDateSelected: boolean;
+  openReserveSuccess: boolean;
   setDateClick: (dateClick: DateClickArg | null) => void;
   setEventDetails: (eventDetails: EventImpl | null) => void;
   setEndDate: (endDate: Dayjs | null) => void;
@@ -48,7 +49,7 @@ export interface CalendarStore {
   setCalendarRef: (calendarRef: RefObject<FullCalendar>) => void;
   setSelectedDate: (selectedDate: Dayjs) => void;
   setCustomDateSelected: (customDateSelected: boolean) => void;
-
+  setOpenReserveSuccess: (openReserveSuccess: boolean) => void;
   // trpc mutations and queries
   setReservationAdd: (
     reservationAdd: ReturnType<typeof useReservationAdd>,
@@ -115,6 +116,7 @@ export const calendarStoreCreator: StateCreator<
   clubData: undefined,
   selectedDate: dayjs().startOf("day"),
   customDateSelected: false,
+  openReserveSuccess: false,
   setDateClick: (dateClick) => {
     set({ dateClick: dateClick });
     set({ endDate: dayjs(dateClick?.date).add(1, "h") });
@@ -132,6 +134,8 @@ export const calendarStoreCreator: StateCreator<
   setSelectedDate: (selectedDate) => set({ selectedDate: selectedDate }),
   setCustomDateSelected: (customDateSelected) =>
     set({ customDateSelected: customDateSelected }),
+  setOpenReserveSuccess: (openReserveSuccess) =>
+    set({ openReserveSuccess: openReserveSuccess }),
 
   // trpc mutations and queries
   setReservationAdd: (reservationAdd) =>

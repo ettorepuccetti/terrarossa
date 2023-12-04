@@ -59,6 +59,7 @@ describe("New Reservation", () => {
 
         // reservation is added
         cy.get("[data-test=calendar-event]").should("be.visible");
+        cy.getByDataTest("reserve-success-snackbar").should("be.visible");
       });
     });
   });
@@ -105,10 +106,15 @@ describe("New Reservation", () => {
             "La tua prenotazione non puo' essere effettuata. Per favore, scegli un orario in cui il campo è libero",
           );
         // close the error dialog
-        cy.get(".MuiAlert-action > .MuiButtonBase-root").click();
+        cy.getByDataTest("error-alert")
+          .find(".MuiAlert-action > .MuiButtonBase-root")
+          .click();
 
         // check that no reservation has been added
         cy.get("[data-test='calendar-event']").should("have.length", 1);
+
+        // check that no confirmation snackbar is shown
+        cy.getByDataTest("reserve-success-snackbar").should("not.exist");
       });
     });
   });
