@@ -40,7 +40,7 @@ export interface ProfileStore {
 }
 
 export const profileStoreCreator: StateCreator<
-  CalendarStore & ProfileStore,
+  ProfileStore,
   [],
   [],
   ProfileStore

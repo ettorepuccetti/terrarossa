@@ -19,8 +19,8 @@ import CalendarHeader from "./CalendarHeader";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
 import FullCalendarWrapper from "./FullCalendarWrapper";
-import SpinnerPartial from "./SpinnerPartial";
 import { ReserveSuccessSnackbar } from "./ReserveSuccessSnackbar";
+import SpinnerPartial from "./SpinnerPartial";
 
 export default function Calendar() {
   const logger = useLogger({
@@ -141,7 +141,7 @@ export default function Calendar() {
   // clubData is not yet available in store , but the sub-component would try to render anyway
   // Should I check also reservationAdd, reservationDelete, recurrentReservationAdd, recurrentReservationDelete?
   if (!clubDataInStore) {
-    return <LinearProgress color="primary" />;
+    return <LinearProgress variant="query" color="primary" />;
   }
 
   return (

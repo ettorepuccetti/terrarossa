@@ -14,7 +14,6 @@ import {
   type useReservationDelete,
   type useReservationQuery,
 } from "./calendarTrpcHooks";
-import { type ProfileStore } from "./profileStoreCreator";
 
 export interface CalendarStore {
   dateClick: DateClickArg | null;
@@ -94,7 +93,7 @@ export interface CalendarStore {
 }
 
 export const calendarStoreCreator: StateCreator<
-  CalendarStore & ProfileStore,
+  CalendarStore,
   [],
   [],
   CalendarStore

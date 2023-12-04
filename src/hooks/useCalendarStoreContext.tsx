@@ -14,13 +14,15 @@ import {
   type CalendarStore,
 } from "./calendarStoreCreator";
 import { profileStoreCreator, type ProfileStore } from "./profileStoreCreator";
+import { searchStoreCreator, type SearchStore } from "./searchStoreCreator";
 
-type MergedStores = CalendarStore & ProfileStore;
+type MergedStores = CalendarStore & ProfileStore & SearchStore;
 
 const createMergedStore = () => {
   return createStore<MergedStores>()((...a) => ({
     ...calendarStoreCreator(...a),
     ...profileStoreCreator(...a),
+    ...searchStoreCreator(...a),
   }));
 };
 

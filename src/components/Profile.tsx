@@ -106,7 +106,12 @@ export const Profile = () => {
   }
 
   if (!userDataInStore) {
-    return <LinearProgress data-test="profile-page-initial-loading" />;
+    return (
+      <LinearProgress
+        variant="query"
+        data-test="profile-page-initial-loading"
+      />
+    );
   }
 
   const showLoading =
