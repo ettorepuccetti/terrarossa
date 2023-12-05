@@ -7,7 +7,11 @@ export const clubRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const logger = loggerInternal.child({ apiEndPoint: "clubRouter.getAll" });
     logger.info({ userId: ctx.session?.user.id }, "get all clubs");
-    return await ctx.prisma.club.findMany();
+    return await ctx.prisma.club.findMany({
+      include: {
+        Address: true,
+      },
+    });
   }),
 
   getByClubId: publicProcedure

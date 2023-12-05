@@ -1,15 +1,18 @@
 import { Box, Container, LinearProgress } from "@mui/material";
-import { type Club } from "@prisma/client";
 import { useState } from "react";
 import { useAllClubsQuery } from "~/hooks/searchTrpcHook";
+import { type RouterOutputs } from "~/utils/api";
 import { ClubSearchCard } from "./ClubSearchCard";
 import ErrorAlert from "./ErrorAlert";
 import SearchBar from "./SearchBar";
 
+export type ClubQueryResult = RouterOutputs["club"]["getAll"][number];
+
 export const Search = () => {
   const allClubsQuery = useAllClubsQuery();
-
-  const [filteredClubs, setFilteredClubs] = useState<Club[] | undefined>();
+  const [filteredClubs, setFilteredClubs] = useState<
+    ClubQueryResult[] | undefined
+  >();
 
   const onSearch = (term: string) => {
     setFilteredClubs(
@@ -22,7 +25,7 @@ export const Search = () => {
   if (allClubsQuery.isError) {
     return (
       <ErrorAlert
-        onClose={() => allClubsQuery.refetch}
+        onClose={() => void allClubsQuery.refetch()}
         error={allClubsQuery.error}
       />
     );

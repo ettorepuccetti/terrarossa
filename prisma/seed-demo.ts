@@ -11,6 +11,7 @@ import {
   foroItalicoName,
   pietrangeliCourtName,
 } from "../src/utils/constants";
+import { allEnglandAddress, foroItalicoAddress } from "./seed";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -32,6 +33,9 @@ async function main() {
       name: foroItalicoName,
       logoSrc: "https://r2.terrarossa.app/bnl-logo.png",
       imageSrc: "https://r2.terrarossa.app/bnl-image.jpg",
+      Address: {
+        create: foroItalicoAddress,
+      },
       clubSettings: {
         create: {
           daysInFutureVisible: 7,
@@ -48,6 +52,7 @@ async function main() {
       name: allEnglandClubName,
       imageSrc: "https://r2.terrarossa.app/wimbledon-image.jpg",
       logoSrc: "https://r2.terrarossa.app/wimbledon-logo.png",
+      Address: { create: allEnglandAddress },
       clubSettings: {
         create: {
           daysInFutureVisible: 5,
