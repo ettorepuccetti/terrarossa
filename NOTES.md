@@ -546,3 +546,19 @@ In order to use R2 with public access, I had to add a custom domain, so I transf
 | ...   |
 
 - Change SSL/TLS encryption mode to `Full` to avoid redirection error from cloudflare dashboard.
+
+## MUI Grid import
+
+Reloading page that use Grid give this error:
+
+```
+Cannot use import statement outside a module
+```
+
+Solution, use this import instead of the suggested one from vscode:
+
+```js
+import Grid from "@mui/material/Unstable_Grid2";
+```
+
+(see this [link](https://stackoverflow.com/questions/73674261/material-ui-cannot-use-import-statement-outside-a-module-select-dependency))

@@ -24,6 +24,17 @@ export const allEnglandAddress = {
   city: "London",
   country: "United Kingdom",
   countryCode: "GB",
+  number: null,
+};
+
+export const foroItalicoPhone = {
+  number: "0636851",
+  nationalPrefix: "+39",
+};
+
+export const allEnglandPhone = {
+  number: "02089441066",
+  nationalPrefix: "+44",
 };
 
 const prisma = new PrismaClient();
@@ -38,6 +49,10 @@ async function main() {
       Address: {
         create: foroItalicoAddress,
       },
+      PhoneNumber: {
+        create: foroItalicoPhone,
+      },
+      mail: "ticketoffice@federtennis.it",
       courts: {
         create: [
           {
@@ -77,6 +92,10 @@ async function main() {
       Address: {
         create: allEnglandAddress,
       },
+      PhoneNumber: {
+        create: allEnglandPhone,
+      },
+      mail: "info@wimbledon-village.com",
       clubSettings: {
         create: {
           daysInFutureVisible: 5,

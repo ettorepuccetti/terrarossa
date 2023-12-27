@@ -11,7 +11,12 @@ import {
   foroItalicoName,
   pietrangeliCourtName,
 } from "../src/utils/constants";
-import { allEnglandAddress, foroItalicoAddress } from "./seed";
+import {
+  allEnglandAddress,
+  allEnglandPhone,
+  foroItalicoAddress,
+  foroItalicoPhone,
+} from "./seed";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -36,6 +41,8 @@ async function main() {
       Address: {
         create: foroItalicoAddress,
       },
+      PhoneNumber: { create: foroItalicoPhone },
+      mail: "ticketoffice@federtennis.it",
       clubSettings: {
         create: {
           daysInFutureVisible: 7,
@@ -53,6 +60,8 @@ async function main() {
       imageSrc: "https://r2.terrarossa.app/wimbledon-image.jpg",
       logoSrc: "https://r2.terrarossa.app/wimbledon-logo.png",
       Address: { create: allEnglandAddress },
+      PhoneNumber: { create: allEnglandPhone },
+      mail: "info@wimbledon-village.com",
       clubSettings: {
         create: {
           daysInFutureVisible: 5,

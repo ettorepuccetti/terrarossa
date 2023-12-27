@@ -22,14 +22,15 @@ export const ClubAddress = ({ address }: { address: Address | null }) => {
         flex={1}
       >
         <Box display={"flex"} gap={0.5} alignItems={"center"}>
-          <Typography fontSize={"inherit"}>{address.street},</Typography>
-          <Typography fontSize={"inherit"}>{address.number}</Typography>
+          <Typography fontSize={"inherit"}>
+            {address.street}, {address.number}
+          </Typography>
         </Box>
 
         <Box display={"flex"} gap={0.5} alignItems={"center"}>
-          <Typography fontSize={"inherit"}>{address.zipCode},</Typography>
-          <Typography fontSize={"inherit"}>{address.city},</Typography>
-          <Typography fontSize={"inherit"}>{address.countryCode}</Typography>
+          <Typography fontSize={"inherit"}>
+            {address.zipCode}, {address.city}, {address.countryCode}
+          </Typography>
         </Box>
       </Box>
     </Box>

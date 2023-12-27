@@ -143,45 +143,47 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   };
 
   return (
-    <FullCalendar
-      ref={calendarRef}
-      schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
-      plugins={[interactionPlugin, resourceTimeGridPlugin, ScrollGrid]}
-      initialView="resourceTimeGridDay"
-      navLinks={true}
-      height="auto"
-      headerToolbar={false}
-      events={props.reservationData.map(reservationToEventMapper)}
-      resources={props.courtData.map(courtToResourceMapper)}
-      eventClick={openEventDialog}
-      dateClick={openReservationDialog}
-      selectable={false}
-      slotMinTime={formatTimeString(
-        clubData.clubSettings.firstBookableHour,
-        clubData.clubSettings.firstBookableMinute,
-      )}
-      slotMaxTime={formatTimeString(
-        clubData.clubSettings.lastBookableHour + 1,
-        clubData.clubSettings.lastBookableMinute,
-      )}
-      selectLongPressDelay={0}
-      slotLabelFormat={{
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: false,
-      }}
-      eventTimeFormat={{
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: false,
-      }}
-      allDaySlot={false}
-      eventContent={(eventInfo: EventContentArg) => {
-        return <CalendarEventCard eventInfo={eventInfo} />;
-      }}
-      titleFormat={{ month: "short", day: "numeric" }}
-      locale={"it-it"}
-      dayMinWidth={150}
-    />
+    <Box padding={0.5}>
+      <FullCalendar
+        ref={calendarRef}
+        schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"
+        plugins={[interactionPlugin, resourceTimeGridPlugin, ScrollGrid]}
+        initialView="resourceTimeGridDay"
+        navLinks={true}
+        height="auto"
+        headerToolbar={false}
+        events={props.reservationData.map(reservationToEventMapper)}
+        resources={props.courtData.map(courtToResourceMapper)}
+        eventClick={openEventDialog}
+        dateClick={openReservationDialog}
+        selectable={false}
+        slotMinTime={formatTimeString(
+          clubData.clubSettings.firstBookableHour,
+          clubData.clubSettings.firstBookableMinute,
+        )}
+        slotMaxTime={formatTimeString(
+          clubData.clubSettings.lastBookableHour + 1,
+          clubData.clubSettings.lastBookableMinute,
+        )}
+        selectLongPressDelay={0}
+        slotLabelFormat={{
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: false,
+        }}
+        eventTimeFormat={{
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: false,
+        }}
+        allDaySlot={false}
+        eventContent={(eventInfo: EventContentArg) => {
+          return <CalendarEventCard eventInfo={eventInfo} />;
+        }}
+        titleFormat={{ month: "short", day: "numeric" }}
+        locale={"it-it"}
+        dayMinWidth={150}
+      />
+    </Box>
   );
 }

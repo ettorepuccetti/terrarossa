@@ -1,4 +1,3 @@
-import { TRPCClientError } from "@trpc/client";
 import { ClubIdInputSchema } from "~/hooks/calendarTrpcHooks";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { loggerInternal } from "~/utils/logger";
@@ -30,25 +29,15 @@ export const clubRouter = createTRPCRouter({
           `Si è verificato un errore, per favore riprova (Invalid clubId)`,
         );
       }
-      return await ctx.prisma.club
-        .findUniqueOrThrow({
-          where: {
-            id: input.clubId,
-          },
-          include: {
-            clubSettings: true,
-            Address: true,
-          },
-        })
-        .catch((_error: Error) => {
-          logger.error(
-            { userId: ctx.session?.user.id, clubId: input.clubId },
-            "club not found",
-          );
-          throw new TRPCClientError(
-            "Si è verificato un errore, per favore riprova (Club not found)",
-            { cause: _error },
-          );
-        });
+      return await ctx.prisma.club.findUniqueOrThrow({
+        where: {
+          id: input.clubId,
+        },
+        include: {
+          clubSettings: true,
+          Address: true,
+          PhoneNumber: true,
+        },
+      });
     }),
 });

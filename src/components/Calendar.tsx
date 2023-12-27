@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ReserveDialog from "~/components/ReserveDialog";
 
-import { Box, Container, LinearProgress } from "@mui/material";
+import { Container, LinearProgress } from "@mui/material";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import {
@@ -180,14 +180,12 @@ export default function Calendar() {
             recurrentReservationDelete.isLoading
           }
         >
-          <Box padding={"0.5rem"}>
-            <FullCalendarWrapper
-              courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
-              reservationData={reservationQuery.data ?? []} //same as above
-            />
-            <CalendarClubInfo address={clubDataInStore.Address} />
-          </Box>
+          <FullCalendarWrapper
+            courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
+            reservationData={reservationQuery.data ?? []} //same as above
+          />
         </SpinnerPartial>
+        <CalendarClubInfo />
       </Container>
       <ReserveDialog />
       <EventDetailDialog />
