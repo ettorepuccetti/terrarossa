@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ReserveDialog from "~/components/ReserveDialog";
 
-import { Container, LinearProgress } from "@mui/material";
+import { Box, Container, LinearProgress } from "@mui/material";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import {
@@ -15,6 +15,7 @@ import {
 } from "~/hooks/calendarTrpcHooks";
 import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
+import CalendarClubInfo from "./CalendarClubInfo";
 import CalendarHeader from "./CalendarHeader";
 import ErrorAlert from "./ErrorAlert";
 import EventDetailDialog from "./EventDetailDialog";
@@ -179,10 +180,13 @@ export default function Calendar() {
             recurrentReservationDelete.isLoading
           }
         >
-          <FullCalendarWrapper
-            courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
-            reservationData={reservationQuery.data ?? []} //same as above
-          />
+          <Box padding={"0.5rem"}>
+            <FullCalendarWrapper
+              courtData={courtQuery.data ?? []} //to reduce the time for rendering the calendar (with a spinner on it), instead of white page
+              reservationData={reservationQuery.data ?? []} //same as above
+            />
+            <CalendarClubInfo address={clubDataInStore.Address} />
+          </Box>
         </SpinnerPartial>
       </Container>
       <ReserveDialog />

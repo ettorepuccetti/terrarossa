@@ -37,6 +37,7 @@ export const clubRouter = createTRPCRouter({
           },
           include: {
             clubSettings: true,
+            Address: true,
           },
         })
         .catch((_error: Error) => {
