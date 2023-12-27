@@ -22,6 +22,8 @@ function CalendarHeaderContext(props: { session: Session; clubId: string }) {
     clubSettings: {
       ...clubSettings,
     },
+    Address: null,
+    PhoneNumber: null,
   });
 
   // set reservation query

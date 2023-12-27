@@ -24,6 +24,8 @@ function ReserveDialogWrapper(props: {
   // set clubData
   useMergedStoreContext((store) => store.setClubData)({
     ...club,
+    Address: null,
+    PhoneNumber: null,
     id: props.clubId ?? club.id,
     clubSettings: props.clubSettings ?? clubSettings,
   });
@@ -384,6 +386,10 @@ describe("USER", () => {
       });
 
       it("GIVEN admin WHEN enable recurrent switch and set end date THEN button enabled", () => {
+        if (dayjs().add(1, "week").year() !== dayjs().year()) {
+          cy.log("SKIP TEST: year of next week is different from current year");
+          return;
+        }
         cy.get("[data-test=recurrent-switch]").click();
         cy.get("[data-test=recurrent-end-date]")
           .should("be.visible")

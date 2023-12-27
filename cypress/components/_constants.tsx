@@ -72,6 +72,7 @@ export const club: Club = {
   imageSrc: null,
   logoSrc: null,
   updatedAt: null,
+  mail: null,
 };
 
 export const courts: Court[] = [

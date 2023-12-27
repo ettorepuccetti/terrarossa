@@ -9,6 +9,8 @@ function ReserveDialogEndDateContext() {
   //setting clubData
   useMergedStoreContext((state) => state.setClubData)({
     clubSettings: clubSettings,
+    Address: null,
+    PhoneNumber: null,
     ...club,
   });
 

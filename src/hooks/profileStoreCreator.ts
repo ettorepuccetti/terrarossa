@@ -1,7 +1,6 @@
 import { type StateCreator } from "zustand";
 import { type RouterOutputs } from "~/utils/api";
 import { getOrThrow } from "~/utils/utils";
-import { type CalendarStore } from "./calendarStoreCreator";
 import {
   type useGetSignedUrl,
   type useMyReservationsQuery,

@@ -40,6 +40,10 @@ jobs:
             echo "Deployment failed"
             exit 1
           fi
+      - name: Delete merged branch
+        if: ${{ env.DEPLOY_SUCCESS }}
+        run: |
+          pscale branch delete ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.PSCALE_BRANCH_NAME }} --org ${{ secrets.PLANETSCALE_ORG_NAME }} --force
 
   deploy-code:
     runs-on: ubuntu-latest
