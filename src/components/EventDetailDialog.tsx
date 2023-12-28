@@ -1,5 +1,4 @@
-import { Alert, Button, DialogActions, Typography } from "@mui/material";
-import { DateField, TimeField } from "@mui/x-date-pickers";
+import { Alert, Button } from "@mui/material";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
 import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
@@ -7,25 +6,33 @@ import { isAdminOfTheClub } from "~/utils/utils";
 import CalendarDialog from "./CalendarDialog";
 import CancelRecurrentDialog from "./CancelRecurrentDialog";
 import CancelSingleDialog from "./CancelSingleDialog";
+import DialogFieldGrid from "./DialogFieldGrid";
 
 export default function EventDetailDialog() {
+  const { data: sessionData } = useSession();
   const eventDetails = useMergedStoreContext((state) => state.eventDetails);
   const setEventDetails = useMergedStoreContext(
     (state) => state.setEventDetails,
   );
   const clubData = useMergedStoreContext((state) => state.getClubData());
-
-  const { data: sessionData } = useSession();
-
   const setDeleteConfirmationOpen = useMergedStoreContext(
     (state) => state.setDeleteConfirmationOpen,
   );
 
+  /**
+   * Check if the user is the admin (can delete every reservation) or the owner of the reservation
+   */
   const canDelete =
     isAdminOfTheClub(sessionData, clubData.id) ||
     (sessionData?.user?.id &&
       sessionData.user.id === eventDetails?.extendedProps?.userId);
 
+  /**
+   * Check if the reservation is too close to be cancelled
+   * @param startTime startTime of the reservation
+   * @param hoursBeforeCancel hours before the reservation that the user can cancel it
+   * @returns True if the reservation is too close to be cancelled and the user is not an admin
+   */
   const tooLateToCancel = (
     startTime: Date | null | undefined,
     hoursBeforeCancel: number,
@@ -44,43 +51,29 @@ export default function EventDetailDialog() {
         onClose={() => setEventDetails(null)}
         title="Prenotazione"
       >
-        {/* Court name */}
-        <DialogActions>
-          <Typography gutterBottom data-test="court-name">
-            {eventDetails?.getResources()[0]?.title}
-          </Typography>
-        </DialogActions>
-
-        {/* date (day) */}
-        <DateField
-          data-test="date"
-          color="info"
-          value={dayjs(eventDetails?.start)}
-          readOnly={true}
-          label={"Data"}
-          format="DD/MM/YYYY"
-          fullWidth
-        />
-
-        {/* time start */}
-        <TimeField
-          data-test="startTime"
-          color="info"
-          value={dayjs(eventDetails?.start)}
-          label={"Orario di inizio"}
-          readOnly={true}
-          ampm={false}
-          fullWidth
-        />
-        {/* time end */}
-        <TimeField
-          data-test="endTime"
-          color="info"
-          value={dayjs(eventDetails?.end)}
-          label={"Orario di fine"}
-          readOnly={true}
-          ampm={false}
-          fullWidth
+        <DialogFieldGrid
+          labelValues={[
+            {
+              label: "Campo",
+              value: eventDetails?.getResources()[0]?.title,
+              dataTest: "court-name",
+            },
+            {
+              label: "Data",
+              value: dayjs(eventDetails?.start).format("DD/MM/YYYY"),
+              dataTest: "date",
+            },
+            {
+              label: "Ora inizio",
+              value: dayjs(eventDetails?.start).format("HH:mm"),
+              dataTest: "startTime",
+            },
+            {
+              label: "Ora fine",
+              value: dayjs(eventDetails?.end).format("HH:mm"),
+              dataTest: "endTime",
+            },
+          ]}
         />
 
         {/* alert message */}
