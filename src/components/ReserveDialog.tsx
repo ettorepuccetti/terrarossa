@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Dialog, TextField } from "@mui/material";
+import { Alert, Box, Button, TextField } from "@mui/material";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { useSession } from "next-auth/react";
@@ -12,6 +12,7 @@ import {
   type RecurrentReservationInputSchema,
   type ReservationInputSchema,
 } from "~/hooks/calendarTrpcHooks";
+import CalendarDialog from "./CalendarDialog";
 import DialogFieldGrid from "./DialogFieldGrid";
 import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
@@ -106,7 +107,6 @@ export default function ReserveDialog() {
         })
         .catch((_error) => {});
     }
-    // setOpenReserveSuccess(true);
     setDateClick(null);
     setOverwriteName(undefined);
     setEndDate(null);
@@ -114,89 +114,84 @@ export default function ReserveDialog() {
   };
 
   return (
-    <>
-      <Dialog
-        data-test="reserve-dialog"
-        open={dateClick !== null}
-        onClose={() => {
-          setDateClick(null);
-          setOverwriteName(undefined);
-          setEndDate(null);
-          setRecurrentEndDate(null);
-        }}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogLayout title="Prenota">
-          {/* if not login only show "Login" button with no other fields */}
-          {sessionData ? (
-            <>
-              {/* Static data displayed with grid style for column allignement */}
-              <DialogFieldGrid
-                labelValues={[
-                  { label: "Campo", value: dateClick?.resource?.title },
-                  {
-                    label: "Data",
-                    value: startDate.format("DD/MM/YYYY"),
-                    dataTest: "date",
-                  },
-                  {
-                    label: "Ora inizio",
-                    value: startDate.format("HH:mm"),
-                    dataTest: "startTime",
-                  },
-                ]}
-              />
+    <CalendarDialog
+      title="Prenota"
+      data-test="reserve-dialog"
+      open={dateClick !== null}
+      onClose={() => {
+        setDateClick(null);
+        setOverwriteName(undefined);
+        setEndDate(null);
+        setRecurrentEndDate(null);
+      }}
+    >
+      {/* if not login only show "Login" button with no other fields */}
+      {sessionData ? (
+        <>
+          {/* Static data displayed with grid style for column allignement */}
+          <DialogFieldGrid
+            labelValues={[
+              { label: "Campo", value: dateClick?.resource?.title },
+              {
+                label: "Data",
+                value: startDate.format("DD/MM/YYYY"),
+                dataTest: "date",
+              },
+              {
+                label: "Ora inizio",
+                value: startDate.format("HH:mm"),
+                dataTest: "startTime",
+              },
+            ]}
+          />
 
-              {/* end time */}
-              <ReserveDialogEndDate clubSettings={clubData.clubSettings} />
+          {/* end time */}
+          <ReserveDialogEndDate clubSettings={clubData.clubSettings} />
 
-              {/* overwrite name, only if admin mode */}
-              {isAdminOfTheClub(sessionData, clubData.id) && (
-                <TextField
-                  data-test="overwriteName"
-                  variant="outlined"
-                  placeholder="Nome"
-                  label="Nome prenotazione"
-                  value={overwriteName || ""}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setOverwriteName(e.target.value)
-                  }
-                  fullWidth
-                  color="info"
-                />
-              )}
-
-              {/* recurrent reservation, only if admin mode */}
-              <ReserveDialogRecurrent />
-
-              {/* start date in the past warning, only for non admin */}
-              {!startDateIsFuture(sessionData, clubData.id, startDate) && (
-                <Box display={"flex"}>
-                  <Alert data-test="past-warning" severity={"warning"}>
-                    Non puoi prenotare una data nel passato
-                  </Alert>
-                </Box>
-              )}
-
-              <Button
-                onClick={() => void onConfirmButton()}
-                disabled={
-                  !startDateIsFuture(sessionData, clubData.id, startDate) ||
-                  endDateError ||
-                  recurrentEndDateError
-                }
-                color="info"
-                data-test="reserveButton"
-              >
-                Prenota
-              </Button>
-            </>
-          ) : (
-            <ReserveDialogLoginButton />
+          {/* overwrite name, only if admin mode */}
+          {isAdminOfTheClub(sessionData, clubData.id) && (
+            <TextField
+              data-test="overwriteName"
+              variant="outlined"
+              placeholder="Nome"
+              label="Nome prenotazione"
+              value={overwriteName || ""}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setOverwriteName(e.target.value)
+              }
+              fullWidth
+              color="info"
+            />
           )}
-        </DialogLayout>
-      </Dialog>
-    </>
+
+          {/* recurrent reservation, only if admin mode */}
+          <ReserveDialogRecurrent />
+
+          {/* start date in the past warning, only for non admin */}
+          {!startDateIsFuture(sessionData, clubData.id, startDate) && (
+            <Box display={"flex"}>
+              <Alert data-test="past-warning" severity={"warning"}>
+                Non puoi prenotare una data nel passato
+              </Alert>
+            </Box>
+          )}
+
+          <Button
+            onClick={() => void onConfirmButton()}
+            disabled={
+              !startDateIsFuture(sessionData, clubData.id, startDate) ||
+              endDateError ||
+              recurrentEndDateError
+            }
+            color="info"
+            data-test="reserveButton"
+          >
+            Prenota
+          </Button>
+        </>
+      ) : (
+        <ReserveDialogLoginButton />
+      )}
+    </CalendarDialog>
   );
 }

@@ -40,6 +40,10 @@ jobs:
             echo "Deployment failed"
             exit 1
           fi
+      - name: skip revert DR
+        if: ${{ env.DEPLOY_SUCCESS }}
+        run: |
+          pscale dr skip-revert ${{ secrets.PLANETSCALE_DATABASE_NAME }} ${{ env.DEPLOY_REQUEST_NUMBER }} --org ${{ secrets.PLANETSCALE_ORG_NAME }}
       - name: Delete merged branch
         if: ${{ env.DEPLOY_SUCCESS }}
         run: |

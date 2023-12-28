@@ -24,6 +24,7 @@ export default function ReserveDialogEndDate(props: {
     <TimePicker
       slotProps={{
         textField: {
+          // variant: "standard",
           inputProps: { "data-test": "endTime" },
           color: "info",
           helperText: endDateErrorText,
