@@ -1,6 +1,6 @@
 import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
-import ConfirmationDialog from "./ConfirmationDialog";
+import ConfirmationInplace from "./ConfirmationInplace";
 
 export default function CancelSingleDialog() {
   const logger = useLogger({
@@ -43,16 +43,15 @@ export default function CancelSingleDialog() {
 
   return (
     <>
-      <ConfirmationDialog
+      <ConfirmationInplace
         data-test="cancel-single-dialog"
         // if the event is recurrent, the delete dialog is handled by CancelRecurrentDialog
         open={
           deleteConfirmationOpen && !eventDetails?.extendedProps.recurrentId
         }
-        title={"Cancellazione"}
         message={"Sei sicuro di voler cancellare la prenotazione?"}
         onConfirm={() => deleteReservation(eventDetails?.id)}
-        onDialogClose={() => setDeleteConfirmationOpen(false)}
+        onCancel={() => setDeleteConfirmationOpen(false)}
       />
     </>
   );

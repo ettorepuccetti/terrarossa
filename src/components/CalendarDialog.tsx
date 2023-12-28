@@ -17,11 +17,9 @@ export default function CalendarDialog({
       onClose={props.onClose}
       data-test={props.dataTest}
       fullWidth
-      sx={{
-        "& .MuiDialog-container": {
-          "& .MuiPaper-root": {
-            maxWidth: "350px",
-          },
+      PaperProps={{
+        sx: {
+          maxWidth: "350px",
         },
       }}
     >

@@ -18,6 +18,9 @@ export default function EventDetailDialog() {
   const setDeleteConfirmationOpen = useMergedStoreContext(
     (state) => state.setDeleteConfirmationOpen,
   );
+  const deleteConfirmationOpen = useMergedStoreContext(
+    (store) => store.deleteConfirmationOpen,
+  );
 
   /**
    * Check if the user is the admin (can delete every reservation) or the owner of the reservation
@@ -48,7 +51,10 @@ export default function EventDetailDialog() {
       <CalendarDialog
         dataTest="event-detail-dialog"
         open={eventDetails !== null}
-        onClose={() => setEventDetails(null)}
+        onClose={() => {
+          setEventDetails(null);
+          setDeleteConfirmationOpen(false);
+        }}
         title="Prenotazione"
       >
         <DialogFieldGrid
@@ -89,7 +95,7 @@ export default function EventDetailDialog() {
           )}
 
         {/* delete button */}
-        {canDelete && (
+        {canDelete && !deleteConfirmationOpen && (
           <Button
             onClick={() => setDeleteConfirmationOpen(true)}
             color={"error"}

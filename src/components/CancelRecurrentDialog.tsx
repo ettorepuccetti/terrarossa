@@ -1,8 +1,7 @@
 import {
   Alert,
+  Box,
   Button,
-  Dialog,
-  DialogActions,
   FormControl,
   FormControlLabel,
   Radio,
@@ -11,7 +10,6 @@ import {
 import React from "react";
 import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
 import { useLogger } from "~/utils/logger";
-import DialogLayout from "./DialogLayout";
 
 export default function CancelRecurrentDialog() {
   const logger = useLogger({
@@ -84,56 +82,51 @@ export default function CancelRecurrentDialog() {
     });
   };
 
+  if (!(deleteOpen && !!eventDetails?.extendedProps.recurrentId)) return null;
+
   return (
-    <Dialog
-      data-test="cancel-recurrent-dialog"
-      open={deleteOpen && !!eventDetails?.extendedProps.recurrentId}
-      onClose={() => setDeleteConfirmationOpen(false)}
-    >
-      <DialogLayout title="Cancellazione">
-        <Alert severity="error">
-          Questa prenotazione fa parte di un{"'"}ora fissa. Cosa vuoi
-          cancellare?
-        </Alert>
-        <FormControl>
-          <RadioGroup
-            name="controlled-radio-buttons-group"
-            value={value}
-            onChange={(event) => setValue(event.target.value)}
-          >
-            <FormControlLabel
-              data-test="single"
-              value="single"
-              control={<Radio color="info" />}
-              label="Prenotazione singola"
-              componentsProps={{ typography: { color: "MenuText" } }}
-            />
-            <FormControlLabel
-              data-test="recurrent"
-              value="recurrent"
-              control={<Radio color="info" />}
-              label="Tutte le prenotazioni di questa ora fissa"
-              componentsProps={{ typography: { color: "MenuText" } }}
-            />
-          </RadioGroup>
-        </FormControl>
-        <DialogActions>
-          <Button
-            data-test="cancel-button"
-            onClick={() => setDeleteConfirmationOpen(false)}
-            color="info"
-          >
-            Annulla
-          </Button>
-          <Button
-            data-test="confirm-button"
-            onClick={() => handleConfirmation()}
-            color="error"
-          >
-            Conferma
-          </Button>
-        </DialogActions>
-      </DialogLayout>
-    </Dialog>
+    <Box data-test="cancel-recurrent-dialog">
+      <Alert severity="error">
+        Questa prenotazione fa parte di un{"'"}ora fissa. Cosa vuoi cancellare?
+      </Alert>
+      <FormControl>
+        <RadioGroup
+          name="controlled-radio-buttons-group"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+        >
+          <FormControlLabel
+            data-test="single"
+            value="single"
+            control={<Radio color="info" />}
+            label="Prenotazione singola"
+            componentsProps={{ typography: { color: "MenuText" } }}
+          />
+          <FormControlLabel
+            data-test="recurrent"
+            value="recurrent"
+            control={<Radio color="info" />}
+            label="Tutte le prenotazioni di questa ora fissa"
+            componentsProps={{ typography: { color: "MenuText" } }}
+          />
+        </RadioGroup>
+      </FormControl>
+      <Box marginTop={2} display={"flex"} justifyContent={"space-evenly"}>
+        <Button
+          data-test="cancel-button"
+          onClick={() => setDeleteConfirmationOpen(false)}
+          color="info"
+        >
+          Annulla
+        </Button>
+        <Button
+          data-test="confirm-button"
+          onClick={() => handleConfirmation()}
+          color="error"
+        >
+          Conferma
+        </Button>
+      </Box>
+    </Box>
   );
 }

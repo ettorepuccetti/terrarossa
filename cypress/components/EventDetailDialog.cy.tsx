@@ -55,24 +55,18 @@ it("check base EventDetailDialog", () => {
   );
 
   cy.get("h2").should("contain", "Prenotazione");
-  cy.get("[data-test=event-detail-dialog]").should("be.visible");
+  cy.getByDataTest("event-detail-dialog").should("be.visible");
   // court name
-  cy.get("[data-test=court-name").should(
+  cy.getByDataTest("court-name").should(
     "have.text",
     eventDetailsSingle.getResources()[0]!.title,
   );
   // date
-  cy.get("[data-test=date]")
-    .find("input")
-    .should("have.value", startDate.format("DD/MM/YYYY"));
+  cy.getByDataTest("date").should("have.text", startDate.format("DD/MM/YYYY"));
   // start time
-  cy.get("[data-test=startTime]")
-    .find("input")
-    .should("have.value", startDate.format("HH:mm"));
+  cy.getByDataTest("startTime").should("have.text", startDate.format("HH:mm"));
   // end time
-  cy.get("[data-test=endTime]")
-    .find("input")
-    .should("have.value", endDate.format("HH:mm"));
+  cy.getByDataTest("endTime").should("have.text", endDate.format("HH:mm"));
   //delete button enabled
   cy.get("[data-test=delete-button]").should("be.visible").and("be.enabled");
 });
