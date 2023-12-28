@@ -1,4 +1,4 @@
-name: Planetscale - open deploy request
+name: Pscale - open deploy request
 run-name: ${{ github.head_ref}}
 on:
   pull_request:
