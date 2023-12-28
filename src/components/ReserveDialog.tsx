@@ -14,7 +14,6 @@ import {
 } from "~/hooks/calendarTrpcHooks";
 import CalendarDialog from "./CalendarDialog";
 import DialogFieldGrid from "./DialogFieldGrid";
-import DialogLayout from "./DialogLayout";
 import ReserveDialogEndDate from "./ReserveDialogEndDate";
 import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
@@ -116,7 +115,7 @@ export default function ReserveDialog() {
   return (
     <CalendarDialog
       title="Prenota"
-      data-test="reserve-dialog"
+      dataTest="reserve-dialog"
       open={dateClick !== null}
       onClose={() => {
         setDateClick(null);

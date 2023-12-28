@@ -39,7 +39,7 @@ export default function EventDetailDialog() {
   return (
     <>
       <CalendarDialog
-        data-test="event-detail-dialog"
+        dataTest="event-detail-dialog"
         open={eventDetails !== null}
         onClose={() => setEventDetails(null)}
         title="Prenotazione"
