@@ -3,20 +3,18 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import {
+  allEnglandAddress,
   allEnglandClubName,
+  allEnglandPhone,
   centerCourtName,
   centralCourtName,
   court1AllEngName,
   court1ForoName,
+  foroItalicoAddress,
   foroItalicoName,
+  foroItalicoPhone,
   pietrangeliCourtName,
 } from "../src/utils/constants";
-import {
-  allEnglandAddress,
-  allEnglandPhone,
-  foroItalicoAddress,
-  foroItalicoPhone,
-} from "./seed";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

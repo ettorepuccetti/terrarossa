@@ -20,3 +20,35 @@ export const court1ForoName = "Court 1";
 export const allEnglandClubName = "All England Club";
 export const centerCourtName = "Center Court";
 export const court1AllEngName = "Court 1";
+
+/* --------------------
+---- CLUBS SEEDING ----
+----------------------- */
+
+export const foroItalicoAddress = {
+  street: "Viale del Foro Italico",
+  number: "1",
+  zipCode: "00135",
+  city: "Roma",
+  country: "Italy",
+  countryCode: "IT",
+};
+
+export const allEnglandAddress = {
+  street: "Church Rd",
+  zipCode: "SW19 5AE",
+  city: "London",
+  country: "United Kingdom",
+  countryCode: "GB",
+  number: null,
+};
+
+export const foroItalicoPhone = {
+  number: "0636851",
+  nationalPrefix: "+39",
+};
+
+export const allEnglandPhone = {
+  number: "02089441066",
+  nationalPrefix: "+44",
+};

@@ -1,41 +1,17 @@
 import { PrismaClient } from "@prisma/client";
 import {
+  allEnglandAddress,
   allEnglandClubName,
+  allEnglandPhone,
   centerCourtName,
   centralCourtName,
   court1AllEngName,
   court1ForoName,
+  foroItalicoAddress,
   foroItalicoName,
+  foroItalicoPhone,
   pietrangeliCourtName,
 } from "../src/utils/constants";
-
-export const foroItalicoAddress = {
-  street: "Viale del Foro Italico",
-  number: "1",
-  zipCode: "00135",
-  city: "Roma",
-  country: "Italy",
-  countryCode: "IT",
-};
-
-export const allEnglandAddress = {
-  street: "Church Rd",
-  zipCode: "SW19 5AE",
-  city: "London",
-  country: "United Kingdom",
-  countryCode: "GB",
-  number: null,
-};
-
-export const foroItalicoPhone = {
-  number: "0636851",
-  nationalPrefix: "+39",
-};
-
-export const allEnglandPhone = {
-  number: "02089441066",
-  nationalPrefix: "+44",
-};
 
 const prisma = new PrismaClient();
 async function main() {
