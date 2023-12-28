@@ -13,6 +13,8 @@ function CancelSingleDialogContext() {
   // set club data
   useMergedStoreContext((store) => store.setClubData)({
     clubSettings: clubSettings,
+    Address: null,
+    PhoneNumber: null,
     ...club,
   });
 

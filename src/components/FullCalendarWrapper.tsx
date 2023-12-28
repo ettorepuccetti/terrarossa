@@ -143,7 +143,7 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   };
 
   return (
-    <Box padding={"0.5rem"}>
+    <Box padding={0.5}>
       <FullCalendar
         ref={calendarRef}
         schedulerLicenseKey="CC-Attribution-NonCommercial-NoDerivatives"

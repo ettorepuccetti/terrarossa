@@ -4,6 +4,7 @@ import { type ResourceApi } from "@fullcalendar/resource";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
+  type Address,
   type Club,
   type ClubSettings,
   type Court,
@@ -52,6 +53,17 @@ export const clubSettings: ClubSettings = {
   updatedAt: new Date(),
 };
 
+export const clubAddress: Address = {
+  id: "1",
+  street: "Via Roma",
+  number: "1",
+  city: "Roma",
+  zipCode: "00100",
+  clubId: "1",
+  country: "Italia",
+  countryCode: "IT",
+};
+
 export const club: Club = {
   id: "1",
   name: "Club 1",
@@ -60,6 +72,7 @@ export const club: Club = {
   imageSrc: null,
   logoSrc: null,
   updatedAt: null,
+  mail: null,
 };
 
 export const courts: Court[] = [

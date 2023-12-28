@@ -94,6 +94,11 @@ describe("New reservation", () => {
   });
 
   it("GIVEN admin WHEN make recurrent reservation THEN reservations are created", function () {
+    // check if I am not in the last two weeks of the year
+    if (dayjs().add(2, "week").year() !== dayjs().year()) {
+      cy.log("Skipping because recurrent reservation endDate is next year");
+      return;
+    }
     cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
     cy.get("[data-test=recurrent-switch]").click();
     cy.get("[data-test=recurrent-end-date]").type(
@@ -111,6 +116,12 @@ describe("New reservation", () => {
   });
 
   it("GIVEN admin WHEN make recurrent reservation AND there is a conflict THEN error is shown", function () {
+    // check if I am not in the last two weeks of the year
+    if (dayjs().add(2, "week").year() !== dayjs().year()) {
+      cy.log("Skipping because recurrent reservation endDate is next year");
+      return;
+    }
+
     //create reservation that will conflict with the recurrent one
     const conflictStartDate = dayjs()
       .add(1, "week")
@@ -186,6 +197,11 @@ describe("Existing reservation", () => {
   });
 
   it("GIVEN admin WHEN cancel recurrent reservation series THEN all reservations are deleted", function () {
+    // check if I am not in the last week of the year
+    if (dayjs().add(1, "week").year() !== dayjs().year()) {
+      cy.log("Skipping because recurrent reservation endDate is next year");
+      return;
+    }
     // create recurrent reservation
     cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
     cy.get("[data-test=recurrent-switch]").click();
@@ -207,6 +223,11 @@ describe("Existing reservation", () => {
   });
 
   it("GIVEN admin WHEN cancel single occurrence of recurrent reservation THEN only single reservation deleted", function () {
+    // check if I am not in the last week of the year
+    if (dayjs().add(2, "week").year() !== dayjs().year()) {
+      cy.log("Skipping because recurrent reservation endDate is next year");
+      return;
+    }
     // create recurrent reservation
     cy.clickOnCalendarSlot(pietrangeliCourtName, 12, 0);
     cy.get("[data-test=recurrent-switch]").click();

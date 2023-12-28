@@ -9,6 +9,34 @@ import {
   pietrangeliCourtName,
 } from "../src/utils/constants";
 
+export const foroItalicoAddress = {
+  street: "Viale del Foro Italico",
+  number: "1",
+  zipCode: "00135",
+  city: "Roma",
+  country: "Italy",
+  countryCode: "IT",
+};
+
+export const allEnglandAddress = {
+  street: "Church Rd",
+  zipCode: "SW19 5AE",
+  city: "London",
+  country: "United Kingdom",
+  countryCode: "GB",
+  number: null,
+};
+
+export const foroItalicoPhone = {
+  number: "0636851",
+  nationalPrefix: "+39",
+};
+
+export const allEnglandPhone = {
+  number: "02089441066",
+  nationalPrefix: "+44",
+};
+
 const prisma = new PrismaClient();
 async function main() {
   const foroItalico = await prisma.club.upsert({
@@ -18,6 +46,13 @@ async function main() {
       name: foroItalicoName,
       logoSrc: "https://r2.terrarossa.app/bnl-logo.png",
       imageSrc: "https://r2.terrarossa.app/bnl-image.jpg",
+      Address: {
+        create: foroItalicoAddress,
+      },
+      PhoneNumber: {
+        create: foroItalicoPhone,
+      },
+      mail: "ticketoffice@federtennis.it",
       courts: {
         create: [
           {
@@ -54,6 +89,13 @@ async function main() {
       name: allEnglandClubName,
       imageSrc: "https://r2.terrarossa.app/wimbledon-image.jpg",
       logoSrc: "https://r2.terrarossa.app/wimbledon-logo.png",
+      Address: {
+        create: allEnglandAddress,
+      },
+      PhoneNumber: {
+        create: allEnglandPhone,
+      },
+      mail: "info@wimbledon-village.com",
       clubSettings: {
         create: {
           daysInFutureVisible: 5,

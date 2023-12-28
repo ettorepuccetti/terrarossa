@@ -1,18 +1,11 @@
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import {
-  Box,
-  Card,
-  CardContent,
-  CardMedia,
-  ListItemText,
-  Typography,
-} from "@mui/material";
-import { type Club } from "@prisma/client";
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { defaultClubImage } from "~/utils/constants";
+import { ClubAddress } from "./ClubAddress";
+import { type ClubQueryResult } from "./Search";
 
-export const ClubSearchCard = ({ club }: { club: Club }) => {
+export const ClubSearchCard = ({ club }: { club: ClubQueryResult }) => {
   return (
     <Link
       href={{
@@ -22,22 +15,30 @@ export const ClubSearchCard = ({ club }: { club: Club }) => {
       data-test={"club-card-" + club.name}
     >
       <Card>
+        {/* Club Image */}
         <CardMedia sx={{ height: 140, position: "relative" }}>
           <Image
             fill={true}
             alt={club.name}
             src={club.imageSrc ?? defaultClubImage}
             style={{ objectFit: "cover" }}
+            sizes="(max-width: 600px) 100vw, 600px"
           />
         </CardMedia>
-        <CardContent>
+        <CardContent
+          sx={{
+            "&.MuiCardContent-root": {
+              paddingTop: "8px",
+              paddingBottom: "12px",
+            },
+          }}
+        >
+          {/* Club name */}
           <Typography variant="h6" fontWeight={500}>
             {club.name}
           </Typography>
-          <Box display={"flex"} gap={1} alignItems={"center"}>
-            <HomeOutlinedIcon />
-            <ListItemText primary="indirizzo" />
-          </Box>
+          {/* Address */}
+          <ClubAddress address={club.Address} />{" "}
         </CardContent>
       </Card>
     </Link>

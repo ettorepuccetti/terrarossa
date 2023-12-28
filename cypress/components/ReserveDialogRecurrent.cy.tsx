@@ -16,6 +16,8 @@ function ReserveDialogRecurrentContext() {
   //setting clubId
   useMergedStoreContext((store) => store.setClubData)({
     clubSettings: clubSettings,
+    Address: null,
+    PhoneNumber: null,
     ...club,
   });
 

@@ -21,6 +21,7 @@ export const ReserveSuccessSnackbar = () => {
       open={open}
       autoHideDuration={6000}
       onClose={handleClose}
+      anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
     >
       <Alert
         severity="success"

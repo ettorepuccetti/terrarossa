@@ -120,11 +120,38 @@ model Club {
   courts         Court[]
   imageSrc       String?
   logoSrc        String?
-  Admin          User[] //TODO: remove
+  Admin          User[]
   clubSettings   ClubSettings @relation(fields: [clubSettingsId], references: [id])
   clubSettingsId String       @unique
+  Address        Address?
+  PhoneNumber    PhoneNumber?
+  mail           String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime?    @updatedAt
+}
+
+model PhoneNumber {
+  id             String @id @unique @default(cuid())
+  number         String
+  nationalPrefix String
+  Club           Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId         String @unique
+
+  @@index([clubId])
+}
+
+model Address {
+  id          String  @id @unique @default(cuid())
+  street      String
+  number      String?
+  zipCode     String
+  city        String
+  country     String
+  countryCode String
+  Club        Club    @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId      String  @unique
+
+  @@index([clubId])
 }
 
 model ClubSettings {
