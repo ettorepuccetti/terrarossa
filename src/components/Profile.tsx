@@ -165,6 +165,7 @@ export const Profile = () => {
           reservations={myReservationsQuery.data || []}
         />
 
+        <Typography variant={"h6"}>Impostazioni</Typography>
         <DeleteAccount />
       </Box>
     </>
