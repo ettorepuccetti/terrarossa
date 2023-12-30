@@ -49,7 +49,7 @@ jobs:
           build: npm run build:test
           runTests: false
       - name: Save build folder
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           if-no-files-found: error
@@ -73,7 +73,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Download the build folders
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: .next
@@ -104,7 +104,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Download the build folders
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: .next
@@ -127,7 +127,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Download the build folders
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: .next
