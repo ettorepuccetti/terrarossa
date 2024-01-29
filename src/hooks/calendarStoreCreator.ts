@@ -21,7 +21,7 @@ export interface CalendarStore {
   endDate: Dayjs | null;
   endDateError: boolean;
   recurrentEndDate: Dayjs | null;
-  recurringEndDateError: boolean;
+  recurrentEndDateError: boolean;
   deleteConfirmationOpen: boolean;
   calendarRef: RefObject<FullCalendar>;
   calendarIsLoading: boolean;
@@ -43,7 +43,7 @@ export interface CalendarStore {
   setEndDate: (endDate: Dayjs | null) => void;
   setEndDateError: (endDateError: boolean) => void;
   setRecurrentEndDate: (recurrentEndDate: Dayjs | null) => void;
-  setRecurringEndDateError: (recurringEndDateError: boolean) => void;
+  setRecurrentEndDateError: (recurringEndDateError: boolean) => void;
   setDeleteConfirmationOpen: (deleteConfirmationOpen: boolean) => void;
   setCalendarRef: (calendarRef: RefObject<FullCalendar>) => void;
   setSelectedDate: (selectedDate: Dayjs) => void;
@@ -103,7 +103,7 @@ export const calendarStoreCreator: StateCreator<
   endDate: null,
   endDateError: false,
   recurrentEndDate: null,
-  recurringEndDateError: false,
+  recurrentEndDateError: false,
   deleteConfirmationOpen: false,
   calendarRef: { current: null },
   calendarIsLoading: false,
@@ -125,8 +125,8 @@ export const calendarStoreCreator: StateCreator<
   setEndDateError: (endDateError) => set({ endDateError: endDateError }),
   setRecurrentEndDate: (recurrentEndDate) =>
     set({ recurrentEndDate: recurrentEndDate }),
-  setRecurringEndDateError: (recurringEndDateError) =>
-    set({ recurringEndDateError: recurringEndDateError }),
+  setRecurrentEndDateError: (recurrentEndDateError) =>
+    set({ recurrentEndDateError: recurrentEndDateError }),
   setDeleteConfirmationOpen: (deleteConfirmationOpen) =>
     set({ deleteConfirmationOpen: deleteConfirmationOpen }),
   setCalendarRef: (calendarRef) => set({ calendarRef: calendarRef }),
@@ -186,7 +186,7 @@ export const calendarStoreCreator: StateCreator<
   setSetRecurrentEndDate: (stub: (endDate: Dayjs | null) => void) =>
     set({ setRecurrentEndDate: stub }),
   setSetRecurringEndDateError: (stub: (endDateError: boolean) => void) =>
-    set({ setRecurringEndDateError: stub }),
+    set({ setRecurrentEndDateError: stub }),
   setSetSelectedDate: (stub: (selectedDate: Dayjs) => void) =>
     set({ setSelectedDate: stub }),
 });

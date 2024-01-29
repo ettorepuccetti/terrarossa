@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import CalendarHeader from "~/components/CalendarHeader";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { type RouterOutputs } from "~/utils/api";
 import { capitaliseFirstChar as capitalizeFirstChar } from "~/utils/utils";
 import {

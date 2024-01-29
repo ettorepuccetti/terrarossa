@@ -4,7 +4,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { isAdminOfTheClub, startDateIsFuture } from "~/utils/utils";
 
 export default function ReserveDialogEndDate(props: {

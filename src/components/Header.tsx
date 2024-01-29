@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Image from "next/image";
 import React from "react";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { appNameInHeader, defaultLogoSrc } from "~/utils/constants";
 import Drawer from "./DrawerWrapper";
 

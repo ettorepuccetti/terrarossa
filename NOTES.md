@@ -240,9 +240,9 @@ group: "UI - Chrome [ - mobile]"
 
 ### Environment variables
 
-[source](https://docs.cypress.io/guides/guides/environment-variables)
+[cypress guide](https://docs.cypress.io/guides/guides/environment-variables)
 
-#### 1. `cypress.config.ts`
+1. `cypress.config.ts`
 
 ```
 export default defineConfig({
@@ -258,7 +258,7 @@ became accessible in test file as
 Cypress.env('login_url') // '/login'
 ```
 
-#### 2. `cypress.env.json`
+2. `cypress.env.json`
 
 ```
 {
@@ -266,7 +266,7 @@ Cypress.env('login_url') // '/login'
 }
 ```
 
-#### 3. `CYPRESS_*`
+3. `CYPRESS_*`
 
 Any exported environment variables set on the command line or in your CI provider that start with either `CYPRESS*` or `cypress*` will automatically be parsed by Cypress.
 
@@ -284,13 +284,40 @@ in test:
 Cypress.env('api_server') // 'http://localhost:8888/api/v1/'
 ```
 
-#### 4. `--env`
+4. `--env`
 
 from command line:
 
 ```
 cypress run --env api_server=http://localhost:8888/api/v1
 ```
+
+### Providing context to component in Cypress component testing
+
+General concept:
+https://blog.zenika.com/2022/10/07/a-few-ways-to-approach-cypress-component-testing-with-react-components/
+https://github.com/Ked57/cypress-ct-example-app
+
+Zustand:
+https://github.com/pmndrs/zustand/blob/main/docs/guides/testing.md
+
+React Query:
+https://tkdodo.eu/blog/testing-react-query
+
+### MSW (in case I want to mock the network for testing)
+
+https://github.com/maloguertin/msw-trpc
+
+How to use with cypress (when to initialize service worker)
+https://github.com/mswjs/msw/issues/1560
+https://www.capocaccia.dev/posts/cypressMsw
+
+libraries or example on top of msw:
+https://github.com/deshiknaves/cypress-msw-interceptor
+https://github.com/abrahamgr/msw-cypress
+
+discussion on trpc repo on how to mock calls:
+https://github.com/trpc/trpc/discussions/1879
 
 ## Github Actions
 
@@ -327,8 +354,7 @@ Currently applied only for preview environment. On new deploy, it mark the old o
 
 install husky and lint-staged:
 
-```
-
+```shell
 npx husky-init
 npm install --save-dev lint-staged
 npx husky set .husky/pre-commit "npx lint-staged"
@@ -337,10 +363,10 @@ npx husky set .husky/pre-commit "npx lint-staged"
 
 configure lint-staged in `package.json`:
 
-```
+```json
 "lint-staged": {
-    "*": "prettier --ignore-unknown --write"
-  },
+  "*": "prettier --ignore-unknown --write"
+},
 ```
 
 run once:
@@ -351,33 +377,6 @@ npm run prepare
 
 On each commit, husky will run lint-staged, which will run prettier on all staged files.
 
-## Providing context to component in Cypress component testing
-
-General concept:
-https://blog.zenika.com/2022/10/07/a-few-ways-to-approach-cypress-component-testing-with-react-components/
-https://github.com/Ked57/cypress-ct-example-app
-
-Zustand:
-https://github.com/pmndrs/zustand/blob/main/docs/guides/testing.md
-
-React Query:
-https://tkdodo.eu/blog/testing-react-query
-
-## MSW (in case I want to mock the network for testing)
-
-https://github.com/maloguertin/msw-trpc
-
-How to use with cypress (when to initialize service worker)
-https://github.com/mswjs/msw/issues/1560
-https://www.capocaccia.dev/posts/cypressMsw
-
-libraries or example on top of msw:
-https://github.com/deshiknaves/cypress-msw-interceptor
-https://github.com/abrahamgr/msw-cypress
-
-discussion on trpc repo on how to mock calls:
-https://github.com/trpc/trpc/discussions/1879
-
 ## Ignoring commit in git blame:
 
 https://akrabat.com/ignoring-revisions-with-git-blame/
@@ -386,7 +385,7 @@ https://akrabat.com/ignoring-revisions-with-git-blame/
 - run: `git config blame.ignoreRevsFile .git-blame-ignore-revs`
 - write the 40 chars commit hash in it of the commit to ignore
 
-## Logs
+## Pino logger + Logflare
 
 Pino logger + Logflare. Code example repo: [next-pino-logflare-logging-example
 ](https://github.com/Logflare/next-pino-logflare-logging-example)
@@ -403,7 +402,7 @@ On logflare, once installed the integration, create a source (`terrarossa.vercel
 
 Create another source (optional) and get `SOURCE_ID` and `API_KEY` for initialize the logger object in the code.
 
-## NODE_ENV (for enabling features client side)
+## NEXT_PUBLIC_APP_ENV (for enabling features client side)
 
 Nextjs actually support only two values: `development` and `production` (see this [discussion](https://github.com/vercel/next.js/issues/17032#issuecomment-691491353)).
 To overcome this, best option is to use `APP_ENV`. Since it needs to be read client side, it became:
@@ -429,7 +428,7 @@ NEXT_PUBLIC_APP_ENV="development"
 
 ### `cypress-testing.yml`:
 
-```
+```conf
 env:
   NODE_ENV="development"
   NEXT_PUBLIC_APP_ENV="test"
@@ -438,10 +437,10 @@ env:
 
 ### `package.json`:
 
-```
-    "dev": "next"
+```json
+    "dev": "next",
 
-    "dev:test": "NEXT_PUBLIC_APP_ENV='test'
+    "dev:test": "NEXT_PUBLIC_APP_ENV='test'",
 
     "cypress": "NEXT_PUBLIC_APP_ENV='test' cypress open",
 
@@ -454,8 +453,6 @@ env:
 
 I set `NEXT_PUBLIC_APP_ENV="development"`
 in `.env` file. Easy as that
-
-TODO: What if I want to make a production build locally and run that one (with variable set to production)?
 
 ### Vercel
 

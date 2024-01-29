@@ -2,7 +2,7 @@ import { Box, Switch, Typography } from "@mui/material";
 import { DatePicker, type DateValidationError } from "@mui/x-date-pickers";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 
 export default function ReserveDialogRecurrent() {
@@ -15,7 +15,7 @@ export default function ReserveDialogRecurrent() {
     (state) => state.setRecurrentEndDate,
   );
   const setRecurrentEndDateError = useMergedStoreContext(
-    (state) => state.setRecurringEndDateError,
+    (state) => state.setRecurrentEndDateError,
   );
   const [recurrentView, setRecurrentView] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string | null>(null);

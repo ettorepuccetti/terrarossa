@@ -1,3 +1,5 @@
+import { type Address, type PhoneNumber } from "@prisma/client";
+
 export enum UserRoles {
   ADMIN = "ADMIN",
   USER = "USER",
@@ -24,8 +26,11 @@ export const court1AllEngName = "Court 1";
 /* --------------------
 ---- CLUBS SEEDING ----
 ----------------------- */
+type AddressInput = Omit<Address, "id" | "createdAt" | "updatedAt" | "clubId">;
 
-export const foroItalicoAddress = {
+type PhoneNumberInput = Pick<PhoneNumber, "number" | "nationalPrefix">;
+
+export const foroItalicoAddress: AddressInput = {
   street: "Viale del Foro Italico",
   number: "1",
   zipCode: "00135",
@@ -34,7 +39,7 @@ export const foroItalicoAddress = {
   countryCode: "IT",
 };
 
-export const allEnglandAddress = {
+export const allEnglandAddress: AddressInput = {
   street: "Church Rd",
   zipCode: "SW19 5AE",
   city: "London",
@@ -43,12 +48,12 @@ export const allEnglandAddress = {
   number: null,
 };
 
-export const foroItalicoPhone = {
+export const foroItalicoPhone: PhoneNumberInput = {
   number: "0636851",
   nationalPrefix: "+39",
 };
 
-export const allEnglandPhone = {
+export const allEnglandPhone: PhoneNumberInput = {
   number: "02089441066",
   nationalPrefix: "+44",
 };

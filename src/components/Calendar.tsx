@@ -13,7 +13,7 @@ import {
   useReservationDelete,
   useReservationQuery,
 } from "~/hooks/calendarTrpcHooks";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 import CalendarClubInfo from "./CalendarClubInfo";
 import CalendarHeader from "./CalendarHeader";

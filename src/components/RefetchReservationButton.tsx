@@ -1,6 +1,6 @@
 import RefreshOutlined from "@mui/icons-material/RefreshOutlined";
 import { IconButton } from "@mui/material";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 
 export default function RefetchReservationButton() {

@@ -2,7 +2,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Box, IconButton, TextField } from "@mui/material";
 import dayjs from "dayjs";
 import { useState } from "react";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { EditUsernameDialog } from "./EditUsernameDialog";
 
 export const ProfileTextInfo = () => {

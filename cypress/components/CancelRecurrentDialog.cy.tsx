@@ -1,5 +1,5 @@
 import CancelRecurrentDialog from "~/components/CancelRecurrentDialog";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import {
   buildTrpcMutationMock,
   club,

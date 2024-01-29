@@ -14,7 +14,7 @@ import { Box, useTheme, type PaletteColor } from "@mui/material";
 import { type inferRouterOutputs } from "@trpc/server";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, type RefObject } from "react";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { type AppRouter } from "~/server/api/root";
 import { useLogger } from "~/utils/logger";
 import {

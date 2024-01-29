@@ -2,7 +2,7 @@ import { type DateClickArg } from "@fullcalendar/interaction";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import ReserveDialogRecurrent from "~/components/ReserveDialogRecurrent";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import {
   club,
   clubSettings,

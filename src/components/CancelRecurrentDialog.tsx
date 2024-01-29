@@ -8,7 +8,7 @@ import {
   RadioGroup,
 } from "@mui/material";
 import React from "react";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 
 export default function CancelRecurrentDialog() {

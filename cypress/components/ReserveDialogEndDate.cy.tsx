@@ -2,7 +2,7 @@ import { type DateClickArg } from "@fullcalendar/interaction";
 import { type ClubSettings } from "@prisma/client";
 import dayjs from "dayjs";
 import ReserveDialogEndDate from "~/components/ReserveDialogEndDate";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { club, clubSettings, mountWithContexts, session } from "./_constants";
 
 function ReserveDialogEndDateContext() {

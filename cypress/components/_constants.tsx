@@ -23,7 +23,7 @@ import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import superjson from "superjson";
-import { MergedStoreProvider } from "~/hooks/useCalendarStoreContext";
+import { MergedStoreProvider } from "~/hooks/useMergedStoreContext";
 import lightTheme from "~/styles/lightTheme";
 import { api, getBaseUrl } from "~/utils/api";
 import { UserRoles } from "~/utils/constants";

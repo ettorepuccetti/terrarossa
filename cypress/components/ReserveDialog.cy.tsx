@@ -4,7 +4,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
 import ReserveDialog from "~/components/ReserveDialog";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import {
   buildTrpcMutationMock,
   club,
