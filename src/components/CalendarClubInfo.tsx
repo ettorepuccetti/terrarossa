@@ -4,7 +4,7 @@ import { Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { grey } from "@mui/material/colors";
 import { Box } from "@mui/system";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { ClubAddress } from "./ClubAddress";
 
 export default function CalendarClubInfo() {

@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import Image from "next/image";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { capitaliseFirstChar } from "~/utils/utils";
 import HorizonalDatePicker from "./HorizontalDatePicker";
 import LegendaButton from "./LegendaButton";

@@ -1,7 +1,7 @@
 import { Alert, Button } from "@mui/material";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 import CalendarDialog from "./CalendarDialog";
 import CancelRecurrentDialog from "./CancelRecurrentDialog";

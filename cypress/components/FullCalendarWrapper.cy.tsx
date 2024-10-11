@@ -1,6 +1,6 @@
 import { type Session } from "next-auth";
 import FullCalendarWrapper from "~/components/FullCalendarWrapper";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { formatTimeString } from "~/utils/utils";
 import { club, clubSettings, courts, mountWithContexts } from "./_constants";
 

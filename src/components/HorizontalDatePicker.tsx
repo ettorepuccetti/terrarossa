@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import dayjs, { type Dayjs } from "dayjs";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 import { DayCard } from "./DayCard";
 import DayCardFreePicker from "./DayCardFreePicker";

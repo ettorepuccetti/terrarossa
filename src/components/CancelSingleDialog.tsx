@@ -1,4 +1,4 @@
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 import ConfirmationInplace from "./ConfirmationInplace";
 

@@ -4,7 +4,7 @@ import utc from "dayjs/plugin/utc";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { type z } from "zod";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 import { isAdminOfTheClub, startDateIsFuture } from "~/utils/utils";
 
@@ -42,7 +42,7 @@ export default function ReserveDialog() {
     (state) => state.setRecurrentEndDate,
   );
   const recurrentEndDateError = useMergedStoreContext(
-    (state) => state.recurringEndDateError,
+    (state) => state.recurrentEndDateError,
   );
 
   const setOpenReserveSuccess = useMergedStoreContext(

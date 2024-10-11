@@ -4,7 +4,7 @@ import { StaticDatePicker } from "@mui/x-date-pickers";
 import { type Dayjs } from "dayjs";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 import { dateIsInTimeRange, isAdminOfTheClub } from "~/utils/utils";
 import DayCardLayout from "./DayCardLayout";

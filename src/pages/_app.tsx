@@ -1,7 +1,7 @@
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppProps } from "next/app";
-import { MergedStoreProvider } from "~/hooks/useCalendarStoreContext";
+import { MergedStoreProvider } from "~/hooks/useMergedStoreContext";
 
 import { api, getBaseUrl } from "~/utils/api";
 

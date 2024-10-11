@@ -1,7 +1,7 @@
 import { type Dayjs } from "dayjs";
 import { z } from "zod";
 import { api } from "~/utils/api";
-import { useMergedStoreContext } from "./useCalendarStoreContext";
+import { useMergedStoreContext } from "./useMergedStoreContext";
 
 //--------------------------------
 //-------- INPUT SCHEMAS ---------

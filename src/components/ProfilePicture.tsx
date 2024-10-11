@@ -1,7 +1,7 @@
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import { Avatar, Box, IconButton, styled } from "@mui/material";
 import { useReducer } from "react";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 
 export default function ProfilePicture() {
@@ -70,7 +70,7 @@ export default function ProfilePicture() {
             name="file-upload"
             className="sr-only"
             onChange={(e) => void handleUpload(e)}
-          />{" "}
+          />
         </IconButton>
       </Box>
     </>

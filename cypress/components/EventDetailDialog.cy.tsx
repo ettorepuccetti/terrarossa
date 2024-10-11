@@ -2,7 +2,7 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import EventDetailDialog from "~/components/EventDetailDialog";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import {
   buildTrpcMutationMock,
   club,

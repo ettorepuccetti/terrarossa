@@ -8,7 +8,7 @@ import {
   useUpdateUsername,
   useUserQuery,
 } from "~/hooks/profileTrpcHooks";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 import DeleteAccount from "./DeleteAccount";
 import ErrorAlert from "./ErrorAlert";

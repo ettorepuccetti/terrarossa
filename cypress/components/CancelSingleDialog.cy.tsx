@@ -1,5 +1,5 @@
 import CancelSingleDialog from "~/components/CancelSingleDialog";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import {
   buildTrpcMutationMock,
   club,

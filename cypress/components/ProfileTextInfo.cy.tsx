@@ -1,7 +1,7 @@
 import { type User } from "@prisma/client";
 import dayjs from "dayjs";
 import { ProfileTextInfo } from "~/components/ProfileTextInfo";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import {
   buildTrpcMutationMock,
   user as defaultUser,

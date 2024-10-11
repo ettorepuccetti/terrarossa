@@ -1,5 +1,5 @@
 import { Alert, Snackbar } from "@mui/material";
-import { useMergedStoreContext } from "~/hooks/useCalendarStoreContext";
+import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 
 export const ReserveSuccessSnackbar = () => {
   const open = useMergedStoreContext((store) => store.openReserveSuccess);
