@@ -1,25 +1,14 @@
+import DateRange from "@mui/icons-material/DateRange";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import {
-  Box,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemText,
-  styled,
-} from "@mui/material";
+import { Box, Drawer, List, ListItemButton, ListItemText } from "@mui/material";
 import NextLink from "next/link";
 import LoginDrawerButton from "./LoginDrawerButton";
-import DateRange from "@mui/icons-material/DateRange";
 
 interface DrawerProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-export const ListItemButtonStyled = styled(ListItemButton)(() => ({
-  gap: "1rem",
-}));
 
 export default function DrawerWrapper(props: DrawerProps) {
   return (
@@ -38,26 +27,26 @@ export default function DrawerWrapper(props: DrawerProps) {
 
           {/* Link to home page */}
           <NextLink href="/">
-            <ListItemButtonStyled>
+            <ListItemButton sx={{ gap: "1rem" }}>
               <HomeOutlinedIcon />
               <ListItemText primary="Home" />
-            </ListItemButtonStyled>
+            </ListItemButton>
           </NextLink>
 
           {/* Link to reservation page */}
           <NextLink href="/search" data-test="reserve-page-link">
-            <ListItemButtonStyled>
+            <ListItemButton sx={{ gap: "1rem" }}>
               <DateRange />
               <ListItemText primary="Prenota" />
-            </ListItemButtonStyled>
+            </ListItemButton>
           </NextLink>
 
           {/* Link to profile page */}
           <NextLink href="/profile">
-            <ListItemButtonStyled>
+            <ListItemButton sx={{ gap: "1rem" }}>
               <PersonOutlineIcon />
               <ListItemText primary="Profilo" />
-            </ListItemButtonStyled>
+            </ListItemButton>
           </NextLink>
         </List>
       </Box>

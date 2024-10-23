@@ -1,9 +1,13 @@
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Divider, ListItemText, Typography } from "@mui/material";
+import {
+  Divider,
+  ListItemButton,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { ListItemButtonStyled } from "./DrawerWrapper";
 
 export default function LoginDrawerButton() {
   const { data: sessionData } = useSession();
@@ -14,28 +18,32 @@ export default function LoginDrawerButton() {
       {/* User already logged in */}
       {sessionData && (
         <>
-          <ListItemButtonStyled>
+          <ListItemButton sx={{ gap: "1rem" }}>
             <Typography variant="h6">{sessionData.user?.name}</Typography>
-          </ListItemButtonStyled>
+          </ListItemButton>
           <Divider />
-          <ListItemButtonStyled
+          <ListItemButton
+            sx={{ gap: "1rem" }}
             onClick={() => {
               void router.push("/").then(() => signOut());
             }}
           >
             <LogoutIcon />
             <ListItemText primary=" Logout" />
-          </ListItemButtonStyled>
+          </ListItemButton>
         </>
       )}
 
       {/* User not logged in */}
       {!sessionData && (
         <>
-          <ListItemButtonStyled onClick={() => void signIn("auth0")}>
+          <ListItemButton
+            sx={{ gap: "1rem" }}
+            onClick={() => void signIn("auth0")}
+          >
             <LoginIcon />
             <ListItemText primary="Login" />
-          </ListItemButtonStyled>
+          </ListItemButton>
         </>
       )}
     </>
