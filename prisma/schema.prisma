@@ -1,33 +1,25 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider     = "mysql"
-  // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
-// Start of NextAuth models
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -51,14 +43,14 @@ model User {
   email         String?       @unique
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
   role          String        @default("USER")
-  Club          Club?         @relation(fields: [clubId], references: [id], onDelete: Cascade)
   clubId        String?
-  Reservation   Reservation[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime?     @updatedAt
+  accounts      Account[]
+  Reservation   Reservation[]
+  sessions      Session[]
+  Club          Club?         @relation(fields: [clubId], references: [id], onDelete: Cascade)
 
   @@index([clubId])
 }
@@ -71,21 +63,19 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// --- End of NextAuth models
-
 model Reservation {
   id                     String                @id @unique @default(cuid())
   startTime              DateTime
   endTime                DateTime
-  court                  Court                 @relation(fields: [courtId], references: [id], onDelete: Cascade)
-  user                   User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
   courtId                String
   userId                 String?
   overwriteName          String?
   createdAt              DateTime              @default(now())
   updatedAt              DateTime              @updatedAt
-  recurrentReservation   RecurrentReservation? @relation(fields: [recurrentReservationId], references: [id], onDelete: Cascade)
   recurrentReservationId String?
+  recurrentReservation   RecurrentReservation? @relation(fields: [recurrentReservationId], references: [id], onDelete: Cascade)
+  user                   User?                 @relation(fields: [userId], references: [id])
+  court                  Court                 @relation(fields: [courtId], references: [id], onDelete: Cascade)
 
   @@index([courtId])
   @@index([userId])
@@ -96,8 +86,8 @@ model RecurrentReservation {
   id           String        @id @unique @default(cuid())
   startDate    DateTime
   endDate      DateTime
-  reservations Reservation[]
   createdAt    DateTime      @default(now())
+  reservations Reservation[]
 }
 
 model Court {
@@ -105,10 +95,10 @@ model Court {
   name        String
   indoor      Boolean?
   surface     String?
-  beginTime   BeginTime?    @default(BOTH)
-  Reservation Reservation[]
-  Club        Club          @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  beginTime   String        @default("BOTH")
   clubId      String
+  Club        Club          @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  Reservation Reservation[]
 
   @@unique([name, clubId])
   @@index([clubId])
@@ -117,25 +107,25 @@ model Court {
 model Club {
   id             String       @id @unique @default(cuid())
   name           String       @unique
-  courts         Court[]
   imageSrc       String?
   logoSrc        String?
-  Admin          User[]
-  clubSettings   ClubSettings @relation(fields: [clubSettingsId], references: [id])
   clubSettingsId String       @unique
-  Address        Address?
-  PhoneNumber    PhoneNumber?
   mail           String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime?    @updatedAt
+  Address        Address?
+  clubSettings   ClubSettings @relation(fields: [clubSettingsId], references: [id])
+  courts         Court[]
+  PhoneNumber    PhoneNumber?
+  Admin          User[]
 }
 
 model PhoneNumber {
   id             String @id @unique @default(cuid())
   number         String
   nationalPrefix String
-  Club           Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
   clubId         String @unique
+  Club           Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
 
   @@index([clubId])
 }
@@ -148,8 +138,8 @@ model Address {
   city        String
   country     String
   countryCode String
-  Club        Club    @relation(fields: [clubId], references: [id], onDelete: Cascade)
   clubId      String  @unique
+  Club        Club    @relation(fields: [clubId], references: [id], onDelete: Cascade)
 
   @@index([clubId])
 }
@@ -157,7 +147,6 @@ model Address {
 model ClubSettings {
   id                    String    @id @unique @default(cuid())
   description           String?
-  club                  Club?
   firstBookableHour     Int       @default(8)
   firstBookableMinute   Int       @default(0)
   lastBookableHour      Int       @default(22)
@@ -168,15 +157,5 @@ model ClubSettings {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime? @updatedAt
   hoursBeforeCancel     Int       @default(4)
-}
-
-enum BeginTime {
-  HOUR
-  HALFHOUR
-  BOTH
-}
-
-enum Role {
-  ADMIN
-  USER
+  club                  Club?
 }

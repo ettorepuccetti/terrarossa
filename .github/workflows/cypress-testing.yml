@@ -43,10 +43,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: install pnpm
+        uses: pnpm/action-setup@v2
       - name: Cypress install
         uses: cypress-io/github-action@v5
         with:
-          build: npm run build:test
+          build: pnpm run build:test
           runTests: false
       - name: Save build folder
         uses: actions/upload-artifact@v4
@@ -72,6 +74,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: install pnpm
+        uses: pnpm/action-setup@v2
       - name: Download the build folders
         uses: actions/download-artifact@v4
         with:
@@ -103,6 +107,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: install pnpm
+        uses: pnpm/action-setup@v2
       - name: Download the build folders
         uses: actions/download-artifact@v4
         with:
@@ -113,8 +119,8 @@ jobs:
         with:
           config: "viewportWidth=375,viewportHeight=667"
           #use build step to seed the database, build is already done in install job
-          build: npm run db:seed
-          start: npm start
+          build: pnpm run db:seed
+          start: pnpm start
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           browser: chrome

@@ -1,10 +1,11 @@
 name: Pscale - open deploy request
 run-name: ${{ github.head_ref}}
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - prisma/schema.prisma
+  workflow_dispatch:
+  # pull_request:
+  #   branches: [main]
+  #   paths:
+  #     - prisma/schema.prisma
 env:
   PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
   PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}

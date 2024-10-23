@@ -48,3 +48,6 @@ cypress.env.json
 cypress/videos
 cypress/screenshots
 cypress/downloads
+
+#db
+prisma/dev.db

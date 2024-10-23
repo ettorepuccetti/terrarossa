@@ -1,8 +1,8 @@
 name: Pscale & Vercel - merge DR and production deployment on PR merge
 on:
-  pull_request:
-    types:
-      - closed
+  # pull_request:
+  #   types:
+  #     - closed
   workflow_dispatch:
 env:
   PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}

@@ -498,7 +498,8 @@ Save new service token as Github secrets `PLANETSCALE_SERVICE_TOKEN_ID_DEMO` and
 
 ### Auth0
 
-New app under `terrarossa.auth0.` provider
+New app under `terrarossa-demo.auth0.` tenant.
+
 Get this values to be saved as Vercel secrets:
 
 - `AUTH0_CLIENT_ID`

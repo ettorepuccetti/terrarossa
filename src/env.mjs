@@ -25,6 +25,8 @@ const server = z.object({
   R2_ACCESS_KEY_ID: z.string(),
   R2_SECRET_ACCESS_KEY: z.string(),
   R2_ACCOUNT_ID: z.string(),
+  TURSO_DATABASE_URL: z.string().url(),
+  TURSO_AUTH_TOKEN: z.string(),
 });
 
 /**
@@ -59,6 +61,8 @@ const processEnv = {
   R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID,
   R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY,
   R2_ACCOUNT_ID: process.env.R2_ACCOUNT_ID,
+  TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL,
+  TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
 };
 
 // Don't touch the part below
