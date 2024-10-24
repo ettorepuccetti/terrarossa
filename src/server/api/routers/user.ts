@@ -6,7 +6,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { loggerInternal } from "~/utils/logger";
 import { r2 } from "~/utils/r2";
 
-const R2_USER_IMAGE_PREFIX = "userImage_";
+const R2_USER_IMAGE_PREFIX = "userImage/";
 
 export const userRouter = createTRPCRouter({
   getInfo: protectedProcedure.query(({ ctx }) => {
