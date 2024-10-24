@@ -34,8 +34,8 @@ async function main() {
     update: {},
     create: {
       name: foroItalicoName,
-      logoSrc: "https://r2.terrarossa.app/bnl-logo.png",
-      imageSrc: "https://r2.terrarossa.app/bnl-image.jpg",
+      logoSrc: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "bnl-logo.png",
+      imageSrc: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "bnl-image.jpg",
       Address: {
         create: foroItalicoAddress,
       },
@@ -55,8 +55,8 @@ async function main() {
     update: {},
     create: {
       name: allEnglandClubName,
-      imageSrc: "https://r2.terrarossa.app/wimbledon-image.jpg",
-      logoSrc: "https://r2.terrarossa.app/wimbledon-logo.png",
+      imageSrc: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "wimbledon-image.jpg",
+      logoSrc: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "wimbledon-logo.png",
       Address: { create: allEnglandAddress },
       PhoneNumber: { create: allEnglandPhone },
       mail: "info@wimbledon-village.com",
@@ -119,7 +119,7 @@ async function main() {
       email: "adminuser@terrarossa.app",
       name: "admin",
       role: "ADMIN",
-      image: "https://r2.terrarossa.app/bnl-logo.png",
+      image: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "bnl-logo.png",
       clubId: foroItalico.id,
       accounts: {
         create: {
@@ -139,7 +139,7 @@ async function main() {
       email: "demouser@terrarossa.app",
       name: "demo user",
       role: "USER",
-      image: "https://r2.terrarossa.app/user_demo_avatar.png",
+      image: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "user_demo_avatar.png",
       accounts: {
         create: {
           type: "oauth",
@@ -156,7 +156,7 @@ async function main() {
       email: "r.federer@atp.com",
       name: "Roger Federer",
       role: "USER",
-      image: "https://r2.terrarossa.app/federer_avatar.jpg",
+      image: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "federer_avatar.jpg",
     },
   });
 
@@ -165,7 +165,7 @@ async function main() {
       email: "mariorossi@personal.it",
       name: "Mario Rossi",
       role: "USER",
-      image: "https://r2.terrarossa.app/mario_avatar.jpg",
+      image: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "mario_avatar.jpg",
     },
   });
 
@@ -174,7 +174,7 @@ async function main() {
       email: "giovanni@personal.it",
       name: "Giovanni",
       role: "USER",
-      image: "https://r2.terrarossa.app/giovane_avatar.jpg",
+      image: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "giovane_avatar.jpg",
     },
   });
 

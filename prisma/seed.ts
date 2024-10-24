@@ -20,8 +20,8 @@ async function main() {
     update: {},
     create: {
       name: foroItalicoName,
-      logoSrc: "https://r2.terrarossa.app/bnl-logo.png",
-      imageSrc: "https://r2.terrarossa.app/bnl-image.jpg",
+      logoSrc: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "bnl-logo.png",
+      imageSrc: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "bnl-image.jpg",
       Address: {
         create: foroItalicoAddress,
       },
@@ -63,8 +63,8 @@ async function main() {
     update: {},
     create: {
       name: allEnglandClubName,
-      imageSrc: "https://r2.terrarossa.app/wimbledon-image.jpg",
-      logoSrc: "https://r2.terrarossa.app/wimbledon-logo.png",
+      imageSrc: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "wimbledon-image.jpg",
+      logoSrc: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "wimbledon-logo.png",
       Address: {
         create: allEnglandAddress,
       },
