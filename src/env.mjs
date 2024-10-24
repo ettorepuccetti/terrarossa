@@ -27,6 +27,7 @@ const server = z.object({
   R2_ACCOUNT_ID: z.string(),
   TURSO_DATABASE_URL: z.string().url(),
   TURSO_AUTH_TOKEN: z.string(),
+  TURSO_REMOTE_DATABASE_URL: z.string().url().optional(),
 });
 
 /**
@@ -38,6 +39,7 @@ const client = z.object({
   NEXT_PUBLIC_LOGFLARE_API_KEY: z.string(),
   NEXT_PUBLIC_APP_ENV: z.enum(["development", "production", "test"]),
   NEXT_PUBLIC_R2_BUCKET_NAME: z.string(),
+  NEXT_PUBLIC_R2_BUCKET_URL: z.string(),
 });
 
 /**
@@ -63,6 +65,8 @@ const processEnv = {
   R2_ACCOUNT_ID: process.env.R2_ACCOUNT_ID,
   TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL,
   TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
+  TURSO_REMOTE_DATABASE_URL: process.env.TURSO_REMOTE_DATABASE_URL,
+  NEXT_PUBLIC_R2_BUCKET_URL: process.env.NEXT_PUBLIC_R2_BUCKET_URL,
 };
 
 // Don't touch the part below

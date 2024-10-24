@@ -1,12 +1,12 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { z } from "zod";
+import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { loggerInternal } from "~/utils/logger";
 import { r2 } from "~/utils/r2";
 
 const R2_USER_IMAGE_PREFIX = "userImage_";
-const R2_BUCKET_URL = "https://r2.terrarossa.app/";
 
 export const userRouter = createTRPCRouter({
   getInfo: protectedProcedure.query(({ ctx }) => {
@@ -54,7 +54,10 @@ export const userRouter = createTRPCRouter({
     const logger = loggerInternal.child({
       apiEndPoint: "userRouter.updateImageSrc",
     });
-    const imageSrc = R2_BUCKET_URL + R2_USER_IMAGE_PREFIX + ctx.session.user.id;
+    const imageSrc =
+      env.NEXT_PUBLIC_R2_BUCKET_URL +
+      R2_USER_IMAGE_PREFIX +
+      ctx.session.user.id;
     logger.info(
       { userId: ctx.session?.user.id, imageSrc: imageSrc },
       "Update user image",

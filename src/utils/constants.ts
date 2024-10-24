@@ -8,7 +8,8 @@ export enum UserRoles {
 export type UserRole = UserRoles.ADMIN | UserRoles.USER;
 
 export const defaultLogoSrc = "/mstile-144x144.png";
-export const defaultClubImage = "https://r2.terrarossa.app/default-club.jpg";
+export const defaultClubImage =
+  process.env.NEXT_PUBLIC_R2_BUCKET_URL + "default-club.jpg";
 export const appNameInHeader = "Terrarossa";
 
 // -------------------------

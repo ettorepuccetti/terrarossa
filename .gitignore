@@ -50,4 +50,4 @@ cypress/screenshots
 cypress/downloads
 
 #db
-prisma/dev.db
+prisma/dev.db*
