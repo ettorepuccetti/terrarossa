@@ -51,7 +51,7 @@ jobs:
       - name: Cypress install
         uses: cypress-io/github-action@v5
         with:
-          build: pnpm run build:test
+          build: pnpm build:test
           runTests: false
       - name: Save build folder
         uses: actions/upload-artifact@v4
@@ -59,19 +59,11 @@ jobs:
           name: build
           if-no-files-found: error
           path: .next
+          include-hidden-files: true
 
   ui-chrome-tests:
     needs: install
     runs-on: ubuntu-latest
-    services:
-      mysql-service:
-        image: mysql:latest
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: terrarossa
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     container:
       image: cypress/browsers:latest
     steps:
@@ -79,6 +71,8 @@ jobs:
         uses: actions/checkout@v4
       - name: install pnpm
         uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - name: Download the build folders
         uses: actions/download-artifact@v4
         with:
@@ -98,13 +92,6 @@ jobs:
   ui-chrome-mobile-tests:
     needs: install
     runs-on: ubuntu-latest
-    services:
-      mysql-service:
-        image: mysql:latest
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: terrarossa
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     container:
       image: cypress/browsers:latest
     steps:
@@ -112,6 +99,8 @@ jobs:
         uses: actions/checkout@v4
       - name: install pnpm
         uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - name: Download the build folders
         uses: actions/download-artifact@v4
         with:
