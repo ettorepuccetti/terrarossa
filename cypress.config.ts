@@ -66,12 +66,23 @@ function tasks(on: Cypress.PluginEvents) {
         },
       });
     },
-    "prisma:deleteAllReservationOfClub"(clubId: string) {
+    async "prisma:deleteAllReservationOfClub"(clubId: string) {
       if (!clubId) throw new Error("clubId is undefined");
-      return prisma.reservation.deleteMany({
+      await prisma.reservation.deleteMany({
         where: {
           court: {
             clubId: clubId,
+          },
+        },
+      });
+      return await prisma.recurrentReservation.deleteMany({
+        where: {
+          reservations: {
+            every: {
+              court: {
+                clubId: clubId,
+              },
+            },
           },
         },
       });

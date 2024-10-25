@@ -169,7 +169,6 @@ export const reservationMutationRouter = createTRPCRouter({
         reservations.push(reservationInput);
       }
 
-      console.log("default timezone", dayjs.locale());
       logger.info("Create recurrent reservations", {
         ...input,
         userId: ctx.session.user.id,

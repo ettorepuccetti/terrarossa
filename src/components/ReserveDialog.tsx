@@ -75,19 +75,12 @@ export default function ReserveDialog() {
 
     // recurrent reservation add. Need to convert dates to UTC for better handling in backend
     if (recurrentEndDate) {
-      const recurrentEndDateUtc = dayjs
-        .utc()
-        .year(recurrentEndDate.year())
-        .month(recurrentEndDate.month())
-        .date(recurrentEndDate.date())
-        .startOf("day");
-
       const recurrentDataPayload: z.infer<
         typeof RecurrentReservationInputSchema
       > = {
         ...dataPayload,
-        recurrentStartDate: startDate.utc().startOf("day").toDate(),
-        recurrentEndDate: recurrentEndDateUtc.toDate(),
+        recurrentStartDate: startDate.startOf("day").utc().toDate(),
+        recurrentEndDate: recurrentEndDate.startOf("day").utc().toDate(),
       };
       logger.info(recurrentDataPayload, "recurrent reservation added");
       void recurrentReservationAdd
