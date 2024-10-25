@@ -1,7 +1,7 @@
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LocalPhoneRoundedIcon from "@mui/icons-material/LocalPhoneRounded";
 import { Typography } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid2";
 import { grey } from "@mui/material/colors";
 import { Box } from "@mui/system";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
@@ -14,18 +14,25 @@ export default function CalendarClubInfo() {
       {/* <Typography variant="h5"> Contatti </Typography> */}
       <Grid container rowSpacing={2} columnSpacing={1} color={grey["A700"]}>
         {/* Address */}
-        <Grid xs={12} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 3,
+          }}
+        >
           <ClubAddress address={clubData.Address} />
         </Grid>
 
         {/* Phone number */}
         <Grid
-          xs={12}
-          md={3}
           className={"phone-number"}
           display={"flex"}
           alignItems={"center"}
           gap={1}
+          size={{
+            xs: 12,
+            md: 3,
+          }}
         >
           <LocalPhoneRoundedIcon />
           <Box display={"flex"} flexWrap={"nowrap"} fontSize={"0.85rem"}>
@@ -38,12 +45,14 @@ export default function CalendarClubInfo() {
 
         {/* Mail */}
         <Grid
-          xs={12}
-          md={6}
           className={"mail"}
           display={"flex"}
           alignItems={"center"}
           gap={1}
+          size={{
+            xs: 12,
+            md: 6,
+          }}
         >
           <EmailOutlinedIcon />
           <Box display={"flex"} flexWrap={"nowrap"} fontSize={"0.85rem"}>
