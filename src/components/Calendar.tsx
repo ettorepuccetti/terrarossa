@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { useEffect, useState } from "react";
 import ReserveDialog from "~/components/ReserveDialog";
 
