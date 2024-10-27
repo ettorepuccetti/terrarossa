@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2";
+import { Grid } from "@mui/system";
 
 export default function DialogFieldGrid({
   labelValues,
@@ -13,7 +13,7 @@ export default function DialogFieldGrid({
   const gap = "10px";
   return (
     <Grid container spacing={1} width={"100%"} marginBottom={"10px"}>
-      <Grid xs={4} display={"flex"} flexDirection={"column"} gap={gap}>
+      <Grid display={"flex"} flexDirection={"column"} gap={gap} size={4}>
         {labelValues.map((labelValue) => (
           <Typography
             key={labelValue.label}
@@ -25,7 +25,7 @@ export default function DialogFieldGrid({
           </Typography>
         ))}
       </Grid>
-      <Grid xs={8} display={"flex"} flexDirection={"column"} gap={gap}>
+      <Grid display={"flex"} flexDirection={"column"} gap={gap} size={8}>
         {labelValues.map((labelValue, index) => (
           <Typography
             key={index}

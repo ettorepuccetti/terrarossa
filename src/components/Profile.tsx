@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Box, LinearProgress, Typography } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
