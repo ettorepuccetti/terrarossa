@@ -33,11 +33,12 @@ const adapter = new PrismaLibSQL(libsql);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  //clean up
+  //clean up - TODO: fully erase the db
   await prisma.recurrentReservation.deleteMany();
   await prisma.reservation.deleteMany();
   await prisma.club.deleteMany();
   await prisma.court.deleteMany();
+  await prisma.clubSettings.deleteMany();
   await prisma.user.deleteMany();
 
   //clubs
