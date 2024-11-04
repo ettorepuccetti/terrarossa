@@ -16,7 +16,7 @@
     "cypress-run-component": "NEXT_PUBLIC_APP_ENV='test' npx cypress run --config video=false --component",
     "db:seed": "npx prisma db push && npx prisma db seed",
     "prettier": "prettier --write .",
-    "prepare": "husky install",
+    "prepare": "husky",
     "db:seed:demo": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-demo.ts"
   },
   "lint-staged": {
