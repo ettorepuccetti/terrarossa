@@ -1,3 +1,5 @@
+import { createClient } from "@libsql/client";
+import { PrismaLibSQL } from "@prisma/adapter-libsql";
 import { PrismaClient } from "@prisma/client";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
@@ -21,7 +23,15 @@ dayjs.extend(timezone);
 
 dayjs.tz.setDefault("Europe/Rome");
 
-const prisma = new PrismaClient();
+const libsql = createClient({
+  url: process.env.TURSO_DATABASE_URL!,
+  syncUrl: process.env.TURSO_SYNC_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+const adapter = new PrismaLibSQL(libsql);
+
+const prisma = new PrismaClient({ adapter });
+
 async function main() {
   //clean up
   await prisma.reservation.deleteMany();
@@ -306,6 +316,7 @@ async function main() {
 
 main()
   .then(async () => {
+    await libsql.sync();
     await prisma.$disconnect();
   })
   .catch(async (e) => {

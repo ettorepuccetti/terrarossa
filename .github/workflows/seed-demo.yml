@@ -1,0 +1,40 @@
+name: Seed demo
+on:
+  workflow_dispatch:
+env:
+  NODE_ENV: "test" # see: https://github.com/vercel/next.js/issues/55804#issuecomment-1735124191.
+  NEXT_PUBLIC_APP_ENV: "test"
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TURSO_DATABASE_URL: "file:./prisma/dev.db"
+  TURSO_SYNC_URL: ${{ secrets.TURSO_DEMO_SYNC_URL }}
+  TURSO_AUTH_TOKEN: ${{ secrets.TURSO_DEMO_AUTH_TOKEN }}
+  CYPRESS_ADMIN_FORO_MAIL: ${{secrets.CYPRESS_ADMIN_FORO_MAIL}}
+  CYPRESS_ADMIN_FORO_PWD: ${{secrets.CYPRESS_ADMIN_FORO_PWD}}
+  CYPRESS_ADMIN_ALLENGLAND_MAIL: ${{secrets.CYPRESS_ADMIN_ALLENGLAND_MAIL}}
+  CYPRESS_ADMIN_ALLENGLAND_PWD: ${{secrets.CYPRESS_ADMIN_ALLENGLAND_PWD}}
+  CYPRESS_USER1_MAIL: ${{secrets.CYPRESS_USER1_MAIL}}
+  CYPRESS_USER1_PWD: ${{secrets.CYPRESS_USER1_PWD}}
+  CYPRESS_USER2_MAIL: ${{secrets.CYPRESS_USER2_MAIL}}
+  CYPRESS_USER2_PWD: ${{secrets.CYPRESS_USER2_PWD}}
+  CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+  NEXT_PUBLIC_R2_BUCKET_NAME: ${{ vars.NEXT_PUBLIC_R2_BUCKET_NAME }}
+  NEXT_PUBLIC_R2_BUCKET_URL: ${{ vars.NEXT_PUBLIC_R2_BUCKET_URL }}
+
+jobs:
+  seed-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: npm install
+      - name: Seed demo
+        run: pnpm db:seed:demo
