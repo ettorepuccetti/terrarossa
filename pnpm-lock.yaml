@@ -106,10 +106,10 @@ dependencies:
     version: 15.0.2(react-dom@18.3.1)(react@18.3.1)
   next-auth:
     specifier: ^4.24.10
-    version: 4.24.10(next@15.0.2)(nodemailer@6.9.15)(react-dom@18.3.1)(react@18.3.1)
+    version: 4.24.10(next@15.0.2)(nodemailer@6.9.16)(react-dom@18.3.1)(react@18.3.1)
   nodemailer:
     specifier: ^6.9.15
-    version: 6.9.15
+    version: 6.9.16
   pino:
     specifier: ^9.5.0
     version: 9.5.0
@@ -1883,7 +1883,7 @@ packages:
       next-auth: ^4
     dependencies:
       '@prisma/client': 5.21.1(prisma@5.21.1)
-      next-auth: 4.24.10(next@15.0.2)(nodemailer@6.9.15)(react-dom@18.3.1)(react@18.3.1)
+      next-auth: 4.24.10(next@15.0.2)(nodemailer@6.9.16)(react-dom@18.3.1)(react@18.3.1)
     dev: false
 
   /@next/env@15.0.2:
@@ -5246,7 +5246,7 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
-  /next-auth@4.24.10(next@15.0.2)(nodemailer@6.9.15)(react-dom@18.3.1)(react@18.3.1):
+  /next-auth@4.24.10(next@15.0.2)(nodemailer@6.9.16)(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-8NGqiRO1GXBcVfV8tbbGcUgQkAGsX4GRzzXXea4lDikAsJtD5KiEY34bfhUOjHLvr6rT6afpcxw2H8EZqOV6aQ==}
     peerDependencies:
       '@auth/core': 0.34.2
@@ -5265,7 +5265,7 @@ packages:
       cookie: 0.7.2
       jose: 4.15.9
       next: 15.0.2(react-dom@18.3.1)(react@18.3.1)
-      nodemailer: 6.9.15
+      nodemailer: 6.9.16
       oauth: 0.9.15
       openid-client: 5.7.0
       preact: 10.24.3
@@ -5334,8 +5334,8 @@ packages:
       formdata-polyfill: 4.0.10
     dev: false
 
-  /nodemailer@6.9.15:
-    resolution: {integrity: sha512-AHf04ySLC6CIfuRtRiEYtGEXgRfa6INgWGluDhnxTZhHSKvrBu7lc1VVchQ0d8nPc4cFaZoPq8vkyNoZr0TpGQ==}
+  /nodemailer@6.9.16:
+    resolution: {integrity: sha512-psAuZdTIRN08HKVd/E8ObdV6NO7NTBY3KsC30F7M4H1OnmLCUNaS56FpYxyb26zWLSyYF9Ozch9KYHhHegsiOQ==}
     engines: {node: '>=6.0.0'}
     dev: false
 
