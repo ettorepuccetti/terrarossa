@@ -126,8 +126,8 @@ dependencies:
     specifier: 18.3.1
     version: 18.3.1(react@18.3.1)
   superjson:
-    specifier: 2.2.1
-    version: 2.2.1
+    specifier: 2.2.2
+    version: 2.2.2
   use-sync-external-store:
     specifier: ^1.2.2
     version: 1.2.2(react@18.3.1)
@@ -6364,8 +6364,8 @@ packages:
       copy-anything: 3.0.5
     dev: false
 
-  /superjson@2.2.1:
-    resolution: {integrity: sha512-8iGv75BYOa0xRJHK5vRLEjE2H/i4lulTjzpUXic3Eg8akftYjkmQDa8JARQ42rlczXyFR3IeRoeFCc7RxHsYZA==}
+  /superjson@2.2.2:
+    resolution: {integrity: sha512-5JRxVqC8I8NuOUjzBbvVJAKNM8qoVuH0O77h4WInc/qC2q5IreqKxYwgkga3PfA22OayK2ikceb/B26dztPl+Q==}
     engines: {node: '>=16'}
     dependencies:
       copy-anything: 3.0.5
