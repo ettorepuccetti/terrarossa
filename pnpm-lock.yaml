@@ -136,7 +136,7 @@ dependencies:
     version: 0.12.5
   zod:
     specifier: ^3.23.8
-    version: 3.23.8
+    version: 3.25.64
   zustand:
     specifier: ^5.0.0
     version: 5.0.5(@types/react@18.3.23)(react@18.3.1)(use-sync-external-store@1.5.0)
@@ -6832,8 +6832,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /zod@3.23.8:
-    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+  /zod@3.25.64:
+    resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
     dev: false
 
   /zustand@5.0.5(@types/react@18.3.23)(react@18.3.1)(use-sync-external-store@1.5.0):
