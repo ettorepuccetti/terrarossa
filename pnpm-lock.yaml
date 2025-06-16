@@ -25,7 +25,7 @@ dependencies:
     version: 11.13.0(@emotion/react@11.13.3)(@types/react@18.3.23)(react@18.3.1)
   '@fontsource/roboto':
     specifier: ^5.1.0
-    version: 5.1.0
+    version: 5.2.6
   '@fullcalendar/core':
     specifier: ^6.1.15
     version: 6.1.17
@@ -1140,8 +1140,8 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@fontsource/roboto@5.1.0:
-    resolution: {integrity: sha512-cFRRC1s6RqPygeZ8Uw/acwVHqih8Czjt6Q0MwoUoDe9U3m4dH1HmNDRBZyqlMSFwgNAUKgFImncKdmDHyKpwdg==}
+  /@fontsource/roboto@5.2.6:
+    resolution: {integrity: sha512-hzarG7yAhMoP418smNgfY4fO7UmuUEm5JUtbxCoCcFHT0hOJB+d/qAEyoNjz7YkPU5OjM2LM8rJnW8hfm0JLaA==}
     dev: false
 
   /@fullcalendar/core@6.1.17:
