@@ -48,7 +48,7 @@ jobs:
         with:
           version: latest
       - name: Cypress install
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         with:
           build: pnpm build:test
           runTests: false
