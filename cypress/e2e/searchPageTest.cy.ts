@@ -32,4 +32,8 @@ describe("search", () => {
     );
     cy.get(".MuiCardContent-root").should("not.exist"); // check that no club is displayed in the UI
   });
+
+  it("GIVEN admin user WHEN land on search page THEN redirect to its club page instead", () => {
+    
+  })
 });
