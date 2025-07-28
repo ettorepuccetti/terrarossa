@@ -46,7 +46,7 @@ function LegendaDialog({
             />
             <LegendaItem
               color={theme.palette.yellow}
-              text="Prenotazioni del circolo"
+              text="Prenotazioni eseguite dal circolo"
             />
             <LegendaItem color={theme.palette.orange} text="Ore fisse" />
           </Box>
