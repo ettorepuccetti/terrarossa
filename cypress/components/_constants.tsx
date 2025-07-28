@@ -244,6 +244,7 @@ export function buildTrpcMutationMock<TData, TVariables>(
     context: undefined,
     isError: false,
     isLoading: false,
+    isPending: false,
     isSuccess: false,
     reset: () => {},
     isIdle: true,
