@@ -1,7 +1,10 @@
 import { Box, Container, LinearProgress } from "@mui/material";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAllClubsQuery } from "~/hooks/searchTrpcHook";
 import { type RouterOutputs } from "~/utils/api";
+import { UserRoles } from "~/utils/constants";
 import { ClubSearchCard } from "./ClubSearchCard";
 import ErrorAlert from "./ErrorAlert";
 import SearchBar from "./SearchBar";
@@ -9,6 +12,13 @@ import SearchBar from "./SearchBar";
 export type ClubQueryResult = RouterOutputs["club"]["getAll"][number];
 
 export const Search = () => {
+  // directly redirect user to club page if is an admin
+  const router = useRouter();
+  const { data: sessionData } = useSession();
+  if (sessionData?.user.role === UserRoles.ADMIN) {
+    router.push(`/prenota?clubId=${sessionData?.user.clubId}`);
+  }
+
   const allClubsQuery = useAllClubsQuery();
   const [filteredClubs, setFilteredClubs] = useState<
     ClubQueryResult[] | undefined
