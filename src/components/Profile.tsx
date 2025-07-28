@@ -95,7 +95,7 @@ export const Profile = () => {
   // -------------------
 
   if (userQuery.isError) {
-    logger.error({ error: userQuery.error }, "error in userQuery");
+    logger.error("error in userQuery", { error: userQuery.error });
     return (
       <ErrorAlert
         error={userQuery.error}

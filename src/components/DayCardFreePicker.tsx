@@ -75,10 +75,10 @@ function DayCardFreePickerDialog({
         clubData.clubSettings.daysInThePastVisible,
         clubData.clubSettings.daysInFutureVisible,
       );
-      logger.info(
-        { date: date.toDate(), dateIsOutsideRange: dateIsOutsideRange },
-        "Date selected from free picker",
-      );
+      logger.info("Date selected from free picker", {
+        date: date.toDate(),
+        dateIsOutsideRange: dateIsOutsideRange,
+      });
       setSelectedDate(date);
       setCustomSelectedDate(dateIsOutsideRange);
       calendarRef.current?.getApi().gotoDate(date.toDate());

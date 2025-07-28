@@ -127,7 +127,7 @@ export default function Calendar() {
 
   //if there is an error in the clubQuery, show an error alert and not render any other component (FullCalendar, ReserveDialog, EventDetailDialog)
   if (clubQuery.isError) {
-    logger.error({ error: clubQuery.error }, "error in clubQuery");
+    logger.error("error in clubQuery", { error: clubQuery.error });
     return (
       <ErrorAlert
         error={clubQuery.error}

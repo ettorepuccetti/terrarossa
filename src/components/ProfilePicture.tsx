@@ -20,10 +20,11 @@ export default function ProfilePicture() {
     if (!file) {
       return;
     }
-    logger.info(
-      { fileName: file.name, fileSize: file.size, fileType: file.type },
-      "uploading file",
-    );
+    logger.info("uploading file", {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+    });
     const formData = new FormData();
     formData.append("image", file);
 
@@ -37,7 +38,7 @@ export default function ProfilePicture() {
     });
 
     if (!result.ok) {
-      logger.error({ result }, "failed to upload image");
+      logger.error("failed to upload image", { result });
       return;
     }
 

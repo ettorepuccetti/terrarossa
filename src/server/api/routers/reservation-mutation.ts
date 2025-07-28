@@ -17,7 +17,8 @@ export const reservationMutationRouter = createTRPCRouter({
     .input(ReservationInputSchema)
     .mutation(async ({ ctx, input }) => {
       const logger = loggerInternal.child({
-        apiEndPoint: "reservationMutationRouter.insertOne",
+        userId: ctx.session?.user.id,
+        context: { apiEndPoint: "reservationMutationRouter.insertOne" },
       });
       const clubSettings = await getClubSettings(ctx.prisma, input.clubId);
 
@@ -107,7 +108,8 @@ export const reservationMutationRouter = createTRPCRouter({
     .input(RecurrentReservationInputSchema)
     .mutation(async ({ ctx, input }) => {
       const logger = loggerInternal.child({
-        apiEndPoint: "reservationMutationRouter.insertRecurrent",
+        userId: ctx.session?.user.id,
+        context: { apiEndPoint: "reservationMutationRouter.insertRecurrent" },
       });
       // check for privileges [UI already prevents this]
       if (!isUserAdminOfClub(ctx.session, input.clubId)) {
@@ -183,7 +185,8 @@ export const reservationMutationRouter = createTRPCRouter({
     .input(ReservationDeleteInputSchema)
     .mutation(async ({ ctx, input }) => {
       const logger = loggerInternal.child({
-        apiEndPoint: "reservationMutationRouter.deleteOne",
+        userId: ctx.session?.user.id,
+        context: { apiEndPoint: "reservationMutationRouter.deleteOne" },
       });
       const clubSettings = await getClubSettings(ctx.prisma, input.clubId);
       const reservationToDelete =
@@ -229,7 +232,8 @@ export const reservationMutationRouter = createTRPCRouter({
     .input(RecurrentReservationDeleteInputSchema)
     .mutation(async ({ ctx, input }) => {
       const logger = loggerInternal.child({
-        apiEndPoint: "reservationMutationRouter.deleteRecurrent",
+        userId: ctx.session?.user.id,
+        context: { apiEndPoint: "reservationMutationRouter.deleteRecurrent" },
       });
       // check for privileges [UI already prevents this]
       if (!isUserAdminOfClub(ctx.session, input.clubId)) {

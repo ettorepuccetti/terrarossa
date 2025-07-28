@@ -39,10 +39,9 @@ export default function CancelRecurrentDialog() {
 
   const handleConfirmation = () => {
     if (!eventDetails?.id || !eventDetails.extendedProps.recurrentId) {
-      logger.error(
-        { eventDetails: eventDetails },
-        "reservaton id or recurrentId is undefined",
-      );
+      logger.error("reservaton id or recurrentId is undefined", {
+        eventDetails: eventDetails,
+      });
       throw new Error(
         "Si è verificato un problema, la tua prentazione non può essere cancellata al momento, per favore riprova.",
       );
@@ -62,7 +61,7 @@ export default function CancelRecurrentDialog() {
   };
 
   const deleteReservation = (reservationId: string) => {
-    logger.info({ reservationId: reservationId }, "delete single reservation");
+    logger.info("delete single reservation", { reservationId: reservationId });
     reservationDelete.mutate({
       reservationId: reservationId,
       clubId: clubData.id,
@@ -70,12 +69,9 @@ export default function CancelRecurrentDialog() {
   };
 
   const deleteRecurrentReservation = (recurentReservationId: string) => {
-    logger.info(
-      {
-        recurrentReservationId: recurentReservationId,
-      },
-      "delete recurrent reservation",
-    );
+    logger.info("delete recurrent reservation", {
+      recurrentReservationId: recurentReservationId,
+    });
     recurrentReservationDelete.mutate({
       recurrentReservationId: recurentReservationId,
       clubId: clubData.id,

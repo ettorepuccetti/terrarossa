@@ -4,8 +4,11 @@ import { loggerInternal } from "~/utils/logger";
 
 export const clubRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const logger = loggerInternal.child({ apiEndPoint: "clubRouter.getAll" });
-    logger.info({ userId: ctx.session?.user.id }, "get all clubs");
+    const logger = loggerInternal.child({
+      userId: ctx.session?.user.id,
+      context: { apiEndPoint: "clubRouter.getAll" },
+    });
+    logger.info("get all clubs");
     return await ctx.prisma.club.findMany({
       include: {
         Address: true,
@@ -17,14 +20,16 @@ export const clubRouter = createTRPCRouter({
     .input(ClubIdInputSchema)
     .query(async ({ ctx, input }) => {
       const logger = loggerInternal.child({
-        apiEndPoint: "clubRouter.getByClubId",
+        userId: ctx.session?.user.id,
+        context: { apiEndPoint: "clubRouter.getByClubId" },
       });
+
       if (typeof input.clubId !== "string") {
         //clubId come from the router, so it can also be an array of strings, or undefined
-        logger.error(
-          { userId: ctx.session?.user.id, clubId: input.clubId },
-          "invalid clubId",
-        );
+        logger.error("invalid clubId", {
+          userId: ctx.session?.user.id,
+          clubId: input.clubId,
+        });
         throw new Error(
           `Si è verificato un errore, per favore riprova (Invalid clubId)`,
         );

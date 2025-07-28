@@ -11,7 +11,7 @@ export default function SearchBar(props: { onSearch: (term: string) => void }) {
   // It listen for changes on `searchTerm`. Every time `searchTerm` changes, we wait 300ms before calling `props.onSearch`
   useDebounce(
     () => {
-      logger.info({ searchTerm: searchTerm }, "searching");
+      logger.info("searching", { searchTerm: searchTerm });
       props.onSearch(searchTerm);
     },
     [searchTerm],

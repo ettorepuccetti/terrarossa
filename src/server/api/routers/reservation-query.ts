@@ -12,8 +12,12 @@ export const reservationQueryRouter = createTRPCRouter({
     .input(reservationQueryInputSchema)
     .query(async ({ ctx, input }) => {
       const logger = loggerInternal.child({
-        apiEndPoint: "reservationQueryRouter.getAllVisibleInCalendarByClubId",
+        userId: ctx.session?.user.id,
+        context: {
+          apiEndPoint: "reservationQueryRouter.getAllVisibleInCalendarByClubId",
+        },
       });
+
       if (typeof input.clubId !== "string") {
         throw new Error(`Server: invalid clubId`);
       }
@@ -36,7 +40,7 @@ export const reservationQueryRouter = createTRPCRouter({
         ? dayjs(input.customSelectedDate)
         : undefined;
 
-      logger.info({
+      logger.info("Query reservations visible in calendar time range", {
         ...input,
         fromDate: fromDate.toDate(),
         toDate: toDate.toDate(),
@@ -85,9 +89,10 @@ export const reservationQueryRouter = createTRPCRouter({
 
   getMine: protectedProcedure.query(({ ctx }) => {
     const logger = loggerInternal.child({
-      apiEndPoint: "reservationQueryRouter.getMine",
+      userId: ctx.session?.user.id,
+      context: { apiEndPoint: "reservationQueryRouter.getMine" },
     });
-    logger.info({ userId: ctx.session?.user.id }, "get all reservations");
+    logger.info("Get all reservations", { userId: ctx.session?.user.id });
     return ctx.prisma.reservation.findMany({
       where: {
         userId: ctx.session.user.id,

@@ -7,14 +7,15 @@ export const courtRouter = createTRPCRouter({
     .input(ClubIdInputSchema)
     .query(async ({ ctx, input }) => {
       const logger = loggerInternal.child({
-        apiEndPoint: "courtRouter.getAllByClubId",
+        userId: ctx.session?.user.id,
+        context: { apiEndPoint: "courtRouter.getAllByClubId" },
       });
       //clubId come from the router, so it can also be an array of strings, or undefined
       if (typeof input.clubId !== "string") {
-        logger.error(
-          { userId: ctx.session?.user.id, clubId: input.clubId },
-          "invalid clubId",
-        );
+        logger.error("invalid clubId", {
+          userId: ctx.session?.user.id,
+          clubId: input.clubId,
+        });
         throw new Error(
           `Si è verificato un errore, per favore riprova (Invalid clubId)`,
         );

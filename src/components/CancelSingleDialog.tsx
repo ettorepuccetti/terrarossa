@@ -24,10 +24,9 @@ export default function CancelSingleDialog() {
 
   const deleteReservation = (reservationId?: string) => {
     if (!reservationId) {
-      logger.error(
-        { eventDetails: eventDetails },
-        "reservationId is undefined",
-      );
+      logger.error("reservationId is undefined", {
+        eventDetails: eventDetails,
+      });
       throw new Error(
         "Si è verificato un problema, la tua prentazione non può essere cancellata al momento, per favore riprova",
       );
@@ -36,7 +35,7 @@ export default function CancelSingleDialog() {
       reservationId: reservationId,
       clubId: clubData.id,
     });
-    logger.info({ reservationId: reservationId }, "delete reservation");
+    logger.info("delete reservation", { reservationId: reservationId });
     setDeleteConfirmationOpen(false);
     setEventDetails(null);
   };

@@ -68,10 +68,9 @@ export const EditUsernameDialog = ({
             <Button
               data-test="submit-username"
               onClick={() => {
-                logger.info(
-                  { newUsername: newUsername },
-                  "submitting new username",
-                );
+                logger.info("submitting new username", {
+                  newUsername: newUsername,
+                });
                 onSubmit(newUsername);
                 onClose();
               }}

@@ -10,8 +10,11 @@ const R2_USER_IMAGE_PREFIX = "userImage/";
 
 export const userRouter = createTRPCRouter({
   getInfo: protectedProcedure.query(({ ctx }) => {
-    const logger = loggerInternal.child({ apiEndPoint: "userRouter.getInfo" });
-    logger.info({ userId: ctx.session?.user.id }, "Get user info");
+    const logger = loggerInternal.child({
+      userId: ctx.session?.user.id,
+      context: { apiEndPoint: "userRouter.getInfo" },
+    });
+    logger.info("Get user info");
     return ctx.prisma.user.findUniqueOrThrow({
       where: {
         id: ctx.session.user.id,
@@ -21,9 +24,10 @@ export const userRouter = createTRPCRouter({
 
   deleteUser: protectedProcedure.mutation(({ ctx }) => {
     const logger = loggerInternal.child({
-      apiEndPoint: "userRouter.deleteUser",
+      userId: ctx.session?.user.id,
+      context: { apiEndPoint: "userRouter.deleteUser" },
     });
-    logger.warn({ userId: ctx.session?.user.id }, "Delete user");
+    logger.warn("Delete user");
     return ctx.prisma.user.delete({
       where: {
         id: ctx.session.user.id,
@@ -33,7 +37,8 @@ export const userRouter = createTRPCRouter({
 
   getSignedUrlForUploadImage: protectedProcedure.mutation(async ({ ctx }) => {
     const logger = loggerInternal.child({
-      apiEndPoint: "userRouter.getSignedUrlForUploadImage",
+      userId: ctx.session?.user.id,
+      context: { apiEndPoint: "userRouter.getSignedUrlForUploadImage" },
     });
     const signedUrl = await getSignedUrl(
       r2,
@@ -43,25 +48,26 @@ export const userRouter = createTRPCRouter({
       }),
       { expiresIn: 60 },
     );
-    logger.info(
-      { userId: ctx.session?.user.id, signedUrl: signedUrl },
-      "Generate signed url for upload image",
-    );
+    logger.info("Generate signed url for upload image", {
+      userId: ctx.session?.user.id,
+      signedUrl: signedUrl,
+    });
     return signedUrl;
   }),
 
   updateImageSrc: protectedProcedure.mutation(async ({ ctx }) => {
     const logger = loggerInternal.child({
-      apiEndPoint: "userRouter.updateImageSrc",
+      userId: ctx.session?.user.id,
+      context: { apiEndPoint: "userRouter.updateImageSrc" },
     });
     const imageSrc =
       env.NEXT_PUBLIC_R2_BUCKET_URL +
       R2_USER_IMAGE_PREFIX +
       ctx.session.user.id;
-    logger.info(
-      { userId: ctx.session?.user.id, imageSrc: imageSrc },
-      "Update user image",
-    );
+    logger.info("Update user image", {
+      userId: ctx.session?.user.id,
+      imageSrc: imageSrc,
+    });
     await ctx.prisma.user.update({
       where: {
         id: ctx.session.user.id,
@@ -76,12 +82,13 @@ export const userRouter = createTRPCRouter({
     .input(z.object({ newUsername: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const logger = loggerInternal.child({
-        apiEndPoint: "userRouter.updateUsername",
+        userId: ctx.session?.user.id,
+        context: { apiEndPoint: "userRouter.updateUsername" },
       });
-      logger.info(
-        { userId: ctx.session?.user.id, newUsername: input.newUsername },
-        "Update username",
-      );
+      logger.info("Update username", {
+        userId: ctx.session?.user.id,
+        newUsername: input.newUsername,
+      });
       await ctx.prisma.user.update({
         where: {
           id: ctx.session.user.id,

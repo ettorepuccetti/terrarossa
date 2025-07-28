@@ -32,7 +32,7 @@ export default function HorizonalDatePicker() {
   );
 
   const onDateClick = (date: dayjs.Dayjs) => {
-    logger.info({ selectedDate: date.toDate() }, "Date selected");
+    logger.info("Date selected", { selectedDate: date.toDate() });
     setSelectedDate(date);
     setCustomSelectedDate(false);
     calendarRef.current?.getApi().gotoDate(date.toDate());

@@ -1,5 +1,4 @@
 import { useSession } from "next-auth/react";
-import { env } from "~/env.mjs";
 
 // create pino-logflare console stream for serverless functions and send function for browser logs
 // Browser logs and serverless function logs are going to: https://logflare.app/sources/29358
@@ -33,27 +32,31 @@ import { env } from "~/env.mjs";
 // );
 
 export const loggerInternal = {
-  child: ({}) => {
+  child: ({
+    context,
+    userId,
+  }: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    context: Record<string, string | undefined>;
+    userId: string | undefined;
+  }) => {
     return {
-      debug: console.debug,
-      info: console.log,
-      error: console.error,
-      warn: console.warn,
+      debug: (message?: string, optionalParams?: object) =>
+        console.debug(message, { userId, ...context, ...optionalParams }),
+
+      info: (message?: string, optionalParams?: object) =>
+        console.log(message, { userId, ...context, ...optionalParams }),
+
+      warn: (message?: string, optionalParams?: object) =>
+        console.warn(message, { userId, ...context, ...optionalParams }),
+
+      error: (message?: string, optionalParams?: object) =>
+        console.error(message, { userId, ...context, ...optionalParams }),
     };
   },
 };
 
 export const useLogger = (context: { [key: string]: string | undefined }) => {
   const { data: session } = useSession();
-  if (env.NEXT_PUBLIC_APP_ENV === "test") {
-    // return a void logger
-    return {
-      debug: console.debug,
-      info: console.log,
-      error: console.error,
-      warn: console.warn,
-    };
-  } else {
-    return loggerInternal.child({ ...context, userId: session?.user.id });
-  }
+  return loggerInternal.child({ userId: session?.user.id, context });
 };

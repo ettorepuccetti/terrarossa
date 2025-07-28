@@ -54,14 +54,11 @@ export default function ReserveDialog() {
 
   const onConfirmButton = () => {
     if (!endDate || !startDate || !dateClick?.resource) {
-      logger.error(
-        {
-          endDate: endDate?.toDate(),
-          startDate: startDate?.toDate(),
-          resource: dateClick?.resource,
-        },
-        "onConfirmButton: unexpected null value",
-      );
+      logger.error("onConfirmButton: unexpected null value", {
+        endDate: endDate?.toDate(),
+        startDate: startDate?.toDate(),
+        resource: dateClick?.resource,
+      });
       throw new Error("Si è verificato un problema, per favore riprova.");
     }
 
@@ -82,7 +79,7 @@ export default function ReserveDialog() {
         recurrentStartDate: startDate.startOf("day").utc().toDate(),
         recurrentEndDate: recurrentEndDate.startOf("day").utc().toDate(),
       };
-      logger.info(recurrentDataPayload, "recurrent reservation added");
+      logger.info("recurrent reservation added", recurrentDataPayload);
       void recurrentReservationAdd
         .mutateAsync(recurrentDataPayload)
         .then(() => {
@@ -91,7 +88,7 @@ export default function ReserveDialog() {
         .catch((_error) => {}); //already catched
     } else {
       // single reservation add
-      logger.info(dataPayload, "reservation added");
+      logger.info("reservation added", dataPayload);
       reservationAdd
         .mutateAsync(dataPayload)
         .then(() => {

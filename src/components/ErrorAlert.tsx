@@ -20,7 +20,7 @@ export default function ErrorAlert({
   // to avoid logging the error twice
   useEffect(() => {
     if (error) {
-      logger.error({ error: error.message }, "Error shown in ErrorAlert");
+      logger.error("Error shown in ErrorAlert", { error: error.message });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
