@@ -1,8 +1,13 @@
-import { type Session } from "next-auth";
 import FullCalendarWrapper from "~/components/FullCalendarWrapper";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { formatTimeString } from "~/utils/utils";
-import { club, clubSettings, courts, mountWithContexts } from "./_constants";
+import {
+  club,
+  clubSettings,
+  courts,
+  mountWithContexts,
+  session,
+} from "./_constants";
 
 function FullCalendarWrapperContext(props: { lastBookableMinute: number }) {
   // set clubData
@@ -34,7 +39,7 @@ describe("<FullCalendarWrapper />", () => {
 
         mountWithContexts(
           <FullCalendarWrapperContext lastBookableMinute={closingMinute} />,
-          {} as Session,
+          session,
         );
 
         // check time of the first slot
