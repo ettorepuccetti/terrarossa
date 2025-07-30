@@ -11,6 +11,7 @@ import {
   getAdminSession,
   mountWithContexts,
 } from "./_constants";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 require("dayjs/locale/it");
 dayjs.locale("it");
 
