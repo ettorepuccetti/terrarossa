@@ -1,4 +1,6 @@
 import { type Club } from "@prisma/client";
+import { foroItalicoName } from "~/utils/constants";
+import { saveClubInfoAndCleanReservations } from "./_constants";
 
 describe("search", () => {
   it("GIVEN clubs in db WHEN no search is performed THEN every club is displayed", () => {
@@ -31,5 +33,28 @@ describe("search", () => {
       (clubs: Club[]) => assert(clubs.length === 0), //check that effectively no club is present in DB
     );
     cy.get(".MuiCardContent-root").should("not.exist"); // check that no club is displayed in the UI
+  });
+
+  it("GIVEN admin user WHEN land on search page THEN redirect to its club page instead", function () {
+    saveClubInfoAndCleanReservations(
+      foroItalicoName,
+      "clubIdForoItalico",
+      " ", // don't need to store club name
+      " ", // don't need to store clubSettings id
+    );
+
+    cy.loginToAuth0(
+      Cypress.env("ADMIN_FORO_MAIL") as string,
+      Cypress.env("ADMIN_FORO_PWD") as string,
+    );
+
+    cy.visit("/search");
+
+    cy.then(() => {
+      cy.url().should(
+        "include",
+        `/prenota?clubId=${this.clubIdForoItalico as string}`,
+      );
+    });
   });
 });

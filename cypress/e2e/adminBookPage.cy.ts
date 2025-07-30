@@ -30,7 +30,7 @@ beforeEach("Retrieve clubs, delete reservations and login", function () {
     loginAndVisitCalendarPage(
       Cypress.env("ADMIN_FORO_MAIL") as string,
       Cypress.env("ADMIN_FORO_PWD") as string,
-      this.clubIdForoItalico as string,
+      this.clubIdForoItalico as string, //`clubIdForoItalico` is accessible as class field because saved with cy.wrap()
     );
   });
 });

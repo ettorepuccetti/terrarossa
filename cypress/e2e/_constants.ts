@@ -19,6 +19,14 @@ export const ADMIN_FORO: User = {
   password: Cypress.env("ADMIN_FORO_PWD") as string,
 };
 
+/**
+ * Retrieve the selected club from db and store its information as class fields during test execution, through Cypress utility.
+ * It also clean up all the reservations of that club.
+ * @param clubName string representing the name of the club to search by in db
+ * @param clubIdAliasName name of the variable later used in test to refer to that Club id, accessible as class field
+ * @param clubAliasName name of the variable later used in test to refer to that Club name, accessible as class field
+ * @param clubSettingsAliasName name of the variable later used in test to refer to that ClubSettings id, accessible as class field
+ */
 export function saveClubInfoAndCleanReservations(
   clubName: string,
   clubIdAliasName: string,
@@ -29,6 +37,7 @@ export function saveClubInfoAndCleanReservations(
     if (clubs[0] === undefined) {
       throw new Error("No clubs found");
     }
+    // save club name for later use in test
     cy.wrap(clubs[0]).as(clubAliasName);
     cy.wrap(clubs[0].id)
       .as(clubIdAliasName)
