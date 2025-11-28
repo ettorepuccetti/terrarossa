@@ -25,7 +25,7 @@ function ReserveDialogWrapper(props: {
   useMergedStoreContext((store) => store.setClubData)({
     ...club,
     Address: null,
-    PhoneNumber: null,
+    phoneNumber: null,
     id: props.clubId ?? club.id,
     clubSettings: props.clubSettings ?? clubSettings,
   });

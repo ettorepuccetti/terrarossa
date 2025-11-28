@@ -41,7 +41,7 @@ export const clubRouter = createTRPCRouter({
         include: {
           clubSettings: true,
           Address: true,
-          PhoneNumber: true,
+          phoneNumber: true,
         },
       });
     }),

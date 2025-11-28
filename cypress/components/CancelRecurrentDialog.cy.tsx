@@ -14,7 +14,7 @@ function CancelRecurrentDialogContext() {
   useMergedStoreContext((store) => store.setClubData)({
     clubSettings: clubSettings,
     Address: null,
-    PhoneNumber: null,
+    phoneNumber: null,
     ...club,
   });
 
