@@ -4,7 +4,7 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ettorepuccetti_terrarossa&metric=bugs)](https://sonarcloud.io/summary/new_code?id=ettorepuccetti_terrarossa)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ettorepuccetti_terrarossa&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=ettorepuccetti_terrarossa)
 
-Book tennis courts in your favourite clubs
+Book tennis courts in your favourite clubs, maybe.
 
 ## Installation
 
