@@ -14,7 +14,7 @@ function FullCalendarWrapperContext(props: { lastBookableMinute: number }) {
   useMergedStoreContext((state) => state.setClubData)({
     ...club,
     Address: null,
-    PhoneNumber: null,
+    phoneNumber: null,
     clubSettings: {
       ...clubSettings,
       lastBookableMinute: props.lastBookableMinute,

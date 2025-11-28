@@ -3,51 +3,53 @@ import { useEffect, useState } from "react";
 import { useLogger } from "~/utils/logger";
 import DialogLayout from "./DialogLayout";
 
-export const EditUsernameDialog = ({
+export const EditPhoneNumberDialog = ({
   open,
-  oldUsername,
+  oldPhoneNumber,
   onClose,
   onSubmit,
 }: {
   open: boolean;
-  oldUsername: string;
+  oldPhoneNumber: string;
   onClose: () => void;
-  onSubmit: (newUsername: string) => void;
+  onSubmit: (newPhoneNumber: string) => void;
 }) => {
-  const logger = useLogger({ component: "EditUsernameDialog" });
+  const logger = useLogger({ component: "EditPhoneNumberDialog" });
 
-  const [newUsername, setNewUsername] = useState<string>(oldUsername);
+  const [newPhoneNumber, setNewPhoneNumber] = useState<string>(oldPhoneNumber);
 
-  function validateUsername(username: string | null) {
-    return username && username.length > 3;
+  function validatePhoneNumber(phonenumber: string | null) {
+    return phonenumber && phonenumber.length > 3;
   }
 
-  // reset username in textbox to the original one when dialog is closed without submit
+  // reset phonenumber in textbox to the original one when dialog is closed without submit
   // otherwise editing, then closing then opening again would show the last edited value
   useEffect(() => {
-    setNewUsername(oldUsername);
+    setNewPhoneNumber(oldPhoneNumber);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   return (
     <>
       <Dialog
-        data-test="edit-username-dialog"
+        data-test="edit-phonenumber-dialog"
         open={open}
         onClose={onClose}
         maxWidth={"xs"}
       >
-        <DialogLayout title="Modifica nome utente">
+        <DialogLayout title="Modifica cellulare">
           <TextField
             inputProps={{
-              "data-test": "edit-username-input",
+              "data-test": "edit-phonenumber-input",
             }}
-            helperText={!validateUsername(newUsername) && "Minimo 4 caratteri"}
+            helperText={
+              !validatePhoneNumber(newPhoneNumber) && "Minimo 4 caratteri"
+            }
             variant="outlined"
-            label="nome utente"
+            label="cellulare"
             sx={{ marginTop: "10px" }}
-            onChange={(e) => setNewUsername(e.target.value)}
-            value={newUsername}
+            onChange={(e) => setNewPhoneNumber(e.target.value)}
+            value={newPhoneNumber}
             fullWidth
             color="info"
             onFocus={(event) => {
@@ -56,26 +58,26 @@ export const EditUsernameDialog = ({
               const target = event.target;
               setTimeout(() => target.select(), 0);
             }}
-            error={!validateUsername(newUsername)}
+            error={!validatePhoneNumber(newPhoneNumber)}
             autoFocus
           />
           <Alert severity="info">
             {
-              "Il nome utente verrà visualizzato pubblicamente sulle prenotazioni."
+              "Il numero di telefono sarà visibile solo al gestore del circolo in cui effettui una prenotazione"
             }
           </Alert>
           <DialogActions>
             <Button
-              data-test="submit-username"
+              data-test="submit-phonenumber"
               onClick={() => {
-                logger.info("submitting new username", {
-                  newUsername: newUsername,
+                logger.info("submitting new phonenumber", {
+                  newPhoneNumber: newPhoneNumber,
                 });
-                onSubmit(newUsername);
+                onSubmit(newPhoneNumber);
                 onClose();
               }}
               color="info"
-              disabled={!validateUsername(newUsername)}
+              disabled={!validatePhoneNumber(newPhoneNumber)}
             >
               ok
             </Button>
