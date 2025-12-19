@@ -1,13 +1,16 @@
 import RefreshOutlined from "@mui/icons-material/RefreshOutlined";
 import { IconButton } from "@mui/material";
-import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
+import { type ReservationQueryType } from "~/hooks/calendarTrpcHooks";
 import { useLogger } from "~/utils/logger";
 
-export default function RefetchReservationButton() {
+type RefetchReservationButtonProps = {
+  reservationQuery: ReservationQueryType;
+};
+
+export default function RefetchReservationButton({
+  reservationQuery,
+}: RefetchReservationButtonProps) {
   const logger = useLogger({ component: "RefetchReservationButton" });
-  const reservationQuery = useMergedStoreContext(
-    (store) => store.getReservationQuery,
-  )();
 
   return (
     <IconButton

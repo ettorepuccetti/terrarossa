@@ -1,8 +1,15 @@
+import { type ReservationDeleteType } from "~/hooks/calendarTrpcHooks";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 import ConfirmationInplace from "./ConfirmationInplace";
 
-export default function CancelSingleDialog() {
+type CancelSingleDialogProps = {
+  reservationDelete: ReservationDeleteType;
+};
+
+export default function CancelSingleDialog({
+  reservationDelete,
+}: CancelSingleDialogProps) {
   const logger = useLogger({
     component: "CancelSingleDialog",
   });
@@ -18,9 +25,6 @@ export default function CancelSingleDialog() {
   );
 
   const clubData = useMergedStoreContext((state) => state.getClubData());
-  const reservationDelete = useMergedStoreContext((state) =>
-    state.getReservationDelete(),
-  );
 
   const deleteReservation = (reservationId?: string) => {
     if (!reservationId) {

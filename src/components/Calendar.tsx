@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import ReserveDialog from "~/components/ReserveDialog";
 
 import { Container, LinearProgress } from "@mui/material";
-import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import {
   useClubQuery,
@@ -33,45 +32,18 @@ export default function Calendar() {
     (store) => store.selectedDate,
   );
 
-  // used during unmount to reset the selectedDate in the store
-  const setSelectedDate = useMergedStoreContext(
-    (store) => store.setSelectedDate,
-  );
-
   // --------------------------------
   // ------ QUERY & MUTATIONS -------
   // --------------------------------
 
-  // reservationAdd - I save here the callback to store the mutation in the store and the mutation itself, to use them in the useEffect
-  // I cannot invoke the callback to save the mutation in the store here (during the render)
-  const setReservationAdd = useMergedStoreContext(
-    (store) => store.setReservationAdd,
-  );
-  const reservationAdd = useReservationAdd();
-
-  // recurrentReservationAdd
-  const setRecurrentReservationAdd = useMergedStoreContext(
-    (store) => store.setRecurrentReservationAdd,
-  );
-  const recurrentReservationAdd = useRecurrentReservationAdd();
-
-  // reservationDelete
-  const setReservationDelete = useMergedStoreContext(
-    (store) => store.setReservationDelete,
-  );
-  const reservationDelete = useReservationDelete();
-
-  // recurrentReservationDelete
-  const setRecurrentReservationDelete = useMergedStoreContext(
-    (store) => store.setRecurrentReservationDelete,
-  );
-  const recurrentReservationDelete = useRecurrentReservationDelete();
-
   // reservationQuery - also used by refresh button
-  const setReservationQuery = useMergedStoreContext(
-    (store) => store.setReservationQuery,
-  );
   const reservationQuery = useReservationQuery(clubId, selectedDateInCalendar);
+
+  const reservationAdd = useReservationAdd(reservationQuery);
+  const recurrentReservationAdd = useRecurrentReservationAdd(reservationQuery);
+  const reservationDelete = useReservationDelete(reservationQuery);
+  const recurrentReservationDelete =
+    useRecurrentReservationDelete(reservationQuery);
 
   // clubQuery
   const setClubData = useMergedStoreContext((store) => store.setClubData);
@@ -106,22 +78,6 @@ export default function Calendar() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clubQuery.data]);
-
-  // set reservationAdd, recurrentReservationAdd, reservationDelete, recurrentReservationDelete in the store on the first render
-  // then clean clubData on component unmount
-  useEffect(() => {
-    setReservationAdd(reservationAdd);
-    setRecurrentReservationAdd(recurrentReservationAdd);
-    setReservationDelete(reservationDelete);
-    setRecurrentReservationDelete(recurrentReservationDelete);
-    setReservationQuery(reservationQuery);
-    //onComponentUnmount: reset the clubData
-    return () => {
-      setClubData(undefined);
-      setSelectedDate(dayjs().startOf("day"));
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // -------------------
 
@@ -170,7 +126,7 @@ export default function Calendar() {
           }}
         />
 
-        <CalendarHeader />
+        <CalendarHeader reservationQuery={reservationQuery} />
         <SpinnerPartial
           open={
             reservationQuery.isLoading ||
@@ -188,8 +144,14 @@ export default function Calendar() {
         </SpinnerPartial>
         <CalendarClubInfo />
       </Container>
-      <ReserveDialog />
-      <EventDetailDialog />
+      <ReserveDialog
+        reservationAdd={reservationAdd}
+        recurrentReservationAdd={recurrentReservationAdd}
+      />
+      <EventDetailDialog
+        reservationDelete={reservationDelete}
+        recurrentReservationDelete={recurrentReservationDelete}
+      />
       <ReserveSuccessSnackbar />
     </>
   );

@@ -1,12 +1,19 @@
 import { Box, Typography } from "@mui/material";
 import Image from "next/image";
+import { type ReservationQueryType } from "~/hooks/calendarTrpcHooks";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { capitaliseFirstChar } from "~/utils/utils";
 import HorizonalDatePicker from "./HorizontalDatePicker";
 import LegendaButton from "./LegendaButton";
 import RefetchReservationButton from "./RefetchReservationButton";
 
-export default function CalendarHeader() {
+type CalendarHeaderProps = {
+  reservationQuery: ReservationQueryType;
+};
+
+export default function CalendarHeader({
+  reservationQuery,
+}: CalendarHeaderProps) {
   const clubData = useMergedStoreContext((state) => state.getClubData());
   const selectedDate = useMergedStoreContext((store) => store.selectedDate);
 
@@ -46,7 +53,7 @@ export default function CalendarHeader() {
         alignItems={"center"}
       >
         {/* refresh query button */}
-        <RefetchReservationButton />
+        <RefetchReservationButton reservationQuery={reservationQuery} />
 
         {/* Selected date extended */}
         <Typography

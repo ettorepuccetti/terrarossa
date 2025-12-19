@@ -2,25 +2,31 @@
 
 ## Next.js
 
+start develop in watch mode:
+
 ```
 npm run dev
 ```
 
 ## DB
 
-### Planetscale
-
-(optional)
-
-```
-brew install planetscale/tap/pscale
-pscale connect terrarossa main --port 3309
-How can
-```
-
-altrimenti connettersi direttamente con `DATABASE_URL` in `.env`
-
 ### Prisma
+
+### DB changes
+
+after a change in dev environment:
+
+```
+npx prisma db push
+```
+
+it also auto `generate` and `seed`.
+
+#### Generate
+
+```
+npx prisma generate
+```
 
 #### Seed
 
@@ -41,48 +47,6 @@ to reset the database (delete all data!!):
 ```
 npx prisma db push --force-reset
 ```
-
-### Docker
-
-For local development and testing.
-In `DATABASE_URL` cambiare username: `root` e password: `secret`
-
-`docker run --name mysql-terrarossa -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql`
-
-### DB changes
-
-in `.env` cambiare il `DATABASE_URL` a quello del branch
-riavviare `npm run dev`
-
-```
-npx prisma db push
-npx prisma generate
-```
-
-(reminder: cambiamenti ai prisma tag non richiedono deployment, si riflettono solo su prisma studio e prisma generate).
-Mergiare da planetscale.com
-
-#### Incorporating databases into your ci cd pipeline
-
-From [webinar](https://planetscale.com/media/incorporating-databases-into-your-ci-cd-pipeline):<br>
-Schema before code (almost always). <br> Two github actions:
-
-Run db migration:
-
-- if pull request opened and changes to schema file:
-  - create a new db branch (check if already exists, since this workflow is triggered on subsequent pushes on same PR)
-  - proxy the db connection to the new created branch on planetscale
-  - run the migration (prisma db push)
-  - comment on the PR the diff in schema changes (_very_ optional)
-  - check if the DR already exists and close it, in that case
-  - open DR on planetscale (branch name of DB = branch name on GH)
-
-Deploy schema then code:
-
-- if the PR has been merged and there's a DR with same branch name:
-
-  - merge the DR on Planetscale (and wait for it)
-  - deploy to vercel
 
 ### Prisma cloud platform [BLOCKED by NextAuth]
 
@@ -308,12 +272,12 @@ https://tkdodo.eu/blog/testing-react-query
 
 https://github.com/maloguertin/msw-trpc
 
-How to use with cypress (when to initialize service worker)
-https://github.com/mswjs/msw/issues/1560
+How to use with cypress (when to initialize service worker) <br>
+https://github.com/mswjs/msw/issues/1560 <br>
 https://www.capocaccia.dev/posts/cypressMsw
 
-libraries or example on top of msw:
-https://github.com/deshiknaves/cypress-msw-interceptor
+libraries or example on top of msw:<br>
+https://github.com/deshiknaves/cypress-msw-interceptor<br>
 https://github.com/abrahamgr/msw-cypress
 
 discussion on trpc repo on how to mock calls:
@@ -534,6 +498,8 @@ In order to use R2 with public access, I had to add a custom domain, so I transf
 | NS   | elmo.ns.cloudflare.com     |
 | NS   | magnolia.ns.cloudflare.com |
 
+<br>
+
 - add DNS record in cloudflare dashboard (most of them are auto discovered).
 
 | Type  | Name              | Content                                                                                                  |
@@ -542,6 +508,8 @@ In order to use R2 with public access, I had to add a custom domain, so I transf
 | CNAME | www               | cname.vercel-dns.com                                                                                     |
 | R2    | r2.terrarossa.app | [terrarossa](https://dash.cloudflare.com/13cc38149d0dd2f1773615d6bf26d59c/r2/default/buckets/terrarossa) |
 | ...   |
+
+<br>
 
 - Change SSL/TLS encryption mode to `Full` to avoid redirection error from cloudflare dashboard.
 

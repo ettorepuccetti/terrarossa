@@ -4,6 +4,10 @@ import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
 import ReserveDialog from "~/components/ReserveDialog";
+import {
+  type RecurrentReservationAddType,
+  type ReservationAddType,
+} from "~/hooks/calendarTrpcHooks";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import {
   buildTrpcMutationMock,
@@ -30,15 +34,13 @@ function ReserveDialogWrapper(props: {
     clubSettings: props.clubSettings ?? clubSettings,
   });
 
-  // set mutations mocks: reservationDelete, recurrentReservationDelete
+  // create mutations mocks
   const addSingle = cy.stub().as("addSingle");
   const addRecurrent = cy.stub().as("addRecurrent");
-  useMergedStoreContext((store) => store.setReservationAdd)(
-    buildTrpcMutationMock(addSingle),
-  );
-  useMergedStoreContext((store) => store.setRecurrentReservationAdd)(
-    buildTrpcMutationMock(addRecurrent),
-  );
+  const reservationAdd = buildTrpcMutationMock(addSingle) as ReservationAddType;
+  const recurrentReservationAdd = buildTrpcMutationMock(
+    addRecurrent,
+  ) as RecurrentReservationAddType;
 
   // set dateClick
   const dateClick: DateClickArg = {
@@ -50,7 +52,12 @@ function ReserveDialogWrapper(props: {
   } as DateClickArg;
   useMergedStoreContext((store) => store.setDateClick)(dateClick);
 
-  return <ReserveDialog />;
+  return (
+    <ReserveDialog
+      reservationAdd={reservationAdd}
+      recurrentReservationAdd={recurrentReservationAdd}
+    />
+  );
 }
 
 function mountComponent({

@@ -9,7 +9,9 @@ import { useLogger } from "~/utils/logger";
 import { isAdminOfTheClub, startDateIsFuture } from "~/utils/utils";
 
 import {
+  type RecurrentReservationAddType,
   type RecurrentReservationInputSchema,
+  type ReservationAddType,
   type ReservationInputSchema,
 } from "~/hooks/calendarTrpcHooks";
 import CalendarDialog from "./CalendarDialog";
@@ -19,17 +21,20 @@ import ReserveDialogLoginButton from "./ReserveDialogLoginButton";
 import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
 dayjs.extend(utc);
 
-export default function ReserveDialog() {
+type ReserveDialogProps = {
+  reservationAdd: ReservationAddType;
+  recurrentReservationAdd: RecurrentReservationAddType;
+};
+
+export default function ReserveDialog({
+  reservationAdd,
+  recurrentReservationAdd,
+}: ReserveDialogProps) {
   const logger = useLogger({ component: "ReserveDialog" });
   const { data: sessionData } = useSession();
   const startDate = useMergedStoreContext((store) => store.getStartDate());
   const clubData = useMergedStoreContext((store) => store.getClubData());
-  const reservationAdd = useMergedStoreContext((store) =>
-    store.getReservationAdd(),
-  );
-  const recurrentReservationAdd = useMergedStoreContext((store) =>
-    store.getRecurrentReservationAdd(),
-  );
+
   const dateClick = useMergedStoreContext((state) => state.dateClick);
   const setDateClick = useMergedStoreContext((state) => state.setDateClick);
   const endDate = useMergedStoreContext((store) => store.endDate);

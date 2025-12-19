@@ -8,10 +8,22 @@ import {
   RadioGroup,
 } from "@mui/material";
 import React from "react";
+import {
+  type RecurrentReservationDeleteType,
+  type ReservationDeleteType,
+} from "~/hooks/calendarTrpcHooks";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 
-export default function CancelRecurrentDialog() {
+type CancelRecurrentDialogProps = {
+  reservationDelete: ReservationDeleteType;
+  recurrentReservationDelete: RecurrentReservationDeleteType;
+};
+
+export default function CancelRecurrentDialog({
+  reservationDelete,
+  recurrentReservationDelete,
+}: CancelRecurrentDialogProps) {
   const logger = useLogger({
     component: "CancelRecurrentDialog",
   });
@@ -27,13 +39,6 @@ export default function CancelRecurrentDialog() {
   );
 
   const clubData = useMergedStoreContext((state) => state.getClubData());
-
-  const recurrentReservationDelete = useMergedStoreContext((state) =>
-    state.getRecurrentReservationDelete(),
-  );
-  const reservationDelete = useMergedStoreContext((state) =>
-    state.getReservationDelete(),
-  );
 
   const [value, setValue] = React.useState("single");
 
