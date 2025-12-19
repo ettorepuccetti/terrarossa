@@ -4,7 +4,7 @@ import { useLogger } from "~/utils/logger";
 import ConfirmationInplace from "./ConfirmationInplace";
 
 type CancelSingleDialogProps = {
-  reservationDelete: ReservationDeleteType;
+  readonly reservationDelete: ReservationDeleteType;
 };
 
 export default function CancelSingleDialog({

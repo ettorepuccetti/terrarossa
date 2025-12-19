@@ -13,8 +13,8 @@ import CancelSingleDialog from "./CancelSingleDialog";
 import DialogFieldGrid from "./DialogFieldGrid";
 
 type EventDetailDialogProps = {
-  reservationDelete: ReservationDeleteType;
-  recurrentReservationDelete: RecurrentReservationDeleteType;
+  readonly reservationDelete: ReservationDeleteType;
+  readonly recurrentReservationDelete: RecurrentReservationDeleteType;
 };
 
 export default function EventDetailDialog({

@@ -22,8 +22,8 @@ import ReserveDialogRecurrent from "./ReserveDialogRecurrent";
 dayjs.extend(utc);
 
 type ReserveDialogProps = {
-  reservationAdd: ReservationAddType;
-  recurrentReservationAdd: RecurrentReservationAddType;
+  readonly reservationAdd: ReservationAddType;
+  readonly recurrentReservationAdd: RecurrentReservationAddType;
 };
 
 export default function ReserveDialog({

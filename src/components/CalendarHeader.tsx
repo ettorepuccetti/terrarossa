@@ -8,7 +8,7 @@ import LegendaButton from "./LegendaButton";
 import RefetchReservationButton from "./RefetchReservationButton";
 
 type CalendarHeaderProps = {
-  reservationQuery: ReservationQueryType;
+  readonly reservationQuery: ReservationQueryType;
 };
 
 export default function CalendarHeader({

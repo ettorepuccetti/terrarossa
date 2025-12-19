@@ -4,7 +4,7 @@ import { type ReservationQueryType } from "~/hooks/calendarTrpcHooks";
 import { useLogger } from "~/utils/logger";
 
 type RefetchReservationButtonProps = {
-  reservationQuery: ReservationQueryType;
+  readonly reservationQuery: ReservationQueryType;
 };
 
 export default function RefetchReservationButton({

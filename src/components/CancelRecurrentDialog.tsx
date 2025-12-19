@@ -16,8 +16,8 @@ import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { useLogger } from "~/utils/logger";
 
 type CancelRecurrentDialogProps = {
-  reservationDelete: ReservationDeleteType;
-  recurrentReservationDelete: RecurrentReservationDeleteType;
+  readonly reservationDelete: ReservationDeleteType;
+  readonly recurrentReservationDelete: RecurrentReservationDeleteType;
 };
 
 export default function CancelRecurrentDialog({
