@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import ReserveDialog from "~/components/ReserveDialog";
 
 import { Container, LinearProgress } from "@mui/material";
+import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import {
   useClubQuery,
@@ -30,6 +31,11 @@ export default function Calendar() {
   const [clubId, setClubId] = useState<string | undefined>(undefined);
   const selectedDateInCalendar = useMergedStoreContext(
     (store) => store.selectedDate,
+  );
+
+  // used to reset the selectedDate to current date when entering the calendar
+  const setSelectedDate = useMergedStoreContext(
+    (store) => store.setSelectedDate,
   );
 
   // --------------------------------
@@ -61,12 +67,14 @@ export default function Calendar() {
   // ----- EFFECTS -----
   // -------------------
 
-  //get the club id from the router when is available
+  //get the club id from the router when is available and reset date
   const router = useRouter();
   useEffect(() => {
     if (router.isReady) {
       //clubId is in local state
       setClubId(router.query.clubId as string);
+      // reset selected date to current date when entering the calendar page
+      setSelectedDate(dayjs());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady]);
