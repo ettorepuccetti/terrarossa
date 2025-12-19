@@ -87,6 +87,14 @@ export default function Calendar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clubQuery.data]);
 
+  // cleanup: reset clubData when leaving the calendar page
+  useEffect(() => {
+    return () => {
+      setClubData(undefined);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // -------------------
 
   //if there is an error in the clubQuery, show an error alert and not render any other component (FullCalendar, ReserveDialog, EventDetailDialog)
