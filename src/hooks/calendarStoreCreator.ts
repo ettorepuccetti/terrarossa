@@ -7,13 +7,6 @@ import { type StateCreator } from "zustand";
 
 import { type RouterOutputs } from "~/utils/api";
 import { getOrThrow } from "~/utils/utils";
-import {
-  type useRecurrentReservationAdd,
-  type useRecurrentReservationDelete,
-  type useReservationAdd,
-  type useReservationDelete,
-  type useReservationQuery,
-} from "./calendarTrpcHooks";
 
 export interface CalendarStore {
   dateClick: DateClickArg | null;
@@ -25,15 +18,6 @@ export interface CalendarStore {
   deleteConfirmationOpen: boolean;
   calendarRef: RefObject<FullCalendar>;
   calendarIsLoading: boolean;
-  reservationAdd: ReturnType<typeof useReservationAdd> | undefined;
-  recurrentReservationAdd:
-    | ReturnType<typeof useRecurrentReservationAdd>
-    | undefined;
-  reservationDelete: ReturnType<typeof useReservationDelete> | undefined;
-  recurrentReservationDelete:
-    | ReturnType<typeof useRecurrentReservationDelete>
-    | undefined;
-  reservationQuery: ReturnType<typeof useReservationQuery> | undefined;
   clubData: RouterOutputs["club"]["getByClubId"] | undefined;
   selectedDate: Dayjs;
   customDateSelected: boolean;
@@ -49,24 +33,6 @@ export interface CalendarStore {
   setSelectedDate: (selectedDate: Dayjs) => void;
   setCustomDateSelected: (customDateSelected: boolean) => void;
   setOpenReserveSuccess: (openReserveSuccess: boolean) => void;
-  // trpc mutations and queries
-  setReservationAdd: (
-    reservationAdd: ReturnType<typeof useReservationAdd>,
-  ) => void;
-  setRecurrentReservationAdd: (
-    reservationAdd: ReturnType<typeof useRecurrentReservationAdd>,
-  ) => void;
-  setReservationDelete: (
-    reservationDelete: ReturnType<typeof useReservationDelete>,
-  ) => void;
-  setRecurrentReservationDelete: (
-    recurrentReservationDelete: ReturnType<
-      typeof useRecurrentReservationDelete
-    >,
-  ) => void;
-  setReservationQuery: (
-    reservationQuery: ReturnType<typeof useReservationQuery>,
-  ) => void;
   setClubData: (
     clubData: RouterOutputs["club"]["getByClubId"] | undefined,
   ) => void;
@@ -74,15 +40,6 @@ export interface CalendarStore {
   //getter
   getStartDate: () => Dayjs;
   getClubData: () => RouterOutputs["club"]["getByClubId"];
-  getReservationAdd: () => ReturnType<typeof useReservationAdd>;
-  getRecurrentReservationAdd: () => ReturnType<
-    typeof useRecurrentReservationAdd
-  >;
-  getReservationDelete: () => ReturnType<typeof useReservationDelete>;
-  getRecurrentReservationDelete: () => ReturnType<
-    typeof useRecurrentReservationDelete
-  >;
-  getReservationQuery: () => ReturnType<typeof useReservationQuery>;
 
   //for testing only
   setSetEndDate: (stub: (endDate: Dayjs | null) => void) => void;
@@ -107,11 +64,6 @@ export const calendarStoreCreator: StateCreator<
   deleteConfirmationOpen: false,
   calendarRef: { current: null },
   calendarIsLoading: false,
-  reservationAdd: undefined,
-  recurrentReservationAdd: undefined,
-  reservationDelete: undefined,
-  recurrentReservationDelete: undefined,
-  reservationQuery: undefined,
   clubData: undefined,
   selectedDate: dayjs().startOf("day"),
   customDateSelected: false,
@@ -136,17 +88,6 @@ export const calendarStoreCreator: StateCreator<
   setOpenReserveSuccess: (openReserveSuccess) =>
     set({ openReserveSuccess: openReserveSuccess }),
 
-  // trpc mutations and queries
-  setReservationAdd: (reservationAdd) =>
-    set({ reservationAdd: reservationAdd }),
-  setRecurrentReservationAdd: (recurrentReservationAdd) =>
-    set({ recurrentReservationAdd: recurrentReservationAdd }),
-  setReservationDelete: (reservationDelete) =>
-    set({ reservationDelete: reservationDelete }),
-  setRecurrentReservationDelete: (recurrentReservationDelete) =>
-    set({ recurrentReservationDelete: recurrentReservationDelete }),
-  setReservationQuery: (reservationQuery) =>
-    set({ reservationQuery: reservationQuery }),
   setClubData: (clubData) => {
     set({ clubData: clubData });
   },
@@ -159,23 +100,6 @@ export const calendarStoreCreator: StateCreator<
 
   getClubData: () => {
     return getOrThrow(() => get().clubData);
-  },
-
-  getReservationAdd: () => {
-    return getOrThrow(() => get().reservationAdd);
-  },
-
-  getRecurrentReservationAdd: () => {
-    return getOrThrow(() => get().recurrentReservationAdd);
-  },
-  getReservationDelete: () => {
-    return getOrThrow(() => get().reservationDelete);
-  },
-  getRecurrentReservationDelete: () => {
-    return getOrThrow(() => get().recurrentReservationDelete);
-  },
-  getReservationQuery: () => {
-    return getOrThrow(() => get().reservationQuery);
   },
 
   //for testing only

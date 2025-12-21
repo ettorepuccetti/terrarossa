@@ -1,6 +1,10 @@
 import { Alert, Button } from "@mui/material";
 import dayjs from "dayjs";
 import { useSession } from "next-auth/react";
+import {
+  type RecurrentReservationDeleteType,
+  type ReservationDeleteType,
+} from "~/hooks/calendarTrpcHooks";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { isAdminOfTheClub } from "~/utils/utils";
 import CalendarDialog from "./CalendarDialog";
@@ -8,7 +12,15 @@ import CancelRecurrentDialog from "./CancelRecurrentDialog";
 import CancelSingleDialog from "./CancelSingleDialog";
 import DialogFieldGrid from "./DialogFieldGrid";
 
-export default function EventDetailDialog() {
+type EventDetailDialogProps = {
+  readonly reservationDelete: ReservationDeleteType;
+  readonly recurrentReservationDelete: RecurrentReservationDeleteType;
+};
+
+export default function EventDetailDialog({
+  reservationDelete,
+  recurrentReservationDelete,
+}: EventDetailDialogProps) {
   const { data: sessionData } = useSession();
   const eventDetails = useMergedStoreContext((state) => state.eventDetails);
   const setEventDetails = useMergedStoreContext(
@@ -110,10 +122,13 @@ export default function EventDetailDialog() {
         )}
 
         {/* show recurrent confirmation dialog */}
-        <CancelRecurrentDialog />
+        <CancelRecurrentDialog
+          reservationDelete={reservationDelete}
+          recurrentReservationDelete={recurrentReservationDelete}
+        />
 
         {/* show confirmation dialog */}
-        <CancelSingleDialog />
+        <CancelSingleDialog reservationDelete={reservationDelete} />
       </CalendarDialog>
     </>
   );

@@ -26,7 +26,7 @@ export default function DrawerWrapper(props: DrawerProps) {
           <LoginDrawerButton />
 
           {/* Link to home page */}
-          <NextLink href="/">
+          <NextLink href="/" data-test="home-page-link">
             <ListItemButton sx={{ gap: "1rem" }}>
               <HomeOutlinedIcon />
               <ListItemText primary="Home" />
@@ -42,7 +42,7 @@ export default function DrawerWrapper(props: DrawerProps) {
           </NextLink>
 
           {/* Link to profile page */}
-          <NextLink href="/profile">
+          <NextLink href="/profile" data-test="profile-page-link">
             <ListItemButton sx={{ gap: "1rem" }}>
               <PersonOutlineIcon />
               <ListItemText primary="Profilo" />

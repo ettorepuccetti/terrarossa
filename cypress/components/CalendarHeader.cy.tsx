@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
 import CalendarHeader from "~/components/CalendarHeader";
+import { type ReservationQueryType } from "~/hooks/calendarTrpcHooks";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { type RouterOutputs } from "~/utils/api";
 import { capitaliseFirstChar as capitalizeFirstChar } from "~/utils/utils";
@@ -27,13 +28,14 @@ function CalendarHeaderContext(props: { session: Session; clubId: string }) {
     PhoneNumber: null,
   });
 
-  // set reservation query
+  // create reservation query mock
   const reservationData: RouterOutputs["reservationQuery"]["getAllVisibleInCalendarByClubId"] =
     [];
-  useMergedStoreContext((store) => store.setReservationQuery)(
-    buildTrpcQueryMock(reservationData),
-  );
-  return <CalendarHeader />;
+  const reservationQuery = buildTrpcQueryMock(
+    reservationData,
+  ) as ReservationQueryType;
+
+  return <CalendarHeader reservationQuery={reservationQuery} />;
 }
 
 const mountComponent = (props: { session: Session; clubId: string }) => {
