@@ -90,7 +90,7 @@ export default function ReserveDialog({
         .then(() => {
           setOpenReserveSuccess(true);
         })
-        .catch((_error) => {}); //already catched
+        .catch((_error: unknown) => {}); //already catched
     } else {
       // single reservation add
       logger.info("reservation added", dataPayload);
@@ -99,7 +99,7 @@ export default function ReserveDialog({
         .then(() => {
           setOpenReserveSuccess(true);
         })
-        .catch((_error) => {});
+        .catch((_error: unknown) => {});
     }
     setDateClick(null);
     setOverwriteName(undefined);
