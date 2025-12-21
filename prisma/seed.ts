@@ -25,7 +25,7 @@ async function main() {
       Address: {
         create: foroItalicoAddress,
       },
-      PhoneNumber: {
+      phoneNumber: {
         create: foroItalicoPhone,
       },
       mail: "ticketoffice@federtennis.it",
@@ -68,7 +68,7 @@ async function main() {
       Address: {
         create: allEnglandAddress,
       },
-      PhoneNumber: {
+      phoneNumber: {
         create: allEnglandPhone,
       },
       mail: "info@wimbledon-village.com",

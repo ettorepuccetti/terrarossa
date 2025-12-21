@@ -37,8 +37,8 @@ export default function CalendarClubInfo() {
           <LocalPhoneRoundedIcon />
           <Box display={"flex"} flexWrap={"nowrap"} fontSize={"0.85rem"}>
             <Typography fontSize={"inherit"}>
-              {clubData.PhoneNumber?.nationalPrefix}
-              {clubData.PhoneNumber?.number}
+              {clubData.phoneNumber?.nationalPrefix}
+              {clubData.phoneNumber?.number}
             </Typography>
           </Box>
         </Grid>
