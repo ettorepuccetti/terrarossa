@@ -14,7 +14,7 @@ import {
   loginAndVisitCalendarPage,
   saveClubInfoAndCleanReservations,
 } from "./_constants";
-require("dayjs/locale/it");
+import "dayjs/locale/it";
 dayjs.locale("it");
 
 beforeEach("Initial clean up and retrieve Clubs", function () {
