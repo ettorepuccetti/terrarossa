@@ -1,100 +1,49 @@
 import { Box } from "@mui/material";
 import { type NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-import { useState } from "react";
-import Footer from "~/components/Footer";
-import Header from "~/components/Header";
-import CircoliClients from "~/components/landing-page/CircoliClients";
-import CircoliFeatureGrid from "~/components/landing-page/CircoliFeatureGrid";
-import CircoliHero from "~/components/landing-page/CircoliHero";
-import CircoliHowItWorks from "~/components/landing-page/CircoliHowItWorks";
-import CircoliRoadmap from "~/components/landing-page/CircoliRoadmap";
-import CircoliStickyCTA from "~/components/landing-page/CircoliStickyCTA";
-import CircoliTeam from "~/components/landing-page/CircoliTeam";
-import CircoliTestimonials from "~/components/landing-page/CircoliTestimonials";
-import LandingSwitch from "~/components/landing-page/LandingSwitch";
-import TennistiClients from "~/components/landing-page/TennistiClients";
-import TennistiCTA from "~/components/landing-page/TennistiCTA";
-import TennistiFAQ from "~/components/landing-page/TennistiFAQ";
-import TennistiFeatureGrid from "~/components/landing-page/TennistiFeatureGrid";
-import TennistiHero from "~/components/landing-page/TennistiHero";
-import TennistiHowItWorks from "~/components/landing-page/TennistiHowItWorks";
-import TennistiTeam from "~/components/landing-page/TennistiTeam";
-import TennistiTestimonials from "~/components/landing-page/TennistiTestimonials";
-import styles from "~/styles/index.module.css";
-
-export function Screenshot({ alt, src }: { alt: string; src: string }) {
-  // Placeholder for generated screenshot, could be replaced with <Image />
-  return (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: 420,
-        mx: "auto",
-        my: 2,
-        borderRadius: 3,
-        overflow: "hidden",
-        boxShadow: 6,
-        border: "1.5px solid #e0e0e0",
-        background: "#fff",
-      }}
-    >
-      <Image
-        src={src}
-        alt={alt}
-        width={420}
-        height={236}
-        style={{ width: "100%", height: "auto" }}
-      />
-    </Box>
-  );
-}
-
-const CircoliLanding = () => (
-  <Box>
-    <CircoliHero />
-    <CircoliHowItWorks />
-    <CircoliFeatureGrid />
-    <CircoliTestimonials />
-    <CircoliClients />
-    <CircoliTeam />
-    <CircoliRoadmap />
-    <CircoliStickyCTA />
-  </Box>
-);
-
-const TennistiLanding = () => (
-  <Box>
-    <TennistiHero />
-    <TennistiHowItWorks />
-    <TennistiFeatureGrid />
-    <TennistiTestimonials />
-    <TennistiClients />
-    <TennistiTeam />
-    <TennistiFAQ />
-    <TennistiCTA />
-  </Box>
-);
+import CTASection from "~/components/landing/CTASection";
+import EnterpriseFooter from "~/components/landing/EnterpriseFooter";
+import EnterpriseHero from "~/components/landing/EnterpriseHero";
+import FeatureShowcase from "~/components/landing/FeatureShowcase";
+import HowItWorksSection from "~/components/landing/HowItWorksSection";
+import LandingHeader from "~/components/landing/LandingHeader";
+import StatsSection from "~/components/landing/StatsSection";
+import TestimonialsSection from "~/components/landing/TestimonialsSection";
+import TrustedBySection from "~/components/landing/TrustedBySection";
 
 const Home: NextPage = () => {
-  const [audience, setAudience] = useState<"circoli" | "tennisti">("tennisti");
   return (
     <>
       <Head>
-        <title>Terrarossa</title>
-        <meta name="description" content="" />
+        <title>Terrarossa | Gestione Prenotazioni Campi da Tennis</title>
+        <meta
+          name="description"
+          content="La piattaforma all-in-one per circoli di tennis. Prenotazioni automatiche, gestione utenti e calendario intelligente per far crescere il tuo club."
+        />
         <meta
           name="google-site-verification"
           content="o13uxXhXF5TtrrsmtA8H3Uqy9eNimvm29w24v1bhUOs"
         />
+        <meta name="theme-color" content="#0a0a0a" />
       </Head>
-      <main className={styles.wrapper}>
-        <Header />
-        <LandingSwitch audience={audience} setAudience={setAudience} />
-        {audience === "circoli" ? <CircoliLanding /> : <TennistiLanding />}
-        <Footer />
-      </main>
+      <Box
+        component="main"
+        sx={{
+          bgcolor: "#0a0a0a",
+          minHeight: "100vh",
+          overflowX: "hidden",
+        }}
+      >
+        <LandingHeader />
+        <EnterpriseHero />
+        <TrustedBySection />
+        <HowItWorksSection />
+        <FeatureShowcase />
+        <StatsSection />
+        <TestimonialsSection />
+        <CTASection />
+        <EnterpriseFooter />
+      </Box>
     </>
   );
 };
