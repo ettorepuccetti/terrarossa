@@ -12,7 +12,6 @@ import LandingHeader from "~/components/landing/LandingHeader";
 import StatsSection from "~/components/landing/StatsSection";
 import TennistiSection from "~/components/landing/TennistiSection";
 import TestimonialsSection from "~/components/landing/TestimonialsSection";
-import TrustedBySection from "~/components/landing/TrustedBySection";
 import UIShowcase from "~/components/landing/UIShowcase";
 
 const Home: NextPage = () => {
@@ -42,12 +41,11 @@ const Home: NextPage = () => {
       >
         <LandingHeader />
         <EnterpriseHero />
-        <TrustedBySection />
         <FeatureShowcase />
-        <TennistiSection />
-        <HowItWorksSection />
         <UIShowcase />
+        <TennistiSection />
         <StatsSection />
+        <HowItWorksSection />
         <TestimonialsSection />
         <CTASection />
         <EnterpriseFooter />
