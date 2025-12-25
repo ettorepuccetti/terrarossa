@@ -102,6 +102,10 @@ const EnterpriseHero = () => {
           pointerEvents: "none",
           borderRadius: "12px",
           overflow: "hidden",
+          maskImage:
+            "linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 100%)",
         }}
       >
         <Image
