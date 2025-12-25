@@ -3,7 +3,6 @@ import EventRepeatIcon from "@mui/icons-material/EventRepeat";
 import PersonIcon from "@mui/icons-material/Person";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
 import { Box, Container, Grid, Typography } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import { luxuryColors } from "./EnterpriseHero";
 
 const features = [

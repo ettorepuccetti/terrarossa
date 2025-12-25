@@ -1,11 +1,11 @@
 import {
+  Box,
   Card,
   CardContent,
   Container,
   Grid,
   Typography,
   useTheme,
-  Box,
 } from "@mui/material";
 import Image from "next/image";
 
