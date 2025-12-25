@@ -7,7 +7,7 @@ const showcaseItems = [
   {
     title: "Calendario Settimanale",
     description: "Vista completa della disponibilità con selezione intuitiva.",
-    screenshot: "/screenshots/book-calendar-2.png",
+    screenshot: "/screenshots/user-book.png",
   },
   {
     title: "Dettaglio Prenotazione",
@@ -32,7 +32,12 @@ const showcaseItems = [
   {
     title: "Area Personale",
     description: "Gestione delle prenotazioni in un profilo curato.",
-    screenshot: "/screenshots/profile-page.png",
+    screenshot: "/screenshots/my-booking.png",
+  },
+  {
+    title: "Profilo",
+    description: "Il tuo profilo utente.",
+    screenshot: "/screenshots/profile.png",
   },
 ];
 
@@ -119,9 +124,12 @@ const UIShowcase = () => {
             <ShowcaseCard item={showcaseItems[4]!} height={320} />
           </Grid>
 
-          {/* Third row - 1 wide item */}
-          <Grid item xs={12}>
-            <ShowcaseCard item={showcaseItems[5]!} height={400} wide />
+          {/* First row - 2 large items */}
+          <Grid item xs={12} md={8}>
+            <ShowcaseCard item={showcaseItems[5]!} height={380} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <ShowcaseCard item={showcaseItems[6]!} height={380} />
           </Grid>
         </Grid>
       </Container>
