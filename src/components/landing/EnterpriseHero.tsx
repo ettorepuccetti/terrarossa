@@ -2,6 +2,21 @@ import { Box, Button, Container, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import Link from "next/link";
 
+// Warm, luxurious color palette inspired by tennis heritage
+export const luxuryColors = {
+  terracotta: "#C45C26",
+  terracottaLight: "#D4784A",
+  terracottaDark: "#8B3A14",
+  cream: "#FAF7F2",
+  warmWhite: "#FFFDF9",
+  gold: "#B8860B",
+  goldLight: "#D4AF37",
+  forestGreen: "#1B4332",
+  warmGray: "#5C5C5C",
+  lightGray: "#E8E4DE",
+  darkText: "#2C2C2C",
+};
+
 const EnterpriseHero = () => {
   return (
     <Box
@@ -12,47 +27,31 @@ const EnterpriseHero = () => {
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
-        background:
-          "linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)",
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background:
-            "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), transparent)",
-          pointerEvents: "none",
-        },
-        "&::after": {
-          content: '""',
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "200%",
-          height: "200%",
-          background:
-            "radial-gradient(circle at center, rgba(230, 81, 0, 0.08) 0%, transparent 50%)",
-          pointerEvents: "none",
-        },
+        background: `linear-gradient(180deg, ${luxuryColors.warmWhite} 0%, ${luxuryColors.cream} 100%)`,
+        pt: { xs: 12, md: 0 },
       }}
     >
-      {/* Animated grid background */}
+      {/* Subtle texture overlay */}
       <Box
         sx={{
           position: "absolute",
           inset: 0,
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
-          `,
-          backgroundSize: "64px 64px",
-          maskImage:
-            "radial-gradient(ellipse at center, black 30%, transparent 70%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+          opacity: 0.02,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C45C26' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Elegant corner accent */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: -200,
+          right: -200,
+          width: 600,
+          height: 600,
+          background: `radial-gradient(circle, ${alpha(luxuryColors.terracotta, 0.04)} 0%, transparent 70%)`,
+          pointerEvents: "none",
         }}
       />
 
@@ -60,93 +59,95 @@ const EnterpriseHero = () => {
         maxWidth="lg"
         sx={{ position: "relative", zIndex: 1, textAlign: "center" }}
       >
-        {/* Badge */}
+        {/* Elegant badge */}
         <Box
           sx={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 1,
-            px: 2,
-            py: 0.75,
-            mb: 4,
-            borderRadius: "999px",
+            gap: 1.5,
+            px: 3,
+            py: 1,
+            mb: 5,
+            borderRadius: "2px",
             border: "1px solid",
-            borderColor: alpha("#fff", 0.1),
-            bgcolor: alpha("#fff", 0.05),
-            backdropFilter: "blur(10px)",
+            borderColor: alpha(luxuryColors.gold, 0.25),
+            bgcolor: alpha(luxuryColors.gold, 0.03),
           }}
         >
           <Box
             sx={{
-              width: 8,
-              height: 8,
+              width: 6,
+              height: 6,
               borderRadius: "50%",
-              bgcolor: "#00d26a",
-              boxShadow: "0 0 10px #00d26a",
+              bgcolor: luxuryColors.forestGreen,
             }}
           />
           <Typography
             variant="body2"
             sx={{
-              color: alpha("#fff", 0.8),
+              color: luxuryColors.warmGray,
               fontWeight: 500,
-              letterSpacing: "0.5px",
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              fontSize: "0.7rem",
             }}
           >
-            +500 circoli attivi su Terrarossa
+            Dal 2024 • Circoli Selezionati
           </Typography>
         </Box>
 
-        {/* Main heading */}
+        {/* Main heading with serif elegance */}
         <Typography
           variant="h1"
           sx={{
-            fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4.5rem", lg: "5rem" },
-            fontWeight: 800,
-            lineHeight: 1.1,
+            fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4rem", lg: "4.5rem" },
+            fontWeight: 300,
+            lineHeight: 1.15,
             letterSpacing: "-0.02em",
-            color: "#fff",
-            mb: 3,
-            "& span": {
-              background:
-                "linear-gradient(135deg, #e65100 0%, #ff9800 50%, #ffc107 100%)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            },
+            color: luxuryColors.darkText,
+            mb: 4,
+            fontFamily: "'Playfair Display', Georgia, 'Times New Roman', serif",
           }}
         >
-          Gestisci le prenotazioni
+          L&apos;arte della prenotazione,
           <br />
-          <span>con semplicità.</span>
+          <Box
+            component="span"
+            sx={{
+              fontStyle: "italic",
+              color: luxuryColors.terracotta,
+            }}
+          >
+            elevata.
+          </Box>
         </Typography>
 
         {/* Subtitle */}
         <Typography
           variant="h5"
           sx={{
-            fontSize: { xs: "1rem", md: "1.25rem" },
-            color: alpha("#fff", 0.7),
-            maxWidth: 720,
+            fontSize: { xs: "1rem", md: "1.15rem" },
+            color: luxuryColors.warmGray,
+            maxWidth: 640,
             mx: "auto",
-            mb: 5,
+            mb: 6,
             fontWeight: 400,
-            lineHeight: 1.7,
+            lineHeight: 1.9,
+            letterSpacing: "0.01em",
           }}
         >
-          La piattaforma all-in-one per circoli di tennis. Prenotazioni
-          automatiche, gestione utenti e calendario intelligente per far
-          crescere il tuo club.
+          Per circoli che non si accontentano. Una piattaforma raffinata per
+          gestire prenotazioni con l&apos;eleganza che i vostri soci meritano.
         </Typography>
 
         {/* CTA Buttons */}
         <Box
           sx={{
             display: "flex",
-            gap: 2,
+            gap: 3,
             justifyContent: "center",
             flexWrap: "wrap",
-            mb: 8,
+            mb: 10,
           }}
         >
           <Button
@@ -155,23 +156,24 @@ const EnterpriseHero = () => {
             variant="contained"
             size="large"
             sx={{
-              px: 4,
-              py: 1.5,
-              fontSize: "1rem",
-              fontWeight: 600,
-              borderRadius: "12px",
-              background: "linear-gradient(135deg, #e65100 0%, #ff6d00 100%)",
-              boxShadow: "0 4px 20px rgba(230, 81, 0, 0.4)",
+              px: 5,
+              py: 1.75,
+              fontSize: "0.9rem",
+              fontWeight: 500,
+              borderRadius: "2px",
+              bgcolor: luxuryColors.terracotta,
+              color: "#fff",
               textTransform: "none",
+              letterSpacing: "0.05em",
+              boxShadow: "none",
               "&:hover": {
-                background: "linear-gradient(135deg, #ff6d00 0%, #ff9800 100%)",
-                boxShadow: "0 6px 30px rgba(230, 81, 0, 0.5)",
-                transform: "translateY(-2px)",
+                bgcolor: luxuryColors.terracottaDark,
+                boxShadow: `0 8px 24px ${alpha(luxuryColors.terracotta, 0.2)}`,
               },
-              transition: "all 0.2s ease-in-out",
+              transition: "all 0.3s ease",
             }}
           >
-            Inizia Gratis
+            Richiedi Accesso
           </Button>
           <Button
             component={Link}
@@ -179,17 +181,20 @@ const EnterpriseHero = () => {
             variant="outlined"
             size="large"
             sx={{
-              px: 4,
-              py: 1.5,
-              fontSize: "1rem",
-              fontWeight: 600,
-              borderRadius: "12px",
-              borderColor: alpha("#fff", 0.2),
-              color: "#fff",
+              px: 5,
+              py: 1.75,
+              fontSize: "0.9rem",
+              fontWeight: 500,
+              borderRadius: "2px",
+              borderColor: luxuryColors.lightGray,
+              borderWidth: 1,
+              color: luxuryColors.warmGray,
               textTransform: "none",
+              letterSpacing: "0.05em",
               "&:hover": {
-                borderColor: alpha("#fff", 0.4),
-                bgcolor: alpha("#fff", 0.05),
+                borderColor: luxuryColors.terracotta,
+                color: luxuryColors.terracotta,
+                bgcolor: "transparent",
               },
             }}
           >
@@ -197,31 +202,35 @@ const EnterpriseHero = () => {
           </Button>
         </Box>
 
-        {/* Stats badges */}
+        {/* Refined stats */}
         <Box
           sx={{
             display: "flex",
-            gap: { xs: 2, md: 6 },
+            gap: { xs: 4, md: 8 },
             justifyContent: "center",
             flexWrap: "wrap",
+            pt: 6,
+            borderTop: "1px solid",
+            borderColor: luxuryColors.lightGray,
+            maxWidth: 600,
+            mx: "auto",
           }}
         >
           {[
-            { value: "10K+", label: "Tennisti Attivi" },
             { value: "500+", label: "Circoli Partner" },
-            { value: "50K+", label: "Prenotazioni/Mese" },
+            { value: "10.000+", label: "Soci Attivi" },
+            { value: "99.9%", label: "Disponibilità" },
           ].map((stat) => (
             <Box key={stat.label} sx={{ textAlign: "center" }}>
               <Typography
                 variant="h3"
                 sx={{
-                  fontWeight: 800,
-                  fontSize: { xs: "2rem", md: "2.5rem" },
-                  background:
-                    "linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%)",
-                  backgroundClip: "text",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
+                  fontWeight: 300,
+                  fontSize: { xs: "1.75rem", md: "2.25rem" },
+                  color: luxuryColors.terracotta,
+                  fontFamily:
+                    "'Playfair Display', Georgia, 'Times New Roman', serif",
+                  mb: 0.5,
                 }}
               >
                 {stat.value}
@@ -229,9 +238,11 @@ const EnterpriseHero = () => {
               <Typography
                 variant="body2"
                 sx={{
-                  color: alpha("#fff", 0.5),
-                  fontWeight: 500,
-                  letterSpacing: "0.5px",
+                  color: luxuryColors.warmGray,
+                  fontWeight: 400,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  fontSize: "0.65rem",
                 }}
               >
                 {stat.label}
@@ -240,19 +251,6 @@ const EnterpriseHero = () => {
           ))}
         </Box>
       </Container>
-
-      {/* Bottom gradient fade */}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 200,
-          background: "linear-gradient(to top, #0a0a0a, transparent)",
-          pointerEvents: "none",
-        }}
-      />
     </Box>
   );
 };

@@ -1,47 +1,45 @@
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import EventRepeatIcon from "@mui/icons-material/EventRepeat";
-import PersonIcon from "@mui/icons-material/Person";
-import TouchAppIcon from "@mui/icons-material/TouchApp";
+import ExploreIcon from "@mui/icons-material/Explore";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
+import TodayIcon from "@mui/icons-material/Today";
 import { Box, Container, Grid, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { luxuryColors } from "./EnterpriseHero";
 
-const features = [
+const benefits = [
   {
-    icon: CalendarMonthIcon,
-    title: "Calendario Elegante",
+    icon: TodayIcon,
+    title: "Prenota in Qualsiasi Momento",
     description:
-      "Una vista settimanale raffinata che permette ai vostri soci di individuare immediatamente la disponibilità desiderata.",
+      "Niente più telefonate. Prenota il tuo campo 24 ore su 24, in pochi secondi, direttamente dal tuo smartphone.",
   },
   {
-    icon: TouchAppIcon,
-    title: "Prenotazione Intuitiva",
+    icon: ExploreIcon,
+    title: "Scopri Nuovi Circoli",
     description:
-      "Un'esperienza di prenotazione fluida e senza attriti, progettata per soddisfare anche i soci più esigenti.",
+      "Trova circoli d'eccellenza vicino a te. Amplia i tuoi orizzonti e gioca nei migliori club della tua zona.",
   },
   {
-    icon: EventRepeatIcon,
-    title: "Gestione Ricorrenze",
+    icon: NotificationsActiveIcon,
+    title: "Ricevi Promemoria",
     description:
-      "Per i soci affezionati, la possibilità di riservare il proprio slot settimanale con elegante semplicità.",
+      "Non perdere mai una partita. Ricevi notifiche per le tue prenotazioni e aggiornamenti dal tuo circolo.",
   },
   {
-    icon: PersonIcon,
-    title: "Profilo Personale",
+    icon: PhoneAndroidIcon,
+    title: "Gestione Semplificata",
     description:
-      "Ogni socio dispone di un profilo curato dove consultare le proprie prenotazioni passate e future.",
+      "Tutte le tue prenotazioni in un unico posto. Consulta lo storico, modifica o cancella con un tap.",
   },
 ];
 
-const FeatureShowcase = () => {
+const TennistiSection = () => {
   return (
     <Box
-      id="features"
       sx={{
         py: 16,
         bgcolor: luxuryColors.warmWhite,
         position: "relative",
-        overflow: "hidden",
       }}
     >
       <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
@@ -58,7 +56,7 @@ const FeatureShowcase = () => {
               fontSize: "0.7rem",
             }}
           >
-            L&apos;ESPERIENZA
+            PER I TENNISTI
           </Typography>
           <Typography
             variant="h2"
@@ -72,7 +70,7 @@ const FeatureShowcase = () => {
                 "'Playfair Display', Georgia, 'Times New Roman', serif",
             }}
           >
-            Ogni dettaglio,{" "}
+            Più tempo in campo,{" "}
             <Box
               component="span"
               sx={{
@@ -80,7 +78,7 @@ const FeatureShowcase = () => {
                 color: luxuryColors.terracotta,
               }}
             >
-              curato.
+              meno attese.
             </Box>
           </Typography>
           <Typography
@@ -92,46 +90,58 @@ const FeatureShowcase = () => {
               lineHeight: 1.8,
             }}
           >
-            Un&apos;interfaccia che riflette l&apos;attenzione al dettaglio che
-            contraddistingue i circoli d&apos;eccellenza.
+            L&apos;esperienza di prenotazione che ogni giocatore merita.
+            Semplice, immediata, sempre disponibile.
           </Typography>
         </Box>
 
-        {/* Feature grid */}
-        <Grid container spacing={4}>
-          {features.map((feature) => (
-            <Grid item xs={12} sm={6} md={3} key={feature.title}>
+        {/* Benefits grid */}
+        <Grid container spacing={6}>
+          {benefits.map((benefit) => (
+            <Grid item xs={12} sm={6} md={3} key={benefit.title}>
               <Box
                 sx={{
                   textAlign: "center",
-                  p: 4,
                   height: "100%",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    "& .feature-icon": {
-                      transform: "translateY(-8px)",
+                    "& .benefit-icon": {
+                      transform: "scale(1.15)",
                       color: luxuryColors.terracottaDark,
                     },
                   },
                 }}
               >
-                {/* Icon */}
+                {/* Icon with circle background */}
                 <Box
-                  className="feature-icon"
                   sx={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     mb: 3,
-                    transition: "all 0.3s ease",
                   }}
                 >
-                  <feature.icon
+                  <Box
                     sx={{
-                      fontSize: 56,
-                      color: luxuryColors.terracotta,
+                      width: 80,
+                      height: 80,
+                      borderRadius: "50%",
+                      bgcolor: alpha(luxuryColors.terracotta, 0.08),
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "all 0.3s ease",
                     }}
-                  />
+                  >
+                    <benefit.icon
+                      className="benefit-icon"
+                      sx={{
+                        fontSize: 40,
+                        color: luxuryColors.terracotta,
+                        transition: "all 0.3s ease",
+                      }}
+                    />
+                  </Box>
                 </Box>
 
                 {/* Content */}
@@ -146,7 +156,7 @@ const FeatureShowcase = () => {
                       "'Playfair Display', Georgia, 'Times New Roman', serif",
                   }}
                 >
-                  {feature.title}
+                  {benefit.title}
                 </Typography>
                 <Typography
                   sx={{
@@ -155,7 +165,7 @@ const FeatureShowcase = () => {
                     fontSize: "0.9rem",
                   }}
                 >
-                  {feature.description}
+                  {benefit.description}
                 </Typography>
               </Box>
             </Grid>
@@ -166,4 +176,4 @@ const FeatureShowcase = () => {
   );
 };
 
-export default FeatureShowcase;
+export default TennistiSection;

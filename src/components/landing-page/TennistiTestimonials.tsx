@@ -36,8 +36,8 @@ const TennistiTestimonials = () => (
             }}
           >
             <Typography variant="body1" sx={{ fontStyle: "italic" }}>
-              “Finalmente posso trovare un campo libero anche all'ultimo
-              minuto!”
+              &quot;Finalmente posso trovare un campo libero anche
+              all&apos;ultimo minuto!&quot;
             </Typography>
             <Typography variant="subtitle2" fontWeight={700} mt={2}>
               Giulia, giocatrice amatoriale

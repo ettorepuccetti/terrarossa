@@ -17,12 +17,11 @@ import { alpha } from "@mui/material/styles";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { luxuryColors } from "./EnterpriseHero";
 
 const navItems = [
   { label: "Funzionalità", href: "#features" },
-  { label: "Per i Circoli", href: "#circoli" },
-  { label: "Per i Tennisti", href: "#tennisti" },
-  { label: "Prezzi", href: "#pricing" },
+  { label: "Circoli", href: "/search" },
 ];
 
 const LandingHeader = () => {
@@ -42,9 +41,9 @@ const LandingHeader = () => {
           zIndex: 1100,
           py: 2,
           backdropFilter: "blur(20px)",
-          bgcolor: alpha("#0a0a0a", 0.8),
+          bgcolor: alpha(luxuryColors.cream, 0.92),
           borderBottom: "1px solid",
-          borderColor: alpha("#fff", 0.06),
+          borderColor: luxuryColors.lightGray,
         }}
       >
         <Container maxWidth="lg">
@@ -63,14 +62,16 @@ const LandingHeader = () => {
                   alt="Terrarossa"
                   width={36}
                   height={36}
-                  style={{ borderRadius: 8 }}
+                  style={{ borderRadius: 4 }}
                 />
                 <Typography
                   variant="h6"
                   sx={{
-                    color: "#fff",
-                    fontWeight: 700,
-                    letterSpacing: "-0.02em",
+                    color: luxuryColors.darkText,
+                    fontWeight: 500,
+                    letterSpacing: "0.02em",
+                    fontFamily:
+                      "'Playfair Display', Georgia, 'Times New Roman', serif",
                     display: { xs: "none", sm: "block" },
                   }}
                 >
@@ -81,20 +82,21 @@ const LandingHeader = () => {
 
             {/* Desktop Nav */}
             {!isMobile && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 5 }}>
                 {navItems.map((item) => (
                   <Typography
                     key={item.label}
                     component={Link}
                     href={item.href}
                     sx={{
-                      color: alpha("#fff", 0.7),
+                      color: luxuryColors.warmGray,
                       textDecoration: "none",
                       fontSize: "0.9rem",
-                      fontWeight: 500,
+                      fontWeight: 400,
+                      letterSpacing: "0.02em",
                       transition: "color 0.2s ease",
                       "&:hover": {
-                        color: "#fff",
+                        color: luxuryColors.terracotta,
                       },
                     }}
                   >
@@ -104,24 +106,8 @@ const LandingHeader = () => {
               </Box>
             )}
 
-            {/* CTA Buttons */}
+            {/* CTA Button */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              {!isMobile && (
-                <Button
-                  component={Link}
-                  href="/search"
-                  sx={{
-                    color: alpha("#fff", 0.8),
-                    textTransform: "none",
-                    fontWeight: 500,
-                    "&:hover": {
-                      bgcolor: alpha("#fff", 0.05),
-                    },
-                  }}
-                >
-                  Accedi
-                </Button>
-              )}
               <Button
                 component={Link}
                 href="/search"
@@ -129,29 +115,28 @@ const LandingHeader = () => {
                 sx={{
                   px: 3,
                   py: 1,
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  borderRadius: "10px",
-                  background:
-                    "linear-gradient(135deg, #e65100 0%, #ff6d00 100%)",
+                  fontSize: "0.85rem",
+                  fontWeight: 500,
+                  borderRadius: "2px",
+                  bgcolor: luxuryColors.terracotta,
                   textTransform: "none",
-                  boxShadow: "0 4px 14px rgba(230, 81, 0, 0.3)",
+                  letterSpacing: "0.05em",
+                  boxShadow: "none",
                   "&:hover": {
-                    background:
-                      "linear-gradient(135deg, #ff6d00 0%, #ff9800 100%)",
-                    boxShadow: "0 6px 20px rgba(230, 81, 0, 0.4)",
+                    bgcolor: luxuryColors.terracottaDark,
+                    boxShadow: "none",
                   },
                   display: { xs: "none", sm: "flex" },
                 }}
               >
-                Inizia Gratis
+                Entra
               </Button>
 
               {/* Mobile menu button */}
               {isMobile && (
                 <IconButton
                   onClick={() => setMobileOpen(true)}
-                  sx={{ color: "#fff" }}
+                  sx={{ color: luxuryColors.darkText }}
                 >
                   <MenuIcon />
                 </IconButton>
@@ -169,9 +154,9 @@ const LandingHeader = () => {
         PaperProps={{
           sx: {
             width: 280,
-            bgcolor: "#0a0a0a",
+            bgcolor: luxuryColors.cream,
             borderLeft: "1px solid",
-            borderColor: alpha("#fff", 0.1),
+            borderColor: luxuryColors.lightGray,
           },
         }}
       >
@@ -182,9 +167,16 @@ const LandingHeader = () => {
               alt="Terrarossa"
               width={32}
               height={32}
-              style={{ borderRadius: 6 }}
+              style={{ borderRadius: 4 }}
             />
-            <Typography sx={{ color: "#fff", fontWeight: 700 }}>
+            <Typography
+              sx={{
+                color: luxuryColors.darkText,
+                fontWeight: 500,
+                fontFamily:
+                  "'Playfair Display', Georgia, 'Times New Roman', serif",
+              }}
+            >
               Terrarossa
             </Typography>
           </Box>
@@ -197,16 +189,16 @@ const LandingHeader = () => {
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
                   sx={{
-                    borderRadius: 2,
+                    borderRadius: 1,
                     "&:hover": {
-                      bgcolor: alpha("#fff", 0.05),
+                      bgcolor: alpha(luxuryColors.terracotta, 0.05),
                     },
                   }}
                 >
                   <ListItemText
                     primary={item.label}
                     primaryTypographyProps={{
-                      sx: { color: alpha("#fff", 0.8), fontWeight: 500 },
+                      sx: { color: luxuryColors.warmGray, fontWeight: 400 },
                     }}
                   />
                 </ListItemButton>
@@ -214,26 +206,7 @@ const LandingHeader = () => {
             ))}
           </List>
 
-          <Box sx={{ mt: 4, display: "flex", flexDirection: "column", gap: 2 }}>
-            <Button
-              component={Link}
-              href="/search"
-              variant="outlined"
-              fullWidth
-              sx={{
-                borderColor: alpha("#fff", 0.2),
-                color: "#fff",
-                textTransform: "none",
-                py: 1.5,
-                borderRadius: "10px",
-                "&:hover": {
-                  borderColor: alpha("#fff", 0.4),
-                  bgcolor: alpha("#fff", 0.05),
-                },
-              }}
-            >
-              Accedi
-            </Button>
+          <Box sx={{ mt: 4 }}>
             <Button
               component={Link}
               href="/search"
@@ -241,17 +214,19 @@ const LandingHeader = () => {
               fullWidth
               sx={{
                 py: 1.5,
-                borderRadius: "10px",
-                background: "linear-gradient(135deg, #e65100 0%, #ff6d00 100%)",
+                borderRadius: "2px",
+                bgcolor: luxuryColors.terracotta,
                 textTransform: "none",
-                fontWeight: 600,
+                fontWeight: 500,
+                letterSpacing: "0.05em",
+                boxShadow: "none",
                 "&:hover": {
-                  background:
-                    "linear-gradient(135deg, #ff6d00 0%, #ff9800 100%)",
+                  bgcolor: luxuryColors.terracottaDark,
+                  boxShadow: "none",
                 },
               }}
             >
-              Inizia Gratis
+              Entra
             </Button>
           </Box>
         </Box>

@@ -1,191 +1,139 @@
 import { Box, Container, Grid, Typography } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { luxuryColors } from "./EnterpriseHero";
 
 const steps = [
   {
-    number: "01",
-    title: "Registra il tuo circolo",
+    number: "I",
+    title: "Registrazione del Circolo",
     description:
-      "Crea il profilo del tuo club in pochi minuti. Aggiungi campi, orari e personalizza le impostazioni.",
-    color: "#667eea",
+      "Il vostro club viene configurato con cura, definendo campi, orari e preferenze di prenotazione.",
   },
   {
-    number: "02",
-    title: "Configura i campi",
+    number: "II",
+    title: "Invito ai Soci",
     description:
-      "Definisci le fasce orarie, i prezzi e le regole di prenotazione per ogni campo da tennis.",
-    color: "#f093fb",
+      "I membri del circolo ricevono l'accesso esclusivo alla piattaforma di prenotazione.",
   },
   {
-    number: "03",
-    title: "Invita i tuoi soci",
+    number: "III",
+    title: "Prenotazione Elegante",
     description:
-      "I tuoi soci si registrano e iniziano a prenotare. Tu hai il controllo totale dalla dashboard.",
-    color: "#4facfe",
+      "I soci selezionano il campo e l'orario desiderato con pochi click raffinati.",
   },
   {
-    number: "04",
-    title: "Gestisci tutto online",
+    number: "IV",
+    title: "Gestione Serena",
     description:
-      "Monitora prenotazioni, utenti e statistiche in tempo reale. Zero carta, zero telefonate.",
-    color: "#43e97b",
+      "Il circolo monitora prenotazioni e disponibilità in tempo reale, senza alcuno sforzo.",
   },
 ];
 
 const HowItWorksSection = () => {
   return (
     <Box
-      id="features"
       sx={{
         py: 16,
-        bgcolor: "#0f0f0f",
+        bgcolor: luxuryColors.warmWhite,
         position: "relative",
-        overflow: "hidden",
       }}
     >
-      {/* Background decoration */}
-      <Box
-        sx={{
-          position: "absolute",
-          left: -200,
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: 400,
-          height: 400,
-          background:
-            "radial-gradient(circle, rgba(230, 81, 0, 0.08) 0%, transparent 70%)",
-          filter: "blur(80px)",
-          pointerEvents: "none",
-        }}
-      />
-
       <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
         {/* Section header */}
         <Box sx={{ textAlign: "center", mb: 12 }}>
           <Typography
             variant="overline"
             sx={{
-              color: "#e65100",
-              fontWeight: 700,
-              letterSpacing: "0.2em",
+              color: luxuryColors.terracotta,
+              fontWeight: 500,
+              letterSpacing: "0.25em",
               mb: 2,
               display: "block",
+              fontSize: "0.7rem",
             }}
           >
-            COME FUNZIONA
+            IL PERCORSO
           </Typography>
           <Typography
             variant="h2"
             sx={{
-              fontSize: { xs: "2rem", md: "3rem" },
-              fontWeight: 800,
-              color: "#fff",
-              mb: 2,
-              letterSpacing: "-0.02em",
+              fontSize: { xs: "2rem", md: "2.75rem" },
+              fontWeight: 300,
+              color: luxuryColors.darkText,
+              mb: 3,
+              letterSpacing: "-0.01em",
+              fontFamily:
+                "'Playfair Display', Georgia, 'Times New Roman', serif",
             }}
           >
-            Inizia in 4 semplici passi
+            Un&apos;esperienza{" "}
+            <Box
+              component="span"
+              sx={{ fontStyle: "italic", color: luxuryColors.terracotta }}
+            >
+              senza tempo.
+            </Box>
           </Typography>
           <Typography
             sx={{
-              color: alpha("#fff", 0.6),
+              color: luxuryColors.warmGray,
               maxWidth: 500,
               mx: "auto",
-              fontSize: "1.1rem",
+              fontSize: "1.05rem",
+              lineHeight: 1.8,
             }}
           >
-            Dal setup alla prima prenotazione in meno di 10 minuti.
+            Dalla registrazione alla prima prenotazione, ogni passaggio è stato
+            progettato per essere naturale e intuitivo.
           </Typography>
         </Box>
 
         {/* Steps */}
-        <Grid container spacing={4}>
+        <Grid container spacing={6}>
           {steps.map((step, index) => (
             <Grid item xs={12} sm={6} md={3} key={step.number}>
               <Box
                 sx={{
                   position: "relative",
-                  p: 4,
-                  height: "100%",
-                  borderRadius: "24px",
-                  border: "1px solid",
-                  borderColor: alpha("#fff", 0.06),
-                  bgcolor: alpha("#fff", 0.02),
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    borderColor: alpha(step.color, 0.3),
-                    bgcolor: alpha(step.color, 0.03),
-                    transform: "translateY(-4px)",
-                    "& .step-number": {
-                      transform: "scale(1.1)",
-                      boxShadow: `0 8px 32px ${alpha(step.color, 0.4)}`,
-                    },
-                  },
+                  textAlign: "center",
                 }}
               >
                 {/* Step number */}
-                <Box
-                  className="step-number"
+                <Typography
                   sx={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: "16px",
-                    background: `linear-gradient(135deg, ${step.color} 0%, ${alpha(step.color, 0.7)} 100%)`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    fontSize: "2.5rem",
+                    fontWeight: 300,
+                    color: luxuryColors.terracotta,
                     mb: 3,
-                    transition: "all 0.3s ease",
-                    boxShadow: `0 4px 20px ${alpha(step.color, 0.3)}`,
+                    fontFamily:
+                      "'Playfair Display', Georgia, 'Times New Roman', serif",
                   }}
                 >
-                  <Typography
-                    sx={{
-                      color: "#fff",
-                      fontWeight: 800,
-                      fontSize: "1.25rem",
-                    }}
-                  >
-                    {step.number}
-                  </Typography>
-                </Box>
+                  {step.number}
+                </Typography>
 
                 {/* Content */}
                 <Typography
                   variant="h6"
                   sx={{
-                    color: "#fff",
-                    fontWeight: 700,
+                    color: luxuryColors.darkText,
+                    fontWeight: 500,
                     mb: 1.5,
-                    fontSize: "1.1rem",
+                    fontSize: "1.05rem",
+                    fontFamily:
+                      "'Playfair Display', Georgia, 'Times New Roman', serif",
                   }}
                 >
                   {step.title}
                 </Typography>
                 <Typography
                   sx={{
-                    color: alpha("#fff", 0.6),
+                    color: luxuryColors.warmGray,
                     lineHeight: 1.7,
-                    fontSize: "0.95rem",
+                    fontSize: "0.9rem",
                   }}
                 >
                   {step.description}
                 </Typography>
-
-                {/* Connector line (except last item) */}
-                {index < steps.length - 1 && (
-                  <Box
-                    sx={{
-                      display: { xs: "none", md: "block" },
-                      position: "absolute",
-                      top: 52,
-                      right: -40,
-                      width: 80,
-                      height: 2,
-                      background: `linear-gradient(90deg, ${alpha(step.color, 0.4)}, ${alpha(steps[index + 1]?.color || step.color, 0.4)})`,
-                    }}
-                  />
-                )}
               </Box>
             </Grid>
           ))}

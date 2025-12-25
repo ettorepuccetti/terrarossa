@@ -1,76 +1,63 @@
-import GitHubIcon from "@mui/icons-material/GitHub";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import {
-  Box,
-  Container,
-  Divider,
-  Grid,
-  IconButton,
-  Typography,
-} from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { Box, Container, Divider, Typography } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
+import { luxuryColors } from "./EnterpriseHero";
 
-const footerLinks = {
-  Prodotto: [
-    { label: "Funzionalità", href: "#features" },
-    { label: "Per i Circoli", href: "#circoli" },
-    { label: "Per i Tennisti", href: "#tennisti" },
-    { label: "Prezzi", href: "#pricing" },
-  ],
-  Risorse: [
-    { label: "Documentazione", href: "#docs" },
-    { label: "FAQ", href: "#faq" },
-    { label: "Blog", href: "#blog" },
-    { label: "Supporto", href: "mailto:support@terrarossa.it" },
-  ],
-  Azienda: [
-    { label: "Chi Siamo", href: "#about" },
-    { label: "Contatti", href: "mailto:info@terrarossa.it" },
-    { label: "Lavora con Noi", href: "#careers" },
-    { label: "Partner", href: "#partners" },
-  ],
-  Legale: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Termini di Servizio", href: "/terms" },
-    { label: "Cookie Policy", href: "#cookies" },
-    { label: "GDPR", href: "#gdpr" },
-  ],
-};
+const footerLinks = [
+  { label: "Funzionalità", href: "#features" },
+  { label: "Circoli", href: "/search" },
+  { label: "Contatti", href: "mailto:info@terrarossa.it" },
+  { label: "Privacy", href: "/privacy" },
+];
 
 const EnterpriseFooter = () => {
   return (
     <Box
       component="footer"
       sx={{
-        bgcolor: "#050505",
+        bgcolor: luxuryColors.cream,
         borderTop: "1px solid",
-        borderColor: alpha("#fff", 0.06),
-        pt: 10,
+        borderColor: luxuryColors.lightGray,
+        pt: 8,
         pb: 4,
       }}
     >
       <Container maxWidth="lg">
         {/* Main footer content */}
-        <Grid container spacing={6} sx={{ mb: 8 }}>
-          {/* Brand column */}
-          <Grid item xs={12} md={4}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            justifyContent: "space-between",
+            alignItems: { xs: "center", md: "flex-start" },
+            gap: 4,
+            mb: 6,
+          }}
+        >
+          {/* Brand */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: { xs: "center", md: "flex-start" },
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
               <Image
                 src="/mstile-144x144.png"
                 alt="Terrarossa"
-                width={40}
-                height={40}
-                style={{ borderRadius: 8 }}
+                width={36}
+                height={36}
+                style={{ borderRadius: 4 }}
               />
               <Typography
                 variant="h6"
                 sx={{
-                  color: "#fff",
-                  fontWeight: 700,
-                  letterSpacing: "-0.02em",
+                  color: luxuryColors.darkText,
+                  fontWeight: 500,
+                  letterSpacing: "0.02em",
+                  fontFamily:
+                    "'Playfair Display', Georgia, 'Times New Roman', serif",
                 }}
               >
                 Terrarossa
@@ -78,123 +65,66 @@ const EnterpriseFooter = () => {
             </Box>
             <Typography
               sx={{
-                color: alpha("#fff", 0.5),
-                mb: 3,
+                color: luxuryColors.warmGray,
+                fontSize: "0.85rem",
                 maxWidth: 280,
                 lineHeight: 1.7,
+                textAlign: { xs: "center", md: "left" },
               }}
             >
-              La piattaforma all-in-one per la gestione delle prenotazioni dei
-              circoli di tennis.
+              Gestione elegante delle prenotazioni per circoli di tennis
+              d&apos;eccellenza.
             </Typography>
-            {/* Social links */}
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <IconButton
-                size="small"
-                sx={{
-                  color: alpha("#fff", 0.5),
-                  "&:hover": { color: "#fff", bgcolor: alpha("#fff", 0.1) },
-                }}
-              >
-                <TwitterIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                sx={{
-                  color: alpha("#fff", 0.5),
-                  "&:hover": { color: "#fff", bgcolor: alpha("#fff", 0.1) },
-                }}
-              >
-                <GitHubIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                sx={{
-                  color: alpha("#fff", 0.5),
-                  "&:hover": { color: "#fff", bgcolor: alpha("#fff", 0.1) },
-                }}
-              >
-                <LinkedInIcon fontSize="small" />
-              </IconButton>
-            </Box>
-          </Grid>
+          </Box>
 
-          {/* Links columns */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <Grid item xs={6} sm={3} md={2} key={category}>
+          {/* Links */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: { xs: 3, md: 5 },
+              flexWrap: "wrap",
+              justifyContent: "center",
+            }}
+          >
+            {footerLinks.map((link) => (
               <Typography
+                key={link.label}
+                component={Link}
+                href={link.href}
                 sx={{
-                  color: "#fff",
-                  fontWeight: 600,
-                  mb: 2,
+                  color: luxuryColors.warmGray,
+                  textDecoration: "none",
                   fontSize: "0.9rem",
+                  transition: "color 0.2s ease",
+                  "&:hover": {
+                    color: luxuryColors.terracotta,
+                  },
                 }}
               >
-                {category}
+                {link.label}
               </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                {links.map((link) => (
-                  <Typography
-                    key={link.label}
-                    component={Link}
-                    href={link.href}
-                    sx={{
-                      color: alpha("#fff", 0.5),
-                      textDecoration: "none",
-                      fontSize: "0.85rem",
-                      transition: "color 0.2s ease",
-                      "&:hover": {
-                        color: "#fff",
-                      },
-                    }}
-                  >
-                    {link.label}
-                  </Typography>
-                ))}
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
+            ))}
+          </Box>
+        </Box>
 
-        <Divider sx={{ borderColor: alpha("#fff", 0.06), mb: 4 }} />
+        <Divider sx={{ borderColor: luxuryColors.lightGray, mb: 4 }} />
 
         {/* Bottom bar */}
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
             alignItems: "center",
-            flexWrap: "wrap",
-            gap: 2,
           }}
         >
           <Typography
             sx={{
-              color: alpha("#fff", 0.4),
+              color: luxuryColors.warmGray,
               fontSize: "0.8rem",
             }}
           >
             © {new Date().getFullYear()} Terrarossa. Tutti i diritti riservati.
           </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Box
-              sx={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                bgcolor: "#00d26a",
-                boxShadow: "0 0 8px #00d26a",
-              }}
-            />
-            <Typography
-              sx={{
-                color: alpha("#fff", 0.4),
-                fontSize: "0.8rem",
-              }}
-            >
-              Tutti i sistemi operativi
-            </Typography>
-          </Box>
         </Box>
       </Container>
     </Box>

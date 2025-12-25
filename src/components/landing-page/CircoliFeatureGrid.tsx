@@ -5,8 +5,16 @@ import {
   Grid,
   Typography,
   useTheme,
+  Box,
 } from "@mui/material";
-import { Screenshot } from "~/pages";
+import Image from "next/image";
+
+// Simple Screenshot component for backwards compatibility
+const Screenshot = ({ alt, src }: { alt: string; src: string }) => (
+  <Box sx={{ position: "relative", width: "100%", height: 200 }}>
+    <Image src={src} alt={alt} fill style={{ objectFit: "cover" }} />
+  </Box>
+);
 
 const CircoliFeatureGrid = () => {
   const theme = useTheme();

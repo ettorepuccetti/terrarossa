@@ -1,61 +1,32 @@
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import { Avatar, Box, Container, Grid, Typography } from "@mui/material";
 import { alpha } from "@mui/material/styles";
+import { luxuryColors } from "./EnterpriseHero";
 
 const testimonials = [
   {
     quote:
-      "Con Terrarossa abbiamo ridotto del 70% il tempo dedicato alla gestione delle prenotazioni. I nostri soci sono entusiasti della semplicità d'uso.",
-    author: "Marco Rossi",
-    role: "Direttore Sportivo",
-    club: "Tennis Club Roma",
-    avatar: "M",
-    color: "#667eea",
-  },
-  {
-    quote:
-      "Finalmente una piattaforma pensata per i circoli italiani. Il supporto è eccezionale e le funzionalità sono esattamente quelle di cui avevamo bisogno.",
-    author: "Laura Bianchi",
-    role: "Responsabile Prenotazioni",
-    club: "Circolo Tennis Milano",
-    avatar: "L",
-    color: "#f093fb",
-  },
-  {
-    quote:
-      "Da quando usiamo Terrarossa, le prenotazioni sono aumentate del 40%. I nostri clienti adorano poter prenotare 24/7 dal loro smartphone.",
-    author: "Giuseppe Verdi",
+      "Da quando il nostro circolo utilizza Terrarossa, la gestione delle prenotazioni è diventata un piacere. I nostri soci apprezzano l'eleganza e la semplicità.",
+    author: "Avv. Marco Ferretti",
     role: "Presidente",
-    club: "Tennis Academy Napoli",
-    avatar: "G",
-    color: "#4facfe",
+    club: "Circolo Tennis Parioli",
+    initials: "MF",
   },
   {
     quote:
-      "Prenotare un campo non è mai stato così facile! Trovo subito la disponibilità e ricevo la conferma istantaneamente.",
-    author: "Giulia Mancini",
-    role: "Tennista Agonista",
-    club: "Utente Premium",
-    avatar: "G",
-    color: "#43e97b",
+      "Una soluzione che rispecchia perfettamente lo spirito del nostro club. Discreta, efficiente, raffinata.",
+    author: "Dott.ssa Elena Visconti",
+    role: "Direttrice Sportiva",
+    club: "Tennis Club Milano",
+    initials: "EV",
   },
   {
     quote:
-      "Ho scoperto nuovi circoli vicino a casa grazie a Terrarossa. Ora gioco molto più spesso e ho conosciuto tanti altri appassionati.",
-    author: "Andrea Ferrari",
-    role: "Appassionato di Tennis",
-    club: "Utente",
-    avatar: "A",
-    color: "#e65100",
-  },
-  {
-    quote:
-      "La dashboard è fantastica. Vedo tutto in tempo reale: prenotazioni, disponibilità, statistiche. Un game changer per il nostro club.",
-    author: "Francesca Romano",
-    role: "Club Manager",
-    club: "Sporting Club Torino",
-    avatar: "F",
-    color: "#ff6d00",
+      "Finalmente un sistema di prenotazione all'altezza delle aspettative dei nostri membri più esigenti.",
+    author: "Ing. Roberto Castellani",
+    role: "Amministratore",
+    club: "Country Club Firenze",
+    initials: "RC",
   },
 ];
 
@@ -64,37 +35,22 @@ const TestimonialsSection = () => {
     <Box
       sx={{
         py: 16,
-        bgcolor: "#0a0a0a",
+        bgcolor: luxuryColors.cream,
         position: "relative",
-        overflow: "hidden",
       }}
     >
-      {/* Background glow */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "100%",
-          height: "50%",
-          background:
-            "radial-gradient(ellipse at center top, rgba(230, 81, 0, 0.05) 0%, transparent 60%)",
-          pointerEvents: "none",
-        }}
-      />
-
       <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
         {/* Section header */}
         <Box sx={{ textAlign: "center", mb: 10 }}>
           <Typography
             variant="overline"
             sx={{
-              color: "#e65100",
-              fontWeight: 700,
-              letterSpacing: "0.2em",
+              color: luxuryColors.terracotta,
+              fontWeight: 500,
+              letterSpacing: "0.25em",
               mb: 2,
               display: "block",
+              fontSize: "0.7rem",
             }}
           >
             TESTIMONIANZE
@@ -102,69 +58,64 @@ const TestimonialsSection = () => {
           <Typography
             variant="h2"
             sx={{
-              fontSize: { xs: "2rem", md: "3rem" },
-              fontWeight: 800,
-              color: "#fff",
-              mb: 2,
-              letterSpacing: "-0.02em",
+              fontSize: { xs: "2rem", md: "2.75rem" },
+              fontWeight: 300,
+              color: luxuryColors.darkText,
+              mb: 3,
+              letterSpacing: "-0.01em",
+              fontFamily:
+                "'Playfair Display', Georgia, 'Times New Roman', serif",
             }}
           >
-            Cosa dicono di noi
-          </Typography>
-          <Typography
-            sx={{
-              color: alpha("#fff", 0.6),
-              maxWidth: 500,
-              mx: "auto",
-              fontSize: "1.1rem",
-            }}
-          >
-            Unisciti a migliaia di tennisti e circoli che hanno scelto
-            Terrarossa.
+            Parole di{" "}
+            <Box
+              component="span"
+              sx={{ fontStyle: "italic", color: luxuryColors.terracotta }}
+            >
+              apprezzamento.
+            </Box>
           </Typography>
         </Box>
 
         {/* Testimonials grid */}
-        <Grid container spacing={3}>
-          {testimonials.map((testimonial, index) => (
+        <Grid container spacing={4}>
+          {testimonials.map((testimonial) => (
             <Grid item xs={12} md={4} key={testimonial.author}>
               <Box
                 sx={{
-                  p: 4,
-                  borderRadius: "20px",
+                  p: 5,
+                  borderRadius: "4px",
                   border: "1px solid",
-                  borderColor: alpha("#fff", 0.06),
-                  bgcolor: alpha("#fff", 0.02),
+                  borderColor: luxuryColors.lightGray,
+                  bgcolor: luxuryColors.warmWhite,
                   height: "100%",
                   display: "flex",
                   flexDirection: "column",
-                  transition: "all 0.3s ease",
+                  transition: "all 0.4s ease",
                   "&:hover": {
-                    borderColor: alpha(testimonial.color, 0.3),
-                    bgcolor: alpha(testimonial.color, 0.03),
-                    transform: "translateY(-4px)",
+                    boxShadow: `0 8px 32px ${alpha(luxuryColors.terracotta, 0.08)}`,
                   },
                 }}
               >
                 {/* Quote icon */}
                 <FormatQuoteIcon
                   sx={{
-                    fontSize: 40,
-                    color: testimonial.color,
-                    opacity: 0.5,
-                    mb: 2,
+                    fontSize: 32,
+                    color: luxuryColors.terracotta,
+                    opacity: 0.4,
+                    mb: 3,
                   }}
                 />
 
                 {/* Quote text */}
                 <Typography
                   sx={{
-                    color: alpha("#fff", 0.85),
+                    color: luxuryColors.darkText,
                     fontSize: "1rem",
-                    lineHeight: 1.8,
+                    lineHeight: 1.9,
                     fontStyle: "italic",
                     flex: 1,
-                    mb: 3,
+                    mb: 4,
                   }}
                 >
                   &ldquo;{testimonial.quote}&rdquo;
@@ -176,17 +127,20 @@ const TestimonialsSection = () => {
                     sx={{
                       width: 48,
                       height: 48,
-                      bgcolor: testimonial.color,
-                      fontWeight: 700,
+                      bgcolor: luxuryColors.terracotta,
+                      fontWeight: 500,
+                      fontSize: "0.9rem",
+                      fontFamily:
+                        "'Playfair Display', Georgia, 'Times New Roman', serif",
                     }}
                   >
-                    {testimonial.avatar}
+                    {testimonial.initials}
                   </Avatar>
                   <Box>
                     <Typography
                       sx={{
-                        color: "#fff",
-                        fontWeight: 600,
+                        color: luxuryColors.darkText,
+                        fontWeight: 500,
                         fontSize: "0.95rem",
                       }}
                     >
@@ -194,11 +148,11 @@ const TestimonialsSection = () => {
                     </Typography>
                     <Typography
                       sx={{
-                        color: alpha("#fff", 0.5),
-                        fontSize: "0.85rem",
+                        color: luxuryColors.warmGray,
+                        fontSize: "0.8rem",
                       }}
                     >
-                      {testimonial.role} • {testimonial.club}
+                      {testimonial.role} · {testimonial.club}
                     </Typography>
                   </Box>
                 </Box>
