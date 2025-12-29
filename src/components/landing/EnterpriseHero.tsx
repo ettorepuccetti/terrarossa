@@ -222,7 +222,7 @@ const EnterpriseHero = () => {
               gap: 3,
               justifyContent: "center",
               flexWrap: "wrap",
-              mb: 10,
+              mb: 5,
             }}
           >
             <Button
@@ -284,7 +284,7 @@ const EnterpriseHero = () => {
               gap: { xs: 4, md: 8 },
               justifyContent: "center",
               flexWrap: "wrap",
-              pt: 6,
+              pt: 4,
               borderTop: "1px solid",
               borderColor: luxuryColors.lightGray,
               maxWidth: 600,
