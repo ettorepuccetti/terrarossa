@@ -33,7 +33,7 @@ export default function Calendar() {
     (store) => store.selectedDate,
   );
 
-  // used during unmount to reset the selectedDate in the store
+  // used to reset the selectedDate to current date when entering the calendar
   const setSelectedDate = useMergedStoreContext(
     (store) => store.setSelectedDate,
   );
@@ -42,36 +42,14 @@ export default function Calendar() {
   // ------ QUERY & MUTATIONS -------
   // --------------------------------
 
-  // reservationAdd - I save here the callback to store the mutation in the store and the mutation itself, to use them in the useEffect
-  // I cannot invoke the callback to save the mutation in the store here (during the render)
-  const setReservationAdd = useMergedStoreContext(
-    (store) => store.setReservationAdd,
-  );
-  const reservationAdd = useReservationAdd();
-
-  // recurrentReservationAdd
-  const setRecurrentReservationAdd = useMergedStoreContext(
-    (store) => store.setRecurrentReservationAdd,
-  );
-  const recurrentReservationAdd = useRecurrentReservationAdd();
-
-  // reservationDelete
-  const setReservationDelete = useMergedStoreContext(
-    (store) => store.setReservationDelete,
-  );
-  const reservationDelete = useReservationDelete();
-
-  // recurrentReservationDelete
-  const setRecurrentReservationDelete = useMergedStoreContext(
-    (store) => store.setRecurrentReservationDelete,
-  );
-  const recurrentReservationDelete = useRecurrentReservationDelete();
-
   // reservationQuery - also used by refresh button
-  const setReservationQuery = useMergedStoreContext(
-    (store) => store.setReservationQuery,
-  );
   const reservationQuery = useReservationQuery(clubId, selectedDateInCalendar);
+
+  const reservationAdd = useReservationAdd(reservationQuery);
+  const recurrentReservationAdd = useRecurrentReservationAdd(reservationQuery);
+  const reservationDelete = useReservationDelete(reservationQuery);
+  const recurrentReservationDelete =
+    useRecurrentReservationDelete(reservationQuery);
 
   // clubQuery
   const setClubData = useMergedStoreContext((store) => store.setClubData);
@@ -89,12 +67,14 @@ export default function Calendar() {
   // ----- EFFECTS -----
   // -------------------
 
-  //get the club id from the router when is available
+  //get the club id from the router when is available and reset date
   const router = useRouter();
   useEffect(() => {
     if (router.isReady) {
       //clubId is in local state
       setClubId(router.query.clubId as string);
+      // reset selected date to current date when entering the calendar page
+      setSelectedDate(dayjs());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady]);
@@ -107,18 +87,10 @@ export default function Calendar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clubQuery.data]);
 
-  // set reservationAdd, recurrentReservationAdd, reservationDelete, recurrentReservationDelete in the store on the first render
-  // then clean clubData on component unmount
+  // cleanup: reset clubData when leaving the calendar page
   useEffect(() => {
-    setReservationAdd(reservationAdd);
-    setRecurrentReservationAdd(recurrentReservationAdd);
-    setReservationDelete(reservationDelete);
-    setRecurrentReservationDelete(recurrentReservationDelete);
-    setReservationQuery(reservationQuery);
-    //onComponentUnmount: reset the clubData
     return () => {
       setClubData(undefined);
-      setSelectedDate(dayjs().startOf("day"));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -170,7 +142,7 @@ export default function Calendar() {
           }}
         />
 
-        <CalendarHeader />
+        <CalendarHeader reservationQuery={reservationQuery} />
         <SpinnerPartial
           open={
             reservationQuery.isLoading ||
@@ -188,8 +160,14 @@ export default function Calendar() {
         </SpinnerPartial>
         <CalendarClubInfo />
       </Container>
-      <ReserveDialog />
-      <EventDetailDialog />
+      <ReserveDialog
+        reservationAdd={reservationAdd}
+        recurrentReservationAdd={recurrentReservationAdd}
+      />
+      <EventDetailDialog
+        reservationDelete={reservationDelete}
+        recurrentReservationDelete={recurrentReservationDelete}
+      />
       <ReserveSuccessSnackbar />
     </>
   );

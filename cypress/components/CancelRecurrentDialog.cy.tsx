@@ -1,4 +1,8 @@
 import CancelRecurrentDialog from "~/components/CancelRecurrentDialog";
+import {
+  type RecurrentReservationDeleteType,
+  type ReservationDeleteType,
+} from "~/hooks/calendarTrpcHooks";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import {
   buildTrpcMutationMock,
@@ -18,22 +22,27 @@ function CancelRecurrentDialogContext() {
     ...club,
   });
 
-  // set mutations mocks
+  // create mutations mocks
   const deleteSingle = cy.stub().as("deleteOne");
   const deleteRecurrent = cy.stub().as("deleteRecurrent");
-  useMergedStoreContext((store) => store.setReservationDelete)(
-    buildTrpcMutationMock(deleteSingle),
-  );
-  useMergedStoreContext((store) => store.setRecurrentReservationDelete)(
-    buildTrpcMutationMock(deleteRecurrent),
-  );
+  const reservationDelete = buildTrpcMutationMock(
+    deleteSingle,
+  ) as ReservationDeleteType;
+  const recurrentReservationDelete = buildTrpcMutationMock(
+    deleteRecurrent,
+  ) as RecurrentReservationDeleteType;
 
   useMergedStoreContext((store) => store.setDeleteConfirmationOpen)(true);
   useMergedStoreContext((store) => store.setEventDetails)(
     eventDetailsRecurrent,
   );
 
-  return <CancelRecurrentDialog />;
+  return (
+    <CancelRecurrentDialog
+      reservationDelete={reservationDelete}
+      recurrentReservationDelete={recurrentReservationDelete}
+    />
+  );
 }
 
 function mountComponent() {

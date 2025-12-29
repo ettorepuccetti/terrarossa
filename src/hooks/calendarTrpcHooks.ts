@@ -87,58 +87,66 @@ export const useReservationQuery = (
 //------- MUTATION HOOKS --------
 //-------------------------------
 
-export const useReservationAdd = () => {
-  const reservationQuery = useMergedStoreContext(
-    (store) => store.reservationQuery,
-  );
+export const useReservationAdd = (reservationQuery: ReservationQueryType) => {
   return api.reservationMutation.insertOne.useMutation({
     async onSuccess() {
-      await reservationQuery?.refetch();
+      await reservationQuery.refetch();
     },
     async onError() {
-      await reservationQuery?.refetch();
+      await reservationQuery.refetch();
     },
   });
 };
 
-export const useRecurrentReservationAdd = () => {
-  const reservationQuery = useMergedStoreContext(
-    (store) => store.reservationQuery,
-  );
+export const useRecurrentReservationAdd = (
+  reservationQuery: ReservationQueryType,
+) => {
   return api.reservationMutation.insertRecurrent.useMutation({
     async onSuccess() {
-      await reservationQuery?.refetch();
+      await reservationQuery.refetch();
     },
     async onError() {
-      await reservationQuery?.refetch();
+      await reservationQuery.refetch();
     },
   });
 };
 
-export const useReservationDelete = () => {
-  const reservationQuery = useMergedStoreContext(
-    (store) => store.reservationQuery,
-  );
+export const useReservationDelete = (
+  reservationQuery: ReservationQueryType,
+) => {
   return api.reservationMutation.deleteOne.useMutation({
     async onSuccess() {
-      await reservationQuery?.refetch();
+      await reservationQuery.refetch();
     },
     async onError() {
-      await reservationQuery?.refetch();
+      await reservationQuery.refetch();
     },
   });
 };
 
-export const useRecurrentReservationDelete = () => {
-  const reservationQuery = useMergedStoreContext(
-    (store) => store.reservationQuery,
-  );
+export const useRecurrentReservationDelete = (
+  reservationQuery: ReservationQueryType,
+) => {
   return api.reservationMutation.deleteRecurrent.useMutation({
     async onSuccess() {
-      await reservationQuery?.refetch();
+      await reservationQuery.refetch();
     },
     async onError() {
-      await reservationQuery?.refetch();
+      await reservationQuery.refetch();
     },
   });
 };
+
+//--------------------------------
+//-------- TYPE EXPORTS ----------
+//--------------------------------
+
+export type ReservationAddType = ReturnType<typeof useReservationAdd>;
+export type RecurrentReservationAddType = ReturnType<
+  typeof useRecurrentReservationAdd
+>;
+export type ReservationDeleteType = ReturnType<typeof useReservationDelete>;
+export type RecurrentReservationDeleteType = ReturnType<
+  typeof useRecurrentReservationDelete
+>;
+export type ReservationQueryType = ReturnType<typeof useReservationQuery>;

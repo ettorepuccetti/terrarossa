@@ -40,8 +40,11 @@ export default function FullCalendarWrapper(props: FullCalendarWrapperProps) {
   const logger = useLogger({
     component: "FullCalendarWrapper",
   });
+
+  //calendarRef is used in HorizontalDatePicker, so I need to set it in the store
   const calendarRef: RefObject<FullCalendar> = useRef<FullCalendar>(null);
   const setCalendarRef = useMergedStoreContext((state) => state.setCalendarRef);
+
   const clubData = useMergedStoreContext((state) => state.getClubData());
   const setDateClick = useMergedStoreContext((state) => state.setDateClick);
   const setEventDetails = useMergedStoreContext(

@@ -2,6 +2,10 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import EventDetailDialog from "~/components/EventDetailDialog";
+import {
+  type RecurrentReservationDeleteType,
+  type ReservationDeleteType,
+} from "~/hooks/calendarTrpcHooks";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import {
   buildTrpcMutationMock,
@@ -22,15 +26,15 @@ function EventDetailDialogWrapper(props: { startDate: Date; endDate: Date }) {
     clubSettings: clubSettings,
   });
 
-  // set mutations mocks: reservationDelete, recurrentReservationDelete
+  // create mutations mocks
   const deleteOne = cy.stub().as("deleteOne");
   const deleteRecurrent = cy.stub().as("deleteRecurrent");
-  useMergedStoreContext((store) => store.setReservationDelete)(
-    buildTrpcMutationMock(deleteOne),
-  );
-  useMergedStoreContext((store) => store.setRecurrentReservationDelete)(
-    buildTrpcMutationMock(deleteRecurrent),
-  );
+  const reservationDelete = buildTrpcMutationMock(
+    deleteOne,
+  ) as ReservationDeleteType;
+  const recurrentReservationDelete = buildTrpcMutationMock(
+    deleteRecurrent,
+  ) as RecurrentReservationDeleteType;
 
   // set eventDetails
   useMergedStoreContext((store) => store.setEventDetails)({
@@ -38,7 +42,12 @@ function EventDetailDialogWrapper(props: { startDate: Date; endDate: Date }) {
     start: props.startDate,
     end: props.endDate,
   } as EventImpl);
-  return <EventDetailDialog />;
+  return (
+    <EventDetailDialog
+      reservationDelete={reservationDelete}
+      recurrentReservationDelete={recurrentReservationDelete}
+    />
+  );
 }
 
 it("check base EventDetailDialog", () => {
