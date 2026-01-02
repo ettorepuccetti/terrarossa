@@ -15,6 +15,11 @@ import {
 
 const prisma = new PrismaClient();
 async function main() {
+  await prisma.club.deleteMany();
+  await prisma.phoneNumber.deleteMany();
+  await prisma.address.deleteMany();
+  await prisma.clubSettings.deleteMany();
+
   const foroItalico = await prisma.club.upsert({
     where: { name: foroItalicoName },
     update: {},

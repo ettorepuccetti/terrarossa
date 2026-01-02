@@ -124,11 +124,11 @@ model Club {
 }
 
 model PhoneNumber {
-  id             String  @id @unique @default(cuid())
+  id             String @id @unique @default(cuid())
   number         String
   nationalPrefix String
-  club           Club?   @relation("ClubPhoneNumber")
-  user           User?   @relation("UserPhoneNumber")
+  club           Club?  @relation("ClubPhoneNumber")
+  user           User?  @relation("UserPhoneNumber")
 }
 
 model Address {
