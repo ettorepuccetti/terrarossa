@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db" //must start with `file:`
+  url      = "file:./dev.db"
 }
 
 model Account {
@@ -73,9 +73,9 @@ model Reservation {
   createdAt              DateTime              @default(now())
   updatedAt              DateTime              @updatedAt
   recurrentReservationId String?
-  recurrentReservation   RecurrentReservation? @relation(fields: [recurrentReservationId], references: [id], onDelete: Cascade)
-  user                   User?                 @relation(fields: [userId], references: [id])
   court                  Court                 @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  user                   User?                 @relation(fields: [userId], references: [id])
+  recurrentReservation   RecurrentReservation? @relation(fields: [recurrentReservationId], references: [id], onDelete: Cascade)
 
   @@index([courtId])
   @@index([userId])
