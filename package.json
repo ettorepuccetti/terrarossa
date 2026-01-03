@@ -18,13 +18,13 @@
     "db:seed": "npx prisma db push && npx prisma db seed",
     "prettier": "prettier --write .",
     "prepare": "husky",
-    "db:seed:demo": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-demo.ts"
+    "db:seed:demo": "pnpm ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-demo.ts"
   },
   "lint-staged": {
     "*": "prettier --ignore-unknown --write"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "seed": "pnpm ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.679.0",
