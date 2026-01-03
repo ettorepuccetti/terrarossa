@@ -9,6 +9,7 @@ import {
   getAdminSession,
   mountWithContexts,
 } from "./_constants";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 require("dayjs/locale/it");
 dayjs.locale("it");
 
@@ -17,7 +18,7 @@ function ReserveDialogRecurrentContext() {
   useMergedStoreContext((store) => store.setClubData)({
     clubSettings: clubSettings,
     Address: null,
-    PhoneNumber: null,
+    phoneNumber: null,
     ...club,
   });
 

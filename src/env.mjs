@@ -26,7 +26,6 @@ const server = z.object({
   R2_ACCOUNT_ID: z.string(),
   TURSO_DATABASE_URL: z.string().url(),
   TURSO_AUTH_TOKEN: z.string().optional(),
-  TURSO_REMOTE_DATABASE_URL: z.string().url().optional(),
 });
 
 /**
@@ -63,7 +62,6 @@ const processEnv = {
   R2_ACCOUNT_ID: process.env.R2_ACCOUNT_ID,
   TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL,
   TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
-  TURSO_REMOTE_DATABASE_URL: process.env.TURSO_REMOTE_DATABASE_URL,
   NEXT_PUBLIC_R2_BUCKET_URL: process.env.NEXT_PUBLIC_R2_BUCKET_URL,
 };
 

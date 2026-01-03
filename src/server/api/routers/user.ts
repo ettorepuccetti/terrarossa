@@ -19,6 +19,9 @@ export const userRouter = createTRPCRouter({
       where: {
         id: ctx.session.user.id,
       },
+      include: {
+        phoneNumber: true,
+      },
     });
   }),
 
@@ -49,7 +52,6 @@ export const userRouter = createTRPCRouter({
       { expiresIn: 60 },
     );
     logger.info("Generate signed url for upload image", {
-      userId: ctx.session?.user.id,
       signedUrl: signedUrl,
     });
     return signedUrl;
@@ -65,7 +67,6 @@ export const userRouter = createTRPCRouter({
       R2_USER_IMAGE_PREFIX +
       ctx.session.user.id;
     logger.info("Update user image", {
-      userId: ctx.session?.user.id,
       imageSrc: imageSrc,
     });
     await ctx.prisma.user.update({
@@ -86,7 +87,6 @@ export const userRouter = createTRPCRouter({
         context: { apiEndPoint: "userRouter.updateUsername" },
       });
       logger.info("Update username", {
-        userId: ctx.session?.user.id,
         newUsername: input.newUsername,
       });
       await ctx.prisma.user.update({
@@ -95,6 +95,31 @@ export const userRouter = createTRPCRouter({
         },
         data: {
           name: input.newUsername,
+        },
+      });
+    }),
+  updatePhoneNumber: protectedProcedure
+    .input(z.object({ nationalPrefix: z.string(), phoneNumber: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const logger = loggerInternal.child({
+        userId: ctx.session?.user.id,
+        context: { apiEndPoint: "userRouter.updatePhoneNumber" },
+      });
+      logger.info("Update phone number", {
+        nationalPrefix: input.nationalPrefix,
+        phoneNumber: input.phoneNumber,
+      });
+      await ctx.prisma.user.update({
+        where: {
+          id: ctx.session.user.id,
+        },
+        data: {
+          phoneNumber: {
+            create: {
+              nationalPrefix: input.nationalPrefix,
+              number: input.phoneNumber,
+            },
+          },
         },
       });
     }),
