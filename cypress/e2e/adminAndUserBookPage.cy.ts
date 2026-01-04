@@ -1,4 +1,4 @@
-import { type ClubSettings } from "@prisma/client";
+import { type ClubSettings } from "../../src/generated/prisma/client";
 import dayjs from "dayjs";
 import {
   allEnglandClubName,

@@ -1,4 +1,4 @@
-import { type Club } from "@prisma/client";
+import { type Club } from "../../src/generated/prisma/client";
 import { UserRoles } from "~/utils/constants";
 
 export interface User {

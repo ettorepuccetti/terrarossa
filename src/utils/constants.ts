@@ -1,4 +1,4 @@
-import { type Address, type PhoneNumber } from "@prisma/client";
+import { type Address, type PhoneNumber } from "~/generated/prisma/client";
 
 export enum UserRoles {
   ADMIN = "ADMIN",

@@ -20,9 +20,9 @@ function CancelSingleDialogContext() {
   });
 
   // create mutation mock
-  const deleteOne = cy.stub().as("deleteOne");
+  const deleteOneAlias: string = "deleteOne";
   const reservationDelete = buildTrpcMutationMock(
-    deleteOne,
+    deleteOneAlias,
   ) as ReservationDeleteType;
 
   useMergedStoreContext((store) => store.setDeleteConfirmationOpen)(true);

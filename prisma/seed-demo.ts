@@ -1,9 +1,9 @@
-import { createClient } from "@libsql/client";
-import { PrismaLibSQL } from "@prisma/adapter-libsql";
-import { PrismaClient } from "@prisma/client";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import dotenv from "dotenv";
+import { PrismaClient } from "../src/generated/prisma/client";
 import {
   allEnglandAddress,
   allEnglandClubName,
@@ -18,17 +18,16 @@ import {
   pietrangeliCourtName,
 } from "../src/utils/constants";
 
+dotenv.config();
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 dayjs.tz.setDefault("Europe/Rome");
 
-const libsql = createClient({
-  url: process.env.TURSO_DATABASE_URL!,
-  syncUrl: process.env.TURSO_SYNC_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL || "file:./prisma/dev.db",
 });
-const adapter = new PrismaLibSQL(libsql);
 
 const prisma = new PrismaClient({ adapter });
 
@@ -319,7 +318,6 @@ async function main() {
 
 main()
   .then(async () => {
-    await libsql.sync();
     await prisma.$disconnect();
   })
   .catch(async (e) => {
