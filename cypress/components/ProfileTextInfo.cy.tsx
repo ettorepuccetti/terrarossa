@@ -14,9 +14,9 @@ function ProfileTextInfoWrapper({ user }: { user: User }) {
   useMergedStoreContext((store) => store.setUserData)(user);
 
   // set mutations mocks
-  const updateUsernameStub = cy.stub().as("setUpdateUsername");
+  const updateUsernameAlias: string = "setUpdateUsername";
   useMergedStoreContext((store) => store.setUpdateUsername)(
-    buildTrpcMutationMock(updateUsernameStub),
+    buildTrpcMutationMock(updateUsernameAlias),
   );
 
   return <ProfileTextInfo />;

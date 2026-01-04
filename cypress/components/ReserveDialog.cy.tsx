@@ -35,11 +35,13 @@ function ReserveDialogWrapper(props: {
   });
 
   // create mutations mocks
-  const addSingle = cy.stub().as("addSingle");
-  const addRecurrent = cy.stub().as("addRecurrent");
-  const reservationAdd = buildTrpcMutationMock(addSingle) as ReservationAddType;
+  const addSingleAlias: string = "addSingle";
+  const addRecurrentAlias: string = "addRecurrent";
+  const reservationAdd = buildTrpcMutationMock(
+    addSingleAlias,
+  ) as ReservationAddType;
   const recurrentReservationAdd = buildTrpcMutationMock(
-    addRecurrent,
+    addRecurrentAlias,
   ) as RecurrentReservationAddType;
 
   // set dateClick

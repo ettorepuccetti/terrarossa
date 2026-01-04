@@ -224,23 +224,24 @@ export const mountWithContexts = (
 /**
  * Builds a mock of the trpc mutation hook with the given stub and input variables.
  * The returned object can be set in the store in place of the real mutation hook.
- * @param stub cypress stub to be used as mutation
+ * @param stubAlias cypress stub to be used as mutation
  * @param inputVariables input for the mutation
  * @returns a mock of the trpc mutation hook
  */
 export function buildTrpcMutationMock<TData, TVariables>(
-  stub: SinonStub,
+  stubAlias: string,
 ): UseTRPCMutationResult<
   TData,
   TRPCClientErrorLike<never>,
   TVariables,
   unknown
 > {
+  const stubInteral = cy.stub().as(stubAlias);
   return {
     data: undefined,
     error: null,
     status: "idle",
-    mutate: stub,
+    mutate: stubInteral,
     context: undefined,
     isError: false,
     isLoading: false,
@@ -252,7 +253,7 @@ export function buildTrpcMutationMock<TData, TVariables>(
     failureReason: null,
     isPaused: false,
     variables: undefined, //input will be passed as argument to the stub, unclear how still...
-    mutateAsync: stub.resolves(),
+    mutateAsync: stubInteral.resolves(),
     trpc: { path: "" },
   };
 }
