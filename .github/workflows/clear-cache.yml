@@ -1,0 +1,49 @@
+name: Clear All Caches
+
+on:
+  workflow_dispatch:
+
+jobs:
+  clear-caches:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Clear all caches
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Fetching list of caches..."
+          caches=$(gh cache list --limit 100 --json id --jq '.[].id')
+
+          if [ -z "$caches" ]; then
+            echo "No caches found to delete."
+            exit 0
+          fi
+
+          echo "Found caches to delete:"
+          gh cache list --limit 100
+
+          echo ""
+          echo "Deleting caches..."
+          for cache_id in $caches; do
+            echo "Deleting cache ID: $cache_id"
+            gh cache delete $cache_id || \
+              echo "Failed to delete cache $cache_id (may already be deleted)"
+          done
+
+          echo ""
+          echo "Cache clearing complete!"
+
+          # Check if any caches remain
+          remaining=$(gh cache list --limit 100 --json id --jq '.[].id')
+          if [ -z "$remaining" ]; then
+            echo "All caches successfully deleted."
+          else
+            echo "Some caches may remain."
+            echo "You may need to run this workflow again."
+            gh cache list --limit 100
+          fi
