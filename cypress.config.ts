@@ -86,8 +86,8 @@ function tasks(on: Cypress.PluginEvents) {
       courtName,
       userMail,
     }: {
-      startTime: string;
-      endTime: string;
+      startTime: Date;
+      endTime: Date;
       clubId: string;
       courtName: string;
       userMail: string;
@@ -101,8 +101,8 @@ function tasks(on: Cypress.PluginEvents) {
 
       return prisma.reservation.create({
         data: {
-          startTime: new Date(startTime),
-          endTime: new Date(endTime),
+          startTime,
+          endTime,
           courtId: court.id,
           userId: user.id,
         },

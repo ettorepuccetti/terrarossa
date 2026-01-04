@@ -57,15 +57,15 @@ Cypress.Commands.add("queryFilteredClubs", (filter) => {
 });
 
 Cypress.Commands.add("deleteAllReservationOfClub", (clubId: string) => {
-  return cy.task("prisma:deleteAllReservationOfClub", clubId);
+  cy.task("prisma:deleteAllReservationOfClub", clubId);
 });
 
 Cypress.Commands.add("getUsername", () => {
   cy.request("http://localhost:3000/api/auth/session").then(
     (response: { body: { user: { name: string } } }) => {
-      expect(response.body).to.not.be.undefined;
-      expect(response.body.user).to.not.be.undefined;
-      expect(response.body.user.name).to.not.be.undefined;
+      void expect(response.body).to.not.be.undefined;
+      void expect(response.body.user).to.not.be.undefined;
+      void expect(response.body.user.name).to.not.be.undefined;
 
       return response.body.user.name;
     },
