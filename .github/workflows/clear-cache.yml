@@ -36,7 +36,7 @@ jobs:
             fi
 
             # Count caches in this batch
-            cache_count=$(echo "$caches" | wc -l)
+            cache_count=$(echo "$caches" | grep -c '^' || echo "0")
             echo "Found $cache_count cache(s) in this batch"
 
             # Delete each cache
@@ -63,7 +63,7 @@ jobs:
           echo "======================================"
 
           # Final check for any remaining caches
-          remaining=$(gh cache list --limit 1 --json id --jq '.[].id')
+          remaining=$(gh cache list --limit 1 --json id --jq '.[0].id // empty')
           if [ -z "$remaining" ]; then
             echo "✓ All caches successfully cleared."
           else
