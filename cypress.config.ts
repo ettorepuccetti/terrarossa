@@ -1,14 +1,11 @@
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { defineConfig } from "cypress";
 import dotenv from "dotenv";
-import path from "path";
 import { PrismaClient } from "~/generated/prisma/client";
 
 dotenv.config();
 
-// Initialize Prisma client for Cypress tasks with better-sqlite3 adapter
-const dbPath = path.join(process.cwd(), "prisma", "dev.db");
-const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
+const adapter = new PrismaBetterSqlite3({ url: `file://prisma/dev.db` });
 const prisma = new PrismaClient({ adapter });
 
 export default defineConfig({
@@ -52,32 +49,45 @@ export default defineConfig({
 
 function tasks(on: Cypress.PluginEvents) {
   on("task", {
-    async "prisma:queryClubs"() {
-      return prisma.club.findMany({
-        include: { clubSettings: true },
-      });
+    "prisma:queryClubs"() {
+      return prisma.club.findMany();
     },
-    async "prisma:queryFilteredClubs"(filter: string) {
+    "prisma:queryFilteredClubs"(filter: string) {
       return prisma.club.findMany({
         where: {
-          name: { contains: filter },
+          name: {
+            contains: filter,
+          },
         },
-        include: { clubSettings: true },
       });
     },
     async "prisma:deleteAllReservationOfClub"(clubId: string) {
       if (!clubId) throw new Error("clubId is undefined");
-      // Delete reservations through the court relation
       await prisma.reservation.deleteMany({
-        where: { court: { clubId } },
+        where: {
+          court: {
+            clubId: clubId,
+          },
+        },
       });
-      return null;
+      return await prisma.recurrentReservation.deleteMany({
+        where: {
+          reservations: {
+            every: {
+              court: {
+                clubId: clubId,
+              },
+            },
+          },
+        },
+      });
     },
     async "prisma:getUserIdFromUsername"(username: string) {
-      const user = await prisma.user.findUnique({
-        where: { email: username },
+      return await prisma.user.findUniqueOrThrow({
+        where: {
+          email: username,
+        },
       });
-      return user?.id ?? null;
     },
     async "prisma:makeReservation"({
       startTime,
@@ -92,31 +102,41 @@ function tasks(on: Cypress.PluginEvents) {
       courtName: string;
       userMail: string;
     }) {
-      const user = await prisma.user.findUnique({ where: { email: userMail } });
-      if (!user) throw new Error(`User not found: ${userMail}`);
-      const court = await prisma.court.findFirst({
-        where: { name: courtName, clubId },
-      });
-      if (!court) throw new Error(`Court not found: ${courtName}`);
-
-      return prisma.reservation.create({
+      return await prisma.reservation.create({
         data: {
-          startTime,
-          endTime,
-          courtId: court.id,
-          userId: user.id,
+          startTime: startTime,
+          endTime: endTime,
+          user: {
+            connect: {
+              email: userMail,
+            },
+          },
+          court: {
+            connect: {
+              name_clubId: {
+                clubId: clubId,
+                name: courtName,
+              },
+            },
+          },
         },
       });
     },
     async "prisma:getClubSettings"(clubSettingsId: string) {
-      return prisma.clubSettings.findUnique({
-        where: { id: clubSettingsId },
+      return await prisma.clubSettings.findUniqueOrThrow({
+        where: {
+          id: clubSettingsId,
+        },
       });
     },
     async "prisma:deleteReservationFromDb"(reservationId: string) {
-      await prisma.reservation.delete({ where: { id: reservationId } });
-      return null;
+      return await prisma.reservation.delete({
+        where: {
+          id: reservationId,
+        },
+      });
     },
+
     async "prisma:editUsername"({
       userMail,
       newUsername,
@@ -124,11 +144,14 @@ function tasks(on: Cypress.PluginEvents) {
       userMail: string;
       newUsername: string;
     }) {
-      await prisma.user.update({
-        where: { email: userMail },
-        data: { name: newUsername },
+      return await prisma.user.update({
+        data: {
+          name: newUsername,
+        },
+        where: {
+          email: userMail,
+        },
       });
-      return null;
     },
   });
 }
