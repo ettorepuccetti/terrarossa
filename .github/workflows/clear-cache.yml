@@ -16,34 +16,56 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Fetching list of caches..."
-          caches=$(gh cache list --limit 100 --json id --jq '.[].id')
-
-          if [ -z "$caches" ]; then
-            echo "No caches found to delete."
-            exit 0
-          fi
-
-          echo "Found caches to delete:"
-          gh cache list --limit 100
-
+          echo "Fetching and deleting all caches..."
           echo ""
-          echo "Deleting caches..."
-          for cache_id in $caches; do
-            echo "Deleting cache ID: $cache_id"
-            gh cache delete $cache_id || \
-              echo "Failed to delete cache $cache_id (may already be deleted)"
+
+          deleted_count=0
+          batch_count=0
+
+          # Loop to handle pagination - delete caches in batches
+          while true; do
+            batch_count=$((batch_count + 1))
+            echo "Processing batch $batch_count..."
+
+            # Get cache IDs (limited to 100 per batch by GitHub API)
+            caches=$(gh cache list --limit 100 --json id --jq '.[].id')
+
+            if [ -z "$caches" ]; then
+              echo "No more caches found."
+              break
+            fi
+
+            # Count caches in this batch
+            cache_count=$(echo "$caches" | wc -l)
+            echo "Found $cache_count cache(s) in this batch"
+
+            # Delete each cache
+            for cache_id in $caches; do
+              if gh cache delete "$cache_id" 2>/dev/null; then
+                deleted_count=$((deleted_count + 1))
+                echo "  ✓ Deleted cache ID: $cache_id"
+              else
+                echo "  ✗ Failed to delete cache $cache_id (may already be deleted)"
+              fi
+            done
+
+            echo ""
+
+            # If we got less than 100 caches, we've processed all
+            if [ "$cache_count" -lt 100 ]; then
+              break
+            fi
           done
 
-          echo ""
+          echo "======================================"
           echo "Cache clearing complete!"
+          echo "Total caches deleted: $deleted_count"
+          echo "======================================"
 
-          # Check if any caches remain
-          remaining=$(gh cache list --limit 100 --json id --jq '.[].id')
+          # Final check for any remaining caches
+          remaining=$(gh cache list --limit 1 --json id --jq '.[].id')
           if [ -z "$remaining" ]; then
-            echo "All caches successfully deleted."
+            echo "✓ All caches successfully cleared."
           else
-            echo "Some caches may remain."
-            echo "You may need to run this workflow again."
-            gh cache list --limit 100
+            echo "⚠ Some caches may still remain. Please run this workflow again."
           fi
