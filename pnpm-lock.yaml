@@ -165,8 +165,8 @@ importers:
         specifier: ^8.11.0
         version: 8.51.0(eslint@8.57.1)(typescript@5.9.3)
       cypress:
-        specifier: ~13.17.0
-        version: 13.17.0
+        specifier: ~15.8.1
+        version: 15.8.1
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
@@ -591,13 +591,6 @@ packages:
       {
         integrity: sha512-hBzuU5+JjB2cqNZyszkDHZgOSrUUT8V3dhgRl8Q9Gp6dAj/H5+KILGjbhDpc3Iy9qmqlm/akuOI2ut9VUtzJxQ==,
       }
-
-  "@colors/colors@1.5.0":
-    resolution:
-      {
-        integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==,
-      }
-    engines: { node: ">=0.1.90" }
 
   "@cypress/request@3.0.9":
     resolution:
@@ -2173,6 +2166,12 @@ packages:
         integrity: sha512-TC0dmN0K8YcWEAEfiPi5gJP14eJe30TTGjkvek3iM/1NdHHsdCA/Td6GvNndMOo/iSnIsZ4HuuhrYPDAmbxzww==,
       }
 
+  "@types/tmp@0.2.6":
+    resolution:
+      {
+        integrity: sha512-chhaNf2oKHlRkDGt+tiKE2Z5aJ6qalm7Z9rlLdBwmOiAAf09YQvvoLXjWK4HWPF1xU/fqvMgfNfpVoBscA/tKA==,
+      }
+
   "@types/yauzl@2.10.3":
     resolution:
       {
@@ -2619,12 +2618,6 @@ packages:
       }
     engines: { node: ">= 0.4" }
 
-  async@3.2.6:
-    resolution:
-      {
-        integrity: sha512-htCUDlxyyCLMgaM3xXg0C0LW2xqfuQ6p05pCEIsXuyQ+a1koYKTuBMzRNwmybfLgvJDMd0r1LTn4+E0Ti6C2AA==,
-      }
-
   asynckit@0.4.0:
     resolution:
       {
@@ -2869,13 +2862,6 @@ packages:
       }
     engines: { node: ^12.17.0 || ^14.13 || >=16.0.0 }
 
-  check-more-types@2.24.0:
-    resolution:
-      {
-        integrity: sha512-Pj779qHxV2tuapviy1bSZNEL1maXr13bPYpsvSDB68HlYcYuhlDrmGd63i0JHMCLKzc7rUSNIrpdJlhVlNwrxA==,
-      }
-    engines: { node: ">= 0.8.0" }
-
   chevrotain@10.5.0:
     resolution:
       {
@@ -2929,10 +2915,10 @@ packages:
       }
     engines: { node: ">=18" }
 
-  cli-table3@0.6.5:
+  cli-table3@0.6.1:
     resolution:
       {
-        integrity: sha512-+W/5efTR7y5HRD7gACw9yQjqMVvEMLBHmboM/kPWam+H+Hmyrgjh6YncVKK122YZkXrLudzTuAukUw9FnMf7IQ==,
+        integrity: sha512-w0q/enDHhPLq44ovMGdQeeDLvwxwavsJX7oQGYt/LrBlYsyaxyDnp6z3QzFut/6kLLKnlcUVJLrpB7KBfgG/RA==,
       }
     engines: { node: 10.* || >= 12.* }
 
@@ -2981,6 +2967,13 @@ packages:
       {
         integrity: sha512-IfEDxwoWIjkeXL1eXcDiow4UbKjhLdq6/EuSVR9GMN7KVH3r9gQ83e73hsz1Nd1T3ijd5xv1wcWRYO+D6kCI2w==,
       }
+
+  colors@1.4.0:
+    resolution:
+      {
+        integrity: sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==,
+      }
+    engines: { node: ">=0.1.90" }
 
   combined-stream@1.0.8:
     resolution:
@@ -3095,12 +3088,12 @@ packages:
         integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==,
       }
 
-  cypress@13.17.0:
+  cypress@15.8.1:
     resolution:
       {
-        integrity: sha512-5xWkaPurwkIljojFidhw8lFScyxhtiFHl/i/3zov+1Z5CmY4t9tjIdvSXfu82Y3w7wt0uR9KkucbhkVvJZLQSA==,
+        integrity: sha512-ogc62stTQGh1395ipKxfCE5hQuSApTzeH5e0d9U6m7wYO9HQeCpgnkYtBtd0MbkN2Fnch5Od2mX9u4hoTlrH4Q==,
       }
-    engines: { node: ^16.0.0 || ^18.0.0 || >=20.0.0 }
+    engines: { node: ^20.1.0 || ^22.0.0 || >=24.0.0 }
     hasBin: true
 
   damerau-levenshtein@1.0.8:
@@ -3924,12 +3917,6 @@ packages:
         integrity: sha512-1VKTZJCwBrvbd+Wn3AOgQP/2Av+TfTCOlE4AcRJE72W1ksZXbAx8PPBR9RzgTeSPzlPMHrbANMH3LbltH73wxQ==,
       }
 
-  getos@3.2.1:
-    resolution:
-      {
-        integrity: sha512-U56CfOK17OKgTVqozZjUKNdkfEv6jk5WISBJ8SHoagjE6L69zOwl3Z+O8myjY9MEW3i2HPWQBt/LTbCgcC973Q==,
-      }
-
   getpass@0.1.7:
     resolution:
       {
@@ -4056,6 +4043,13 @@ packages:
         integrity: sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw==,
       }
     engines: { node: ">= 0.4" }
+
+  hasha@5.2.2:
+    resolution:
+      {
+        integrity: sha512-Hrp5vIK/xr5SkeN2onO32H0MgNZ0f17HRNH39WfL0SYUNOTZ5Lz1TJ8Pajo/87dYGEFlLMm7mIc/k/s6Bvz9HQ==,
+      }
+    engines: { node: ">=8" }
 
   hasown@2.0.2:
     resolution:
@@ -4634,13 +4628,6 @@ packages:
         integrity: sha512-MbjN408fEndfiQXbFQ1vnd+1NoLDsnQW41410oQBXiyXDMYH5z505juWa4KUE1LqxRC7DgOgZDbKLxHIwm27hA==,
       }
     engines: { node: ">=0.10" }
-
-  lazy-ass@1.6.0:
-    resolution:
-      {
-        integrity: sha512-cc8oEVoctTvsFZ/Oje/kGnHbpWHYBe8IAJe4C0QNc3t8uM/0Y8+erSz/7Y1ALuXTEZTMvxXwO6YbX1ey3ujiZw==,
-      }
-    engines: { node: "> 0.8" }
 
   levn@0.4.1:
     resolution:
@@ -6179,6 +6166,15 @@ packages:
       }
     engines: { node: ">= 0.4" }
 
+  systeminformation@5.29.0:
+    resolution:
+      {
+        integrity: sha512-d4H5A/8uuK/w1Ee6Rpp0HuelXv5TTcyyqikPlPUiIREDwDWmXxRMLQAE90jL09fejuIxwHcn1fxlpNiAhNpy6A==,
+      }
+    engines: { node: ">=8.0.0" }
+    os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
+    hasBin: true
+
   tar-fs@2.1.4:
     resolution:
       {
@@ -6336,6 +6332,13 @@ packages:
         integrity: sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w==,
       }
     engines: { node: ">=10" }
+
+  type-fest@0.8.1:
+    resolution:
+      {
+        integrity: sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==,
+      }
+    engines: { node: ">=8" }
 
   type-fest@4.41.0:
     resolution:
@@ -7182,9 +7185,6 @@ snapshots:
   "@chevrotain/types@10.5.0": {}
 
   "@chevrotain/utils@10.5.0": {}
-
-  "@colors/colors@1.5.0":
-    optional: true
 
   "@cypress/request@3.0.9":
     dependencies:
@@ -8275,6 +8275,8 @@ snapshots:
 
   "@types/sizzle@2.3.10": {}
 
+  "@types/tmp@0.2.6": {}
+
   "@types/yauzl@2.10.3":
     dependencies:
       "@types/node": 22.19.3
@@ -8559,8 +8561,6 @@ snapshots:
 
   async-function@1.0.0: {}
 
-  async@3.2.6: {}
-
   asynckit@0.4.0: {}
 
   at-least-node@1.0.0: {}
@@ -8694,8 +8694,6 @@ snapshots:
 
   chalk@5.6.2: {}
 
-  check-more-types@2.24.0: {}
-
   chevrotain@10.5.0:
     dependencies:
       "@chevrotain/cst-dts-gen": 10.5.0
@@ -8727,11 +8725,11 @@ snapshots:
     dependencies:
       restore-cursor: 5.1.0
 
-  cli-table3@0.6.5:
+  cli-table3@0.6.1:
     dependencies:
       string-width: 4.2.3
     optionalDependencies:
-      "@colors/colors": 1.5.0
+      colors: 1.4.0
 
   cli-truncate@2.1.0:
     dependencies:
@@ -8754,6 +8752,9 @@ snapshots:
   color-name@1.1.4: {}
 
   colorette@2.0.20: {}
+
+  colors@1.4.0:
+    optional: true
 
   combined-stream@1.0.8:
     dependencies:
@@ -8805,22 +8806,22 @@ snapshots:
 
   csstype@3.2.3: {}
 
-  cypress@13.17.0:
+  cypress@15.8.1:
     dependencies:
       "@cypress/request": 3.0.9
       "@cypress/xvfb": 1.2.4(supports-color@8.1.1)
       "@types/sinonjs__fake-timers": 8.1.1
       "@types/sizzle": 2.3.10
+      "@types/tmp": 0.2.6
       arch: 2.2.0
       blob-util: 2.0.2
       bluebird: 3.7.2
       buffer: 5.7.1
       cachedir: 2.4.0
       chalk: 4.1.2
-      check-more-types: 2.24.0
       ci-info: 4.3.1
       cli-cursor: 3.1.0
-      cli-table3: 0.6.5
+      cli-table3: 0.6.1
       commander: 6.2.1
       common-tags: 1.8.2
       dayjs: 1.11.19
@@ -8832,9 +8833,8 @@ snapshots:
       extract-zip: 2.0.1(supports-color@8.1.1)
       figures: 3.2.0
       fs-extra: 9.1.0
-      getos: 3.2.1
+      hasha: 5.2.2
       is-installed-globally: 0.4.0
-      lazy-ass: 1.6.0
       listr2: 3.14.0(enquirer@2.4.1)
       lodash: 4.17.21
       log-symbols: 4.1.0
@@ -8844,8 +8844,8 @@ snapshots:
       process: 0.11.10
       proxy-from-env: 1.0.0
       request-progress: 3.0.0
-      semver: 7.7.3
       supports-color: 8.1.1
+      systeminformation: 5.29.0
       tmp: 0.2.5
       tree-kill: 1.2.2
       untildify: 4.0.0
@@ -9497,10 +9497,6 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  getos@3.2.1:
-    dependencies:
-      async: 3.2.6
-
   getpass@0.1.7:
     dependencies:
       assert-plus: 1.0.0
@@ -9571,6 +9567,11 @@ snapshots:
   has-tostringtag@1.0.2:
     dependencies:
       has-symbols: 1.1.0
+
+  hasha@5.2.2:
+    dependencies:
+      is-stream: 2.0.1
+      type-fest: 0.8.1
 
   hasown@2.0.2:
     dependencies:
@@ -9866,8 +9867,6 @@ snapshots:
   language-tags@1.0.9:
     dependencies:
       language-subtag-registry: 0.3.23
-
-  lazy-ass@1.6.0: {}
 
   levn@0.4.1:
     dependencies:
@@ -10850,6 +10849,8 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
+  systeminformation@5.29.0: {}
+
   tar-fs@2.1.4:
     dependencies:
       chownr: 1.1.4
@@ -10936,6 +10937,8 @@ snapshots:
   type-fest@0.20.2: {}
 
   type-fest@0.21.3: {}
+
+  type-fest@0.8.1: {}
 
   type-fest@4.41.0: {}
 

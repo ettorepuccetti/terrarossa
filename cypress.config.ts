@@ -1,8 +1,15 @@
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { defineConfig } from "cypress";
 import dotenv from "dotenv";
-import { cypressDb } from "./cypress/support/db";
+import path from "path";
+import { PrismaClient } from "~/generated/prisma/client";
 
 dotenv.config();
+
+// Initialize Prisma client for Cypress tasks with better-sqlite3 adapter
+const dbPath = path.join(process.cwd(), "prisma", "dev.db");
+const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
+const prisma = new PrismaClient({ adapter });
 
 export default defineConfig({
   projectId: "y4edyf",
@@ -45,54 +52,83 @@ export default defineConfig({
 
 function tasks(on: Cypress.PluginEvents) {
   on("task", {
-    "prisma:queryClubs"() {
-      return cypressDb.queryClubs();
+    async "prisma:queryClubs"() {
+      return prisma.club.findMany({
+        include: { clubSettings: true },
+      });
     },
-    "prisma:queryFilteredClubs"(filter: string) {
-      return cypressDb.queryFilteredClubs(filter);
+    async "prisma:queryFilteredClubs"(filter: string) {
+      return prisma.club.findMany({
+        where: {
+          name: { contains: filter },
+        },
+        include: { clubSettings: true },
+      });
     },
-    "prisma:deleteAllReservationOfClub"(clubId: string) {
+    async "prisma:deleteAllReservationOfClub"(clubId: string) {
       if (!clubId) throw new Error("clubId is undefined");
-      return cypressDb.deleteAllReservationsOfClub(clubId);
+      // Delete reservations through the court relation
+      await prisma.reservation.deleteMany({
+        where: { court: { clubId } },
+      });
+      return null;
     },
-    "prisma:getUserIdFromUsername"(username: string) {
-      return cypressDb.getUserByEmail(username);
+    async "prisma:getUserIdFromUsername"(username: string) {
+      const user = await prisma.user.findUnique({
+        where: { email: username },
+      });
+      return user?.id ?? null;
     },
-    "prisma:makeReservation"({
+    async "prisma:makeReservation"({
       startTime,
       endTime,
       clubId,
       courtName,
       userMail,
     }: {
-      startTime: Date;
-      endTime: Date;
+      startTime: string;
+      endTime: string;
       clubId: string;
       courtName: string;
       userMail: string;
     }) {
-      return cypressDb.createReservation({
-        startTime,
-        endTime,
-        clubId,
-        courtName,
-        userMail,
+      const user = await prisma.user.findUnique({ where: { email: userMail } });
+      if (!user) throw new Error(`User not found: ${userMail}`);
+      const court = await prisma.court.findFirst({
+        where: { name: courtName, clubId },
+      });
+      if (!court) throw new Error(`Court not found: ${courtName}`);
+
+      return prisma.reservation.create({
+        data: {
+          startTime: new Date(startTime),
+          endTime: new Date(endTime),
+          courtId: court.id,
+          userId: user.id,
+        },
       });
     },
-    "prisma:getClubSettings"(clubSettingsId: string) {
-      return cypressDb.getClubSettingsById(clubSettingsId);
+    async "prisma:getClubSettings"(clubSettingsId: string) {
+      return prisma.clubSettings.findUnique({
+        where: { id: clubSettingsId },
+      });
     },
-    "prisma:deleteReservationFromDb"(reservationId: string) {
-      return cypressDb.deleteReservation(reservationId);
+    async "prisma:deleteReservationFromDb"(reservationId: string) {
+      await prisma.reservation.delete({ where: { id: reservationId } });
+      return null;
     },
-    "prisma:editUsername"({
+    async "prisma:editUsername"({
       userMail,
       newUsername,
     }: {
       userMail: string;
       newUsername: string;
     }) {
-      return cypressDb.editUsername(userMail, newUsername);
+      await prisma.user.update({
+        where: { email: userMail },
+        data: { name: newUsername },
+      });
+      return null;
     },
   });
 }
