@@ -16,6 +16,18 @@ Book tennis courts in your favourite clubs
 1. Start the development server: `npm run dev`
 2. Open [http://localhost:3000](http://localhost:3000) in a web browser.
 
+## Maintenance
+
+### Clearing GitHub Actions Caches
+
+To clear all GitHub Actions caches for this repository:
+
+1. Navigate to the [Actions tab](https://github.com/ettorepuccetti/terrarossa/actions)
+2. Select the "Clear All Caches" workflow from the left sidebar
+3. Click "Run workflow" button and confirm
+
+This will delete all cached dependencies and build artifacts, which can be useful when troubleshooting CI issues or freeing up storage space.
+
 ## Contributing
 
 1. Fork the repository.
