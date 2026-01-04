@@ -1,4 +1,4 @@
-import { type User } from "@prisma/client";
+import { type User } from "../../src/generated/prisma/client";
 import dayjs from "dayjs";
 import { ProfileTextInfo } from "~/components/ProfileTextInfo";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";

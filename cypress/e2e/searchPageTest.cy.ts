@@ -1,4 +1,4 @@
-import { type Club } from "@prisma/client";
+import { type Club } from "../../src/generated/prisma/client";
 import { foroItalicoName } from "~/utils/constants";
 import { saveClubInfoAndCleanReservations } from "./_constants";
 

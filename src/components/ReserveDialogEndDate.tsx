@@ -1,9 +1,9 @@
 import { TimePicker, type TimeValidationError } from "@mui/x-date-pickers";
-import { type ClubSettings } from "@prisma/client";
 import dayjs, { type Dayjs } from "dayjs";
 import { type Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { type ClubSettings } from "~/generated/prisma/client";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
 import { isAdminOfTheClub, startDateIsFuture } from "~/utils/utils";
 

@@ -9,7 +9,7 @@ import {
   type ClubSettings,
   type Court,
   type User,
-} from "@prisma/client";
+} from "../../src/generated/prisma/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, type TRPCClientErrorLike } from "@trpc/client";
 import {

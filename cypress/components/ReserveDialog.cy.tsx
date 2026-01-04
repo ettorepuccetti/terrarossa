@@ -1,5 +1,5 @@
 import { type DateClickArg } from "@fullcalendar/interaction";
-import { type ClubSettings } from "@prisma/client";
+import { type ClubSettings } from "../../src/generated/prisma/client";
 import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
