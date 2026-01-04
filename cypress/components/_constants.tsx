@@ -3,20 +3,12 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import { type ResourceApi } from "@fullcalendar/resource";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import {
-  type Address,
-  type Club,
-  type ClubSettings,
-  type Court,
-  type User,
-} from "../../src/generated/prisma/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, type TRPCClientErrorLike } from "@trpc/client";
 import {
   type UseTRPCMutationResult,
   type UseTRPCQueryResult,
 } from "@trpc/react-query/shared";
-import { type SinonStub } from "cypress/types/sinon";
 import dayjs from "dayjs";
 import "dayjs/locale/it";
 import { type Session } from "next-auth";
@@ -28,6 +20,13 @@ import lightTheme from "~/styles/lightTheme";
 import { api, getBaseUrl } from "~/utils/api";
 import { UserRoles } from "~/utils/constants";
 import createEmotionCache from "~/utils/createEmotionCache";
+import {
+  type Address,
+  type Club,
+  type ClubSettings,
+  type Court,
+  type User,
+} from "../../src/generated/prisma/client";
 
 export const session: Session = {
   expires: "2022-10-20T11:00:00.000Z",

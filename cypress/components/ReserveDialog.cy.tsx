@@ -1,5 +1,4 @@
 import { type DateClickArg } from "@fullcalendar/interaction";
-import { type ClubSettings } from "../../src/generated/prisma/client";
 import dayjs, { type Dayjs } from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { type Session } from "next-auth";
@@ -9,6 +8,7 @@ import {
   type ReservationAddType,
 } from "~/hooks/calendarTrpcHooks";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
+import { type ClubSettings } from "../../src/generated/prisma/client";
 import {
   buildTrpcMutationMock,
   club,
