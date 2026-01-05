@@ -39,5 +39,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # erase the db and push new schema
+      - name: reset db
+        run: pnpm prisma db push --force-reset
+
       - name: Seed demo
         run: pnpm db:seed:demo
