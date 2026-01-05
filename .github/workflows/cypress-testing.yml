@@ -72,10 +72,6 @@ jobs:
           node-version-file: ".nvmrc"
       - name: install pnpm
         uses: pnpm/action-setup@v4
-
-      - name: Rebuild better-sqlite3
-        run: pnpm rebuild better-sqlite3
-
       - name: Download the build folders
         uses: actions/download-artifact@v4
         with:
