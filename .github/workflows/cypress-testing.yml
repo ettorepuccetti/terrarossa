@@ -102,7 +102,7 @@ jobs:
           browser: chrome
           config-file: cypress.config.ts
         env:
-          DATABASE_URL: "postgresql://terrarossa:terrarossa@localhost:5432/terrarossa"
+          DATABASE_URL: "postgresql://terrarossa:terrarossa@postgres:5432/terrarossa"
 
   ui-chrome-mobile-tests:
     needs: install
@@ -149,7 +149,7 @@ jobs:
           browser: chrome
           config-file: cypress.config.ts
         env:
-          DATABASE_URL: "postgresql://terrarossa:terrarossa@localhost:5432/terrarossa"
+          DATABASE_URL: "postgresql://terrarossa:terrarossa@postgres:5432/terrarossa"
 
   component-testing:
     needs: install
