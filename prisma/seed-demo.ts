@@ -29,7 +29,6 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  //clean up - TODO: fully erase the db
   await prisma.recurrentReservation.deleteMany();
   await prisma.reservation.deleteMany();
   await prisma.club.deleteMany();
