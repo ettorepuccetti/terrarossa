@@ -1,12 +1,17 @@
 version: "3.1"
 
 services:
-  db:
-    image: mysql:latest
-    container_name: mysql-terrarossa
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-terrarossa
     ports:
-      - 3306:3306
-    # User/password for local dev: root/password, if not overwritten by command line option when starting the container
+      - 5432:5432
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: terrarossa
+      POSTGRES_USER: terrarossa
+      POSTGRES_PASSWORD: terrarossa
+      POSTGRES_DB: terrarossa
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

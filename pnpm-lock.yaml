@@ -70,7 +70,7 @@ importers:
       "@next-auth/prisma-adapter":
         specifier: ^1.0.7
         version: 1.0.7(@prisma/client@7.2.0(prisma@7.2.0(@types/react@18.3.27)(better-sqlite3@12.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(typescript@5.9.3))(next-auth@4.24.13(next@15.5.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.10.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
-      "@prisma/adapter-better-sqlite3":
+      "@prisma/adapter-pg":
         specifier: ^7.2.0
         version: 7.2.0
       "@prisma/client":
@@ -94,9 +94,6 @@ importers:
       "@trpc/server":
         specifier: 10.45.3
         version: 10.45.3
-      better-sqlite3:
-        specifier: ^12.5.0
-        version: 12.5.0
       dayjs:
         specifier: ^1.11.13
         version: 1.11.19
@@ -143,15 +140,15 @@ importers:
         specifier: ^5.0.0
         version: 5.0.9(@types/react@18.3.27)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
     devDependencies:
-      "@types/better-sqlite3":
-        specifier: ^7.6.13
-        version: 7.6.13
       "@types/eslint":
         specifier: ^8.56.12
         version: 8.56.12
       "@types/node":
         specifier: ^22.7.9
         version: 22.19.3
+      "@types/pg":
+        specifier: ^8.16.0
+        version: 8.16.0
       "@types/react":
         specifier: ^18.3.12
         version: 18.3.27
@@ -1495,10 +1492,10 @@ packages:
         integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==,
       }
 
-  "@prisma/adapter-better-sqlite3@7.2.0":
+  "@prisma/adapter-pg@7.2.0":
     resolution:
       {
-        integrity: sha512-ZowCgDOnv0nk0VIUSPp6y8ns+wXRctVADPSu/vluznAYDx/Xy0dK4nTr7+7XVX/XqUrPPtOYdCBELwjEklS8vQ==,
+        integrity: sha512-euIdQ13cRB2wZ3jPsnDnFhINquo1PYFPCg6yVL8b2rp3EdinQHsX9EDdCtRr489D5uhphcRk463OdQAFlsCr0w==,
       }
 
   "@prisma/client-runtime-utils@7.2.0":
@@ -2084,12 +2081,6 @@ packages:
         integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==,
       }
 
-  "@types/better-sqlite3@7.6.13":
-    resolution:
-      {
-        integrity: sha512-NMv9ASNARoKksWtsq/SHakpYAYnhBrQgGD8zkLYk/jaK8jUGn08CfEdTRgYhMypUQAfzSP8W6gNLe0q19/t4VA==,
-      }
-
   "@types/eslint@8.56.12":
     resolution:
       {
@@ -2124,6 +2115,12 @@ packages:
     resolution:
       {
         integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==,
+      }
+
+  "@types/pg@8.16.0":
+    resolution:
+      {
+        integrity: sha512-RmhMd/wD+CF8Dfo+cVIy3RR5cl8CyfXQ0tGgW6XBL8L4LM/UTEbNXYRbLwU6w+CgrKBNbrQWt4FUtTfaU5jSYQ==,
       }
 
   "@types/prop-types@15.7.15":
@@ -5241,6 +5238,64 @@ packages:
         integrity: sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==,
       }
 
+  pg-cloudflare@1.2.7:
+    resolution:
+      {
+        integrity: sha512-YgCtzMH0ptvZJslLM1ffsY4EuGaU0cx4XSdXLRFae8bPP4dS5xL1tNB3k2o/N64cHJpwU7dxKli/nZ2lUa5fLg==,
+      }
+
+  pg-connection-string@2.9.1:
+    resolution:
+      {
+        integrity: sha512-nkc6NpDcvPVpZXxrreI/FOtX3XemeLl8E0qFr6F2Lrm/I8WOnaWNhIPK2Z7OHpw7gh5XJThi6j6ppgNoaT1w4w==,
+      }
+
+  pg-int8@1.0.1:
+    resolution:
+      {
+        integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==,
+      }
+    engines: { node: ">=4.0.0" }
+
+  pg-pool@3.10.1:
+    resolution:
+      {
+        integrity: sha512-Tu8jMlcX+9d8+QVzKIvM/uJtp07PKr82IUOYEphaWcoBhIYkoHpLXN3qO59nAI11ripznDsEzEv8nUxBVWajGg==,
+      }
+    peerDependencies:
+      pg: ">=8.0"
+
+  pg-protocol@1.10.3:
+    resolution:
+      {
+        integrity: sha512-6DIBgBQaTKDJyxnXaLiLR8wBpQQcGWuAESkRBX/t6OwA8YsqP+iVSiond2EDy6Y/dsGk8rh/jtax3js5NeV7JQ==,
+      }
+
+  pg-types@2.2.0:
+    resolution:
+      {
+        integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==,
+      }
+    engines: { node: ">=4" }
+
+  pg@8.16.3:
+    resolution:
+      {
+        integrity: sha512-enxc1h0jA/aq5oSDMvqyW3q89ra6XIIDZgCX9vkMrnz5DFTw/Ny3Li2lFQ+pt3L6MCgm/5o2o8HW9hiJji+xvw==,
+      }
+    engines: { node: ">= 16.0.0" }
+    peerDependencies:
+      pg-native: ">=3.0.1"
+    peerDependenciesMeta:
+      pg-native:
+        optional: true
+
+  pgpass@1.0.5:
+    resolution:
+      {
+        integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==,
+      }
+
   picocolors@1.1.1:
     resolution:
       {
@@ -5329,6 +5384,41 @@ packages:
         integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==,
       }
     engines: { node: ^10 || ^12 || >=14 }
+
+  postgres-array@2.0.0:
+    resolution:
+      {
+        integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==,
+      }
+    engines: { node: ">=4" }
+
+  postgres-array@3.0.4:
+    resolution:
+      {
+        integrity: sha512-nAUSGfSDGOaOAEGwqsRY27GPOea7CNipJPOA7lPbdEpx5Kg3qzdP0AaWC5MlhTWV9s4hFX39nomVZ+C4tnGOJQ==,
+      }
+    engines: { node: ">=12" }
+
+  postgres-bytea@1.0.1:
+    resolution:
+      {
+        integrity: sha512-5+5HqXnsZPE65IJZSMkZtURARZelel2oXUEO8rH83VS/hxH5vv1uHquPg5wZs8yMAfdv971IU+kcPUczi7NVBQ==,
+      }
+    engines: { node: ">=0.10.0" }
+
+  postgres-date@1.0.7:
+    resolution:
+      {
+        integrity: sha512-suDmjLVQg78nMK2UZ454hAG+OAW+HQPZ6n++TNDUX+L0+uUlLywnoxJKDou51Zm+zTCjrCl0Nq6J9C5hP9vK/Q==,
+      }
+    engines: { node: ">=0.10.0" }
+
+  postgres-interval@1.2.0:
+    resolution:
+      {
+        integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==,
+      }
+    engines: { node: ">=0.10.0" }
 
   postgres@3.4.7:
     resolution:
@@ -6544,6 +6634,13 @@ packages:
       }
     engines: { node: ">=0.4" }
 
+  xtend@4.0.2:
+    resolution:
+      {
+        integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==,
+      }
+    engines: { node: ">=0.4" }
+
   yallist@4.0.0:
     resolution:
       {
@@ -7751,10 +7848,13 @@ snapshots:
 
   "@popperjs/core@2.11.8": {}
 
-  "@prisma/adapter-better-sqlite3@7.2.0":
+  "@prisma/adapter-pg@7.2.0":
     dependencies:
       "@prisma/driver-adapter-utils": 7.2.0
-      better-sqlite3: 12.5.0
+      pg: 8.16.3
+      postgres-array: 3.0.4
+    transitivePeerDependencies:
+      - pg-native
 
   "@prisma/client-runtime-utils@7.2.0": {}
 
@@ -8235,10 +8335,6 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  "@types/better-sqlite3@7.6.13":
-    dependencies:
-      "@types/node": 22.19.3
-
   "@types/eslint@8.56.12":
     dependencies:
       "@types/estree": 1.0.8
@@ -8255,6 +8351,12 @@ snapshots:
       undici-types: 6.21.0
 
   "@types/parse-json@4.0.2": {}
+
+  "@types/pg@8.16.0":
+    dependencies:
+      "@types/node": 22.19.3
+      pg-protocol: 1.10.3
+      pg-types: 2.2.0
 
   "@types/prop-types@15.7.15": {}
 
@@ -8603,16 +8705,19 @@ snapshots:
     dependencies:
       bindings: 1.5.0
       prebuild-install: 7.1.3
+    optional: true
 
   bindings@1.5.0:
     dependencies:
       file-uri-to-path: 1.0.0
+    optional: true
 
   bl@4.1.0:
     dependencies:
       buffer: 5.7.1
       inherits: 2.0.4
       readable-stream: 3.6.2
+    optional: true
 
   blob-util@2.0.2: {}
 
@@ -8707,7 +8812,8 @@ snapshots:
     dependencies:
       readdirp: 4.1.2
 
-  chownr@1.1.4: {}
+  chownr@1.1.4:
+    optional: true
 
   ci-info@4.3.1: {}
 
@@ -8892,8 +8998,10 @@ snapshots:
   decompress-response@6.0.0:
     dependencies:
       mimic-response: 3.1.0
+    optional: true
 
-  deep-extend@0.6.0: {}
+  deep-extend@0.6.0:
+    optional: true
 
   deep-is@0.1.4: {}
 
@@ -8919,7 +9027,8 @@ snapshots:
 
   destr@2.0.5: {}
 
-  detect-libc@2.1.2: {}
+  detect-libc@2.1.2:
+    optional: true
 
   doctrine@2.1.0:
     dependencies:
@@ -9327,7 +9436,8 @@ snapshots:
     dependencies:
       pify: 2.3.0
 
-  expand-template@2.0.3: {}
+  expand-template@2.0.3:
+    optional: true
 
   exsolve@1.0.8: {}
 
@@ -9389,7 +9499,8 @@ snapshots:
     dependencies:
       flat-cache: 3.2.0
 
-  file-uri-to-path@1.0.0: {}
+  file-uri-to-path@1.0.0:
+    optional: true
 
   fill-range@7.1.1:
     dependencies:
@@ -9429,7 +9540,8 @@ snapshots:
       hasown: 2.0.2
       mime-types: 2.1.35
 
-  fs-constants@1.0.0: {}
+  fs-constants@1.0.0:
+    optional: true
 
   fs-extra@9.1.0:
     dependencies:
@@ -9510,7 +9622,8 @@ snapshots:
       nypm: 0.6.2
       pathe: 2.0.3
 
-  github-from-package@0.0.0: {}
+  github-from-package@0.0.0:
+    optional: true
 
   glob-parent@5.1.2:
     dependencies:
@@ -9631,7 +9744,8 @@ snapshots:
 
   inherits@2.0.4: {}
 
-  ini@1.3.8: {}
+  ini@1.3.8:
+    optional: true
 
   ini@2.0.0: {}
 
@@ -9983,7 +10097,8 @@ snapshots:
 
   mimic-function@5.0.1: {}
 
-  mimic-response@3.1.0: {}
+  mimic-response@3.1.0:
+    optional: true
 
   minimatch@3.1.2:
     dependencies:
@@ -9995,7 +10110,8 @@ snapshots:
 
   minimist@1.2.8: {}
 
-  mkdirp-classic@0.5.3: {}
+  mkdirp-classic@0.5.3:
+    optional: true
 
   ms@2.1.3: {}
 
@@ -10022,7 +10138,8 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  napi-build-utils@2.0.0: {}
+  napi-build-utils@2.0.0:
+    optional: true
 
   napi-postinstall@0.3.4: {}
 
@@ -10071,6 +10188,7 @@ snapshots:
   node-abi@3.85.0:
     dependencies:
       semver: 7.7.3
+    optional: true
 
   node-fetch-native@1.6.7: {}
 
@@ -10229,6 +10347,41 @@ snapshots:
 
   performance-now@2.1.0: {}
 
+  pg-cloudflare@1.2.7:
+    optional: true
+
+  pg-connection-string@2.9.1: {}
+
+  pg-int8@1.0.1: {}
+
+  pg-pool@3.10.1(pg@8.16.3):
+    dependencies:
+      pg: 8.16.3
+
+  pg-protocol@1.10.3: {}
+
+  pg-types@2.2.0:
+    dependencies:
+      pg-int8: 1.0.1
+      postgres-array: 2.0.0
+      postgres-bytea: 1.0.1
+      postgres-date: 1.0.7
+      postgres-interval: 1.2.0
+
+  pg@8.16.3:
+    dependencies:
+      pg-connection-string: 2.9.1
+      pg-pool: 3.10.1(pg@8.16.3)
+      pg-protocol: 1.10.3
+      pg-types: 2.2.0
+      pgpass: 1.0.5
+    optionalDependencies:
+      pg-cloudflare: 1.2.7
+
+  pgpass@1.0.5:
+    dependencies:
+      split2: 4.2.0
+
   picocolors@1.1.1: {}
 
   picomatch@2.3.1: {}
@@ -10290,6 +10443,18 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
+  postgres-array@2.0.0: {}
+
+  postgres-array@3.0.4: {}
+
+  postgres-bytea@1.0.1: {}
+
+  postgres-date@1.0.7: {}
+
+  postgres-interval@1.2.0:
+    dependencies:
+      xtend: 4.0.2
+
   postgres@3.4.7: {}
 
   preact-render-to-string@5.2.6(preact@10.28.1):
@@ -10315,6 +10480,7 @@ snapshots:
       simple-get: 4.0.1
       tar-fs: 2.1.4
       tunnel-agent: 0.6.0
+    optional: true
 
   prelude-ls@1.2.1: {}
 
@@ -10395,6 +10561,7 @@ snapshots:
       ini: 1.3.8
       minimist: 1.2.8
       strip-json-comments: 2.0.1
+    optional: true
 
   react-dom@18.3.1(react@18.3.1):
     dependencies:
@@ -10661,13 +10828,15 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  simple-concat@1.0.1: {}
+  simple-concat@1.0.1:
+    optional: true
 
   simple-get@4.0.1:
     dependencies:
       decompress-response: 6.0.0
       once: 1.4.0
       simple-concat: 1.0.1
+    optional: true
 
   slice-ansi@3.0.0:
     dependencies:
@@ -10818,7 +10987,8 @@ snapshots:
 
   strip-final-newline@3.0.0: {}
 
-  strip-json-comments@2.0.1: {}
+  strip-json-comments@2.0.1:
+    optional: true
 
   strip-json-comments@3.1.1: {}
 
@@ -10857,6 +11027,7 @@ snapshots:
       mkdirp-classic: 0.5.3
       pump: 3.0.3
       tar-stream: 2.2.0
+    optional: true
 
   tar-stream@2.2.0:
     dependencies:
@@ -10865,6 +11036,7 @@ snapshots:
       fs-constants: 1.0.0
       inherits: 2.0.4
       readable-stream: 3.6.2
+    optional: true
 
   text-table@0.2.0: {}
 
@@ -11114,6 +11286,8 @@ snapshots:
   xtend@2.1.2:
     dependencies:
       object-keys: 0.4.0
+
+  xtend@4.0.2: {}
 
   yallist@4.0.0: {}
 
