@@ -1,7 +1,7 @@
-import { type User } from "@prisma/client";
 import dayjs from "dayjs";
 import { ProfileTextInfo } from "~/components/ProfileTextInfo";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";
+import { type User } from "../../src/generated/prisma/client";
 import {
   buildTrpcMutationMock,
   user as defaultUser,
@@ -14,9 +14,9 @@ function ProfileTextInfoWrapper({ user }: { user: User }) {
   useMergedStoreContext((store) => store.setUserData)(user);
 
   // set mutations mocks
-  const updateUsernameStub = cy.stub().as("setUpdateUsername");
+  const updateUsernameAlias: string = "setUpdateUsername";
   useMergedStoreContext((store) => store.setUpdateUsername)(
-    buildTrpcMutationMock(updateUsernameStub),
+    buildTrpcMutationMock(updateUsernameAlias),
   );
 
   return <ProfileTextInfo />;

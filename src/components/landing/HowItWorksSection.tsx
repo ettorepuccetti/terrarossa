@@ -89,7 +89,7 @@ const HowItWorksSection = () => {
 
         {/* Steps */}
         <Grid container spacing={6}>
-          {steps.map((step, index) => (
+          {steps.map((step) => (
             <Grid item xs={12} sm={6} md={3} key={step.number}>
               <Box
                 sx={{

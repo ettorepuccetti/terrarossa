@@ -1,16 +1,11 @@
-import { createClient } from "@libsql/client";
-import { PrismaLibSQL } from "@prisma/adapter-libsql";
-import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { defineConfig } from "cypress";
 import dotenv from "dotenv";
+import { PrismaClient } from "~/generated/prisma/client";
 
 dotenv.config();
 
-const libsql = createClient({
-  url: process.env.TURSO_DATABASE_URL!,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
-const adapter = new PrismaLibSQL(libsql);
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 export default defineConfig({
@@ -27,6 +22,7 @@ export default defineConfig({
     env: {
       AUTH0_ISSUER: process.env.AUTH0_ISSUER,
     },
+    resolvedNodeVersion: "system",
     setupNodeEvents(on, config) {
       on("before:browser:launch", (browser, launchOptions) => {
         if (browser.family === "chromium" && browser.name !== "electron") {
@@ -152,7 +148,6 @@ function tasks(on: Cypress.PluginEvents) {
       return await prisma.user.update({
         data: {
           name: newUsername,
-          image: null,
         },
         where: {
           email: userMail,

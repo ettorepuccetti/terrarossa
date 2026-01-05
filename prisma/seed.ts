@@ -1,4 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import dotenv from "dotenv";
+import { PrismaClient } from "../src/generated/prisma/client";
 import {
   allEnglandAddress,
   allEnglandClubName,
@@ -13,7 +15,10 @@ import {
   pietrangeliCourtName,
 } from "../src/utils/constants";
 
-const prisma = new PrismaClient();
+dotenv.config();
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 async function main() {
   const foroItalico = await prisma.club.upsert({
     where: { name: foroItalicoName },

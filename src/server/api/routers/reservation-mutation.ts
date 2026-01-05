@@ -1,7 +1,7 @@
-import { type PrismaClient } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
 import dayjs from "dayjs";
 import { type Session } from "next-auth";
+import { type PrismaClient } from "~/generated/prisma/client";
 import {
   RecurrentReservationDeleteInputSchema,
   RecurrentReservationInputSchema,
@@ -189,10 +189,13 @@ export const reservationMutationRouter = createTRPCRouter({
         context: { apiEndPoint: "reservationMutationRouter.deleteOne" },
       });
       const clubSettings = await getClubSettings(ctx.prisma, input.clubId);
-      const reservationToDelete =
-        await ctx.prisma.reservation.findUniqueOrThrow({
-          where: { id: input.reservationId },
-        });
+      const reservationToDelete = await ctx.prisma.reservation.findUnique({
+        where: { id: input.reservationId },
+      });
+
+      if (!reservationToDelete) {
+        throw new TRPCClientError("No Reservation found");
+      }
 
       // checks for NON ADMIN user
       // TODO: check that user is admin of the club for which the reservation is made.

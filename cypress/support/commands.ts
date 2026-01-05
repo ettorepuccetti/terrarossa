@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import dayjs from "dayjs";
 
 export {};
@@ -57,7 +58,7 @@ Cypress.Commands.add("queryFilteredClubs", (filter) => {
 });
 
 Cypress.Commands.add("deleteAllReservationOfClub", (clubId: string) => {
-  return cy.task("prisma:deleteAllReservationOfClub", clubId);
+  cy.task("prisma:deleteAllReservationOfClub", clubId);
 });
 
 Cypress.Commands.add("getUsername", () => {

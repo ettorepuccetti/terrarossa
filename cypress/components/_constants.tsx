@@ -3,20 +3,12 @@ import { type EventImpl } from "@fullcalendar/core/internal";
 import { type ResourceApi } from "@fullcalendar/resource";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import {
-  type Address,
-  type Club,
-  type ClubSettings,
-  type Court,
-  type User,
-} from "@prisma/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, type TRPCClientErrorLike } from "@trpc/client";
 import {
   type UseTRPCMutationResult,
   type UseTRPCQueryResult,
 } from "@trpc/react-query/shared";
-import { type SinonStub } from "cypress/types/sinon";
 import dayjs from "dayjs";
 import "dayjs/locale/it";
 import { type Session } from "next-auth";
@@ -28,6 +20,13 @@ import lightTheme from "~/styles/lightTheme";
 import { api, getBaseUrl } from "~/utils/api";
 import { UserRoles } from "~/utils/constants";
 import createEmotionCache from "~/utils/createEmotionCache";
+import {
+  type Address,
+  type Club,
+  type ClubSettings,
+  type Court,
+  type User,
+} from "../../src/generated/prisma/client";
 
 export const session: Session = {
   expires: "2022-10-20T11:00:00.000Z",
@@ -224,23 +223,24 @@ export const mountWithContexts = (
 /**
  * Builds a mock of the trpc mutation hook with the given stub and input variables.
  * The returned object can be set in the store in place of the real mutation hook.
- * @param stub cypress stub to be used as mutation
+ * @param stubAlias cypress stub to be used as mutation
  * @param inputVariables input for the mutation
  * @returns a mock of the trpc mutation hook
  */
 export function buildTrpcMutationMock<TData, TVariables>(
-  stub: SinonStub,
+  stubAlias: string,
 ): UseTRPCMutationResult<
   TData,
   TRPCClientErrorLike<never>,
   TVariables,
   unknown
 > {
+  const stubInteral = cy.stub().as(stubAlias);
   return {
     data: undefined,
     error: null,
     status: "idle",
-    mutate: stub,
+    mutate: stubInteral,
     context: undefined,
     isError: false,
     isLoading: false,
@@ -252,7 +252,7 @@ export function buildTrpcMutationMock<TData, TVariables>(
     failureReason: null,
     isPaused: false,
     variables: undefined, //input will be passed as argument to the stub, unclear how still...
-    mutateAsync: stub.resolves(),
+    mutateAsync: stubInteral.resolves(),
     trpc: { path: "" },
   };
 }
