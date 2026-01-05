@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import dayjs from "dayjs";
 
 export {};
@@ -63,9 +64,9 @@ Cypress.Commands.add("deleteAllReservationOfClub", (clubId: string) => {
 Cypress.Commands.add("getUsername", () => {
   cy.request("http://localhost:3000/api/auth/session").then(
     (response: { body: { user: { name: string } } }) => {
-      void expect(response.body).to.not.be.undefined;
-      void expect(response.body.user).to.not.be.undefined;
-      void expect(response.body.user.name).to.not.be.undefined;
+      expect(response.body).to.not.be.undefined;
+      expect(response.body.user).to.not.be.undefined;
+      expect(response.body.user.name).to.not.be.undefined;
 
       return response.body.user.name;
     },

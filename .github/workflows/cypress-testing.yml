@@ -46,7 +46,7 @@ jobs:
       - name: install pnpm
         uses: pnpm/action-setup@v4
       - name: Cypress install
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@2ad32e649e4db26c07674ebae31a297601dbcbaf # v6.10.8
         with:
           build: pnpm build:test
           runTests: false
@@ -78,7 +78,7 @@ jobs:
           name: build
           path: .next
       - name: "UI Tests - Chrome"
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@2ad32e649e4db26c07674ebae31a297601dbcbaf # v6.10.8
         with:
           # use build step to seed the database, build is already done in install job
           build: pnpm run db:seed
@@ -108,7 +108,7 @@ jobs:
           name: build
           path: .next
       - name: "UI Tests - Chrome - Mobile"
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@2ad32e649e4db26c07674ebae31a297601dbcbaf # v6.10.8
         with:
           config: "viewportWidth=375,viewportHeight=667"
           #use build step to seed the database, build is already done in install job
@@ -133,7 +133,7 @@ jobs:
           name: build
           path: .next
       - name: Run Component Testing
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@2ad32e649e4db26c07674ebae31a297601dbcbaf # v6.10.8
         with:
           component: true
           config-file: cypress.config.ts

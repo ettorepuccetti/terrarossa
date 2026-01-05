@@ -1,7 +1,7 @@
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { defineConfig } from "cypress";
 import dotenv from "dotenv";
-import path from "path";
+import path from "node:path";
 import { PrismaClient } from "~/generated/prisma/client";
 
 dotenv.config();
