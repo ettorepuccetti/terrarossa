@@ -74,7 +74,6 @@ jobs:
       - name: install pnpm
         uses: pnpm/action-setup@v4
 
-      - run: rm -rf node_modules && pnpm install
       - run: pnpm rebuild better-sqlite3
 
       - name: Download the build folders
