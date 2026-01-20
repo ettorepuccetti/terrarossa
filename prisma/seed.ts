@@ -20,6 +20,11 @@ dotenv.config();
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 async function main() {
+  await prisma.club.deleteMany();
+  await prisma.phoneNumber.deleteMany();
+  await prisma.address.deleteMany();
+  await prisma.clubSettings.deleteMany();
+
   const foroItalico = await prisma.club.upsert({
     where: { name: foroItalicoName },
     update: {},
@@ -30,7 +35,7 @@ async function main() {
       Address: {
         create: foroItalicoAddress,
       },
-      PhoneNumber: {
+      phoneNumber: {
         create: foroItalicoPhone,
       },
       mail: "ticketoffice@federtennis.it",
@@ -73,7 +78,7 @@ async function main() {
       Address: {
         create: allEnglandAddress,
       },
-      PhoneNumber: {
+      phoneNumber: {
         create: allEnglandPhone,
       },
       mail: "info@wimbledon-village.com",

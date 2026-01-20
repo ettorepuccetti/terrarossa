@@ -25,7 +25,7 @@ function CalendarHeaderContext(props: { session: Session; clubId: string }) {
       ...clubSettings,
     },
     Address: null,
-    PhoneNumber: null,
+    phoneNumber: null,
   });
 
   // create reservation query mock

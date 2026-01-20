@@ -47,7 +47,7 @@ async function main() {
       Address: {
         create: foroItalicoAddress,
       },
-      PhoneNumber: { create: foroItalicoPhone },
+      phoneNumber: { create: foroItalicoPhone },
       mail: "ticketoffice@federtennis.it",
       clubSettings: {
         create: {
@@ -66,7 +66,7 @@ async function main() {
       imageSrc: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "wimbledon-image.jpg",
       logoSrc: process.env.NEXT_PUBLIC_R2_BUCKET_URL + "wimbledon-logo.png",
       Address: { create: allEnglandAddress },
-      PhoneNumber: { create: allEnglandPhone },
+      phoneNumber: { create: allEnglandPhone },
       mail: "info@wimbledon-village.com",
       clubSettings: {
         create: {

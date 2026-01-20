@@ -43,13 +43,15 @@ model User {
   emailVerified DateTime?
   image         String?
   role          String        @default("USER")
-  clubId        String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime?     @updatedAt
   accounts      Account[]
   Reservation   Reservation[]
   sessions      Session[]
   Club          Club?         @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId        String?
+  phoneNumber   PhoneNumber?  @relation("UserPhoneNumber", fields: [phoneNumberId], references: [id])
+  phoneNumberId String?       @unique
 
   @@index([clubId])
 }
@@ -108,25 +110,24 @@ model Club {
   name           String       @unique
   imageSrc       String?
   logoSrc        String?
-  clubSettingsId String       @unique
   mail           String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime?    @updatedAt
+  courts         Court[]
+  Admin          User[]
   Address        Address?
   clubSettings   ClubSettings @relation(fields: [clubSettingsId], references: [id])
-  courts         Court[]
-  PhoneNumber    PhoneNumber?
-  Admin          User[]
+  clubSettingsId String       @unique
+  phoneNumber    PhoneNumber? @relation("ClubPhoneNumber", fields: [phoneNumberId], references: [id])
+  phoneNumberId  String?      @unique
 }
 
 model PhoneNumber {
   id             String @id @unique @default(cuid())
   number         String
   nationalPrefix String
-  clubId         String @unique
-  Club           Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
-
-  @@index([clubId])
+  club           Club?  @relation("ClubPhoneNumber")
+  user           User?  @relation("UserPhoneNumber")
 }
 
 model Address {

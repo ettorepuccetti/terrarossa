@@ -22,7 +22,7 @@ function EventDetailDialogWrapper(props: { startDate: Date; endDate: Date }) {
   useMergedStoreContext((store) => store.setClubData)({
     ...club,
     Address: null,
-    PhoneNumber: null,
+    phoneNumber: null,
     clubSettings: clubSettings,
   });
 
