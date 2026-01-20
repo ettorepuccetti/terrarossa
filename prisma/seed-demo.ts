@@ -1,9 +1,9 @@
-import { createClient } from "@libsql/client";
-import { PrismaLibSQL } from "@prisma/adapter-libsql";
-import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import dotenv from "dotenv";
+import { PrismaClient } from "../src/generated/prisma/client";
 import {
   allEnglandAddress,
   allEnglandClubName,
@@ -18,22 +18,17 @@ import {
   pietrangeliCourtName,
 } from "../src/utils/constants";
 
+dotenv.config();
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 dayjs.tz.setDefault("Europe/Rome");
 
-const libsql = createClient({
-  url: process.env.TURSO_DATABASE_URL!,
-  syncUrl: process.env.TURSO_SYNC_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
-const adapter = new PrismaLibSQL(libsql);
-
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  //clean up - TODO: fully erase the db
   await prisma.recurrentReservation.deleteMany();
   await prisma.reservation.deleteMany();
   await prisma.club.deleteMany();
@@ -319,7 +314,6 @@ async function main() {
 
 main()
   .then(async () => {
-    await libsql.sync();
     await prisma.$disconnect();
   })
   .catch(async (e) => {

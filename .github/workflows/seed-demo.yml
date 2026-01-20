@@ -8,9 +8,7 @@ env:
   NODE_ENV: "test" # see: https://github.com/vercel/next.js/issues/55804#issuecomment-1735124191.
   NEXT_PUBLIC_APP_ENV: "test"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  TURSO_DATABASE_URL: "file:./prisma/dev.db"
-  TURSO_SYNC_URL: ${{ secrets.TURSO_DEMO_SYNC_URL }}
-  TURSO_AUTH_TOKEN: ${{ secrets.TURSO_DEMO_AUTH_TOKEN }}
+  DATABASE_URL: ${{secrets.DEMO_DATABASE_URL}}
   CYPRESS_ADMIN_FORO_MAIL: ${{secrets.CYPRESS_ADMIN_FORO_MAIL}}
   CYPRESS_ADMIN_FORO_PWD: ${{secrets.CYPRESS_ADMIN_FORO_PWD}}
   CYPRESS_ADMIN_ALLENGLAND_MAIL: ${{secrets.CYPRESS_ADMIN_ALLENGLAND_MAIL}}
@@ -36,10 +34,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version-file: ".nvmrc"
 
       - name: Install dependencies
         run: pnpm install
+
+      # erase the db and push new schema
+      - name: reset db
+        run: pnpm prisma db push --force-reset
 
       - name: Seed demo
         run: pnpm db:seed:demo

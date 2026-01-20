@@ -27,13 +27,13 @@ function EventDetailDialogWrapper(props: { startDate: Date; endDate: Date }) {
   });
 
   // create mutations mocks
-  const deleteOne = cy.stub().as("deleteOne");
-  const deleteRecurrent = cy.stub().as("deleteRecurrent");
+  const deleteOneAlias: string = "deleteOne";
+  const deleteRecurrentAlias: string = "deleteRecurrent";
   const reservationDelete = buildTrpcMutationMock(
-    deleteOne,
+    deleteOneAlias,
   ) as ReservationDeleteType;
   const recurrentReservationDelete = buildTrpcMutationMock(
-    deleteRecurrent,
+    deleteRecurrentAlias,
   ) as RecurrentReservationDeleteType;
 
   // set eventDetails

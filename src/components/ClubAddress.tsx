@@ -1,6 +1,6 @@
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { Box, Typography } from "@mui/material";
-import { type Address } from "@prisma/client";
+import { type Address } from "~/generated/prisma/client";
 
 export const ClubAddress = ({ address }: { address: Address | null }) => {
   if (!address) {

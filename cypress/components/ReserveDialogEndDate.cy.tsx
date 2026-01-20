@@ -1,5 +1,5 @@
 import { type DateClickArg } from "@fullcalendar/interaction";
-import { type ClubSettings } from "@prisma/client";
+import { type ClubSettings } from "../../src/generated/prisma/client";
 import dayjs from "dayjs";
 import ReserveDialogEndDate from "~/components/ReserveDialogEndDate";
 import { useMergedStoreContext } from "~/hooks/useMergedStoreContext";

@@ -11,7 +11,7 @@ env:
   NEXT_PUBLIC_APP_ENV: "test"
   DEBUG: "cypress:server:args"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  TURSO_DATABASE_URL: "file:./prisma/dev.db"
+  DATABASE_URL: "postgresql://terrarossa:terrarossa@postgres:5432/terrarossa"
   NEXTAUTH_SECRET: ${{secrets.NEXTAUTH_SECRET}}
   NEXTAUTH_URL: ${{vars.NEXTAUTH_URL}}
   AUTH0_CLIENT_ID: ${{secrets.AUTH0_CLIENT_ID}}
@@ -46,7 +46,7 @@ jobs:
       - name: install pnpm
         uses: pnpm/action-setup@v4
       - name: Cypress install
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@2ad32e649e4db26c07674ebae31a297601dbcbaf # v6.10.8
         with:
           build: pnpm build:test
           runTests: false
@@ -63,9 +63,27 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: cypress/browsers:latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: terrarossa
+          POSTGRES_PASSWORD: terrarossa
+          POSTGRES_DB: terrarossa
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
       - name: install pnpm
         uses: pnpm/action-setup@v4
       - name: Download the build folders
@@ -74,24 +92,44 @@ jobs:
           name: build
           path: .next
       - name: "UI Tests - Chrome"
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@2ad32e649e4db26c07674ebae31a297601dbcbaf # v6.10.8
         with:
           # use build step to seed the database, build is already done in install job
-          build: npm run db:seed
-          start: npm start
+          build: pnpm run db:seed
+          start: pnpm start
           wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           browser: chrome
           config-file: cypress.config.ts
+        env:
+          DATABASE_URL: "postgresql://terrarossa:terrarossa@postgres:5432/terrarossa"
 
   ui-chrome-mobile-tests:
     needs: install
     runs-on: ubuntu-latest
     container:
       image: cypress/browsers:latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: terrarossa
+          POSTGRES_PASSWORD: terrarossa
+          POSTGRES_DB: terrarossa
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
       - name: install pnpm
         uses: pnpm/action-setup@v4
       - name: Download the build folders
@@ -100,7 +138,7 @@ jobs:
           name: build
           path: .next
       - name: "UI Tests - Chrome - Mobile"
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@2ad32e649e4db26c07674ebae31a297601dbcbaf # v6.10.8
         with:
           config: "viewportWidth=375,viewportHeight=667"
           #use build step to seed the database, build is already done in install job
@@ -110,6 +148,8 @@ jobs:
           wait-on-timeout: 120
           browser: chrome
           config-file: cypress.config.ts
+        env:
+          DATABASE_URL: "postgresql://terrarossa:terrarossa@postgres:5432/terrarossa"
 
   component-testing:
     needs: install
@@ -125,7 +165,7 @@ jobs:
           name: build
           path: .next
       - name: Run Component Testing
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@2ad32e649e4db26c07674ebae31a297601dbcbaf # v6.10.8
         with:
           component: true
           config-file: cypress.config.ts
